@@ -1,0 +1,5 @@
+DB_HOST=localhost
+DB_NAME=produccion-limpia
+DB_USER=root
+DB_PASS=TuContraseñaSegura
+DB_CHARSET=utf8mb4

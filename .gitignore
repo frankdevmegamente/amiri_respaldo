@@ -1,0 +1,31 @@
+# Archivos de entorno
+.env
+.env.*
+!.env.example
+
+# Archivos subidos por usuarios
+uploads/*
+!uploads/.gitkeep
+
+# Dependencias
+node_modules/
+
+# Configuraciones del editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+logs/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporales
+*.tmp
+*.temp
+*.cache

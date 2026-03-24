@@ -1,0 +1,134 @@
+# =====================================================
+# CONFIGURACIÓN DE SEGURIDAD - SISTEMA AMIRI
+# =====================================================
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # =====================================
+    # FORZAR HTTPS EN PRODUCCIÓN
+    # =====================================
+    # DESCOMENTAR LAS SIGUIENTES LÍNEAS EN PRODUCCIÓN:
+    # RewriteCond %{HTTPS} off
+    # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    
+    # =====================================
+    # PREVENIR ACCESO DIRECTO A ARCHIVOS SENSIBLES
+    # =====================================
+    # Bloquear acceso a config
+    RewriteRule ^src/config/.* - [F,L]
+    
+    # Bloquear acceso a .env
+    RewriteRule ^\.env$ - [F,L]
+    
+    # Bloquear acceso a archivos de log
+    RewriteRule ^logs/.* - [F,L]
+    
+    # Bloquear acceso a backups
+    RewriteRule ^backups/.* - [F,L]
+    
+    # Bloquear acceso a vendor (opcional, si no necesitas acceso público)
+    # RewriteRule ^vendor/.* - [F,L]
+</IfModule>
+
+# =====================================
+# HEADERS DE SEGURIDAD
+# =====================================
+<IfModule mod_headers.c>
+    # Prevenir XSS
+    Header set X-Content-Type-Options "nosniff"
+    
+    # Prevenir clickjacking
+    Header set X-Frame-Options "SAMEORIGIN"
+    
+    # Protección XSS del navegador
+    Header set X-XSS-Protection "1; mode=block"
+    
+    # Política de referrer
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Content Security Policy (ajustar según necesidad)
+    # Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';"
+    
+    # Prevenir MIME sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # HSTS - Forzar HTTPS por 1 año (DESCOMENTAR EN PRODUCCIÓN)
+    # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+# =====================================
+# PROTECCIÓN DE ARCHIVOS
+# =====================================
+# Denegar acceso a archivos ocultos (que empiezan con punto)
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# Bloquear acceso a archivos de configuración
+<FilesMatch "\.(env|ini|log|sh|sql)$">
+    Require all denied
+</FilesMatch>
+
+# =====================================
+# COMPRESIÓN GZIP
+# =====================================
+<IfModule mod_deflate.c>
+    # Comprimir HTML, CSS, JavaScript, Text, XML
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+    AddOutputFilterByType DEFLATE application/xml application/xhtml+xml application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript application/x-javascript
+    AddOutputFilterByType DEFLATE application/json
+</IfModule>
+
+# =====================================
+# CACHÉ DEL NAVEGADOR
+# =====================================
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # Imágenes
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+    
+    # CSS y JavaScript
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType application/x-javascript "access plus 1 month"
+    
+    # Fuentes
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType application/font-woff "access plus 1 year"
+    ExpiresByType application/font-woff2 "access plus 1 year"
+    
+    # HTML - No cachear
+    ExpiresByType text/html "access plus 0 seconds"
+    
+    # JSON - No cachear
+    ExpiresByType application/json "access plus 0 seconds"
+</IfModule>
+
+# =====================================
+# LÍMITE DE TAMAÑO DE ARCHIVO (upload)
+# =====================================
+# Ajustar según necesidad
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+
+# =====================================
+# DESACTIVAR LISTADO DE DIRECTORIOS
+# =====================================
+Options -Indexes
+
+# =====================================
+# PÁGINA DE ERROR PERSONALIZADA
+# =====================================
+# ErrorDocument 404 /404.php
+# ErrorDocument 403 /403.php
+# ErrorDocument 500 /500.php

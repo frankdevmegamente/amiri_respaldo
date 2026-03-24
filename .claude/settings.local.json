@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -1 /c/laragon/www/amiriApp/api/*.php)",
+      "Bash(mysql -u root -pTuContraseñaSegura -e \"SHOW DATABASES;\")",
+      "Bash(mysql -u root -pTuContraseñaSegura guiaspar_amiri_db -e \"SHOW TABLES;\")",
+      "Bash(mysql -u root -pTuContraseñaSegura guiaspar_amiri_db -e \"SELECT * FROM servicios ORDER BY id;\")",
+      "Bash(mysql -u root -pTuContraseñaSegura guiaspar_amiri_db -e \"DESCRIBE deudas_clientes;\")",
+      "Bash(mysql -u root -pTuContraseñaSegura guiaspar_amiri_db -e \"DESCRIBE deudas_empresa;\")",
+      "Bash(mysql -u root -pTuContraseñaSegura guiaspar_amiri_db -e \"DESCRIBE pagos_promotores;\")",
+      "Bash(mysql -u root -pTuContraseñaSegura guiaspar_amiri_db -e \"DESCRIBE movimientos;\")",
+      "Bash(mysql -u root -pTuContraseñaSegura guiaspar_amiri_db -e \"DESCRIBE inventario_monedas;\")"
+    ]
+  }
+}
