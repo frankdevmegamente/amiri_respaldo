@@ -9,3 +9,5 @@
 [2026-03-17 14:42:14] [INFO] Préstamo creado exitosamente {"prestamo_id":"1"}
 [2026-03-19 17:29:13] [INFO] Cliente desactivado exitosamente {"cliente_id":1,"nombre":"Cliente Pepe"}
 [2026-03-19 17:30:52] [INFO] Préstamo creado exitosamente {"prestamo_id":"1"}
+[2026-03-24 12:42:59] [INFO] Préstamo creado exitosamente {"prestamo_id":"2"}
+[2026-03-24 16:55:03] [INFO] Préstamo creado exitosamente {"prestamo_id":"3"}
