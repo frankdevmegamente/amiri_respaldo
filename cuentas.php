@@ -42,6 +42,34 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
+    <style>
+        #cuentasTab .nav-link.active {
+            color: #5D87FF !important;
+            background-color: transparent !important;
+            border-bottom: 2px solid #5D87FF !important;
+            border-top: none;
+            border-left: none;
+            border-right: none;
+            font-weight: 600;
+        }
+        #cuentasTab .nav-link:not(.active) {
+            border: none;
+            color: #64748b;
+        }
+        #cuentasTab .nav-link:not(.active):hover {
+            color: #5D87FF;
+        }
+         body[data-bs-theme="dark"] .logo-modo-claro,
+        .dark-mode .logo-modo-claro {
+            display: none !important;
+        }
+
+        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        .dark-mode .logo-modo-oscuro {
+            display: block !important;
+        }
+    </style>
+
 </head>
 
 
@@ -62,7 +90,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
-                <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+                <div class="container-fluid px-4" style="max-width: 95%;">
                     <div class="row">
                         <div class="col-12">
                             <div class="page-breadcrumb d-flex align-items-center mb-3 mt-2">
@@ -97,7 +125,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         <div class="tab-pane fade show active" id="bancaria" role="tabpanel">
                             <div class="card">
                                 <div class="card-body p-4">
-                                    <table id="tablaCuentasBancarias" class="table table-striped" style="width:100%">
+                                    <table id="tablaCuentasBancarias" class="table table-hover align-middle w-100">
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
@@ -642,16 +670,20 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
 
 
-            const badgeOK = () => '<span class="badge bg-success">Activa</span>';
-
-            const badgeNO = () => '<span class="badge bg-danger">Inactiva</span>';
-
+            // Etiquetas de estado con estilo suave
+            const badgeOK = () => '<span class="badge bg-success bg-opacity-10 text-success border-0">Activa</span>';
+            const badgeNO = () => '<span class="badge bg-danger bg-opacity-10 text-danger border-0">Inactiva</span>';
+            
+            // Botones de acción con estilo Soft Badge
             const botones = (id, tipo) => `
-
-<button class="btn btn-warning btn-sm" onclick="editarCuenta(${id},${tipo})"><i class="ti ti-edit"></i></button>
-
-<button class="btn btn-danger btn-sm" onclick="eliminarCuenta(${id})"><i class="ti ti-trash"></i></button>
-
+<div class="d-flex align-items-center">
+    <button class="badge bg-warning bg-opacity-10 text-warning border-0 me-2" style="cursor: pointer; font-size: 0.75rem;" onclick="editarCuenta(${id},${tipo})" title="Editar">
+        <i class="ti ti-pencil"></i> Editar
+    </button>
+    <button class="badge bg-danger bg-opacity-10 text-danger border-0" style="cursor: pointer; font-size: 0.75rem;" onclick="eliminarCuenta(${id})" title="Eliminar">
+        <i class="ti ti-trash"></i> Eliminar
+    </button>
+</div>
 `;
 
 

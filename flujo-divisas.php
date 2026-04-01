@@ -135,7 +135,15 @@ $serviciosDivisas = [
             color: white;
 
         }
+ body[data-bs-theme="dark"] .logo-modo-claro,
+        .dark-mode .logo-modo-claro {
+            display: none !important;
+        }
 
+        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        .dark-mode .logo-modo-oscuro {
+            display: block !important;
+        }
     </style>
 
 </head>

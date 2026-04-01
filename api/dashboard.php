@@ -422,62 +422,44 @@ try {
 
 
 
-        // Calcular total de gastos
-
-        $sqlGastos = "SELECT COALESCE(SUM(monto), 0) as total
-
+        // Calcular total de gastos y su desglose (Fijos / Variables)
+        $sqlGastos = "SELECT 
+                        COALESCE(SUM(fm.monto), 0) as total,
+                        COALESCE(SUM(CASE WHEN g.clasificacion = 'fijo' THEN fm.monto ELSE 0 END), 0) as fijos,
+                        COALESCE(SUM(CASE WHEN g.clasificacion = 'variable' THEN fm.monto ELSE 0 END), 0) as variables
                       FROM movimientos fm
-
+                      LEFT JOIN gastos g ON fm.gasto_id = g.id
                       WHERE fm.tipo = 'salida' AND fm.activo = 1
-
                       AND fm.cuenta_origen_id = :cuentaId";
-
         
-
         $sqlGastos .= $filtroFecha;
-
         
-
         $stmtGastos = $pdo->prepare($sqlGastos);
-
         $stmtGastos->execute($params);
+        $gastosRow = $stmtGastos->fetch(PDO::FETCH_ASSOC);
 
-        $totalGastos = (float)$stmtGastos->fetchColumn();
-
-
+        $totalGastos = (float)$gastosRow['total'];
+        $gastosFijos = (float)$gastosRow['fijos'];
+        $gastosVariables = (float)$gastosRow['variables'];
 
         // Calcular remanente (comisiones - gastos)
-
         $remanente = $totalComisiones - $totalGastos;
 
-
-
         // GENERAR PDF
-
         if (isset($_GET['pdf'])) {
-
             generarPDFComisionesAmiri($pdo, $totalComisiones, $totalGastos, $remanente, $graficaData, $params, $filtroFecha, $cuentaAmiriId);
-
             exit;
-
         }
 
-
-
-        jsonResponse([
-
+        echo json_encode([
             'total_comisiones' => $totalComisiones,
-
             'total_gastos' => $totalGastos,
-
+            'gastos_fijos' => $gastosFijos,
+            'gastos_variables' => $gastosVariables,
             'remanente' => $remanente,
-
             'grafica_fechas' => $grafica_fechas,
-
             'grafica_montos' => $grafica_montos
-
         ]);
-
         exit;
 
     }

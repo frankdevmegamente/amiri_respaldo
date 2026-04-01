@@ -109,7 +109,15 @@ $serviciosDivisas = [
         .badge-usd  { background: linear-gradient(135deg, #0ea5e9, #2563eb); color: white; }
 
         .badge-usdt { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+ body[data-bs-theme="dark"] .logo-modo-claro,
+        .dark-mode .logo-modo-claro {
+            display: none !important;
+        }
 
+        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        .dark-mode .logo-modo-oscuro {
+            display: block !important;
+        }
     </style>
 
 </head>
@@ -132,7 +140,7 @@ $serviciosDivisas = [
 
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
-                <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+                <div class="container-fluid px-4" style="max-width: 95%;">
 
                     <div class="row mb-3 mt-2">
                         <div class="col-12 d-flex align-items-center gap-2">
@@ -256,8 +264,22 @@ $serviciosDivisas = [
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
+                                <div class="card-header bg-white pt-4 pb-0 border-bottom">
+                                    <ul class="nav nav-tabs border-0" id="tabsFlujo" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active border-0 border-bottom border-2 border-primary text-primary fw-semibold" id="tab-activos" data-vista="activos" data-bs-toggle="tab" type="button" role="tab" style="background: transparent;">
+                                                <i class="ti ti-list-check fs-5 me-1"></i> Movimientos Activos
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link border-0 text-muted fw-semibold" id="tab-anulados" data-vista="anulados" data-bs-toggle="tab" type="button" role="tab" style="background: transparent;">
+                                                <i class="ti ti-trash-x fs-5 me-1"></i> Anulados / Revertidos
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
                                 <div class="card-body p-4">
-                                    <table id="tablaFlujo" class="table table-striped w-100">
+                                    <table id="tablaFlujo" class="table table-hover align-middle w-100">
                                         <thead>
                                             <tr>
                                                 <th>Grupo</th>
@@ -695,133 +717,93 @@ $serviciosDivisas = [
             ajax: { url: 'api/flujo-lista.php?servicios_ids=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15', dataSrc: 'data' },
 
             columns: [
-
                 {
-
                     data: 'grupo_id', title: 'Grupo', visible: false,
-
-                    render: d => '<span class="badge bg-secondary">#' + d + '</span>'
-
+                    render: d => '<span class="badge bg-secondary bg-opacity-10 text-secondary border-0">#' + d + '</span>'
                 },
-
-                { data: 'fecha', title: 'Fecha' },
-
+                { 
+                    data: 'fecha', title: 'Fecha',
+                    render: function(data, type, row) {
+                        if (!data) return '';
+                        // Esta es la fecha REAL de la operación que tú elegiste
+                        const partes = data.split('-');
+                        const fechaOperacion = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                        
+                        let infoExtra = '';
+                        
+                        // Si el movimiento fue anulado, mostrar con letras rojas cuándo lo anulaste
+                        if (row.estado === 'anulado' || row.estado === 'corregido') {
+                            let anulado = (row.corregido_en && typeof formatearFechaHora === 'function') ? formatearFechaHora(row.corregido_en) : (row.corregido_en || row.creado_en);
+                            infoExtra = `<br><small class="text-danger" style="font-size: 0.7rem;"><i class="ti ti-trash-x"></i> Anulado: ${anulado}</small>`;
+                        } 
+                        // Si el movimiento es normal, mostrar cuándo lo capturaste
+                        else if (row.creado_en) {
+                            let captura = typeof formatearFechaHora === 'function' ? formatearFechaHora(row.creado_en) : row.creado_en;
+                            infoExtra = `<br><small class="text-muted" style="font-size: 0.7rem;"><i class="ti ti-device-floppy"></i> Capturado: ${captura}</small>`;
+                        }
+                        
+                        // La fecha operativa siempre manda arriba y en negritas
+                        return `<span class="fw-bold text-dark">${fechaOperacion}</span>${infoExtra}`;
+                    }
+                },
                 {
-
                     data: 'tipo_principal', title: 'Tipo', defaultContent: '',
-
                     render: function (d) {
-
-                        if (!d) return '<span class="badge bg-secondary">-</span>';
-
-                        if (d === 'Entrada')       return '<span class="badge bg-success">✓ Entrada</span>';
-
-                        if (d === 'Salida')        return '<span class="badge bg-danger">✗ Salida</span>';
-
-                        if (d === 'Traspaso')      return '<span class="badge bg-primary">⇄ Traspaso</span>';
-
-                        if (d === 'Entrada/Salida') return '<span class="badge bg-warning">⇅ Entrada/Salida</span>';
-
-                        return '<span class="badge bg-secondary">' + d + '</span>';
-
+                        if (!d) return '<span class="badge bg-secondary bg-opacity-10 text-secondary border-0">-</span>';
+                        if (d === 'Entrada')       return '<span class="badge bg-success bg-opacity-10 text-success border-0">✓ Entrada</span>';
+                        if (d === 'Salida')        return '<span class="badge bg-danger bg-opacity-10 text-danger border-0">✗ Salida</span>';
+                        if (d === 'Traspaso')      return '<span class="badge bg-primary bg-opacity-10 text-primary border-0">⇄ Traspaso</span>';
+                        if (d === 'Entrada/Salida') return '<span class="badge bg-warning bg-opacity-10 text-warning border-0">⇅ Entrada/Salida</span>';
+                        return '<span class="badge bg-secondary bg-opacity-10 text-secondary border-0">' + d + '</span>';
                     }
-
                 },
-
                 {
-
                     data: 'servicio', title: 'Servicio',
-
-                    render: d => '<strong>' + d + '</strong>'
-
+                    render: d => '<strong class="text-dark">' + d + '</strong>'
                 },
-
                 {
-
                     data: 'cantidad_movimientos', title: 'Movimientos',
-
-                    render: d => '<span class="badge bg-info">' + d + ' mov.</span>'
-
+                    render: d => '<span class="badge bg-info bg-opacity-10 text-info border-0">' + d + ' mov.</span>'
                 },
-
                 {
-
                     data: null, title: 'Monto',
-
                     render: function (data, type, row) {
-
                         let monto = parseFloat(row.monto_principal);
-
                         return '<span class="fw-bold text-success">$' + monto.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</span>';
-
                     }
-
                 },
-
                 {
-
                     data: 'moneda', title: 'Moneda',
-
                     render: function (d) {
-
-                        if (d === 'USD')  return '<span class="badge badge-usd">USD</span>';
-
-                        if (d === 'USDT') return '<span class="badge badge-usdt">USDT</span>';
-
-                        return '<span class="badge bg-secondary">' + d + '</span>';
-
+                        if (d === 'USD')  return '<span class="badge bg-primary bg-opacity-10 text-primary border-0">USD</span>';
+                        if (d === 'USDT') return '<span class="badge bg-info bg-opacity-10 text-info border-0">USDT</span>';
+                        return '<span class="badge bg-success bg-opacity-10 text-success border-0">' + d + '</span>';
                     }
-
                 },
-
                 {
-
                     data: null, title: 'Involucrados',
-
                     render: function (data, type, row) {
-
-                        let html = '<div style="font-size:0.875rem;">';
-
-                        if (row.cliente  && row.cliente.trim())  html += '<div><i class="ti ti-user text-primary"></i> <strong>Cliente:</strong> ' + row.cliente + '</div>';
-
-                        if (row.proveedor && row.proveedor.trim()) html += '<div><i class="ti ti-building text-info"></i> <strong>Proveedor:</strong> ' + row.proveedor + '</div>';
-
-                        if (row.promotor  && row.promotor.trim())  html += '<div><i class="ti ti-user-star text-warning"></i> <strong>Promotor:</strong> ' + row.promotor + '</div>';
-
+                        let html = '<div style="font-size:0.85rem; line-height: 1.4;">';
+                        if (row.cliente  && row.cliente.trim())  html += '<div><i class="ti ti-user text-primary"></i> <strong class="text-dark">Cliente:</strong> <span class="text-muted">' + row.cliente + '</span></div>';
+                        if (row.proveedor && row.proveedor.trim()) html += '<div><i class="ti ti-building text-info"></i> <strong class="text-dark">Proveedor:</strong> <span class="text-muted">' + row.proveedor + '</span></div>';
+                        if (row.promotor  && row.promotor.trim())  html += '<div><i class="ti ti-user-star text-warning"></i> <strong class="text-dark">Promotor:</strong> <span class="text-muted">' + row.promotor + '</span></div>';
                         if (row.cuentas_origen && row.cuentas_origen.trim()) {
-
                             let c = row.cuentas_origen.split(',').filter(x => x.trim());
-
-                            if (c.length) html += '<div><i class="ti ti-arrow-right text-danger"></i> <strong>Origen:</strong> ' + c[0] + '</div>';
-
+                            if (c.length) html += '<div><i class="ti ti-arrow-right text-danger"></i> <strong class="text-dark">Origen:</strong> <span class="text-muted">' + c[0] + '</span></div>';
                         }
-
                         if (row.cuentas_destino && row.cuentas_destino.trim()) {
-
                             let c = row.cuentas_destino.split(',').filter(x => x.trim());
-
-                            if (c.length) html += '<div><i class="ti ti-arrow-left text-success"></i> <strong>Destino:</strong> ' + c[0] + '</div>';
-
+                            if (c.length) html += '<div><i class="ti ti-arrow-left text-success"></i> <strong class="text-dark">Destino:</strong> <span class="text-muted">' + c[0] + '</span></div>';
                         }
-
                         html += '</div>';
-
                         return html || '<small class="text-muted">Sin datos</small>';
-
                     }
-
                 },
-
                 {
-
                     data: null, title: 'Acciones', orderable: false,
-
                     render: (data, type, row) =>
-
-                        '<button class="btn btn-sm btn-primary btn-ver" data-id="' + row.id + '" data-grupo="' + row.grupo_id + '"><i class="ti ti-eye"></i> Ver</button>'
-
+                        '<button class="badge bg-primary bg-opacity-10 text-primary border-0 btn-ver" style="cursor: pointer; font-size: 0.75rem;" data-id="' + row.id + '" data-grupo="' + row.grupo_id + '"><i class="ti ti-eye"></i> Ver Detalle</button>'
                 }
-
             ],
 
             language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
@@ -832,6 +814,18 @@ $serviciosDivisas = [
 
             responsive: true
 
+        });
+
+        // ─── EVENTO PARA CAMBIAR ENTRE PESTAÑAS (ACTIVOS / ANULADOS) ───
+        $('#tabsFlujo button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+            // Cambiar estilos de la pestaña activa
+            $('#tabsFlujo button').removeClass('border-bottom border-2 border-primary text-primary').addClass('text-muted');
+            $(e.target).removeClass('text-muted').addClass('border-bottom border-2 border-primary text-primary');
+
+            // Recargar la tabla con la nueva vista
+            let vistaActual = $(e.target).data('vista');
+            let nuevaUrl = 'api/flujo-lista.php?servicios_ids=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15&vista=' + vistaActual;
+            table.ajax.url(nuevaUrl).load();
         });
 
 

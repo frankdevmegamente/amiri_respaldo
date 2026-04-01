@@ -42,7 +42,17 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
 </head>
 
+<style>
+     body[data-bs-theme="dark"] .logo-modo-claro,
+        .dark-mode .logo-modo-claro {
+            display: none !important;
+        }
 
+        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        .dark-mode .logo-modo-oscuro {
+            display: block !important;
+        }
+</style>
 
 <body>
 
@@ -60,7 +70,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
-                <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+                <div class="container-fluid px-4" style="max-width: 95%;">
                     
                     <div class="row mt-2">
                         <div class="col-12">
@@ -101,16 +111,16 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body p-4">
-                                    <table id="tablaGastos" class="table table-striped" style="width:100%">
+                                    <table id="tablaGastos" class="table table-hover align-middle w-100">
                                         <thead>
-                                            <tr>
-                                                <th>Fecha</th>
-                                                <th>Cuenta</th>
-                                                <th>Tipo de Gasto</th>
-                                                <th>Monto</th>
-                                                <th>Concepto</th>
-                                            </tr>
-                                        </thead>
+    <tr>
+        <th>Fecha</th>
+        <th>Cuenta</th>
+        <th>Clasificación</th> <th>Tipo de Gasto</th>
+        <th>Monto</th>
+        <th>Concepto</th>
+    </tr>
+</thead>
                                         <tbody></tbody>
                                     </table>
                                 </div>
@@ -164,6 +174,15 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                 </select>
 
                             </div>
+
+                            <div class="mb-3">
+    <label class="form-label">Clasificación (Fijo/Variable) *</label>
+    <select class="form-select" name="clasificacion" required>
+        <option value="">-- Selecciona una clasificación --</option>
+        <option value="fijo">Gasto Fijo</option>
+        <option value="variable">Gasto Variable</option>
+    </select>
+</div>
 
                             <div class="mb-3">
 
@@ -276,61 +295,37 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
 
             const tabla = $('#tablaGastos').DataTable({
-
                 ajax: {
-
                     url: 'api/gastos.php',
-
                     dataSrc: ''
-
                 },
-
-                columns: [{
-
-                        data: 'fecha'
-
+                columns: [
+                    { data: 'creado_en', render: formatearFechaHora },
+                    { data: 'cuenta_nombre' },
+                    { data: 'tipo_gasto_nombre' },
+                    { 
+                        data: 'clasificacion',
+                        render: function(data) {
+                            if (data === 'fijo') return '<span class="badge bg-primary bg-opacity-10 text-primary border-0">Fijo</span>';
+                            if (data === 'variable') return '<span class="badge bg-warning bg-opacity-10 text-warning border-0">Variable</span>';
+                            return '<span class="badge bg-secondary bg-opacity-10 text-secondary border-0">Sin definir</span>';
+                        }
                     },
-
-                    {
-
-                        data: 'cuenta_nombre'
-
+                    { 
+                        data: 'monto', 
+                        render: function(data) { 
+                            const monto = parseFloat(data) || 0;
+                            return '<strong class="">$' + monto.toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</strong>'; 
+                        } 
                     },
-
-                    {
-
-                        data: 'tipo_gasto_nombre'
-
-                    },
-
-                    {
-
-                        data: 'monto',
-
-                        render: d => '$' + parseFloat(d).toLocaleString('en-US', {
-
-                            minimumFractionDigits: 2,
-
-                            maximumFractionDigits: 2
-
-                        })
-
-                    },
-
-                    {
-
-                        data: 'concepto'
-
-                    },
-
+                    { data: 'concepto' }
                 ],
-
                 order: [
-
                     [0, 'desc']
-
-                ]
-
+                ],
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                }
             });
 
 

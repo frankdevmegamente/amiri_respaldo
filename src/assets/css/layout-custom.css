@@ -1,178 +1,338 @@
-/* src/assets/css/layout-custom.css */
-
-.theme-toggle-btn,
-.fullscreen-btn {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: #fff;
-    padding: 0.5rem;
-}
-
-.theme-toggle-btn:hover,
-.fullscreen-btn:hover {
-    color: #e9ecef;
-}
-
-.user-name {
-    color: #fff;
-    cursor: pointer;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-}
-
-.user-name:hover {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.sidebar-item.active .sidebar-link {
-    background-color: #6c5ce7 !important;
-    color: white !important;
-}
-
-/* ============================================
-   SIDEBAR COLAPSABLE (Desktop ≥ 1200px)
-   ============================================ */
-@media (min-width: 1200px) {
-    .left-sidebar {
-        transition: width 0.25s ease;
-    }
-    .body-wrapper {
-        transition: margin-left 0.25s ease;
-    }
-
-    /* Estado mini: solo iconos */
-    #main-wrapper.sidebar-mini .left-sidebar {
-        width: 70px;
-        overflow: hidden;
-    }
-    #main-wrapper.sidebar-mini .body-wrapper {
-        margin-left: 70px;
-    }
-
-    /* Ocultar textos */
-    #main-wrapper.sidebar-mini .hide-menu {
-        display: none;
-    }
-
-    /* Centrar iconos de los links */
-    #main-wrapper.sidebar-mini .sidebar-nav ul .sidebar-item .sidebar-link {
-        justify-content: center;
-        padding-left: 0;
-        padding-right: 0;
-    }
-
-    /* Sección separadora: mostrar icono, ocultar texto */
-    #main-wrapper.sidebar-mini .nav-small-cap {
-        justify-content: center;
-    }
-    #main-wrapper.sidebar-mini .nav-small-cap .nav-small-cap-icon {
-        display: block;
-    }
-
-    /* Logo: ocultar imagen, centrar área */
-    #main-wrapper.sidebar-mini .brand-logo .logo-img {
-        display: none;
-    }
-    #main-wrapper.sidebar-mini .brand-logo {
-        justify-content: center;
-        padding: 16px 0;
-    }
-
-    /* Expandir contenido: quitar max-width fijo y ajustar padding */
-    #main-wrapper.sidebar-mini .body-wrapper .container-fluid,
-    #main-wrapper.sidebar-mini .body-wrapper .container-sm,
-    #main-wrapper.sidebar-mini .body-wrapper .container-md,
-    #main-wrapper.sidebar-mini .body-wrapper .container-lg,
-    #main-wrapper.sidebar-mini .body-wrapper .container-xl,
-    #main-wrapper.sidebar-mini .body-wrapper .container-xxl {
-        max-width: 100%;
-        padding-left: 0px;
-        padding-right: 100px;
-    }
-}
-
-/* ============================================
-   OVERLAY SIDEBAR EN MÓVIL/TABLET
-   ============================================ */
-@media (max-width: 1199.98px) {
-    .sidebar-overlay {
-        position: fixed;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.45);
-        border: 0;
-        padding: 0;
-        margin: 0;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.2s ease-in;
-        z-index: 11;
-    }
-
-    #main-wrapper.show-sidebar .sidebar-overlay {
-        opacity: 1;
-        visibility: visible;
-    }
-}
-
-.left-sidebar .close-btn:hover,
-.left-sidebar .close-btn:focus {
-    background: rgba(255, 255, 255, 0.18);
-    border-color: rgba(255, 255, 255, 0.45);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
-    outline: none;
-}
-
-.left-sidebar .close-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
-}
-
-/* Overlay visible = sistema bloqueado */
-.loading-overlay {
-    pointer-events: all;
-}
-
-/* Cuando el overlay NO está oculto */
-body.loading {
-    overflow: hidden;
-    /* Bloquea scroll */
-}
-
-/* Bloquea clicks en todo excepto el overlay */
-body.loading #main-wrapper {
-    pointer-events: none;
-    user-select: none;
-}
-
-/* Overlay oculto */
-.loading-overlay.hidden {
-    display: none !important;
-}
-
-/* ============================================
-   CAPITALIZACIÓN AUTOMÁTICA EN DATATABLES
-   ============================================ */
-/* Capitaliza la primera letra de cada palabra en todas las celdas de DataTables */
-.dataTable tbody td {
-    text-transform: capitalize !important;
-}
-
-/* Capitaliza también los encabezados */
-.dataTable thead th {
-    text-transform: capitalize !important;
-}
-
-/* EXCEPCIONES - NO capitalizar estos tipos de contenido */
-/* Clase especial para emails, teléfonos, cuentas, etc. */
-.dataTable .no-capitalize,
-.dataTable .badge,
-.dataTable .btn,
-.dataTable input,
-.dataTable select {
-    text-transform: none !important;
+/* src/assets/css/layout-custom.css */
+
+.theme-toggle-btn,
+.fullscreen-btn {
+  background: none;
+
+  border: none;
+
+  font-size: 1.2rem;
+
+  cursor: pointer;
+
+  color: #fff;
+
+  padding: 0.5rem;
+}
+
+.theme-toggle-btn:hover,
+.fullscreen-btn:hover {
+  color: #e9ecef;
+}
+
+.user-name {
+  color: #fff;
+
+  cursor: pointer;
+
+  padding: 0.5rem 1rem;
+
+  border-radius: 4px;
+}
+
+.user-name:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-item.active .sidebar-link {
+  background-color: #6c5ce7 !important;
+
+  color: white !important;
+}
+
+/* ============================================
+
+   SIDEBAR COLAPSABLE (Desktop ≥ 1200px)
+
+   ============================================ */
+
+@media (min-width: 1200px) {
+  .left-sidebar {
+    transition: width 0.25s ease;
+  }
+
+  .body-wrapper {
+    transition: margin-left 0.25s ease;
+  }
+
+  /* Estado mini: solo iconos */
+
+  #main-wrapper.sidebar-mini .left-sidebar {
+    width: 70px;
+
+    overflow: hidden;
+  }
+
+  #main-wrapper.sidebar-mini .body-wrapper {
+    margin-left: 70px;
+  }
+
+  /* Ocultar textos */
+
+  #main-wrapper.sidebar-mini .hide-menu {
+    display: none;
+  }
+
+  /* Centrar iconos de los links */
+
+  #main-wrapper.sidebar-mini .sidebar-nav ul .sidebar-item .sidebar-link {
+    justify-content: center;
+
+    padding-left: 0;
+
+    padding-right: 0;
+  }
+
+  /* Sección separadora: mostrar icono, ocultar texto */
+
+  #main-wrapper.sidebar-mini .nav-small-cap {
+    justify-content: center;
+  }
+
+  #main-wrapper.sidebar-mini .nav-small-cap .nav-small-cap-icon {
+    display: block;
+  }
+
+  /* Logo: ocultar imagen, centrar área */
+
+  #main-wrapper.sidebar-mini .brand-logo .logo-img {
+    display: none;
+  }
+
+  #main-wrapper.sidebar-mini .brand-logo {
+    justify-content: center;
+
+    padding: 16px 0;
+  }
+
+  /* Expandir contenido: quitar max-width fijo y ajustar padding */
+  #main-wrapper.sidebar-mini .body-wrapper .container-fluid,
+  #main-wrapper.sidebar-mini .body-wrapper .container-sm,
+  #main-wrapper.sidebar-mini .body-wrapper .container-md,
+  #main-wrapper.sidebar-mini .body-wrapper .container-lg,
+  #main-wrapper.sidebar-mini .body-wrapper .container-xl,
+  #main-wrapper.sidebar-mini .body-wrapper .container-xxl {
+    max-width: 100% !important; /* ¡Con esto vencemos al estilo del HTML! */
+    padding-left: 25px !important;
+    padding-right: 25px !important;
+    margin: 0 auto !important;
+    transition: max-width 0.3s ease-in-out;
+  }
+
+  #main-wrapper.sidebar-mini .body-wrapper {
+    margin-left: 70px !important;
+    width: calc(100% - 70px) !important;
+  }
+}
+
+/* ============================================
+
+   OVERLAY SIDEBAR EN MÓVIL/TABLET
+
+   ============================================ */
+
+@media (max-width: 1199.98px) {
+  .sidebar-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    background: rgba(0, 0, 0, 0.45);
+
+    border: 0;
+
+    padding: 0;
+
+    margin: 0;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transition: opacity 0.2s ease-in;
+
+    z-index: 11;
+  }
+
+  #main-wrapper.show-sidebar .sidebar-overlay {
+    opacity: 1;
+
+    visibility: visible;
+  }
+}
+
+.left-sidebar .close-btn:hover,
+.left-sidebar .close-btn:focus {
+  background: rgba(255, 255, 255, 0.18);
+
+  border-color: rgba(255, 255, 255, 0.45);
+
+  transform: translateY(-1px);
+
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+
+  outline: none;
+}
+
+.left-sidebar .close-btn:active {
+  transform: translateY(0);
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+/* Overlay visible = sistema bloqueado */
+
+.loading-overlay {
+  pointer-events: all;
+}
+
+/* Cuando el overlay NO está oculto */
+
+body.loading {
+  overflow: hidden;
+
+  /* Bloquea scroll */
+}
+
+/* Bloquea clicks en todo excepto el overlay */
+
+body.loading #main-wrapper {
+  pointer-events: none;
+
+  user-select: none;
+}
+
+/* Overlay oculto */
+
+.loading-overlay.hidden {
+  display: none !important;
+}
+
+/* ============================================
+
+   CAPITALIZACIÓN AUTOMÁTICA EN DATATABLES
+
+   ============================================ */
+
+/* Capitaliza la primera letra de cada palabra en todas las celdas de DataTables */
+
+.dataTable tbody td {
+  text-transform: capitalize !important;
+}
+
+/* Capitaliza también los encabezados */
+
+.dataTable thead th {
+  text-transform: capitalize !important;
+}
+
+/* EXCEPCIONES - NO capitalizar estos tipos de contenido */
+
+/* Clase especial para emails, teléfonos, cuentas, etc. */
+
+.dataTable .no-capitalize,
+.dataTable .badge,
+.dataTable .btn,
+.dataTable input,
+.dataTable select {
+  text-transform: none !important;
+}
+
+/* ============================================
+   MEJORAS ESTÉTICAS PARA TABLAS Y BADGES (UI PREMIUM)
+   ============================================ */
+
+/* 1. Badges (etiquetas) más modernos */
+.dataTable .badge,
+.table .badge {
+  padding: 0.5em 0.85em;
+  font-weight: 600;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+  font-size: 0.72rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* 2. Celdas más limpias y centradas */
+.dataTable tbody td,
+.table tbody td {
+  vertical-align: middle;
+  padding: 14px 10px;
+  border-bottom: 1px solid #f0f2f5;
+  color: #4b5563;
+}
+
+/* 3. Efecto al pasar el mouse (Hover) en las filas */
+.dataTable tbody tr,
+.table tbody tr {
+  transition: all 0.2s ease-in-out;
+}
+
+.dataTable tbody tr:hover,
+.table tbody tr:hover {
+  background-color: rgba(93, 135, 255, 0.04) !important;
+  box-shadow: inset 4px 0 0 0 #5d87ff;
+}
+
+/* ============================================
+   CABECERAS DE TABLA Y CONTROLES PREMIUM
+   ============================================ */
+
+/* Cabeceras elegantes: gris clarito, texto pequeño en mayúsculas */
+.dataTable thead th,
+.table thead th {
+  background-color: #f8fafc !important;
+  color: #64748b !important;
+  font-size: 0.72rem;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  border-bottom: 2px solid #e2e8f0 !important;
+  border-top: none !important;
+  padding: 14px 15px;
+}
+
+/* Quitar bordes laterales (estilo limpio) */
+.dataTable tbody td,
+.table tbody td {
+  border-right: none !important;
+  border-left: none !important;
+}
+
+/* Estilizar el buscador y el selector de registros */
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.4rem 0.8rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+  transition: border-color 0.2s;
+}
+
+.dataTables_wrapper .dataTables_filter input:focus {
+  outline: none;
+  border-color: #5d87ff;
+  box-shadow: 0 0 0 3px rgba(93, 135, 255, 0.1);
+}
+
+/* Paginación redondeada moderna */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  border-radius: 8px !important;
+  border: none !important;
+  margin: 0 2px !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+  background: #5d87ff !important;
+  color: white !important;
+  box-shadow: 0 4px 6px rgba(93, 135, 255, 0.25) !important;
+}
+/* Corrección para que la flecha del selector no se encime con el número */
+.dataTables_wrapper .dataTables_length select {
+  padding-right: 2.2rem !important; /* Le da espacio a la derecha para la flecha */
+  min-width: 75px; /* Asegura que la cajita no se haga muy pequeña */
 }

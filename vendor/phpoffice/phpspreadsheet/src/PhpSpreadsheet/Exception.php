@@ -1,9 +1,18 @@
-<?php
-
-namespace PhpOffice\PhpSpreadsheet;
-
-use RuntimeException;
-
-class Exception extends RuntimeException
-{
-}
+<?php
+
+
+
+namespace PhpOffice\PhpSpreadsheet;
+
+
+
+use RuntimeException;
+
+
+
+class Exception extends RuntimeException
+
+{
+
+}
+

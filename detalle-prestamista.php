@@ -152,7 +152,17 @@ try {
 
 </head>
 
+<style>
+     body[data-bs-theme="dark"] .logo-modo-claro,
+        .dark-mode .logo-modo-claro {
+            display: none !important;
+        }
 
+        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        .dark-mode .logo-modo-oscuro {
+            display: block !important;
+        }
+</style>
 
 <body>
 
@@ -178,7 +188,7 @@ try {
 
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
-                <div class="container-fluid detalle-container" style="max-width: 1400px; margin: 0 auto;">
+                <div class="container-fluid px-4" style="max-width: 95%;">
                     
                     <div class="row mt-2">
                         <div class="col-12">
@@ -285,7 +295,7 @@ try {
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body p-4 table-responsive">
-                                    <table id="tablaPrestamos" class="table table-striped table-hover table-bordered" style="width:100%">
+                                    <table id="tablaPrestamos" class="table table-hover align-middle w-100">
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
@@ -673,8 +683,8 @@ try {
 
                     {
 
-                        data: 'fecha'
-
+                        data: 'creado_en',
+                        render: formatearFechaHora
                     },
 
                     {
@@ -692,75 +702,41 @@ try {
                     },
 
                     {
-
                         data: 'estado',
-
                         render: estado => {
-
-                            const cls =
-
-                                estado === "pagado" ? "bg-success" :
-
-                                estado === "parcial" ? "bg-warning" : "bg-danger";
-
-
-
-                            return `<span class="badge ${cls}">
-
-                    ${estado.charAt(0).toUpperCase() + estado.slice(1)}
-
-                </span>`;
-
+                            const cls = estado === "pagado" ? "success" : estado === "parcial" ? "warning" : "danger";
+                            return `<span class="badge bg-${cls} bg-opacity-10 text-${cls} border-0">
+                                ${estado.charAt(0).toUpperCase() + estado.slice(1)}
+                            </span>`;
                         }
-
                     },
-
                     {
-
                         data: 'monto_pagado',
-
                         render: d => formatoMoneda(d)
-
                     },
-
                     {
-
                         data: 'fecha_pago',
-
                         render: d => d || "N/A"
-
                     },
-
                     {
-
                         data: null,
-
                         render: function(data) {
-
                             let btnPagar = '';
-
                             if (data.estado !== 'pagado') {
-
-                                btnPagar = `<button class="btn btn-sm btn-warning pagar" data-id="${data.id}"><i class="ti ti-edit"></i> Pagar</button> `;
-
+                                btnPagar = `<button class="badge bg-primary bg-opacity-10 text-primary border-0 pagar me-2" style="cursor: pointer; font-size: 0.75rem;" data-id="${data.id}" title="Pagar"><i class="ti ti-cash"></i> Pagar</button>`;
                             }
-
-                            let btnEliminar = `<button class="btn btn-sm btn-danger eliminar" data-id="${data.id}"><i class="ti ti-trash"></i> Eliminar</button>`;
-
-                            return btnPagar + btnEliminar;
-
+                            let btnEliminar = `<button class="badge bg-danger bg-opacity-10 text-danger border-0 eliminar" style="cursor: pointer; font-size: 0.75rem;" data-id="${data.id}" title="Eliminar"><i class="ti ti-trash"></i> Eliminar</button>`;
+                            return `<div class="d-flex align-items-center">${btnPagar}${btnEliminar}</div>`;
                         }
-
                     }
-
                 ],
-
                 order: [
-
                     [1, "desc"]
-
-                ]
-
+                ],
+                // Agregar el idioma español
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                }
             });
 
 

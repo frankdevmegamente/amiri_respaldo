@@ -44,6 +44,17 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
 </head>
 
+<style>
+     body[data-bs-theme="dark"] .logo-modo-claro,
+        .dark-mode .logo-modo-claro {
+            display: none !important;
+        }
+
+        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        .dark-mode .logo-modo-oscuro {
+            display: block !important;
+        }
+</style>
 
 
 <body>
@@ -60,7 +71,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
-                <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+                <div class="container-fluid px-4" style="max-width: 95%;">
 
                     <div class="d-flex align-items-center mb-3 mt-2">
                         <h3 class="mb-0"><i class="ti ti-users"></i> Clientes</h3>
@@ -71,7 +82,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                     <div class="card">
                         <div class="card-body p-4">
-                            <table id="tablaClientes" class="table table-striped table-bordered w-100">
+                            <table id="tablaClientes" class="table table-hover align-middle w-100">
                                 <thead>
                                     <tr>
                                         <th>ID</th>
@@ -360,21 +371,16 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 },
 
                 {
-
                     data: null,
-
-                    render: d => {
-
-                        let botones = '';
-
-                        botones += `<button class="btn btn-warning btn-sm editar" data-id="${d.id}"><i class="ti ti-pencil"></i></button>`;
-
-                        botones += `<button class="btn btn-danger btn-sm eliminar" data-id="${d.id}"><i class="ti ti-x"></i></button>`;
-
-                        return botones;
-
+                    render: function(d) {
+                        // Botón Editar estilo Soft Badge (Amarillo/Warning)
+                        let btnEditar = `<button class="badge bg-warning bg-opacity-10 text-warning border-0 editar me-2" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Editar"><i class="ti ti-pencil"></i> Editar</button>`;
+                        
+                        // Botón Eliminar estilo Soft Badge (Rojo/Danger)
+                        let btnEliminar = `<button class="badge bg-danger bg-opacity-10 text-danger border-0 eliminar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Eliminar"><i class="ti ti-trash"></i> Eliminar</button>`;
+                        
+                        return btnEditar + btnEliminar;
                     }
-
                 }
 
             ],
@@ -392,7 +398,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             ],
             autoWidth: false,
             scrollX: true,
-            order: [[0, 'desc']]
+            order: [[0, 'desc']],
+            language: {
+                url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+            }
 
         });
 

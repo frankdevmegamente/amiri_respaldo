@@ -167,7 +167,15 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             background-color: #1e293b;
 
         }
+ body[data-bs-theme="dark"] .logo-modo-claro,
+        .dark-mode .logo-modo-claro {
+            display: none !important;
+        }
 
+        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        .dark-mode .logo-modo-oscuro {
+            display: block !important;
+        }
     </style>
 
 </head>
@@ -337,11 +345,9 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                         </div>
 
                                         <div class="flex-grow-1">
-
-                                            <p class="text-muted mb-1 small">Ganancia Total</p>
-
+                                            <p class="text-muted mb-1 small">Ganancia Neta</p>
                                             <h4 class="mb-0 fw-bold" id="statGananciaTotal">$0.00</h4>
-
+                                            <div id="statGastosDetalle" class="mt-1" style="font-size: 0.8rem; line-height: 1.2;"></div>
                                         </div>
 
                                     </div>
@@ -1074,9 +1080,17 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
             $.getJSON(`api/reportes.php?tipo=resumen&${getParams()}`, function(data) {
 
-                $('#statGananciaTotal').text('$' + formatoNumero(data.ganancia_total));
-
+                // Ahora mostramos la ganancia neta real
+                $('#statGananciaTotal').text('$' + formatoNumero(data.ganancia_neta));
+                
+                // Imprimimos el desglose de los gastos en la tarjeta
+                $('#statGastosDetalle').html(`
+                    <span class="text-danger fw-bold">Gastos: -$${formatoNumero(data.gastos_total)}</span><br>
+                    <span class="text-muted">Fijos: $${formatoNumero(data.gastos_fijos)} | Variables: $${formatoNumero(data.gastos_variables)}</span>
+                `);
+                
                 $('#statComisionesAmiri').text('$' + formatoNumero(data.comisiones_amiri));
+                // ... el resto se queda igual
 
                 $('#statGananciaDivisas').text('$' + formatoNumero(data.ganancia_divisas_total));
 
@@ -1560,7 +1574,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                         html += `<tr>
 
-                            <td>${row.fecha}</td>
+                            <td>${formatearFechaHora(row.creado_en)}</td>
 
                             <td>${row.operaciones || '-'}</td>
 
@@ -1690,7 +1704,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                     html += `<tr>
 
-                        <td>${op.fecha}</td>
+                        <td>${formatearFechaHora(op.creado_en)}</td>
 
                         <td><span class="badge ${badgeClass}">${op.servicio}</span></td>
 
@@ -1750,7 +1764,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                     html += `<tr>
 
-                        <td>${v.fecha}</td>
+                        <td>${formatearFechaHora(v.creado_en)}</td>
 
                         <td><a href="detalle-cliente.php?id=${v.id}">${v.cliente}</a></td>
 

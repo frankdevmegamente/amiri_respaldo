@@ -42,7 +42,17 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
 </head>
 
+<style>
+     body[data-bs-theme="dark"] .logo-modo-claro,
+        .dark-mode .logo-modo-claro {
+            display: none !important;
+        }
 
+        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        .dark-mode .logo-modo-oscuro {
+            display: block !important;
+        }
+</style>
 
 <body>
 
@@ -68,7 +78,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
-                <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+                <div class="container-fluid px-4" style="max-width: 95%;">
                     <div class="row mt-2">
                         <div class="col-12">
                             <div class="page-breadcrumb d-flex align-items-center mb-3">
@@ -273,57 +283,39 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     },
 
                     {
-
                         data: 'rol',
-
                         render: function(data) {
-
-                            return data === 'admin' ? '<span class="badge bg-danger">Admin</span>' :
-
-                                data === 'prestamista' ? '<span class="badge bg-warning text-dark">Prestamista</span>' :
-
-                                '<span class="badge bg-info">Usuario</span>';
-
+                            return data === 'admin' ? '<span class="badge bg-danger bg-opacity-10 text-danger border-0">Admin</span>' :
+                                data === 'prestamista' ? '<span class="badge bg-warning bg-opacity-10 text-warning border-0">Prestamista</span>' :
+                                '<span class="badge bg-info bg-opacity-10 text-info border-0">Usuario</span>';
                         }
-
                     },
-
                     {
-
                         data: 'creado_en',
-
                         render: function(data) {
-
                             return new Date(data).toLocaleString();
-
                         }
-
                     },
-
                     {
-
                         data: null,
-
                         render: function(data) {
-
                             const esActual = Number(data.id) === Number(currentUserId);
-
-                            const btnEditar = `<button class="btn btn-sm btn-warning editar" data-id="${data.id}"><i class="ti ti-pencil"></i> Editar</button>`;
-
+                            
+                            const btnEditar = `<button class="badge bg-warning bg-opacity-10 text-warning border-0 editar me-2" style="cursor: pointer; font-size: 0.75rem;" data-id="${data.id}" title="Editar"><i class="ti ti-pencil"></i> Editar</button>`;
+                            
                             const btnEliminar = esActual ?
-
-                                `<button class="btn btn-sm btn-danger" disabled title="No puedes desactivarte"><i class="ti ti-x"></i> Desactivar</button>` :
-
-                                `<button class="btn btn-sm btn-danger eliminar" data-id="${data.id}"><i class="ti ti-x"></i> Desactivar</button>`;
-
-                            return `${btnEditar} ${btnEliminar}`;
-
+                                `<button class="badge bg-secondary bg-opacity-10 text-secondary border-0" style="font-size: 0.75rem;" disabled title="No puedes desactivarte"><i class="ti ti-x"></i> Desactivar</button>` :
+                                `<button class="badge bg-danger bg-opacity-10 text-danger border-0 eliminar" style="cursor: pointer; font-size: 0.75rem;" data-id="${data.id}" title="Desactivar"><i class="ti ti-power"></i> Desactivar</button>`;
+                                
+                            return `<div class="d-flex align-items-center">${btnEditar}${btnEliminar}</div>`;
                         }
-
                     }
-
-                ]
-
+                ] // <-- Aquí terminó el bloque que acabamos de pegar
+                // AGREGAR ESTO:
+                ,
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                }
             });
 
 

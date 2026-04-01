@@ -169,23 +169,23 @@ try {
         }
 
         #tabsCliente .nav-link.active {
-
-            color: #0d6efd;
-
+            color: #5D87FF; /* Morado Amiri */
             background-color: transparent;
-
-            border-bottom: 2px solid #0d6efd;
-
+            border-bottom: 2px solid #5D87FF;
             font-weight: 600;
-
         }
-
         #tabsCliente .nav-link:not(.active):hover {
-
-            color: #0d6efd;
-
+            color: #5D87FF; /* Morado Amiri al pasar el mouse */
+        }
+ body[data-bs-theme="dark"] .logo-modo-claro,
+        .dark-mode .logo-modo-claro {
+            display: none !important;
         }
 
+        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        .dark-mode .logo-modo-oscuro {
+            display: block !important;
+        }
     </style>
 
 </head>
@@ -208,7 +208,7 @@ try {
 
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
-                <div class="container-fluid detalle-container" style="max-width: 1400px; margin: 0 auto;">
+                <div class="container-fluid px-4" style="max-width: 95%;">
                     <div class="row">
                         <div class="col-12">
                             <div class="page-breadcrumb d-flex align-items-center mb-3 mt-2">
@@ -220,23 +220,81 @@ try {
 
                     <div class="row mb-4">
                         <div class="col-md-12">
-                            <div class="card shadow-sm">
-                                <div class="card-header bg-primary text-white">
-                                    <h5 class="card-title mb-0"><i class="ti ti-info-circle"></i> Información del Cliente</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <h5><strong>• Nombre:</strong> <?= htmlspecialchars($cliente['nombre']) ?></h5>
-                                            <h5><strong>• Contacto:</strong> <?= htmlspecialchars($cliente['contacto'] ?? 'N/A') ?></h5>
+                            <div class="card shadow-sm border-0 rounded-4">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            <i class="ti ti-user fs-5"></i>
                                         </div>
-                                        <div class="col-md-4">
-                                            <h5><strong>• Promotor:</strong> <?= htmlspecialchars($cliente['promotor_nombre'] ?? 'N/A') ?></h5>
-                                            <h5><strong>• Comisión Amiri:</strong> <?= htmlspecialchars($cliente['porcentaje_amiri'] ?? 0) ?>%</h5>
+                                        <h5 class="card-title fw-semibold mb-0">Perfil del Cliente</h5>
+                                    </div>
+                                    
+                                    <div class="row g-4">
+                                        <div class="col-md-4 col-sm-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-light text-secondary rounded d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                                    <i class="ti ti-id fs-5"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Nombre Completo</p>
+                                                    <h6 class="fw-bold mb-0 fs-5 mt-1"><?= htmlspecialchars($cliente['nombre']) ?></h6>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <h5><strong>• Cuenta:</strong> <?= htmlspecialchars($cliente['cuenta_nombre'] ?? 'N/A') ?></h5>
-                                            <h5><strong>• Saldo Actual:</strong> $<?= number_format((float)($cliente['cuenta_saldo'] ?? 0), 2, '.', ',') ?></h5>
+                                        <div class="col-md-4 col-sm-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-light text-secondary rounded d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                                    <i class="ti ti-phone fs-5"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Contacto</p>
+                                                    <h6 class="fw-bold mb-0 fs-5 mt-1"><?= htmlspecialchars($cliente['contacto'] ?? 'N/A') ?></h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-info bg-opacity-10 text-info rounded d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                                    <i class="ti ti-user fs-5"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Promotor Asignado</p>
+                                                    <h6 class="fw-bold mb-0 fs-5 mt-1"><?= htmlspecialchars($cliente['promotor_nombre'] ?? 'N/A') ?></h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-warning bg-opacity-10 text-warning rounded d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                                    <i class="ti ti-percentage fs-5"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Comisión AMIRI</p>
+                                                    <span class="badge bg-warning bg-opacity-10 text-warning border-0 mt-1 fs-6"><?= htmlspecialchars($cliente['porcentaje_amiri'] ?? 0) ?>%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-dark bg-opacity-10 text-dark rounded d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                                    <i class="ti ti-building-bank fs-5"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Cuenta Vinculada</p>
+                                                    <h6 class="fw-bold mb-0 fs-5 mt-1"><?= htmlspecialchars($cliente['cuenta_nombre'] ?? 'N/A') ?></h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-6">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-success bg-opacity-10 text-success rounded d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                                    <i class="ti ti-wallet fs-5"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Saldo a Favor</p>
+                                                    <h6 class="text-success fw-bolder mb-0 fs-4 mt-1">$<?= number_format((float)($cliente['cuenta_saldo'] ?? 0), 2, '.', ',') ?></h6>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -266,7 +324,7 @@ try {
 
                                         <div class="tab-pane fade show active" id="tab-adeudos" role="tabpanel">
                                             <div class="table-responsive">
-                                                <table id="tablaVentas" class="table table-striped table-hover table-bordered" style="width:100%">
+                                                <table id="tablaVentas" class="table table-hover align-middle" style="width:100%">
                                                     <thead>
                                                         <tr>
                                                             <th>ID</th>
@@ -719,6 +777,9 @@ try {
 
 
             const tablaVentas = $('#tablaVentas').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
 
                 ajax: {
 
@@ -729,16 +790,30 @@ try {
                 },
 
                 columns: [{
-
                         data: 'id'
-
                     },
-
                     {
-
-                        data: 'fecha'
-                        
-
+                        data: 'fecha', // <-- Ahora jalamos la fecha operativa real
+                        render: function(data, type, row) {
+                            if (!data) return '';
+                            // Formatear fecha operativa de YYYY-MM-DD a DD/MM/YYYY
+                            const partes = data.split('-');
+                            const fechaOperacion = partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : data;
+                            
+                            // Mostrar la fecha de captura original en pequeño
+                            let infoExtra = '';
+                            if (row.creado_en) {
+                                const fechaC = new Date(row.creado_en);
+                                if (!isNaN(fechaC)) {
+                                    const captura = fechaC.toLocaleString('es-MX', {
+                                        day: '2-digit', month: '2-digit', year: 'numeric',
+                                        hour: '2-digit', minute: '2-digit', hour12: true
+                                    });
+                                    infoExtra = `<br><small class="text-muted" style="font-size: 0.7rem;"><i class="ti ti-device-floppy"></i> Capturado: ${captura}</small>`;
+                                }
+                            }
+                            return `<span class="fw-bold text-dark">${fechaOperacion}</span>${infoExtra}`;
+                        }
                     },
 
                     {
@@ -798,25 +873,15 @@ try {
                     },
 
                     {
-
                         data: null,
-
                         render: function(data) {
-
                             const moneda = data.moneda || 'MXN';
-
-                            const badgeMoneda = moneda === 'MXN' ? 'bg-primary' : (moneda === 'USD' ? 'bg-success' : 'bg-info');
-
+                            const badgeMoneda = moneda === 'MXN' ? 'bg-primary bg-opacity-10 text-primary' : (moneda === 'USD' ? 'bg-success bg-opacity-10 text-success' : 'bg-info bg-opacity-10 text-info');
                             const estado = data.estado;
-
-                            const clsEstado = estado === "pagado" ? "bg-success" :
-
-                                estado === "parcial" ? "bg-warning" : "bg-danger";
-
+                            const clsEstado = estado === "pagado" ? "bg-success bg-opacity-10 text-success" :
+                                estado === "parcial" ? "bg-warning bg-opacity-10 text-warning" : "bg-danger bg-opacity-10 text-danger";
                             return `<span class="badge ${badgeMoneda} me-1">${moneda}</span><span class="badge ${clsEstado}">${estado.charAt(0).toUpperCase() + estado.slice(1)}</span>`;
-
                         }
-
                     },
 
                     {
@@ -850,25 +915,19 @@ try {
                     },
 
                     {
-
                         data: null,
-
                         render: function(data) {
-
                             let btnPagar = '';
-
                             if (data.estado !== 'pagado') {
-
-                                btnPagar = `<button class="btn btn-sm btn-warning pagar" data-id="${data.id}"><i class="ti ti-cash"></i> Pagar</button> `;
-
+                                // Botón Pagar estilo Badge (Naranja/Warning como lo tenías originalmente)
+                                btnPagar = `<button class="badge bg-warning bg-opacity-10 text-warning border-0 pagar me-2" style="cursor: pointer; font-size: 0.75rem;" data-id="${data.id}"><i class="ti ti-cash"></i> Pagar</button>`;
                             }
-
-                            let btnEliminar = `<button class="btn btn-sm btn-danger eliminar" data-id="${data.id}"><i class="ti ti-trash"></i></button>`;
-
+                            
+                            // Botón Eliminar estilo Badge (Rojo/Danger)
+                            let btnEliminar = `<button class="badge bg-danger bg-opacity-10 text-danger border-0 eliminar" style="cursor: pointer; font-size: 0.75rem;" data-id="${data.id}" title="Eliminar"><i class="ti ti-trash"></i> Eliminar</button>`;
+                            
                             return btnPagar + btnEliminar;
-
                         }
-
                     }
 
                 ],
@@ -929,9 +988,9 @@ try {
 
                     // Mostrar badge de moneda
 
-                    const badgeClass = moneda === 'MXN' ? 'bg-primary' : (moneda === 'USD' ? 'bg-success' : 'bg-info');
-
-                    $('#badgeMoneda').removeClass('bg-primary bg-success bg-info').addClass(badgeClass).text(moneda);
+                    // Mostrar badge de moneda (Estilo Soft Badge)
+                    const badgeClass = moneda === 'MXN' ? 'bg-primary bg-opacity-10 text-primary' : (moneda === 'USD' ? 'bg-success bg-opacity-10 text-success' : 'bg-info bg-opacity-10 text-info');
+                    $('#badgeMoneda').attr('class', 'badge border-0 ' + badgeClass).text(moneda);
 
 
 
@@ -1306,23 +1365,34 @@ try {
                 },
 
                 order: [[0, "desc"]],
-
                 columns: [
-
-                    { data: 'fecha' },
-
-                    {
-
-                        data: 'moneda',
-
-                        render: function(data) {
-
-                            const cls = data === 'USD' ? 'bg-success' : 'bg-info';
-
-                            return `<span class="badge ${cls}">${data}</span>`;
-
+                    { 
+                        data: 'fecha', // <-- Ahora jalamos la fecha operativa real
+                        render: function(data, type, row) {
+                            if (!data) return '';
+                            const partes = data.split('-');
+                            const fechaOperacion = partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : data;
+                            
+                            let infoExtra = '';
+                            if (row.creado_en) {
+                                const fechaC = new Date(row.creado_en);
+                                if (!isNaN(fechaC)) {
+                                    const captura = fechaC.toLocaleString('es-MX', {
+                                        day: '2-digit', month: '2-digit', year: 'numeric',
+                                        hour: '2-digit', minute: '2-digit', hour12: true
+                                    });
+                                    infoExtra = `<br><small class="text-muted" style="font-size: 0.7rem;"><i class="ti ti-device-floppy"></i> Capturado: ${captura}</small>`;
+                                }
+                            }
+                            return `<span class="fw-bold text-dark">${fechaOperacion}</span>${infoExtra}`;
                         }
-
+                    },
+                    {
+                        data: 'moneda',
+                        render: function(data) {
+                            const cls = data === 'USD' ? 'bg-success bg-opacity-10 text-success' : 'bg-info bg-opacity-10 text-info';
+                            return `<span class="badge ${cls}">${data}</span>`;
+                        }
                     },
 
                     {

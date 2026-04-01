@@ -46,7 +46,17 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
 </head>
 
+<style>
+     body[data-bs-theme="dark"] .logo-modo-claro,
+        .dark-mode .logo-modo-claro {
+            display: none !important;
+        }
 
+        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        .dark-mode .logo-modo-oscuro {
+            display: block !important;
+        }
+</style>
 
 <body>
 
@@ -64,7 +74,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
-                <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+                <div class="container-fluid px-4" style="max-width: 95%;">
                     
                     <div class="row mt-2">
                         <div class="col-12">
@@ -79,7 +89,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body p-4 table-responsive">
-                                    <table id="tablaPromotores" class="table table-striped" style="width:100%">
+                                    <table id="tablaPromotores" class="table table-hover align-middle w-100">
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
@@ -352,33 +362,20 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                     },
 
                     {
-
                         data: 'activo',
-
-                        render: d => d == 1 ? '<span class="badge bg-success">Sí</span>' : '<span class="badge bg-danger">No</span>'
-
+                        render: d => d == 1 ? '<span class="badge bg-success bg-opacity-10 text-success border-0">Sí</span>' : '<span class="badge bg-danger bg-opacity-10 text-danger border-0">No</span>'
                     },
-
                     {
-
                         data: 'creado_en',
-
                         render: d => d ? new Date(d).toLocaleDateString('es-MX') : ''
-
                     },
-
                     {
-
                         data: null,
-
-                        render: d => `
-
-                <button class="btn btn-sm btn-warning editar" data-id="${d.id}"><i class="ti ti-edit"></i> Editar</button>
-
-                <button class="btn btn-sm btn-danger eliminar" data-id="${d.id}"><i class="ti ti-trash"></i> Eliminar</button>
-
-            `
-
+                        render: function(d) {
+                            let btnEditar = `<button class="badge bg-warning bg-opacity-10 text-warning border-0 editar me-2" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Editar"><i class="ti ti-pencil"></i> Editar</button>`;
+                            let btnEliminar = `<button class="badge bg-danger bg-opacity-10 text-danger border-0 eliminar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Eliminar"><i class="ti ti-trash"></i> Eliminar</button>`;
+                            return `<div class="d-flex align-items-center">${btnEditar}${btnEliminar}</div>`;
+                        }
                     }
 
                 ],

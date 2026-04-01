@@ -135,7 +135,15 @@ try {
         .table-salida { color: #fa896b !important; } /* Rojo para los pagos realizados */
 
         .table-entrada { color: #13deb9 !important; } /* Verde para comisiones ganadas */
+ body[data-bs-theme="dark"] .logo-modo-claro,
+        .dark-mode .logo-modo-claro {
+            display: none !important;
+        }
 
+        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        .dark-mode .logo-modo-oscuro {
+            display: block !important;
+        }
     </style>
 
 </head>
@@ -526,7 +534,8 @@ try {
 
                 columns: [
 
-                    { data: 'fecha' },
+                    { data: 'creado_en', 
+                    render: formatearFechaHora },
 
                     { 
 

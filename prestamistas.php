@@ -42,7 +42,17 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
 </head>
 
+<style>
+     body[data-bs-theme="dark"] .logo-modo-claro,
+        .dark-mode .logo-modo-claro {
+            display: none !important;
+        }
 
+        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        .dark-mode .logo-modo-oscuro {
+            display: block !important;
+        }
+</style>
 
 <body>
 
@@ -68,7 +78,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
-                <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+                <div class="container-fluid px-4" style="max-width: 95%;">
                     
                     <div class="row mt-2">
                         <div class="col-12">
@@ -83,7 +93,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         <div class="col-12">
                             <div class="card">
                                 <div class="card-body p-4 table-responsive">
-                                    <table id="tablaPrestamistas" class="table table-striped table-hover table-bordered" style="width:100%">
+                                    <table id="tablaPrestamistas" class="table table-hover align-middle w-100">
                                         <thead>
                                             <tr>
                                                 <th>ID</th>
@@ -285,37 +295,27 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     },
 
                     {
-
                         data: 'activo',
-
-                        render: d => d ? '<span class="badge bg-success">Sí</span>' : '<span class="badge bg-danger">No</span>'
-
+                        render: d => d ? '<span class="badge bg-success bg-opacity-10 text-success border-0">Sí</span>' : '<span class="badge bg-danger bg-opacity-10 text-danger border-0">No</span>'
                     },
-
                     {
-
                         data: null,
-
-                        render: d => `
-
-                        <a href="detalle-prestamista.php?id=${d.id}" class="btn btn-sm btn-info"><i class="ti ti-eye"></i> Detalles</a>
-
-                        <button class="btn btn-sm btn-warning editar" data-id="${d.id}"><i class="ti ti-edit"></i> Editar</button>
-
-                        <button class="btn btn-sm btn-danger eliminar" data-id="${d.id}"><i class="ti ti-trash"></i> Eliminar</button>
-
-                    `
-
+                        render: function(d) {
+                            return `<div class="d-flex align-items-center gap-2">
+                                <a href="detalle-prestamista.php?id=${d.id}" class="badge bg-info bg-opacity-10 text-info border-0 text-decoration-none" style="font-size: 0.75rem;" title="Detalles"><i class="ti ti-eye"></i> Detalles</a>
+                                <button class="badge bg-warning bg-opacity-10 text-warning border-0 editar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Editar"><i class="ti ti-pencil"></i> Editar</button>
+                                <button class="badge bg-danger bg-opacity-10 text-danger border-0 eliminar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Eliminar"><i class="ti ti-trash"></i> Eliminar</button>
+                            </div>`;
+                        }
                     }
-
                 ],
-
                 order: [
-
                     [0, 'desc']
-
-                ]
-
+                ],
+                // Agregar el idioma español
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                }
             });
 
 

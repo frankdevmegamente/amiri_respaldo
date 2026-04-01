@@ -42,7 +42,17 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
 </head>
 
+<style>
+   body[data-bs-theme="dark"] .logo-modo-claro,
+        .dark-mode .logo-modo-claro {
+            display: none !important;
+        }
 
+        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        .dark-mode .logo-modo-oscuro {
+            display: block !important;
+        }
+</style>
 
 <body>
 
@@ -144,6 +154,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     <div class="card-body">
                       <h6 class="text-muted">Gastos Generados</h6>
                       <h3 class="text-danger" id="gastosGeneradosAmiri">$0.00</h3>
+                      <small class="text-muted fw-bold d-block mt-1">
+                          Fijos: <span id="gastosFijosAmiri" class="text-primary">$0.00</span> | 
+                          Variables: <span id="gastosVarAmiri" class="text-warning">$0.00</span>
+                      </small>
                     </div>
                   </div>
                 </div>
@@ -390,47 +404,37 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     // Cargar datos de comisiones AMIRI
 
     function cargarComisionesAmiri() {
-
       $.get(construirURLAmiri(), function(data) {
-
         if (data.error) {
-
           console.error('Error en API:', data.error);
-
           $('#comisionesAmiriTotal').text('$0.00');
-
           $('#gastosGeneradosAmiri').text('$0.00');
-
+          $('#gastosFijosAmiri').text('$0.00'); // Reseteamos en caso de error
+          $('#gastosVarAmiri').text('$0.00'); // Reseteamos en caso de error
           $('#remanenteAmiri').text('$0.00');
-
           return;
-
         }
 
+        // --- ¡Aquí es el lugar correcto, cuando la API responde con éxito! ---
         $('#comisionesAmiriTotal').text(formatoMoneda(data.total_comisiones));
-
         $('#gastosGeneradosAmiri').text(formatoMoneda(data.total_gastos));
+        
+        // Alimentamos los span con la nueva información de Fijos y Variables
+        $('#gastosFijosAmiri').text(formatoMoneda(data.gastos_fijos));
+        $('#gastosVarAmiri').text(formatoMoneda(data.gastos_variables));
 
         $('#remanenteAmiri').text(formatoMoneda(data.remanente));
 
-
-
         // Renderizar gráfica
-
         renderComisionesAmiriChart(data.grafica_fechas || [], data.grafica_montos || []);
-
       }).fail(function(xhr, status, error) {
-
         console.error('Error HTTP:', status, error);
-
         $('#comisionesAmiriTotal').text('Error');
-
         $('#gastosGeneradosAmiri').text('Error');
-
+        $('#gastosFijosAmiri').text('Error');
+        $('#gastosVarAmiri').text('Error');
         $('#remanenteAmiri').text('Error');
-
       });
-
     }
 
 

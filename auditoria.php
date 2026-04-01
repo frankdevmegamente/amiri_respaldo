@@ -112,6 +112,16 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
 
         }
 
+         body[data-bs-theme="dark"] .logo-modo-claro,
+        .dark-mode .logo-modo-claro {
+            display: none !important;
+        }
+
+        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        .dark-mode .logo-modo-oscuro {
+            display: block !important;
+        }
+
     </style>
 
 </head>
