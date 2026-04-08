@@ -23,49 +23,28 @@ try {
 
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-
         if (isset($_GET['id'])) {
-
             $stmt = $pdo->prepare("
-
                 SELECT g.*, c.nombre cuenta_nombre, tg.nombre tipo_gasto_nombre
-
                 FROM gastos g
-
                 JOIN cuentas c ON g.cuenta_id = c.id
-
                 JOIN categorias_gasto tg ON g.categoria_id = tg.id
-
-                WHERE g.id = ?
-
+                WHERE g.id = ? AND g.activo = 1
             ");
-
             $stmt->execute([$_GET['id']]);
-
             echo json_encode($stmt->fetch());
-
         } else {
-
             $stmt = $pdo->query("
-
                 SELECT g.*, c.nombre cuenta_nombre, tg.nombre tipo_gasto_nombre
-
                 FROM gastos g
-
                 JOIN cuentas c ON g.cuenta_id = c.id
-
                 JOIN categorias_gasto tg ON g.categoria_id = tg.id
-
+                WHERE g.activo = 1
                 ORDER BY g.fecha DESC, g.id DESC
-
             ");
-
             echo json_encode($stmt->fetchAll());
-
         }
-
         exit;
-
     }
 
 

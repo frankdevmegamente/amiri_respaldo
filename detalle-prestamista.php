@@ -172,19 +172,13 @@ try {
 
 
 
-        <!-- Header -->
-
         <?php include 'src/assets/partials/header.php'; ?>
 
 
 
-        <!-- Sidebar -->
-
         <?php include 'src/assets/partials/sidebar.php'; ?>
 
 
-
-        <!-- Main wrapper -->
 
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
@@ -322,8 +316,6 @@ try {
 
 
 
-
-        <!-- Modal Pagar Préstamo (Versión Actualizada) -->
 
         <div class="modal fade" id="modalPagarPrestamo" tabindex="-1">
 
@@ -525,8 +517,6 @@ try {
 
 
 
-        <!-- Scripts -->
-
         <script src="src/assets/libs/jquery/dist/jquery.min.js"></script>
 
         <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -682,9 +672,29 @@ try {
                     },
 
                     {
-
-                        data: 'creado_en',
-                        render: formatearFechaHora
+                        data: 'fecha',
+                        title: 'Fecha',
+                        render: function(data, type, row) {
+                            if (!data) return 'N/A';
+                            
+                            // 1. EXTRAEMOS LA FECHA EXACTA EN TEXTO (Ignorando las zonas horarias)
+                            // Si data es "2026-03-31 15:30:00", lo cortamos a "2026-03-31"
+                            const soloFecha = data.split(' ')[0]; 
+                            // Lo separamos por guiones [2026, 03, 31]
+                            const partes = soloFecha.split('-'); 
+                            // Lo armamos al estilo latino: DD/MM/YYYY
+                            const fechaOperacion = `${partes[2]}/${partes[1]}/${partes[0]}`; 
+                            
+                            let infoExtra = '';
+                            
+                            // 2. LA FECHA DE CAPTURA (Esa sí dejamos que use tu función normal)
+                            if (row.creado_en) {
+                                let captura = typeof formatearFechaHora === 'function' ? formatearFechaHora(row.creado_en) : row.creado_en;
+                                infoExtra = `<br><small class="text-muted" style="font-size: 0.7rem;"><i class="ti ti-device-floppy"></i> Capturado: ${captura}</small>`;
+                            }
+                            
+                            return `<span class="fw-bold text-dark">${fechaOperacion}</span>${infoExtra}`;
+                        }
                     },
 
                     {
@@ -716,7 +726,21 @@ try {
                     },
                     {
                         data: 'fecha_pago',
-                        render: d => d || "N/A"
+                        title: 'Fecha Pago',
+                        render: function(data, type, row) {
+                            if (!data || data === '0000-00-00 00:00:00' || data === '0000-00-00') return '<span class="text-muted">N/A</span>';
+                            
+                            // 1. Extraemos la fecha exacta ignorando zonas horarias
+                            const soloFecha = data.split(' ')[0]; 
+                            const partes = soloFecha.split('-'); 
+                            const fechaOperacion = `${partes[2]}/${partes[1]}/${partes[0]}`; 
+                            
+                            // 2. La fecha de captura exacta (Usamos el mismo 'data' porque ahí guardamos la hora)
+                            let captura = typeof formatearFechaHora === 'function' ? formatearFechaHora(data) : data;
+                            let infoExtra = `<br><small class="text-muted" style="font-size: 0.7rem;"><i class="ti ti-device-floppy"></i> Capturado: ${captura}</small>`;
+                            
+                            return `<span class="fw-bold text-dark">${fechaOperacion}</span>${infoExtra}`;
+                        }
                     },
                     {
                         data: null,
@@ -820,8 +844,13 @@ try {
 
 
                     $('#resumenPago').show();
-
-                    $('#editarFechaPago').val(data.fecha_pago || "<?= date('Y-m-d') ?>");
+                    
+                    // Si la fecha de pago ya existe usamos esa, si no, la de hoy
+                    if(data.fecha_pago) {
+                        $('#editarFechaPago').val(data.fecha_pago.split(' ')[0]);
+                    } else {
+                        $('#editarFechaPago').val("<?= date('Y-m-d') ?>");
+                    }
 
 
 
@@ -1077,7 +1106,10 @@ try {
 
                 const cuentaPagoId = $('#cuentaPagoSelect').val();
 
-                const fechaPago = $('#editarFechaPago').val();
+                // AQUÍ LE AGREGAMOS LA HORA AL PAGO
+                const fechaElegida = $('#editarFechaPago').val();
+                const horaActual = new Date().toTimeString().split(' ')[0];
+                const fechaPagoCompletada = fechaElegida ? (fechaElegida + ' ' + horaActual) : '';
 
 
 
@@ -1131,7 +1163,7 @@ try {
 
                     cuenta_pago_id: cuentaPagoId,
 
-                    fecha_pago: fechaPago
+                    fecha_pago: fechaPagoCompletada
 
                 });
 
@@ -1153,7 +1185,7 @@ try {
 
                         cuenta_pago_id: cuentaPagoId,
 
-                        fecha_pago: fechaPago
+                        fecha_pago: fechaPagoCompletada
 
                     }),
 
@@ -1253,7 +1285,10 @@ try {
 
                 e.preventDefault();
 
-
+                // AQUÍ LE AGREGAMOS LA HORA AL NUEVO PRÉSTAMO
+                const fechaElegida = $('input[name="fecha"]').val();
+                const horaActual = new Date().toTimeString().split(' ')[0]; // Genera HH:MM:SS
+                const fechaConHora = fechaElegida + ' ' + horaActual;
 
                 $.post(
 
@@ -1263,7 +1298,7 @@ try {
 
                         monto: parseMoneda($('#montoInput').val()),
 
-                        fecha: $('input[name="fecha"]').val(),
+                        fecha: fechaConHora,
 
                         cuenta_id: $('select[name="cuenta_id"]').val(),
 

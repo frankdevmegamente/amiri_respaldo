@@ -220,8 +220,12 @@ try {
 
                     <div class="row mb-4">
                         <div class="col-md-12">
-                            <div class="card shadow-sm border-0 rounded-4">
-                                <div class="card-body p-4">
+                            <div class="card shadow-sm border-0 rounded-4" style="position: relative; overflow: hidden;">
+                                
+                                <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #5D87FF; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                                <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+
+                                <div class="card-body p-4" style="position: relative; z-index: 1;">
                                     <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
                                         <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                                             <i class="ti ti-user fs-5"></i>
@@ -793,28 +797,28 @@ try {
                         data: 'id'
                     },
                     {
-                        data: 'fecha', // <-- Ahora jalamos la fecha operativa real
-                        render: function(data, type, row) {
-                            if (!data) return '';
-                            // Formatear fecha operativa de YYYY-MM-DD a DD/MM/YYYY
-                            const partes = data.split('-');
-                            const fechaOperacion = partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : data;
-                            
-                            // Mostrar la fecha de captura original en pequeño
-                            let infoExtra = '';
-                            if (row.creado_en) {
-                                const fechaC = new Date(row.creado_en);
-                                if (!isNaN(fechaC)) {
-                                    const captura = fechaC.toLocaleString('es-MX', {
-                                        day: '2-digit', month: '2-digit', year: 'numeric',
-                                        hour: '2-digit', minute: '2-digit', hour12: true
-                                    });
-                                    infoExtra = `<br><small class="text-muted" style="font-size: 0.7rem;"><i class="ti ti-device-floppy"></i> Capturado: ${captura}</small>`;
-                                }
-                            }
-                            return `<span class="fw-bold text-dark">${fechaOperacion}</span>${infoExtra}`;
-                        }
-                    },
+                        data: 'fecha', // <-- Ahora jalamos la fecha operativa real
+                        render: function(data, type, row) {
+                            if (!data) return '';
+                            // Formatear fecha operativa de YYYY-MM-DD a DD/MM/YYYY
+                            const partes = data.split('-');
+                            const fechaOperacion = partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : data;
+                            
+                            // Mostrar la fecha de captura original en pequeño
+                            let infoExtra = '';
+                            if (row.creado_en) {
+                                const fechaC = new Date(row.creado_en);
+                                if (!isNaN(fechaC)) {
+                                    const captura = fechaC.toLocaleString('es-MX', {
+                                        day: '2-digit', month: '2-digit', year: 'numeric',
+                                        hour: '2-digit', minute: '2-digit', hour12: true
+                                    });
+                                    infoExtra = `<br><small class="text-muted" style="font-size: 0.7rem;"><i class="ti ti-device-floppy"></i> Capturado: ${captura}</small>`;
+                                }
+                            }
+                            return `<span class="fw-bold text-dark">${fechaOperacion}</span>${infoExtra}`;
+                        }
+                    },
 
                     {
 
@@ -1233,17 +1237,17 @@ try {
 
 
             $('#btnGuardarPago').on('click', function() {
-
                 const id = $('#ventaId').val();
-
                 const montoAPagar = parseMoneda($('#montoPagarHidden').val());
-
                 const cuentaPagoId = $('#cuentaPagoSelect').val();
-
-                const fechaPago = $('#fechaPago').val();
-
+                
+                // --- CAPTURAMOS FECHA Y LE SUMAMOS LA HORA ---
+                const fechaElegida = $('#fechaPago').val();
+                const horaActual = new Date().toTimeString().split(' ')[0];
+                const fechaPagoCompleta = fechaElegida ? (fechaElegida + ' ' + horaActual) : '';
+                // ---------------------------------------------
+                
                 const pendiente = parseFloat($('#montoPagarFormatted').data('pendiente')) || 0;
-
                 const moneda = $('#montoPagarFormatted').data('moneda') || 'MXN';
 
 
@@ -1285,15 +1289,10 @@ try {
                     contentType: 'application/json',
 
                     data: JSON.stringify({
-
                         id: id,
-
                         monto_a_pagar: montoAPagar,
-
                         cuenta_pago_id: cuentaPagoId,
-
-                        fecha_pago: fechaPago
-
+                        fecha_pago: fechaPagoCompleta // <--- USAMOS LA NUEVA VARIABLE AQUÍ
                     }),
 
                     success: function(response) {

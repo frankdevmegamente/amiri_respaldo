@@ -291,7 +291,7 @@ try {
                     COALESCE(SUM(CASE WHEN clasificacion = 'fijo' THEN monto ELSE 0 END), 0) as gastos_fijos,
                     COALESCE(SUM(CASE WHEN clasificacion = 'variable' THEN monto ELSE 0 END), 0) as gastos_variables
                 FROM gastos 
-                WHERE fecha BETWEEN ? AND ?
+                WHERE fecha BETWEEN ? AND ? AND activo = 1
             ");
             $stmt->execute([$fechaInicio, $fechaFin]);
             $gastos = $stmt->fetch(PDO::FETCH_ASSOC);

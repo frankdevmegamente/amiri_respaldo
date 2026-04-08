@@ -429,7 +429,8 @@ try {
                         COALESCE(SUM(CASE WHEN g.clasificacion = 'variable' THEN fm.monto ELSE 0 END), 0) as variables
                       FROM movimientos fm
                       LEFT JOIN gastos g ON fm.gasto_id = g.id
-                      WHERE fm.tipo = 'salida' AND fm.activo = 1
+                      WHERE fm.tipo = 'salida' AND fm.activo = 1 
+                      AND fm.estado = 'activo' AND (g.id IS NULL OR g.activo = 1)
                       AND fm.cuenta_origen_id = :cuentaId";
         
         $sqlGastos .= $filtroFecha;

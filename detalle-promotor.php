@@ -533,9 +533,28 @@ try {
                 },
 
                 columns: [
-
-                    { data: 'creado_en', 
-                    render: formatearFechaHora },
+                    {
+                        data: 'fecha',
+                        title: 'Fecha',
+                        render: function(data, type, row) {
+                            if (!data) return 'N/A';
+                            
+                            // Fecha de la operación principal (sin la zona horaria que resta un día)
+                            const soloFecha = data.split(' ')[0]; 
+                            const partes = soloFecha.split('-'); 
+                            const fechaOperacion = `${partes[2]}/${partes[1]}/${partes[0]}`; 
+                            
+                            let infoExtra = '';
+                            
+                            // Fecha real de cuando lo capturaste en el sistema
+                            if (row.creado_en) {
+                                let captura = typeof formatearFechaHora === 'function' ? formatearFechaHora(row.creado_en) : row.creado_en;
+                                infoExtra = `<br><small class="text-muted" style="font-size: 0.7rem;"><i class="ti ti-device-floppy"></i> Capturado: ${captura}</small>`;
+                            }
+                            
+                            return `<span class="fw-bold text-dark">${fechaOperacion}</span>${infoExtra}`;
+                        }
+                    },
 
                     { 
 

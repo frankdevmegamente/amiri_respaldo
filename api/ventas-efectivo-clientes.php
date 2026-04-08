@@ -176,7 +176,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 
     $cuenta = $input['cuenta_pago_id'] ?? null;
 
-    $fecha_pago = $input['fecha_pago'] ?? date('Y-m-d');
+    $fecha_pago_input = $input['fecha_pago'] ?? date('Y-m-d H:i:s');
+    if (strlen($fecha_pago_input) === 10) {
+        $fecha_pago = $fecha_pago_input . ' ' . date('H:i:s');
+    } else {
+        $fecha_pago = $fecha_pago_input;
+    }
 
 
 
@@ -315,14 +320,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 
 
             // Insertar movimiento tipo 'salida' (Pago a Cliente)
-
-            $stmtIns = $pdo->prepare("\n            INSERT INTO movimientos (grupo_id, fecha, servicio_id, tipo, moneda, monto, cuenta_origen_id, cuenta_destino_id, cliente_id, paridad, descripcion, activo)\n            VALUES (?, NOW(), ?, 'salida', 'MXN', ?, ?, ?, ?, ?, ?, 1)\n        ");
-
+            $stmtIns = $pdo->prepare("
+                INSERT INTO movimientos (grupo_id, fecha, servicio_id, tipo, moneda, monto, cuenta_origen_id, cuenta_destino_id, cliente_id, paridad, descripcion, activo)
+                VALUES (?, ?, ?, 'salida', 'MXN', ?, ?, ?, ?, ?, ?, 1)
+            ");
             $descripcion = 'Pago de venta efectivo ID ' . $id;
-
             // paridad = 1 para MXN
-
-            $stmtIns->execute([$grupo_id, $servicio_id, $pago, $cuenta, $venta['cuenta_cliente_id'], $venta['cliente_id'], 1, $descripcion]);
+            $stmtIns->execute([$grupo_id, $fecha_pago, $servicio_id, $pago, $cuenta, $venta['cuenta_cliente_id'], $venta['cliente_id'], 1, $descripcion]);
 
 
 

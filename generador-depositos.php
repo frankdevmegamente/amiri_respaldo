@@ -233,7 +233,92 @@ sort($bancos_unicos);
         }
     </style>
 </head>
+<style>
+    /* =========================================
+   🌙 REGLAS PARA MODO OSCURO (Generador Depósitos)
+   ========================================= */
 
+/* 1. Ticket y Fondo */
+[data-bs-theme="dark"] .ticket-wrapper {
+    background-color: transparent !important;
+}
+
+[data-bs-theme="dark"] .ticket-card {
+    background: #1a2234; /* Fondo oscuro del dashboard */
+    border-color: #2c344c;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+[data-bs-theme="dark"] .ticket-header {
+    border-bottom-color: #2c344c;
+}
+
+[data-bs-theme="dark"] .client-name {
+    color: #e9ecef;
+}
+
+[data-bs-theme="dark"] .client-account {
+    color: #8c9ea8;
+}
+
+[data-bs-theme="dark"] .client-row {
+    border-bottom-color: #2c344c;
+}
+
+[data-bs-theme="dark"] .client-amount {
+    background-color: rgba(93, 135, 255, 0.15);
+    color: #799dfb; 
+}
+
+[data-bs-theme="dark"] #placeholderTicket,
+[data-bs-theme="dark"] .text-muted-custom {
+    color: #8c9ea8 !important;
+}
+
+/* 2. Buscador Select2 (Para quitar el recuadro blanco) */
+[data-bs-theme="dark"] .select2-container--default .select2-selection--single {
+    background-color: #1a2234;
+    border-color: #2c344c;
+}
+
+[data-bs-theme="dark"] .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #e9ecef;
+}
+
+[data-bs-theme="dark"] .select2-dropdown {
+    background-color: #1a2234;
+    border-color: #2c344c;
+}
+
+[data-bs-theme="dark"] .select2-container--default .select2-search--dropdown .select2-search__field {
+    background-color: #252f43;
+    border-color: #2c344c;
+    color: #e9ecef;
+}
+
+[data-bs-theme="dark"] .select2-container--default .select2-results__option[aria-selected=true] {
+    background-color: #252f43;
+    color: #e9ecef;
+}
+
+[data-bs-theme="dark"] .select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #5d87ff;
+    color: #ffffff;
+}
+
+/* 3. Tabla del Directorio */
+[data-bs-theme="dark"] .table-directorio thead th {
+    background-color: #1a2234 !important;
+    color: #e9ecef !important;
+    border-bottom-color: #2c344c !important;
+    box-shadow: 0 1px 0px #2c344c;
+}
+
+[data-bs-theme="dark"] .table-directorio td {
+    color: #e9ecef;
+    border-color: #2c344c;
+}
+</style>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
         <?php include 'src/assets/partials/header.php'; ?>
@@ -271,29 +356,32 @@ sort($bancos_unicos);
                             <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
                                 <table class="table table-hover table-bordered table-directorio mb-0">
                                     <thead>
-                                        <tr>
-                                            <th style="position: sticky; top: 0; background: #f4f6f9 !important; z-index: 10; border-bottom: 2px solid #ebf1f6; color: #2A3547;">Nombre Completo</th>
-                                            <th style="position: sticky; top: 0; background: #f4f6f9 !important; z-index: 10; border-bottom: 2px solid #ebf1f6; color: #2A3547;">Banco</th>
-                                            <th style="position: sticky; top: 0; background: #f4f6f9 !important; z-index: 10; border-bottom: 2px solid #ebf1f6; color: #2A3547;">Cuenta</th>
-                                            <!-- <th style="position: sticky; top: 0; background: #f4f6f9 !important; z-index: 10; border-bottom: 2px solid #ebf1f6; color: #2A3547;">CLABE</th> -->
-                                            <th class="text-center" style="position: sticky; top: 0; background: #f4f6f9 !important; z-index: 10; border-bottom: 2px solid #ebf1f6; color: #2A3547;">Acción</th>
-                                        </tr>
-                                    </thead>
+    <tr>
+        <th style="position: sticky; top: 0; z-index: 10;">Nombre Completo</th>
+        <th style="position: sticky; top: 0; z-index: 10;">Banco</th>
+        <th style="position: sticky; top: 0; z-index: 10;">Cuenta</th>
+        <th class="text-center" style="position: sticky; top: 0; z-index: 10;">Acción</th>
+    </tr>
+</thead>
                                     <tbody id="cuerpoDirectorio">
                                         <?php if(empty($clientes)): ?>
                                             <tr><td colspan="5" class="text-center text-muted py-4">No hay clientes en el directorio. Descarga el machote y sube tu archivo.</td></tr>
                                         <?php else: ?>
                                             <?php foreach($clientes as $c): ?>
-                                            <tr>
-                                                <td class="fw-bold"><?= htmlspecialchars($c['nombre']) ?></td>
-                                                <td><span class="badge bg-light-primary text-primary"><?= htmlspecialchars($c['banco']) ?></span></td>
-                                                <td><?= htmlspecialchars($c['cuenta']) ?></td>
-                                                <!-- <td><?= htmlspecialchars($c['clabe']) ?></td> -->
-                                                <td class="text-center">
-                                                    <a href="?delete_id=<?= $c['id'] ?>" class="btn btn-sm btn-light-danger text-danger" onclick="return confirm('¿Eliminar cliente?')"><i class="ti ti-trash"></i></a>
-                                                </td>
-                                            </tr>
-                                            <?php endforeach; ?>
+<tr>
+    <td class="fw-bold"><?= htmlspecialchars($c['nombre']) ?></td>
+    
+    <td><span class="badge bg-primary bg-opacity-10 text-primary border-0 py-1 px-2" style="font-size: 0.8rem;"><?= htmlspecialchars($c['banco']) ?></span></td>
+    
+    <td><?= htmlspecialchars($c['cuenta']) ?></td>
+    
+    <td class="text-center">
+        <a href="?delete_id=<?= $c['id'] ?>" class="badge bg-danger bg-opacity-10 text-danger border-0" style="padding: 8px 12px; text-decoration: none; font-size: 0.85rem;" onclick="return confirm('¿Eliminar cliente?')">
+            <i class="ti ti-trash"></i>
+        </a>
+    </td>
+</tr>
+<?php endforeach; ?>
                                         <?php endif; ?>
                                     </tbody>
                                 </table>
@@ -344,12 +432,16 @@ sort($bancos_unicos);
 
                         <div class="col-lg-7 col-md-7">
                             <div class="ticket-wrapper">
-                                <div class="ticket-card" id="vistaPreviaTicket">
+                                <div class="ticket-card" id="vistaPreviaTicket" style="position: relative; overflow: hidden;">
                                     
-                                    <div class="ticket-header">
+                                    <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #5D87FF; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                                    <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+
+                                    <div class="ticket-header" style="position: relative; z-index: 1;">
                                         <div class="d-flex align-items-center" style="max-width: 50%; overflow: hidden;">
-                                            <img src="src/assets/images/logos/logo2.png" alt="Logo Amiri" style="height: 45px; max-width: 100%; object-fit: contain;" />
-                                        </div>
+    <img src="src/assets/images/logos/logo2.png" alt="Logo Amiri" class="logo-modo-claro" style="height: 45px; max-width: 100%; object-fit: contain;" />
+    <img src="src/assets/images/logos/logo2-blanco-sin-fondo.png" alt="Logo Amiri" class="logo-modo-oscuro" style="height: 45px; max-width: 100%; object-fit: contain; display: none;" />
+</div>
                                         <div class="text-end" style="margin-left: 15px;">
                                             <div class="ticket-title">DEPÓSITOS EN EFECTIVO</div>
                                         </div>

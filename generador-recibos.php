@@ -226,8 +226,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                         <div class="col-lg-7 col-md-7">
                             <div class="ticket-wrapper">
-                                <div class="ticket-card" id="vistaPreviaTicket">
-                                    <div class="ticket-header">
+                                <div class="ticket-card" id="vistaPreviaTicket" style="position: relative; overflow: hidden;">
+                                    
+                                    <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #5D87FF; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                                    <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+
+                                    <div class="ticket-header" style="position: relative; z-index: 1;">
                                         <img src="src/assets/images/logos/logo2.png" alt="Logo Amiri" class="logo-modo-claro" style="height: 45px; max-width: 100%; object-fit: contain;" />
 
 <img src="src/assets/images/logos/logo2-blanco-sin-fondo.png" alt="Logo Amiri" class="logo-modo-oscuro" style="height: 45px; max-width: 100%; object-fit: contain; display: none;" />

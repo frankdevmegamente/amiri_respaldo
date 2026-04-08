@@ -52,6 +52,96 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }
+        /* =========================================
+   🌙 REGLAS PARA MODO OSCURO (Usuarios y DataTables)
+   ========================================= */
+
+/* 1. Textos generales y Tarjetas */
+[data-bs-theme="dark"] h3,
+[data-bs-theme="dark"] .page-breadcrumb h3 {
+    color: #e9ecef !important;
+}
+
+[data-bs-theme="dark"] .card {
+    background: #1a2234;
+    border-color: #2c344c;
+}
+
+/* 2. Tabla principal (DataTables) */
+[data-bs-theme="dark"] .table>thead>tr>th {
+    background-color: #1a2234 !important;
+    color: #e9ecef !important;
+    border-bottom-color: #2c344c !important;
+}
+
+[data-bs-theme="dark"] .table>tbody>tr>td {
+    color: #e9ecef !important;
+    border-color: #2c344c !important;
+}
+
+/* Respetar el estilo "zebra" (striped) y hover en modo oscuro */
+[data-bs-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd)>* {
+    box-shadow: inset 0 0 0 9999px rgba(255, 255, 255, 0.02);
+}
+[data-bs-theme="dark"] .table-hover>tbody>tr:hover>* {
+    box-shadow: inset 0 0 0 9999px rgba(255, 255, 255, 0.05);
+}
+
+/* 3. Controles de DataTables (Buscar, Paginación, Entradas) */
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_length,
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter,
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_info,
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate {
+    color: #8c9ea8 !important;
+}
+
+/* Estilo para los botones de paginación */
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: #8c9ea8 !important;
+}
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: #252f43 !important;
+    border-color: #2c344c !important;
+    color: #e9ecef !important;
+}
+
+/* Inputs del buscador de DataTables */
+[data-bs-theme="dark"] .dataTables_wrapper select,
+[data-bs-theme="dark"] .dataTables_wrapper input {
+    background-color: #252f43;
+    border: 1px solid #2c344c;
+    color: #e9ecef;
+}
+
+/* 4. Modal de Agregar/Editar Usuario */
+[data-bs-theme="dark"] .modal-content {
+    background-color: #1a2234;
+    border-color: #2c344c;
+}
+[data-bs-theme="dark"] .modal-header {
+    border-bottom-color: #2c344c;
+}
+[data-bs-theme="dark"] .modal-footer {
+    border-top-color: #2c344c;
+}
+[data-bs-theme="dark"] .modal-title {
+    color: #e9ecef;
+}
+[data-bs-theme="dark"] .form-label {
+    color: #e9ecef;
+}
+
+/* Campos de texto y select dentro del Modal */
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: #252f43;
+    border-color: #2c344c;
+    color: #e9ecef;
+}
+[data-bs-theme="dark"] .form-control::placeholder {
+    color: #8c9ea8;
+}
 </style>
 
 <body>
@@ -300,7 +390,27 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     dataSrc: ''
                 },
                 columns: [
-                    { data: 'creado_en', render: formatearFechaHora },
+                    {
+                        data: 'fecha',
+                        title: 'Fecha',
+                        render: function(data, type, row) {
+                            if (!data) return 'N/A';
+                            
+                            // 1. Extraemos la fecha exacta ignorando zonas horarias
+                            const soloFecha = data.split(' ')[0]; 
+                            const partes = soloFecha.split('-'); 
+                            const fechaOperacion = `${partes[2]}/${partes[1]}/${partes[0]}`; 
+                            
+                            // 2. La fecha de captura exacta
+                            let infoExtra = '';
+                            if (row.creado_en) {
+                                let captura = typeof formatearFechaHora === 'function' ? formatearFechaHora(row.creado_en) : row.creado_en;
+                                infoExtra = `<br><small class="text-muted" style="font-size: 0.7rem;"><i class="ti ti-device-floppy"></i> Capturado: ${captura}</small>`;
+                            }
+                            
+                            return `<span class="fw-bold text-dark">${fechaOperacion}</span>${infoExtra}`;
+                        }
+                    },
                     { data: 'cuenta_nombre' },
                     { data: 'tipo_gasto_nombre' },
                     { 

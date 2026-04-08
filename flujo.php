@@ -86,6 +86,48 @@ $serviciosDivisas = [
 
     <style>
 
+    /* =========================================
+   🌙 ESTILOS PARA TARJETAS DE RESUMEN EN MODO OSCURO (BLINDADO)
+   ========================================= */
+
+/* 1. RECUPERAR EL TAMAÑO ORIGINAL (Venciendo la regla global de padding) */
+body[data-bs-theme="dark"] .card .card-header.header-saldos,
+body[data-bs-theme="dark"] .card .card-header.header-capital,
+body[data-bs-theme="dark"] .card .card-header.header-prestamos {
+    padding: 16px 20px !important; /* Devuelve el tamaño grande */
+    border-radius: 12px 12px 0 0 !important;
+}
+
+/* 2. SALDOS BANCARIOS (SUCCESS) */
+body[data-bs-theme="dark"] .card .header-saldos {
+    background-color: rgba(102, 187, 106, 0.15) !important;
+    border-bottom: 1px solid rgba(102, 187, 106, 0.3) !important;
+}
+body[data-bs-theme="dark"] .card .header-saldos span,
+body[data-bs-theme="dark"] .card .header-saldos i {
+    color: #66bb6a !important; /* Verde exacto de tu plantilla */
+}
+
+/* 3. CAPITAL (WARNING - Este color faltaba en tu dark-mode.css) */
+body[data-bs-theme="dark"] .card .header-capital {
+    background-color: rgba(255, 193, 7, 0.15) !important;
+    border-bottom: 1px solid rgba(255, 193, 7, 0.3) !important;
+}
+body[data-bs-theme="dark"] .card .header-capital span,
+body[data-bs-theme="dark"] .card .header-capital i {
+    color: #ffc107 !important; /* Amarillo brillante */
+}
+
+/* 4. PRÉSTAMOS (DANGER) */
+body[data-bs-theme="dark"] .card .header-prestamos {
+    background-color: rgba(239, 83, 80, 0.15) !important;
+    border-bottom: 1px solid rgba(239, 83, 80, 0.3) !important;
+}
+body[data-bs-theme="dark"] .card .header-prestamos span,
+body[data-bs-theme="dark"] .card .header-prestamos i {
+    color: #ef5350 !important; /* Rojo exacto de tu plantilla */
+}
+
         #modalDetalle .table-hover tbody tr:hover,
 
         #modalDetalle .table-hover tbody tr:hover td {
@@ -118,6 +160,136 @@ $serviciosDivisas = [
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }
+        /* =========================================
+   🌙 REGLAS PARA MODO OSCURO (Usuarios y DataTables)
+   ========================================= */
+
+/* 1. Textos generales y Tarjetas */
+[data-bs-theme="dark"] h3,
+[data-bs-theme="dark"] .page-breadcrumb h3 {
+    color: #e9ecef !important;
+}
+
+[data-bs-theme="dark"] .card {
+    background: #1a2234;
+    border-color: #2c344c;
+}
+
+/* 2. Tabla principal (DataTables) */
+[data-bs-theme="dark"] .table>thead>tr>th {
+    background-color: #1a2234 !important;
+    color: #e9ecef !important;
+    border-bottom-color: #2c344c !important;
+}
+
+[data-bs-theme="dark"] .table>tbody>tr>td {
+    color: #e9ecef !important;
+    border-color: #2c344c !important;
+}
+
+/* Respetar el estilo "zebra" (striped) y hover en modo oscuro */
+[data-bs-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd)>* {
+    box-shadow: inset 0 0 0 9999px rgba(255, 255, 255, 0.02);
+}
+[data-bs-theme="dark"] .table-hover>tbody>tr:hover>* {
+    box-shadow: inset 0 0 0 9999px rgba(255, 255, 255, 0.05);
+}
+
+/* 3. Controles de DataTables (Buscar, Paginación, Entradas) */
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_length,
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter,
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_info,
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate {
+    color: #8c9ea8 !important;
+}
+
+/* Estilo para los botones de paginación */
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: #8c9ea8 !important;
+}
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: #252f43 !important;
+    border-color: #2c344c !important;
+    color: #e9ecef !important;
+}
+
+/* Inputs del buscador de DataTables */
+[data-bs-theme="dark"] .dataTables_wrapper select,
+[data-bs-theme="dark"] .dataTables_wrapper input {
+    background-color: #252f43;
+    border: 1px solid #2c344c;
+    color: #e9ecef;
+}
+
+/* 4. Modal de Agregar/Editar Usuario */
+[data-bs-theme="dark"] .modal-content {
+    background-color: #1a2234;
+    border-color: #2c344c;
+}
+[data-bs-theme="dark"] .modal-header {
+    border-bottom-color: #2c344c;
+}
+[data-bs-theme="dark"] .modal-footer {
+    border-top-color: #2c344c;
+}
+[data-bs-theme="dark"] .modal-title {
+    color: #e9ecef;
+}
+[data-bs-theme="dark"] .form-label {
+    color: #e9ecef;
+}
+
+/* Campos de texto y select dentro del Modal */
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: #252f43;
+    border-color: #2c344c;
+    color: #e9ecef;
+}
+[data-bs-theme="dark"] .form-control::placeholder {
+    color: #8c9ea8;
+}
+/* =========================================
+   🌙 ESTILOS PARA TARJETAS DE RESUMEN EN MODO OSCURO Y CLARO
+   ========================================= */
+
+/* 1. ASEGURAR TAMAÑO Y FORMATO EN AMBOS MODOS (Claro y Oscuro) */
+.header-saldos, .header-capital, .header-prestamos {
+    font-size: 1.15rem !important;
+    font-weight: 700 !important;
+    padding: 16px 20px !important;
+    display: flex;
+    align-items: center;
+}
+
+/* 2. MODO OSCURO: FONDOS TRANSLÚCIDOS (Efecto Badge) */
+body[data-bs-theme="dark"] .header-saldos, .dark-mode .header-saldos {
+    background-color: rgba(25, 135, 84, 0.15) !important;
+    border-bottom: 1px solid #2c344c !important;
+}
+body[data-bs-theme="dark"] .header-capital, .dark-mode .header-capital {
+    background-color: rgba(255, 193, 7, 0.15) !important;
+    border-bottom: 1px solid #2c344c !important;
+}
+body[data-bs-theme="dark"] .header-prestamos, .dark-mode .header-prestamos {
+    background-color: rgba(220, 53, 69, 0.15) !important;
+    border-bottom: 1px solid #2c344c !important;
+}
+
+/* 3. MODO OSCURO: FORZAR COLORES DE TEXTO E ICONOS (Para vencer al text-white) */
+body[data-bs-theme="dark"] .header-saldos, .dark-mode .header-saldos,
+body[data-bs-theme="dark"] .header-saldos *, .dark-mode .header-saldos * {
+    color: #36c76c !important; /* Verde brillante */
+}
+body[data-bs-theme="dark"] .header-capital, .dark-mode .header-capital,
+body[data-bs-theme="dark"] .header-capital *, .dark-mode .header-capital * {
+    color: #ffc107 !important; /* Amarillo brillante */
+}
+body[data-bs-theme="dark"] .header-prestamos, .dark-mode .header-prestamos,
+body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
+    color: #fc4b6c !important; /* Rojo brillante */
+}
     </style>
 
 </head>
@@ -177,9 +349,9 @@ $serviciosDivisas = [
 
                         <div class="col-lg-4 mb-3">
                             <div class="card shadow-sm h-100">
-                                <div class="card-header bg-success text-white">
-                                    <span><i class="ti ti-wallet"></i> SALDOS BANCARIOS</span>
-                                </div>
+                                <div class="card-header header-saldos bg-success text-white fw-bold fs-5 py-3">
+    <span><i class="ti ti-wallet"></i> SALDOS BANCARIOS</span>
+</div>
                                 <div class="card-body p-0" style="max-height: 500px; overflow-y: auto;">
                                     <table class="table table-sm table-striped mb-0">
                                         <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">
@@ -199,9 +371,9 @@ $serviciosDivisas = [
 
                         <div class="col-lg-4 mb-3">
                             <div class="card shadow-sm h-100">
-                                <div class="card-header bg-warning text-white">
-                                    <span><i class="ti ti-building-bank"></i> CAPITAL</span>
-                                </div>
+                                <div class="card-header header-capital bg-warning text-white fw-bold fs-5 py-3">
+    <span><i class="ti ti-building-bank"></i> CAPITAL</span>
+</div>
                                 <div class="card-body p-0" style="max-height: 500px; overflow-y: auto;">
                                     <table class="table table-sm table-striped mb-0">
                                         <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">
@@ -221,9 +393,9 @@ $serviciosDivisas = [
 
                         <div class="col-lg-4 mb-3">
                             <div class="card shadow-sm h-100">
-                                <div class="card-header bg-danger text-white">
-                                    <span><i class="ti ti-coin"></i> PRÉSTAMOS / PROVEEDORES</span>
-                                </div>
+                                <div class="card-header header-prestamos bg-danger text-white fw-bold fs-5 py-3">
+    <span><i class="ti ti-coin"></i> PRÉSTAMOS / PROVEEDORES</span>
+</div>
                                 <div class="card-body p-0" style="max-height: 500px; overflow-y: auto;">
                                     <table class="table table-sm table-striped mb-0">
                                         <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">
