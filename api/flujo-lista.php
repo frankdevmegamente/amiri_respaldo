@@ -282,9 +282,8 @@ try {
 
             ) as monto_principal,
 
-            GROUP_CONCAT(DISTINCT COALESCE(co.nombre, '') SEPARATOR ', ') as cuentas_origen,
-
-            GROUP_CONCAT(DISTINCT COALESCE(cd.nombre, '') SEPARATOR ', ') as cuentas_destino,
+            GROUP_CONCAT(DISTINCT NULLIF(co.nombre, '') SEPARATOR ' | ') as cuentas_origen,
+            GROUP_CONCAT(DISTINCT NULLIF(cd.nombre, '') SEPARATOR ' | ') as cuentas_destino,
 
             MAX(COALESCE(cl.nombre, '')) as cliente,
 

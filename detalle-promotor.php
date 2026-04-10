@@ -741,27 +741,18 @@ try {
                 
 
                 $.get(url, function(data) {
-
                     $('#comisionesTotal').text(formatoMoneda(data.total_comisiones));
-
                     $('#comisionesPagadas').text(formatoMoneda(data.total_pagado));
-
                     $('#comisionesPendientes').text(formatoMoneda(data.total_pendiente));
-
                     
-
                     // Actualizar label en el modal
-
                     $('#labelPendiente').text(formatoMoneda(data.total_pendiente));
-
-                    $('#inputMontoPago').attr('max', data.total_pendiente);
-
                     
-
+                    // ACÁ MATAMOS AL FANTASMA: Obligamos al 'max' a tener máximo 2 decimales
+                    $('#inputMontoPago').attr('max', parseFloat(data.total_pendiente).toFixed(2));
+                    
                     // Deshabilitar botón si no hay deuda
-
-                    $('#btnPagarComisiones').prop('disabled', data.total_pendiente <= 0);
-
+                    $('#btnPagarComisiones').prop('disabled', parseFloat(data.total_pendiente) <= 0.001);
                 });
 
             }

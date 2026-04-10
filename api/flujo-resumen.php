@@ -112,14 +112,16 @@ try {
 
 
 
-            $stmtProv = $pdo->query("SELECT COALESCE(SUM(CASE WHEN tipo_moneda='MXN' THEN saldo_actual ELSE valor_mxn END),0) AS total FROM cuentas WHERE activo=1 AND tipo_cuenta=6");
-
+            // Buscamos la deuda directamente desde los proveedores enlazados
+            $stmtProv = $pdo->query("
+                SELECT COALESCE(SUM(c.valor_mxn), 0) AS total 
+                FROM proveedores p 
+                INNER JOIN cuentas c ON (p.cuenta_usd_id = c.id OR p.cuenta_usdt_id = c.id)
+                WHERE p.activo = 1
+            ");
             $totalProveedores = (float)$stmtProv->fetch(PDO::FETCH_ASSOC)['total'];
 
-
-
             $totalObligaciones = $totalPrestamistas + $totalProveedores;
-
             $diferencia = $totalSaldos - $totalCapital - $totalObligaciones;
 
 
@@ -254,20 +256,14 @@ try {
 
 
 
-            // 3. PROVEEDOR en MXN: valor_mxn acumulado en cuentas tipo 6
-
+            // 3. PROVEEDOR en MXN: valor_mxn acumulado conectado directamente al proveedor
             $stmt = $pdo->prepare("
-
-                SELECT COALESCE(SUM(valor_mxn), 0) AS total
-
-                FROM cuentas
-
-                WHERE activo = 1 AND tipo_cuenta = 6 AND tipo_moneda = :moneda
-
+                SELECT COALESCE(SUM(c.valor_mxn), 0) AS total
+                FROM proveedores p
+                INNER JOIN cuentas c ON (p.cuenta_usd_id = c.id OR p.cuenta_usdt_id = c.id)
+                WHERE p.activo = 1 AND c.tipo_moneda = :moneda
             ");
-
             $stmt->execute(['moneda' => $moneda]);
-
             $totalProveedoresAdeudos = (float)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
 
@@ -412,30 +408,19 @@ try {
 
         
 
-        // Sumar también las cuentas de proveedores (tipo 6) que representan adeudos
-
-        $sql = "SELECT COALESCE(SUM(saldo_actual), 0) AS total
-
-                FROM cuentas
-
-                WHERE activo = 1 
-
-                AND tipo_cuenta = 6" . $whereMoneda;
-
+        // Sumar también las cuentas de proveedores que representan adeudos
+        $sql = "SELECT COALESCE(SUM(c.valor_mxn), 0) AS total
+                FROM proveedores p
+                INNER JOIN cuentas c ON (p.cuenta_usd_id = c.id OR p.cuenta_usdt_id = c.id)
+                WHERE p.activo = 1";
         
-
         if ($moneda !== 'TODAS') {
-
+            $sql .= " AND c.tipo_moneda = :moneda";
             $stmt = $pdo->prepare($sql);
-
             $stmt->execute(['moneda' => $moneda]);
-
         } else {
-
             $stmt = $pdo->query($sql);
-
         }
-
         $totalProveedoresAdeudos = (float)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
         

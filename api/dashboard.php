@@ -14,26 +14,18 @@ require_once __DIR__ . '/../src/config/db.php';
 
 function generarPDFComisionesAmiri($pdo, $totalComisiones, $totalGastos, $remanente, $graficaData, $params, $filtroFecha, $cuentaAmiriId) {
 
-    // Obtener detalle de comisiones SOLO de AMIRI (excluir promotores)
+    // Eliminar el parámetro de cuenta porque ya no es necesario
+    if (isset($params[':cuentaId'])) {
+        unset($params[':cuentaId']);
+    }
 
-    $sqlDetalle = "SELECT fm.fecha, fm.descripcion, s.nombre as servicio, fm.monto, 
-
+    // Obtener detalle de comisiones SOLO de AMIRI (Sincronizado con Reportes)
+    $sqlDetalle = "SELECT fm.fecha, 'Comisión Amiri' as descripcion, 'Venta de Efectivo' as servicio, fm.comision_amiri as monto, 
                    cl.nombre as cliente
-
-                   FROM movimientos fm
-
-                   LEFT JOIN servicios s ON fm.servicio_id = s.id
-
+                   FROM deudas_clientes fm
                    LEFT JOIN clientes cl ON fm.cliente_id = cl.id
-
-                   WHERE fm.tipo = 'comision' AND fm.activo = 1
-
-                   AND fm.descripcion LIKE '%Amiri%'
-
-                   AND fm.cuenta_destino_id = :cuentaId";
-
+                   WHERE fm.activo = 1";
     
-
     $sqlDetalle .= $filtroFecha . " ORDER BY fm.fecha DESC";
 
     
@@ -352,59 +344,33 @@ try {
 
 
 
-        // Total de comisiones generadas SOLO de AMIRI
+        // Obtenemos los params sin :cuentaId para la nueva consulta
+        $paramsComisiones = $params;
 
-        $sql = "SELECT COALESCE(SUM(monto), 0) as total 
-
-                FROM movimientos fm
-
-                WHERE fm.tipo = 'comision' AND fm.activo = 1
-
-                AND fm.descripcion LIKE '%Amiri%'
-
-                AND fm.cuenta_destino_id = :cuentaId";
-
+        // Total de comisiones generadas SOLO de AMIRI (Sincronizado con Reportes)
+        $sql = "SELECT COALESCE(SUM(comision_amiri), 0) as total 
+                FROM deudas_clientes fm
+                WHERE fm.activo = 1";
         
-
-        $params[':cuentaId'] = $cuentaAmiriId;
-
-        
-
         $sql .= $filtroFecha;
-
         
-
         $stmt = $pdo->prepare($sql);
-
-        $stmt->execute($params);
-
+        $stmt->execute($paramsComisiones);
         $totalComisiones = (float)$stmt->fetchColumn();
 
-
-
-        // Datos para la gráfica (agrupados por fecha) SOLO de AMIRI
-
-        $sqlGrafica = "SELECT DATE(fm.fecha) as fecha, SUM(monto) as total
-
-                       FROM movimientos fm
-
-                       WHERE fm.tipo = 'comision' AND fm.activo = 1
-
-                       AND fm.descripcion LIKE '%Amiri%'
-
-                       AND fm.cuenta_destino_id = :cuentaId";
-
+        // Datos para la gráfica (agrupados por fecha) SOLO de AMIRI (Sincronizado con Reportes)
+        $sqlGrafica = "SELECT DATE(fm.fecha) as fecha, SUM(comision_amiri) as total
+                       FROM deudas_clientes fm
+                       WHERE fm.activo = 1";
         
-
         $sqlGrafica .= $filtroFecha . " GROUP BY DATE(fm.fecha) ORDER BY fecha ASC";
-
         
-
         $stmt = $pdo->prepare($sqlGrafica);
-
-        $stmt->execute($params);
-
+        $stmt->execute($paramsComisiones);
         $graficaData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Retornamos el cuentaId al array principal porque los Gastos de abajo sí lo necesitan
+        $params[':cuentaId'] = $cuentaAmiriId;
 
 
 

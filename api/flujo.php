@@ -212,11 +212,10 @@ try {
 
         $porcentaje_promotor = floatval($data['porcentaje_promotor'] ?? 0);
 
-        $comAmiri = $monto * ($porcentaje_amiri / 100);
-
-        $comPromotor = $monto * ($porcentaje_promotor / 100);
-
-        $montoAlCliente = $monto - $comAmiri - $comPromotor;
+        // Redondear estrictamente a 2 decimales para evitar fantasmas de centavos
+        $comAmiri = round($monto * ($porcentaje_amiri / 100), 2);
+        $comPromotor = round($monto * ($porcentaje_promotor / 100), 2);
+        $montoAlCliente = round($monto - $comAmiri - $comPromotor, 2);
 
         $stmtMovimiento->execute([
 

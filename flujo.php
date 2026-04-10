@@ -897,6 +897,12 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                     data: 'fecha', title: 'Fecha',
                     render: function(data, type, row) {
                         if (!data) return '';
+                        
+                        // ¡MAGIA DE ORDENAMIENTO!: Le damos la fecha cruda a la tabla para que sepa ordenar
+                        if (type === 'sort' || type === 'type') {
+                            return data; 
+                        }
+
                         // Esta es la fecha REAL de la operación que tú elegiste
                         const partes = data.split('-');
                         const fechaOperacion = `${partes[2]}/${partes[1]}/${partes[0]}`;
@@ -953,20 +959,39 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                     }
                 },
                 {
-                    data: null, title: 'Involucrados',
+                    data: null, 
+                    title: 'Involucrados',
+                    width: '300px', // Le decimos a la tabla que queremos esta columna ancha
                     render: function (data, type, row) {
-                        let html = '<div style="font-size:0.85rem; line-height: 1.4;">';
+                        // Le agregamos min-width: 260px; al contenedor para evitar que se apachurre el texto
+                        let html = '<div style="font-size:0.85rem; line-height: 1.4; min-width: 260px;">';
+                        
                         if (row.cliente  && row.cliente.trim())  html += '<div><i class="ti ti-user text-primary"></i> <strong class="text-dark">Cliente:</strong> <span class="text-muted">' + row.cliente + '</span></div>';
                         if (row.proveedor && row.proveedor.trim()) html += '<div><i class="ti ti-building text-info"></i> <strong class="text-dark">Proveedor:</strong> <span class="text-muted">' + row.proveedor + '</span></div>';
                         if (row.promotor  && row.promotor.trim())  html += '<div><i class="ti ti-user-star text-warning"></i> <strong class="text-dark">Promotor:</strong> <span class="text-muted">' + row.promotor + '</span></div>';
+                        
+                        // Extraer y mostrar cuentas de ORIGEN con punto visible
                         if (row.cuentas_origen && row.cuentas_origen.trim()) {
-                            let c = row.cuentas_origen.split(',').filter(x => x.trim());
-                            if (c.length) html += '<div><i class="ti ti-arrow-right text-danger"></i> <strong class="text-dark">Origen:</strong> <span class="text-muted">' + c[0] + '</span></div>';
+                            let c = row.cuentas_origen.split(/[,|]/).map(x => x.trim()).filter(x => x !== '');
+                            let unicos = [...new Set(c)];
+                            if (unicos.length) {
+                                html += '<div class="mt-1"><i class="ti ti-arrow-up text-danger"></i> <strong class="text-dark">Sale de:</strong>';
+                                unicos.forEach(cuenta => html += `<div class="text-muted" style="padding-left: 12px; margin-top: 2px;">• ${cuenta}</div>`);
+                                html += '</div>';
+                            }
                         }
+                        
+                        // Extraer y mostrar cuentas de DESTINO con punto visible
                         if (row.cuentas_destino && row.cuentas_destino.trim()) {
-                            let c = row.cuentas_destino.split(',').filter(x => x.trim());
-                            if (c.length) html += '<div><i class="ti ti-arrow-left text-success"></i> <strong class="text-dark">Destino:</strong> <span class="text-muted">' + c[0] + '</span></div>';
+                            let c = row.cuentas_destino.split(/[,|]/).map(x => x.trim()).filter(x => x !== '');
+                            let unicos = [...new Set(c)];
+                            if (unicos.length) {
+                                html += '<div class="mt-1"><i class="ti ti-arrow-down text-success"></i> <strong class="text-dark">Entra a:</strong>';
+                                unicos.forEach(cuenta => html += `<div class="text-muted" style="padding-left: 12px; margin-top: 2px;">• ${cuenta}</div>`);
+                                html += '</div>';
+                            }
                         }
+                        
                         html += '</div>';
                         return html || '<small class="text-muted">Sin datos</small>';
                     }
@@ -1007,61 +1032,33 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
 
         function cargarSaldos() {
-
             $.getJSON('api/flujo-resumen.php?tipo=saldos&moneda=TODAS', function (data) {
-
                 let html = '', totalMxn = 0;
-
                 if (data.cuentas && data.cuentas.length) {
-
                     data.cuentas.forEach(function (c) {
-
                         let saldo = parseFloat(c.saldo_actual || 0);
-
                         let mxn   = c.tipo_moneda === 'MXN' ? saldo : parseFloat(c.valor_mxn || 0);
-
                         totalMxn += mxn;
-
                         let montoDisplay = mostrarEnMXN
-
                             ? '$' + formatMXN(mxn) + ' MXN'
-
                             : (c.tipo_moneda === 'MXN' ? '$' + formatMXN(saldo) + ' MXN' : formatNativo(saldo) + ' ' + c.tipo_moneda);
-
                         let badge = c.tipo_moneda === 'USD'  ? '<span class="badge badge-usd">USD</span>' :
-
                                     c.tipo_moneda === 'USDT' ? '<span class="badge badge-usdt">USDT</span>' :
-
                                     '<span class="badge bg-secondary">MXN</span>';
-
                         let nombreCuenta = c.nombre;
-
                         if (c.banco && c.banco.trim()) {
-
                             nombreCuenta += ' (' + c.banco + ')';
-
                         }
-
                         html += `<tr>
-
                             <td>${nombreCuenta}</td>
-
                             <td>${badge}</td>
-
                             <td class="text-end fw-bold">${montoDisplay}</td>
-
                         </tr>`;
-
                     });
-
                 }
-
                 if (!html) html = `<tr><td colspan="3" class="text-center text-muted py-3">No hay cuentas</td></tr>`;
-
                 $('#saldosBody').html(html);
-
             });
-
         }
 
 
@@ -1423,29 +1420,18 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
 
         function cargarCuentasMXNPago() {
-
-            $.getJSON('api/cuentas.php?tipo_moneda=MXN&es_caja_empresa=1&con_saldo=1', function (data) {
-
+            $.getJSON('api/cuentas.php?tipo_moneda=MXN&es_caja_empresa=1', function (data) {
                 let html = '<option value="">-- Selecciona la cuenta --</option>';
-
                 data.forEach(c => {
-
                     let nombreCuenta = c.nombre;
-
                     if (c.banco && c.banco.trim()) {
-
                         nombreCuenta += ' (' + c.banco + ')';
-
                     }
-
-                    html += `<option value="${c.id}">${nombreCuenta} ($${formatMXN(c.saldo_actual)} MXN)</option>`;
-
+                    // AQUÍ ESTÁ LA MAGIA: data-saldo="${c.saldo_actual}"
+                    html += `<option value="${c.id}" data-saldo="${c.saldo_actual}">${nombreCuenta} ($${formatMXN(c.saldo_actual)} MXN)</option>`;
                 });
-
                 $('#cuentaPagoContadoSelect').html(html);
-
             });
-
         }
 
 
@@ -1655,29 +1641,17 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                         </div>
 
                         <div class="mb-3">
-
-                            <small class="text-muted label-formato-tc"></small>
-
-                            <label class="form-label">Tipo de Cambio <span class="text-muted">(MXN por 1 ${moneda})</span></label>
-
-                            <input type="number" step="0.0001" class="form-control input-tc" required>
-
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label class="form-label">Total MXN <span class="text-muted">(referencia)</span></label>
-
+                            <label class="form-label fw-bold">Total a Pagar (MXN) *</label>
                             <div class="input-group">
-
                                 <span class="input-group-text">$</span>
-
-                                <input type="text" class="form-control input-total-mxn bg-light" readonly>
-
+                                <input type="number" step="0.01" class="form-control input-total-mxn-editable fw-bold" required>
                                 <span class="input-group-text">MXN</span>
-
                             </div>
-
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted label-formato-tc"></small>
+                            <label class="form-label">Tipo de Cambio <span class="text-muted">(calculado o manual)</span></label>
+                            <input type="number" step="0.0001" class="form-control input-tc" required>
                         </div>
 
                         <div class="mb-3">
@@ -1705,17 +1679,12 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                         </div>
 
                         <div class="mb-3" id="grupoCuentaPagoContado" style="display:none;">
-
                             <label class="form-label fw-bold text-success">Cuenta de Pago (Contado) *</label>
-
                             <select class="form-select" id="cuentaPagoContadoSelect">
-
                                 <option value="">-- Selecciona la cuenta --</option>
-
                             </select>
-
+                            <div id="warningFondoInsuficiente" class="alert alert-warning py-1 px-2 mt-1 mb-0" style="display:none;font-size:0.875rem;"></div>
                             <small class="text-success"><i class="ti ti-arrow-right"></i> Se descontará el MXN de esta cuenta inmediatamente</small>
-
                         </div>
 
                     `);
@@ -1763,31 +1732,18 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                         </div>
 
                         <div class="mb-3">
-
-                            <small class="text-muted label-formato-tc"></small>
-
-                            <label class="form-label">Tipo de Cambio <span class="text-muted">(precio por ${moneda} en MXN)</span></label>
-
-                            <input type="number" step="0.0001" class="form-control input-tc" required>
-
-                        </div>
-
-                        <div class="mb-3">
-
-                            <label class="form-label fw-bold text-success">Total MXN a depositar en cuenta</label>
-
+                            <label class="form-label fw-bold text-success">Total MXN a recibir *</label>
                             <div class="input-group">
-
                                 <span class="input-group-text">$</span>
-
-                                <input type="text" class="form-control input-total-mxn bg-light fw-bold" readonly>
-
+                                <input type="number" step="0.01" class="form-control input-total-mxn-editable fw-bold text-success" required>
                                 <span class="input-group-text">MXN</span>
-
                             </div>
-
                             <small class="text-success"><i class="ti ti-arrow-right"></i> Este monto se sumará a la cuenta seleccionada</small>
-
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted label-formato-tc"></small>
+                            <label class="form-label">Tipo de Cambio <span class="text-muted">(calculado o manual)</span></label>
+                            <input type="number" step="0.0001" class="form-control input-tc" required>
                         </div>
 
                     `);
@@ -2254,42 +2210,47 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
         // ─── Cálculo automático Divisas (cantidad × TC) + labels de formato ─────
 
-        $(document).on('input', '.input-cantidad, .input-tc', function () {
-
+        // ─── Cálculo automático Divisas (Bidireccional) ─────────────────────────
+        $(document).on('input', '.input-cantidad, .input-tc, .input-total-mxn-editable', function (e) {
+            let $target  = $(e.target);
             let cantidad = parseFloat($('.input-cantidad').val()) || 0;
+            let tc       = parseFloat($('.input-tc').val()) || 0;
+            let total    = parseFloat($('.input-total-mxn-editable').val()) || 0;
 
-            let tc       = parseFloat($('.input-tc').val())       || 0;
-
-            let totalMxn = cantidad * tc;
-
-
-
-            $('.input-total-mxn').val(formatMXN(totalMxn));
-
-
+            if ($target.hasClass('input-total-mxn-editable')) {
+                // Si escribes el Total MXN -> Calcula automáticamente el Tipo de Cambio
+                if (cantidad > 0 && total > 0) {
+                    tc = total / cantidad;
+                    $('.input-tc').val(tc.toFixed(4));
+                }
+            } else if ($target.hasClass('input-tc')) {
+                // Si escribes el Tipo de Cambio -> Calcula automáticamente el Total MXN
+                if (cantidad > 0 && tc > 0) {
+                    total = cantidad * tc;
+                    $('.input-total-mxn-editable').val(total.toFixed(2));
+                }
+            } else if ($target.hasClass('input-cantidad')) {
+                // Si cambias la Cantidad -> Prioriza actualizar el Total si ya hay un TC
+                if (tc > 0) {
+                    total = cantidad * tc;
+                    $('.input-total-mxn-editable').val(total.toFixed(2));
+                } else if (total > 0 && cantidad > 0) {
+                    tc = total / cantidad;
+                    $('.input-tc').val(tc.toFixed(4));
+                }
+            }
 
             // Labels con formato de comas encima de los inputs
-
             if (cantidad > 0) {
-
                 $('.label-formato-cantidad').text('= ' + formatNativo(cantidad));
-
             } else {
-
                 $('.label-formato-cantidad').text('');
-
             }
-
             if (tc > 0) {
-
                 $('.label-formato-tc').text('= $' + formatMXN(tc));
-
             } else {
-
                 $('.label-formato-tc').text('');
-
             }
-
         });
 
 
@@ -2978,31 +2939,39 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
 
 
-            if (esDivisas) {
+           if (esDivisas) {
 
                 // Validar que no se venda más de lo disponible en inventario
-
                 // IDs de venta: 2=Venta de Dólares, 3=Venta de USDT
-
                 let esVenta = [2, 3].includes(servicioId);
-
                 if (esVenta) {
-
                     let cantInput   = $('.input-cantidad');
-
                     let cantVal     = parseFloat(cantInput.val()) || 0;
-
                     let maxDisp     = parseFloat(cantInput.data('max-disponible')) || 0;
-
                     if (maxDisp > 0 && cantVal > maxDisp + 0.0001) {
-
                         showToast('No puedes vender más de lo disponible en inventario (' + formatNativo(maxDisp) + ')', 'error');
-
                         return;
-
                     }
-
                 }
+
+                // Validar que en compras de contado la cuenta de origen tenga saldo suficiente
+                let esCompra = [5, 6].includes(servicioId); // 5=Compra USD, 6=Compra USDT
+                if (esCompra && $('.input-tipo-pago').val() === 'contado') {
+                    // Leemos el total, quitándole las comas por si tiene formato
+                    let inputTotal = $('.input-total-mxn-editable').length > 0 ? $('.input-total-mxn-editable').val() : $('.input-total-mxn').val();
+                    let totalAPagar = parseFloat((inputTotal || '0').replace(/,/g, '')) || 0;
+                    let saldoCuenta = parseFloat($('#cuentaPagoContadoSelect option:selected').data('saldo')) || 0;
+                    
+                    if ($('#cuentaPagoContadoSelect').val() && totalAPagar > saldoCuenta + 0.001) {
+                        showToast('Fondos insuficientes: El monto a pagar supera el saldo de la cuenta seleccionada.', 'error');
+                        
+                        // Mostrar la alerta visual
+                        $('#warningFondoInsuficiente').show().html('<i class="ti ti-alert-triangle"></i> El total a pagar (<strong>$' + formatMXN(totalAPagar) + '</strong>) supera el saldo de la cuenta (<strong>$' + formatMXN(saldoCuenta) + '</strong>)');
+                        return;
+                    }
+                }
+
+                // ── POST a api/flujo-divisas.php ──────────────────────────
 
 
 
