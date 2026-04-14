@@ -122,9 +122,18 @@ try {
             $totalProveedores = (float)$stmtProv->fetch(PDO::FETCH_ASSOC)['total'];
 
             $totalObligaciones = $totalPrestamistas + $totalProveedores;
-            $diferencia = $totalSaldos - $totalCapital - $totalObligaciones;
+            
+            // Redondear para evitar basura de flotantes
+            $totalSaldos = round($totalSaldos, 2);
+            $totalCapital = round($totalCapital, 2);
+            $totalObligaciones = round($totalObligaciones, 2);
 
-
+            $diferencia = round($totalSaldos - $totalCapital - $totalObligaciones, 2);
+            
+            // Absorber discrepancias microscópicas de redondeo de divisas (hasta 5 centavos)
+            if (abs($diferencia) <= 0.05) {
+                $diferencia = 0.00;
+            }
 
             echo json_encode([
 
@@ -269,10 +278,16 @@ try {
 
 
             // 4. DIFERENCIA = Saldos - Capital - Proveedor
+            $totalSaldos = round($totalSaldos, 2);
+            $totalCapital = round($totalCapital, 2);
+            $totalProveedoresAdeudos = round($totalProveedoresAdeudos, 2);
 
-            $diferencia = $totalSaldos - $totalCapital - $totalProveedoresAdeudos;
+            $diferencia = round($totalSaldos - $totalCapital - $totalProveedoresAdeudos, 2);
 
-
+            // Absorber discrepancias de redondeo
+            if (abs($diferencia) <= 0.05) {
+                $diferencia = 0.00;
+            }
 
             echo json_encode([
 
@@ -429,24 +444,23 @@ try {
 
         
 
+        $totalSaldos = round($totalSaldos, 2);
+        $totalCapital = round($totalCapital, 2);
+        $totalPrestamos = round($totalPrestamos, 2);
+        $totalProveedoresAdeudos = round($totalProveedoresAdeudos, 2);
+
         // 4. DIFERENCIA
-
-        // Para MXN: Saldos - (Capital + Préstamos)
-
-        // Para divisas (USD/USDT): Saldos + Capital - Proveedor
-
         if ($moneda === 'USD' || $moneda === 'USDT') {
-
-            $diferencia = $totalSaldos + $totalCapital - $totalProveedoresAdeudos;
-
+            $diferencia = round($totalSaldos + $totalCapital - $totalProveedoresAdeudos, 2);
         } else {
-
-            $diferencia = $totalSaldos - ($totalCapital + $totalPrestamos);
-
+            $diferencia = round($totalSaldos - ($totalCapital + $totalPrestamos), 2);
         }
-
         
-
+        // Absorber discrepancias de redondeo
+        if (abs($diferencia) <= 0.05) {
+            $diferencia = 0.00;
+        }
+        
         echo json_encode([
 
             'diferencia' => $diferencia,

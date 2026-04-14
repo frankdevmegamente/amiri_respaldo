@@ -200,7 +200,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
             <div class="body-wrapper-inner">
 
-                <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+                <div class="container-fluid px-4" style="max-width: 100%;">
 
 
 

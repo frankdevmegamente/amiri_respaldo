@@ -166,7 +166,7 @@ try {
 
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
-                <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+                <div class="container-fluid px-4" style="max-width: 100%;">
                     
                     <div class="card bg-light-info shadow-none position-relative overflow-hidden mb-4 mt-2">
                         <div class="card-body px-4 py-3">

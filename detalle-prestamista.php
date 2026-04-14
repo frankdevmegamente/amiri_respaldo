@@ -182,7 +182,7 @@ try {
 
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
-                <div class="container-fluid px-4" style="max-width: 95%;">
+                <div class="container-fluid px-4" style="max-width: 100%;">
                     
                     <div class="row mt-2">
                         <div class="col-12">

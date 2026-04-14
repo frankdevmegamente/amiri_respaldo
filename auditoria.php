@@ -144,7 +144,7 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
 
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
-                <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+                <div class="container-fluid px-4" style="max-width: 100%;">
                     <div class="card bg-light-info shadow-none position-relative overflow-hidden mt-2 mb-4">
                         <div class="card-body px-4 py-3">
                             <div class="row align-items-center">

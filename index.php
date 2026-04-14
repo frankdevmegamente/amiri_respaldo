@@ -72,7 +72,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
     <div class="body-wrapper">
       <div class="body-wrapper-inner">
-        <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
+        <div class="container-fluid px-4" style="max-width: 100%;">
           <div class="card-body text-center py-4 mt-2">
             <h1 class="text-gray mb-0 fw-bold" id="myElement" style="font-size: 2.5rem; letter-spacing: 1px;"></h1>
           </div>

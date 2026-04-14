@@ -312,7 +312,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
-                <div class="container-fluid px-4" style="max-width: 95%;">
+                <div class="container-fluid px-4" style="max-width: 100%;">
 
                     <div class="row mb-3 mt-2">
                         <div class="col-12 d-flex align-items-center gap-2">
@@ -960,36 +960,52 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                 },
                 {
                     data: null, 
-                    title: 'Involucrados',
-                    width: '300px', // Le decimos a la tabla que queremos esta columna ancha
+                    title: 'Movimiento',
+                    width: '320px',
                     render: function (data, type, row) {
-                        // Le agregamos min-width: 260px; al contenedor para evitar que se apachurre el texto
-                        let html = '<div style="font-size:0.85rem; line-height: 1.4; min-width: 260px;">';
+                        let html = '<div style="font-size:0.85rem; line-height: 1.5; min-width: 280px;">';
                         
-                        if (row.cliente  && row.cliente.trim())  html += '<div><i class="ti ti-user text-primary"></i> <strong class="text-dark">Cliente:</strong> <span class="text-muted">' + row.cliente + '</span></div>';
-                        if (row.proveedor && row.proveedor.trim()) html += '<div><i class="ti ti-building text-info"></i> <strong class="text-dark">Proveedor:</strong> <span class="text-muted">' + row.proveedor + '</span></div>';
-                        if (row.promotor  && row.promotor.trim())  html += '<div><i class="ti ti-user-star text-warning"></i> <strong class="text-dark">Promotor:</strong> <span class="text-muted">' + row.promotor + '</span></div>';
+                        // 1. LA PERSONA (A quién se le paga o quién nos paga)
+                        let personaHtml = '';
+                        if (row.cliente  && row.cliente.trim())  personaHtml += '<div class="mb-1"><i class="ti ti-user text-primary"></i> <strong class="text-dark">Cliente:</strong> <span class="text-muted">' + row.cliente + '</span></div>';
+                        if (row.proveedor && row.proveedor.trim()) personaHtml += '<div class="mb-1"><i class="ti ti-building text-info"></i> <strong class="text-dark">Proveedor:</strong> <span class="text-muted">' + row.proveedor + '</span></div>';
+                        if (row.promotor  && row.promotor.trim())  personaHtml += '<div class="mb-1"><i class="ti ti-user-star text-warning"></i> <strong class="text-dark">Promotor:</strong> <span class="text-muted">' + row.promotor + '</span></div>';
                         
-                        // Extraer y mostrar cuentas de ORIGEN con punto visible
-                        if (row.cuentas_origen && row.cuentas_origen.trim()) {
-                            let c = row.cuentas_origen.split(/[,|]/).map(x => x.trim()).filter(x => x !== '');
-                            let unicos = [...new Set(c)];
-                            if (unicos.length) {
-                                html += '<div class="mt-1"><i class="ti ti-arrow-up text-danger"></i> <strong class="text-dark">Sale de:</strong>';
-                                unicos.forEach(cuenta => html += `<div class="text-muted" style="padding-left: 12px; margin-top: 2px;">• ${cuenta}</div>`);
-                                html += '</div>';
+                        if (personaHtml) {
+                            html += '<div class="p-2 mb-2 rounded bg-light border border-light-subtle">' + personaHtml + '</div>';
+                        }
+
+                        // 2. LAS CUENTAS REALES (Filtramos la basura virtual)
+                        function limpiarCuentas(cuentasString) {
+                            if (!cuentasString || !cuentasString.trim()) return [];
+                            return cuentasString.split(/[,|]/)
+                                .map(x => x.trim())
+                                .filter(x => x !== '')
+                                .filter(x => !x.startsWith('Caja -') && !x.startsWith('Comisiones -') && !x.startsWith('Caja Proveedor'));
+                        }
+
+                        let unicosOrigen = [...new Set(limpiarCuentas(row.cuentas_origen))];
+                        let unicosDestino = [...new Set(limpiarCuentas(row.cuentas_destino))];
+
+                        // 3. LÓGICA HUMANA DE LECTURA (Lo que pidió Jorge)
+                        let tipoMov = row.tipo_principal || '';
+
+                        if (tipoMov === 'Salida') {
+                            // Si es una salida (pago a cliente/proveedor), SOLO decimos de dónde salió el dinero
+                            if (unicosOrigen.length) {
+                                html += '<div><i class="ti ti-arrow-up text-danger"></i> <strong class="text-dark">Salió de:</strong><br><span class="text-muted ps-3 d-block">• ' + unicosOrigen.join('<br>• ') + '</span></div>';
                             }
                         }
-                        
-                        // Extraer y mostrar cuentas de DESTINO con punto visible
-                        if (row.cuentas_destino && row.cuentas_destino.trim()) {
-                            let c = row.cuentas_destino.split(/[,|]/).map(x => x.trim()).filter(x => x !== '');
-                            let unicos = [...new Set(c)];
-                            if (unicos.length) {
-                                html += '<div class="mt-1"><i class="ti ti-arrow-down text-success"></i> <strong class="text-dark">Entra a:</strong>';
-                                unicos.forEach(cuenta => html += `<div class="text-muted" style="padding-left: 12px; margin-top: 2px;">• ${cuenta}</div>`);
-                                html += '</div>';
+                        else if (tipoMov === 'Entrada') {
+                            // Si es una entrada, SOLO decimos a qué banco nuestro entró
+                            if (unicosDestino.length) {
+                                html += '<div><i class="ti ti-arrow-down text-success"></i> <strong class="text-dark">Entró a:</strong><br><span class="text-muted ps-3 d-block">• ' + unicosDestino.join('<br>• ') + '</span></div>';
                             }
+                        }
+                        else {
+                            // Si es un Traspaso o movimiento combinado, mostramos ambas
+                            if (unicosOrigen.length) html += '<div><i class="ti ti-arrow-up text-danger"></i> <strong class="text-dark">Salió de:</strong><br><span class="text-muted ps-3 d-block">• ' + unicosOrigen.join('<br>• ') + '</span></div>';
+                            if (unicosDestino.length) html += '<div class="mt-1"><i class="ti ti-arrow-down text-success"></i> <strong class="text-dark">Entró a:</strong><br><span class="text-muted ps-3 d-block">• ' + unicosDestino.join('<br>• ') + '</span></div>';
                         }
                         
                         html += '</div>';
@@ -1641,7 +1657,10 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Total a Pagar (MXN) *</label>
+                            <label class="form-label fw-bold">
+                                Total a Pagar (MXN) *
+                                <span class="label-formato-total text-success fw-bold ms-2"></span>
+                            </label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" step="0.01" class="form-control input-total-mxn-editable fw-bold" required>
@@ -1732,7 +1751,10 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label fw-bold text-success">Total MXN a recibir *</label>
+                            <label class="form-label fw-bold text-success">
+                                Total MXN a recibir *
+                                <span class="label-formato-total text-success fw-bold ms-2"></span>
+                            </label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
                                 <input type="number" step="0.01" class="form-control input-total-mxn-editable fw-bold text-success" required>
@@ -2250,6 +2272,12 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                 $('.label-formato-tc').text('= $' + formatMXN(tc));
             } else {
                 $('.label-formato-tc').text('');
+            }
+            // Espejito con comas para el Total MXN
+            if (total > 0) {
+                $('.label-formato-total').text('= $' + formatMXN(total));
+            } else {
+                $('.label-formato-total').text('');
             }
         });
 
