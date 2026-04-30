@@ -1,107 +1,225 @@
 <?php
-
 require_once __DIR__ . '/../src/config/api-middleware.php';
-
 require_once __DIR__ . '/../src/config/db.php';
 
-require_once __DIR__ . '/../src/config/auditoria.php';
-
-require_once __DIR__ . '/../src/config/logger.php';
-
-
-
-initApi();
-
-requireAdmin();
-
+initApi(); 
+requireAdmin(); 
 $pdo = getPDO();
 
-
-
-/* METHOD OVERRIDE */
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['_method'])) {
-
-    $_SERVER['REQUEST_METHOD'] = strtoupper($_POST['_method']);
-
+/* ==========================================================
+   1. GET: LEER DEUDAS (TABLA O INDIVIDUAL)
+   ========================================================== */
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $prestamista_id = isset($_GET['prestamista_id']) ? (int)$_GET['prestamista_id'] : 0;
+    $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+    
+    try {
+        if ($id > 0) {
+            $stmt = $pdo->prepare("SELECT * FROM deudas_empresa WHERE id = ? AND activo = 1");
+            $stmt->execute([$id]);
+            $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
+            echo json_encode($prestamo ?: ['error' => 'No encontrado']);
+        } elseif ($prestamista_id > 0) {
+            $stmt = $pdo->prepare("SELECT * FROM deudas_empresa WHERE prestamista_id = ? AND activo = 1 ORDER BY id DESC");
+            $stmt->execute([$prestamista_id]);
+            echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        } else {
+            $stmt = $pdo->query("SELECT * FROM deudas_empresa WHERE activo = 1 ORDER BY id DESC");
+            echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        }
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => $e->getMessage()]);
+    }
+    exit;
 }
 
+/* ==========================================================
+   2. POST: CREAR NUEVO PRÉSTAMO
+   ========================================================== */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        $prestamista_id = $_POST['prestamista_id'] ?? null;
+        $cuenta_id = $_POST['cuenta_id'] ?? null;
+        $monto = (float)($_POST['monto'] ?? 0);
+        $fecha = $_POST['fecha'] ?? null;
 
-
-/* GET */
-
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-
-
-
-    // Si viene ?id= retorna un préstamo específico
-
-    $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
-
-    if ($id) {
-
-        $stmt = $pdo->prepare("
-
-            SELECT *
-
-            FROM deudas_empresa
-
-            WHERE id = ?
-
-        ");
-
-        $stmt->execute([$id]);
-
-        $resultado = $stmt->fetch();
-
-        if (!$resultado) {
-
-            http_response_code(404);
-
-            echo json_encode(['error' => 'Préstamo no encontrado']);
-
-            exit;
-
+        if (!$prestamista_id || !$cuenta_id || $monto <= 0 || !$fecha) {
+            throw new Exception("Datos insuficientes para crear el préstamo");
         }
 
-        echo json_encode($resultado);
+        $pdo->beginTransaction();
+        
+        $pdo->prepare("INSERT INTO deudas_empresa (prestamista_id, cuenta_id, monto, fecha, descripcion, estado, monto_pagado, activo) VALUES (?,?,?,?,?,'pendiente',0,1)")
+            ->execute([$prestamista_id, $cuenta_id, $monto, $fecha, $_POST['descripcion'] ?? null]);
+        
+        $prestamo_id = $pdo->lastInsertId();
+        $grupo_id = round(microtime(true) * 1000);
+        
+        $stmt = $pdo->prepare("SELECT nombre FROM prestamistas WHERE id = ?");
+        $stmt->execute([$prestamista_id]);
+        $prestamista_nombre = $stmt->fetchColumn();
+        
+        $pdo->prepare("INSERT INTO movimientos (grupo_id, fecha, tipo, monto, moneda, descripcion, cuenta_destino_id, prestamista_id, usuario_id, servicio_id, referencia_id, activo) VALUES (?, ?, 'entrada', ?, 'MXN', ?, ?, ?, ?, 10, ?, 1)")
+            ->execute([$grupo_id, $fecha, $monto, 'Préstamo de ' . $prestamista_nombre, $cuenta_id, $prestamista_id, $_SESSION['usuario_id'], $prestamo_id]);
 
-        exit;
+        $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual + ? WHERE id = ?")->execute([$monto, $cuenta_id]);
 
+        $pdo->commit();
+        echo json_encode(['success' => true]);
+    } catch (Exception $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        http_response_code(400); echo json_encode(['error' => $e->getMessage()]);
     }
-
-
-
-    // Si viene ?prestamista_id= retorna todos los de ese prestamista
-
-    $prestamistaId = filter_input(INPUT_GET, 'prestamista_id', FILTER_VALIDATE_INT);
-
-
-
-    if ($prestamistaId) {
-
-        $stmt = $pdo->prepare("
-
-            SELECT *
-
-            FROM deudas_empresa
-
-            WHERE prestamista_id = ? AND activo = 1
-
-            ORDER BY fecha DESC
-
-        ");
-
-        $stmt->execute([$prestamistaId]);
-
-        echo json_encode($stmt->fetchAll());
-
-        exit;
-
-    }
-
+    exit;
 }
 
+/* ==========================================================
+   PUT (ABONO CON CONTROL MANUAL DE CANTIDADES UNIFICADO)
+   ========================================================== */
+if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $pagos = $input['pagos'] ?? []; 
+    $cuenta_id = $input['cuenta_pago_id'] ?? null;
+    $fecha_pago = $input['fecha_pago'] ?? date('Y-m-d H:i:s');
+
+    if (empty($pagos) || !$cuenta_id) {
+        http_response_code(400); echo json_encode(['error' => 'Datos inválidos']); exit;
+    }
+
+    $pdo->beginTransaction();
+    try {
+        // --- 1. FILTRO DE SEGURIDAD (CANDADO ANTI-SOBREPAGOS) ---
+        $pagos_reales = [];
+        $total_real_a_pagar = 0;
+
+        foreach ($pagos as $p) {
+            $id = (int)$p['id'];
+            $abono_solicitado = (float)$p['abono'];
+            if ($abono_solicitado <= 0) continue;
+
+            $stmtD = $pdo->prepare("SELECT monto, monto_pagado, prestamista_id FROM deudas_empresa WHERE id = ? AND activo = 1");
+            $stmtD->execute([$id]);
+            $deuda = $stmtD->fetch(PDO::FETCH_ASSOC);
+
+            if (!$deuda) continue;
+
+            $pendiente = round((float)$deuda['monto'] - (float)$deuda['monto_pagado'], 2);
+            
+            // MAGIA AQUÍ: Si el abono es mayor al pendiente, lo bajamos matemáticamente al límite exacto.
+            $abono_seguro = ($abono_solicitado > $pendiente) ? $pendiente : $abono_solicitado;
+
+            if ($abono_seguro > 0) {
+                $pagos_reales[] = [
+                    'id' => $id,
+                    'abono' => $abono_seguro,
+                    'prestamista_id' => $deuda['prestamista_id'],
+                    'monto' => $deuda['monto'],
+                    'monto_pagado' => $deuda['monto_pagado']
+                ];
+                $total_real_a_pagar += $abono_seguro;
+            }
+        }
+
+        if ($total_real_a_pagar <= 0) {
+            throw new Exception("No hay deudas válidas para abonar.");
+        }
+
+        // --- 2. VALIDACIÓN DE LA CAJA REAL ---
+        $stmtS = $pdo->prepare("SELECT saldo_actual FROM cuentas WHERE id = ?");
+        $stmtS->execute([$cuenta_id]);
+        if ($stmtS->fetchColumn() < $total_real_a_pagar) {
+            throw new Exception("Saldo insuficiente en caja. Necesitas $" . number_format($total_real_a_pagar, 2));
+        }
+
+        $g_id = round(microtime(true) * 1000);
+
+        // --- 3. APLICACIÓN DE PAGOS VERIFICADOS ---
+        foreach ($pagos_reales as $p) {
+            $nuevo_pagado = $p['monto_pagado'] + $p['abono'];
+            $estado = ($nuevo_pagado >= $p['monto'] - 0.01) ? 'pagado' : 'parcial';
+
+            $pdo->prepare("UPDATE deudas_empresa SET monto_pagado = ?, estado = ?, fecha_pago = ? WHERE id = ?")
+                ->execute([$nuevo_pagado, $estado, $fecha_pago, $p['id']]);
+
+            $pdo->prepare("INSERT INTO movimientos (grupo_id, fecha, tipo, monto, moneda, descripcion, cuenta_origen_id, prestamista_id, usuario_id, servicio_id, referencia_id, activo) VALUES (?, ?, 'salida', ?, 'MXN', ?, ?, ?, ?, 14, ?, 1)")
+                ->execute([$g_id, $fecha_pago, $p['abono'], "Abono manual a préstamo #{$p['id']}", $cuenta_id, $p['prestamista_id'], $_SESSION['usuario_id'], $p['id']]);
+        }
+
+        $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?")
+            ->execute([$total_real_a_pagar, $cuenta_id]);
+        
+        $pdo->commit();
+        echo json_encode(['success' => true]);
+    } catch (Exception $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        http_response_code(400); echo json_encode(['error' => $e->getMessage()]);
+    }
+    exit;
+}
+
+/* ==========================================================
+   4. DELETE: ELIMINAR PRÉSTAMO
+   ========================================================== */
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    $id = (int)($_GET['id'] ?? 0);
+    $pdo->beginTransaction();
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM deudas_empresa WHERE id = ?");
+        $stmt->execute([$id]);
+        $d = $stmt->fetch();
+
+        if ($d['monto_pagado'] > 0) throw new Exception("No se puede eliminar con abonos existentes");
+
+        $pdo->prepare("UPDATE deudas_empresa SET activo = 0 WHERE id = ?")->execute([$id]);
+        $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?")->execute([$d['monto'], $d['cuenta_id']]);
+        
+        $pdo->prepare("UPDATE movimientos SET estado = 'anulado' WHERE referencia_id = ? AND servicio_id = 10")->execute([$id]);
+
+        $pdo->commit();
+        echo json_encode(['success' => true]);
+    } catch (Exception $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        http_response_code(400); echo json_encode(['error' => $e->getMessage()]);
+    }
+    exit;
+}
+/* ==========================================================
+   1. GET (LEER DEUDAS PARA LA TABLA O INDIVIDUAL)
+   ========================================================== */
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    $prestamista_id = isset($_GET['prestamista_id']) ? (int)$_GET['prestamista_id'] : 0;
+    $id = isset($_GET['id']) ? (int)$_GET['id'] : 0; // <-- ESTO ES LO QUE FALTABA
+    
+    try {
+        if ($id > 0) {
+            // Busca un solo préstamo para llenar el modal de pago individual
+            $stmt = $pdo->prepare("SELECT * FROM deudas_empresa WHERE id = ? AND activo = 1");
+            $stmt->execute([$id]);
+            $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($prestamo) {
+                echo json_encode($prestamo);
+            } else {
+                http_response_code(404);
+                echo json_encode(['error' => 'Préstamo no encontrado']);
+            }
+        } elseif ($prestamista_id > 0) {
+            // Busca las deudas específicas del prestamista para la tabla
+            $stmt = $pdo->prepare("SELECT * FROM deudas_empresa WHERE prestamista_id = ? AND activo = 1 ORDER BY id DESC");
+            $stmt->execute([$prestamista_id]);
+            echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        } else {
+            // Muestra todas las deudas activas
+            $stmt = $pdo->query("SELECT * FROM deudas_empresa WHERE activo = 1 ORDER BY id DESC");
+            echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+        }
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Error al leer la base de datos: ' . $e->getMessage()]);
+    }
+    exit;
+}
 
 
 /* POST (CREAR PRÉSTAMO) */
@@ -191,29 +309,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // moneda = MXN por defecto para préstamos
 
         $pdo->prepare("
-
             INSERT INTO movimientos
-
-            (grupo_id, fecha, tipo, monto, moneda, descripcion, cuenta_destino_id, prestamista_id, usuario_id, servicio_id, activo)
-
-            VALUES (?, ?, 'entrada', ?, 'MXN', ?, ?, ?, ?, 10, 1)
-
+            (grupo_id, fecha, tipo, monto, moneda, descripcion, cuenta_destino_id, prestamista_id, usuario_id, servicio_id, referencia_id, activo)
+            VALUES (?, ?, 'entrada', ?, 'MXN', ?, ?, ?, ?, 10, ?, 1)
         ")->execute([
-
             $grupo_id,
-
             $fecha,
-
             $monto,
-
             'Préstamo de ' . $prestamista_nombre . ': ' . ($_POST['descripcion'] ?? 'Sin descripción'),
-
             $cuenta_id,
-
             $prestamista_id,
-
-            $_SESSION['usuario_id']
-
+            $_SESSION['usuario_id'],
+            $prestamo_id // <--- EL HILO CONDUCTOR (ID de la deuda)
         ]);
 
 
@@ -304,241 +411,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 
-/* PUT (PAGO) */
 
-if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-
-
-
-    // Leer datos de PUT como JSON
-
-    $input = json_decode(file_get_contents('php://input'), true) ?? [];
-
-
-
-    $id = $input['id'] ?? null;
-
-    $pago = (float)($input['monto_a_pagar'] ?? 0);
-
-    $cuenta = $input['cuenta_pago_id'] ?? null;
-
-    // AQUÍ ATRAPAMOS LA FECHA DE PAGO MANUAL
-
-    $fecha_pago = $input['fecha_pago'] ?? date('Y-m-d H:i:s');
-
-
-
-    if (!$id || !$cuenta || $pago <= 0) {
-
-        http_response_code(400);
-
-        echo json_encode(['error' => 'Datos inválidos para pago']);
-
-        exit;
-
-    }
-
-
-
-    $stmt = $pdo->prepare("SELECT saldo_actual FROM cuentas WHERE id=?");
-
-    $stmt->execute([$cuenta]);
-
-    $saldo = $stmt->fetchColumn();
-
-    if ($saldo < $pago) {
-
-        http_response_code(400);
-
-        echo json_encode(['error' => 'Saldo insuficiente']);
-
-        exit;
-
-    }
-
-
-
-    $stmt = $pdo->prepare("SELECT monto, monto_pagado FROM deudas_empresa WHERE id=?");
-
-    $stmt->execute([$id]);
-
-    $prestamo = $stmt->fetch();
-
-
-
-    if (!$prestamo) {
-
-        http_response_code(404);
-
-        echo json_encode(['error' => 'Préstamo no encontrado']);
-
-        exit;
-
-    }
-
-
-
-    $nuevoPagado = $prestamo['monto_pagado'] + $pago;
-
-    if ($nuevoPagado > $prestamo['monto']) {
-
-        http_response_code(400);
-
-        echo json_encode(['error' => 'Pago excede el monto']);
-
-        exit;
-
-    }
-
-
-
-    $estado = $nuevoPagado >= $prestamo['monto'] ? 'pagado' : 'parcial';
-
-
-
-    $pdo->beginTransaction();
-
-    try {
-
-        // Generar ID de grupo único para este pago
-
-        $grupo_id = round(microtime(true) * 1000);
-
-        
-
-        // Obtener datos del préstamo y prestamista
-
-        $stmt = $pdo->prepare("
-
-            SELECT pp.*, p.nombre AS prestamista_nombre
-
-            FROM deudas_empresa pp
-
-            JOIN prestamistas p ON pp.prestamista_id = p.id
-
-            WHERE pp.id = ?
-
-        ");
-
-        $stmt->execute([$id]);
-
-        $datos_prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        
-
-        // AQUÍ CAMBIAMOS EL NOW() POR NUESTRA VARIABLE $fecha_pago
-
-        $pdo->prepare("
-
-            UPDATE deudas_empresa
-
-            SET monto_pagado=?, estado=?, fecha_pago=?
-
-            WHERE id=?
-
-        ")->execute([$nuevoPagado, $estado, $fecha_pago, $id]);
-
-
-
-        $pdo->prepare("
-
-            UPDATE cuentas SET saldo_actual = saldo_actual - ?
-
-            WHERE id=?
-
-        ")->execute([$pago, $cuenta]);
-
-        
-
-        // AQUÍ TAMBIÉN CAMBIAMOS EL NOW() POR NUESTRA VARIABLE $fecha_pago
-
-        // Registrar en movimientos con servicio_id = 14 (Pago de Préstamo)
-
-        $pdo->prepare("
-
-            INSERT INTO movimientos
-
-            (grupo_id, fecha, tipo, monto, moneda, descripcion, cuenta_origen_id, prestamista_id, usuario_id, servicio_id, activo)
-
-            VALUES (?, ?, 'salida', ?, 'MXN', ?, ?, ?, ?, 14, 1)
-
-        ")->execute([
-
-            $grupo_id,
-
-            $fecha_pago,
-
-            $pago,
-
-            'Pago de préstamo a ' . $datos_prestamo['prestamista_nombre'],
-
-            $cuenta,
-
-            $datos_prestamo['prestamista_id'],
-
-            $_SESSION['usuario_id']
-
-        ]);
-
-        
-
-        // Registrar auditoría
-
-        registrarAuditoria($pdo, [
-
-            'accion' => 'UPDATE',
-
-            'modulo' => 'prestamos',
-
-            'tabla' => 'deudas_empresa',
-
-            'registro_id' => $id,
-
-            'descripcion' => "Registró pago de $" . number_format($pago, 2) . " al préstamo de {$datos_prestamo['prestamista_nombre']} (Estado: $estado)",
-
-            'datos_anteriores' => [
-
-                'monto_pagado' => $prestamo['monto_pagado'],
-
-                'estado' => $datos_prestamo['estado']
-
-            ],
-
-            'datos_nuevos' => [
-
-                'monto_pagado' => $nuevoPagado,
-
-                'estado' => $estado,
-
-                'pago_realizado' => $pago,
-
-                'fecha_pago' => $fecha_pago
-
-            ]
-
-        ]);
-
-
-
-        $pdo->commit();
-
-        echo json_encode(['success' => true]);
-
-        exit;
-
-    } catch (Exception $e) {
-
-        $pdo->rollBack();
-
-        http_response_code(500);
-
-        echo json_encode(['error' => 'Error al pagar préstamo: ' . $e->getMessage()]);
-
-        exit;
-
-    }
-
-}
 
 
 

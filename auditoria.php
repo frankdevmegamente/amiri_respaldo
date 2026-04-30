@@ -61,6 +61,17 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
     <style>
+                .body-wrapper {
+            /* Aumentamos esto para librar completamente la altura del header azul */
+            padding-top: 100px !important; 
+        }
+        
+        .body-wrapper-inner, 
+        .body-wrapper .container-fluid {
+            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
+            padding-top: 15px !important;
+            margin-top: 0 !important;
+        }
 
         .badge-action {
 
@@ -122,6 +133,68 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
             display: block !important;
         }
 
+        body[data-bs-theme="dark"] .card,
+        body[data-bs-theme="dark"] .page-breadcrumb,
+        body[data-bs-theme="dark"] .page-breadcrumb h3,
+        body[data-bs-theme="dark"] .card-header,
+        body[data-bs-theme="dark"] .card-body,
+        body[data-bs-theme="dark"] .modal-content,
+        body[data-bs-theme="dark"] .modal-header,
+        body[data-bs-theme="dark"] .modal-footer {
+            background-color: #1f2535 !important;
+            border-color: #2b3350 !important;
+            color: #e6ecff !important;
+        }
+
+        body[data-bs-theme="dark"] .card {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        body[data-bs-theme="dark"] .table,
+        body[data-bs-theme="dark"] .table thead th,
+        body[data-bs-theme="dark"] .table tbody td,
+        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+            background-color: #1f2535 !important;
+            color: #e6ecff !important;
+            border-color: #2b3350 !important;
+        }
+
+        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
+            background-color: #232b3c !important;
+        }
+
+        body[data-bs-theme="dark"] .form-control,
+        body[data-bs-theme="dark"] .form-select,
+        body[data-bs-theme="dark"] .input-group-text,
+        body[data-bs-theme="dark"] .form-control-plaintext,
+        body[data-bs-theme="dark"] .alert,
+        body[data-bs-theme="dark"] .badge,
+        body[data-bs-theme="dark"] .nav-tabs .nav-link {
+            background-color: #232b3c !important;
+            color: #e6ecff !important;
+            border-color: #2b3350 !important;
+        }
+
+        body[data-bs-theme="dark"] .nav-tabs .nav-link.active {
+            color: #ffffff !important;
+            border-bottom-color: #5d87ff !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-light {
+            background-color: rgba(255, 255, 255, 0.06) !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
+            background-color: rgba(93, 135, 255, 0.12) !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-success.bg-opacity-10 {
+            background-color: rgba(25, 135, 84, 0.12) !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-warning.bg-opacity-10 {
+            background-color: rgba(255, 193, 7, 0.12) !important;
+        }
     </style>
 
 </head>
@@ -145,17 +218,22 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
                 <div class="container-fluid px-4" style="max-width: 100%;">
-                    <div class="card bg-light-info shadow-none position-relative overflow-hidden mt-2 mb-4">
-                        <div class="card-body px-4 py-3">
-                            <div class="row align-items-center">
-                                <div class="col-9">
-                                    <h4 id="myElement" class="fw-semibold mb-8"></h4>
-                                    <nav aria-label="breadcrumb">
-                                        <ol class="breadcrumb">
-                                            <li class="breadcrumb-item"><a href="index.php">Inicio</a></li>
-                                            <li class="breadcrumb-item active">Auditoría</li>
-                                        </ol>
-                                    </nav>
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card shadow-sm border-0 rounded-4" style="position: relative; overflow: hidden;">
+                                
+                                <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #5D87FF; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                                <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+
+                                <div class="card-body p-4" style="position: relative; z-index: 1;">
+                                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            <i class="ti ti-shield-check fs-5"></i>
+                                        </div>
+                                        <h5 class="card-title fw-semibold mb-0">Auditoría del Sistema</h5>
+                                    </div>
+                                    
+                                    <p class="text-muted mb-0">Monitorea todas las actividades y cambios realizados en el sistema</p>
                                 </div>
                             </div>
                         </div>
@@ -171,105 +249,121 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
                             </div>
                         </div>
                         <div class="col-md-3 col-sm-6">
-                            <div class="card stat-card h-100" style="border-left-color: #49BEFF;">
+                            <div class="card stat-card h-100">
                                 <div class="card-body">
-                                    <h6 class="text-muted">Últimas 24 horas</h6>
-                                    <h3 class="fw-bold" id="stat-24h">0</h3>
+                                    <h6 class="text-muted">Registros de Hoy</h6>
+                                    <h3 class="fw-bold" id="stat-hoy">0</h3>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-3 col-sm-6">
-                            <div class="card stat-card h-100" style="border-left-color: #13DEB9;">
+                            <div class="card stat-card h-100">
                                 <div class="card-body">
-                                    <h6 class="text-muted">Usuarios Activos</h6>
-                                    <h3 class="fw-bold" id="stat-usuarios">0</h3>
+                                    <h6 class="text-muted">Esta Semana</h6>
+                                    <h3 class="fw-bold" id="stat-semana">0</h3>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-3 col-sm-6">
-                            <div class="card stat-card h-100" style="border-left-color: #FFAE1F;">
+                            <div class="card stat-card h-100">
                                 <div class="card-body">
-                                    <h6 class="text-muted">Módulos Monitoreados</h6>
-                                    <h3 class="fw-bold" id="stat-modulos">0</h3>
+                                    <h6 class="text-muted">Este Mes</h6>
+                                    <h3 class="fw-bold" id="stat-mes">0</h3>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title mb-3">
-                                <i class="ti ti-filter"></i> Filtros
-                            </h5>
-                            <form id="formFiltros">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <label class="form-label">Usuario</label>
-                                        <select class="form-select" id="filtroUsuario" name="usuario_id">
-                                            <option value="">Todos</option>
-                                            <?php foreach ($usuarios as $u): ?>
-                                                <option value="<?= $u['id'] ?>"><?= htmlspecialchars($u['nombre']) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label">Acción</label>
-                                        <select class="form-select" id="filtroAccion" name="accion">
-                                            <option value="">Todas</option>
-                                            <option value="LOGIN">LOGIN</option>
-                                            <option value="LOGOUT">LOGOUT</option>
-                                            <option value="INSERT">INSERT</option>
-                                            <option value="UPDATE">UPDATE</option>
-                                            <option value="DELETE">DELETE</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label">Módulo</label>
-                                        <select class="form-select" id="filtroModulo" name="modulo">
-                                            <option value="">Todos</option>
-                                            <option value="auth">Auth</option>
-                                            <option value="clientes">Clientes</option>
-                                            <option value="gastos">Gastos</option>
-                                            <option value="usuarios">Usuarios</option>
-                                            <option value="comisiones-promotores">Comisiones</option>
-                                            <option value="prestamistas">Prestamistas</option>
-                                            <option value="prestamos">Préstamos</option>
-                                            <option value="proveedores">Proveedores</option>
-                                            <option value="cuentas">Cuentas</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label">Desde</label>
-                                        <input type="date" class="form-control" id="filtroFechaInicio" name="fecha_inicio">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label">Hasta</label>
-                                        <input type="date" class="form-control" id="filtroFechaFin" name="fecha_fin">
-                                    </div>
-                                    <div class="col-md-1 d-flex align-items-end">
-                                        <button type="button" class="btn btn-primary w-100" onclick="aplicarFiltros()">
-                                            <i class="ti ti-search"></i>
-                                        </button>
+                    <!-- Filtros -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card filter-card shadow-sm">
+                                <div class="card-body py-3">
+                                    <div class="row align-items-end g-3">
+                                        <div class="col-md-3">
+                                            <label class="form-label fw-semibold">Usuario</label>
+                                            <select class="form-select" id="filtroUsuario" name="usuario_id">
+                                                <option value="">Todos</option>
+                                                <?php foreach ($usuarios as $u): ?>
+                                                    <option value="<?= $u['id'] ?>"><?= htmlspecialchars($u['nombre']) ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Acción</label>
+                                            <select class="form-select" id="filtroAccion" name="accion">
+                                                <option value="">Todas</option>
+                                                <option value="LOGIN">LOGIN</option>
+                                                <option value="LOGOUT">LOGOUT</option>
+                                                <option value="INSERT">INSERT</option>
+                                                <option value="UPDATE">UPDATE</option>
+                                                <option value="DELETE">DELETE</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Módulo</label>
+                                            <select class="form-select" id="filtroModulo" name="modulo">
+                                                <option value="">Todos</option>
+                                                <option value="auth">Auth</option>
+                                                <option value="clientes">Clientes</option>
+                                                <option value="gastos">Gastos</option>
+                                                <option value="usuarios">Usuarios</option>
+                                                <option value="comisiones-promotores">Comisiones</option>
+                                                <option value="prestamistas">Prestamistas</option>
+                                                <option value="prestamos">Préstamos</option>
+                                                <option value="proveedores">Proveedores</option>
+                                                <option value="cuentas">Cuentas</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Desde</label>
+                                            <input type="date" class="form-control" id="filtroFechaInicio" name="fecha_inicio">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold">Hasta</label>
+                                            <input type="date" class="form-control" id="filtroFechaFin" name="fecha_fin">
+                                        </div>
+                                        <div class="col-md-1 d-flex align-items-end">
+                                            <button type="button" class="btn btn-primary w-100" onclick="aplicarFiltros()">
+                                                <i class="ti ti-search"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="card">
-                        <div class="card-body p-4">
-                            <h5 class="card-title mb-3">
-                                <i class="ti ti-list-details"></i> Registro de Actividades
-                            </h5>
-                            <div class="table-responsive">
-                                <table id="tablaAuditoria" class="table table-striped table-hover" style="width:100%">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Fecha/Hora</th>
-                                            <th>Usuario</th>
-                                            <th>Acción</th>
-                                            <th>Módulo</th>
+                    <!-- Tabla de Auditoría -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card shadow-sm">
+                                <div class="card-header bg-transparent">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0 fw-semibold">Registro de Actividades</h6>
+                                        <div class="btn-group">
+                                            <button class="btn btn-outline-success" onclick="exportarExcel()">
+                                                <i class="ti ti-file-spreadsheet"></i> Excel
+                                            </button>
+                                            <button class="btn btn-outline-info" onclick="exportarCSV()">
+                                                <i class="ti ti-file-text"></i> CSV
+                                            </button>
+                                            <button class="btn btn-outline-danger" onclick="limpiarFiltros()">
+                                                <i class="ti ti-x"></i> Limpiar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="table-responsive">
+                                        <table id="tablaAuditoria" class="table table-striped table-hover" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>ID</th>
+                                                    <th>Fecha/Hora</th>
+                                                    <th>Usuario</th>
+                                                    <th>Acción</th>
+                                                    <th>Módulo</th>
                                             <th>Descripción</th>
                                             <th>IP</th>
                                             <th>Acciones</th>

@@ -319,67 +319,70 @@ try {
         switch ($action) {
 
             case 'anular':
-
-                // Anular un movimiento o grupo de movimientos
-
-                $movimiento_id = filter_var($_POST['movimiento_id'] ?? null, FILTER_VALIDATE_INT);
-
-                $grupo_id = filter_var($_POST['grupo_id'] ?? null, FILTER_VALIDATE_INT);
-
-                $motivo = trim($_POST['motivo'] ?? '');
-
-                
-
-                if (!$movimiento_id && !$grupo_id) {
-
+                if (!isset($_POST['grupo_id'])) {
                     http_response_code(400);
-
-                    echo json_encode(['error' => 'ID de movimiento o grupo requerido']);
-
+                    echo json_encode(['error' => 'No se especificó el grupo a anular']);
                     exit;
-
                 }
-
                 
+                $grupo_id = $_POST['grupo_id'];
+                $motivo = $_POST['motivo'] ?? 'Anulación manual';
 
-                if (empty($motivo)) {
+                try {
+                    global $pdo;
+                    if (!isset($pdo)) {
+                        $pdo = getPDO();
+                    }
 
-                    http_response_code(400);
+                    // --- [EL CANDADO DE SEGURIDAD] ---
+                    $stmtCheck = $pdo->prepare("
+                        SELECT servicio_id, referencia_id, prestamista_id 
+                        FROM movimientos 
+                        WHERE grupo_id = ? AND estado = 'activo'
+                    ");
+                    $stmtCheck->execute([$grupo_id]);
+                    $movsEnGrupo = $stmtCheck->fetchAll(PDO::FETCH_ASSOC);
 
-                    echo json_encode(['error' => 'Motivo de anulación requerido']);
+                    foreach ($movsEnGrupo as $m) {
+                        $s_id = (int)$m['servicio_id'];
+                        $ref_id = $m['referencia_id'] ?? null;
 
-                    exit;
+                        // Candado 1: Préstamos Recibidos
+                        if ($s_id === 10) {
+                            if ($ref_id) {
+                                $check = $pdo->prepare("SELECT COUNT(*) FROM movimientos WHERE referencia_id = ? AND servicio_id = 14 AND estado = 'activo'");
+                                $check->execute([$ref_id]);
+                                if ($check->fetchColumn() > 0) throw new Exception("🚨 No puedes anular este préstamo porque tiene pagos registrados. Anula los pagos primero.");
+                            } else {
+                                $check = $pdo->prepare("SELECT COUNT(*) FROM movimientos WHERE prestamista_id = ? AND servicio_id = 14 AND estado = 'activo'");
+                                $check->execute([$m['prestamista_id']]);
+                                if ($check->fetchColumn() > 0) throw new Exception("🚨 No puedes anular este préstamo porque el prestamista tiene pagos registrados.");
+                            }
+                        }
 
-                }
+                        // Candado 2: Préstamos Otorgados
+                        if ($s_id === 16 && $ref_id) {
+                            $check = $pdo->prepare("SELECT COUNT(*) FROM movimientos WHERE referencia_id = ? AND servicio_id = 17 AND estado = 'activo'");
+                            $check->execute([$ref_id]);
+                            if ($check->fetchColumn() > 0) throw new Exception("🚨 No puedes anular este préstamo porque ya le hiciste cobros. Anula los cobros primero.");
+                        }
+                    }
 
-                
-
-                // Si se envía grupo_id, anular todo el grupo
-
-                if ($grupo_id) {
-
+                    // --- [EJECUCIÓN CENTRALIZADA] ---
+                    // El Service ahora hará todo el trabajo matemático una sola vez.
                     $resultado = $service->anularPorGrupo($grupo_id, $motivo, $usuario_id);
+                    
+                    if (isset($resultado['success']) && $resultado['success']) {
+                        echo json_encode($resultado);
+                    } else {
+                        http_response_code(400);
+                        echo json_encode($resultado);
+                    }
 
-                } else {
-
-                    $resultado = $service->anularMovimiento($movimiento_id, $motivo, $usuario_id);
-
-                }
-
-                
-
-                if ($resultado['success']) {
-
-                    echo json_encode($resultado);
-
-                } else {
-
+                } catch (Exception $e) {
                     http_response_code(400);
-
-                    echo json_encode($resultado);
-
+                    echo json_encode(['error' => $e->getMessage()]);
                 }
-
                 break;
 
                 

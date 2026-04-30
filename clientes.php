@@ -45,6 +45,17 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 </head>
 
 <style>
+        .body-wrapper {
+            /* Aumentamos esto para librar completamente la altura del header azul */
+            padding-top: 100px !important; 
+        }
+        
+        .body-wrapper-inner, 
+        .body-wrapper .container-fluid {
+            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
+            padding-top: 15px !important;
+            margin-top: 0 !important;
+        }
      body[data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
@@ -449,6 +460,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     data: 'contacto',
 
                     render: (d) => d ? `<span class="no-capitalize">${d}</span>` : ''
+                    
 
                 },
 
@@ -463,13 +475,16 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 {
                     data: null,
                     render: function(d) {
+                        // NUEVO Botón de Historial
+                        let btnHistorial = `<a href="historial-cliente.php?id=${d.id}" class="badge bg-secondary bg-opacity-10 text-secondary border-0 text-decoration-none me-2" style="font-size: 0.75rem;" title="Historial"><i class="ti ti-history"></i> Movimientos</a>`;
+                        
                         // Botón Editar estilo Soft Badge (Amarillo/Warning)
                         let btnEditar = `<button class="badge bg-warning bg-opacity-10 text-warning border-0 editar me-2" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Editar"><i class="ti ti-pencil"></i> Editar</button>`;
                         
                         // Botón Eliminar estilo Soft Badge (Rojo/Danger)
                         let btnEliminar = `<button class="badge bg-danger bg-opacity-10 text-danger border-0 eliminar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Eliminar"><i class="ti ti-trash"></i> Eliminar</button>`;
                         
-                        return btnEditar + btnEliminar;
+                        return `<div class="d-flex align-items-center">${btnHistorial}${btnEditar}${btnEliminar}</div>`;
                     }
                 }
 

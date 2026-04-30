@@ -43,6 +43,17 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 </head>
 
 <style>
+        .body-wrapper {
+            /* Aumentamos esto para librar completamente la altura del header azul */
+            padding-top: 100px !important; 
+        }
+        
+        .body-wrapper-inner, 
+        .body-wrapper .container-fluid {
+            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
+            padding-top: 15px !important;
+            margin-top: 0 !important;
+        }
      body[data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
@@ -389,15 +400,18 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         render: d => d ? '<span class="badge bg-success bg-opacity-10 text-success border-0">Sí</span>' : '<span class="badge bg-danger bg-opacity-10 text-danger border-0">No</span>'
                     },
                     {
-                        data: null,
-                        render: function(d) {
-                            return `<div class="d-flex align-items-center gap-2">
-                                <a href="detalle-prestamista.php?id=${d.id}" class="badge bg-info bg-opacity-10 text-info border-0 text-decoration-none" style="font-size: 0.75rem;" title="Detalles"><i class="ti ti-eye"></i> Detalles</a>
-                                <button class="badge bg-warning bg-opacity-10 text-warning border-0 editar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Editar"><i class="ti ti-pencil"></i> Editar</button>
-                                <button class="badge bg-danger bg-opacity-10 text-danger border-0 eliminar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Eliminar"><i class="ti ti-trash"></i> Eliminar</button>
-                            </div>`;
-                        }
-                    }
+    data: null,
+    render: function(d) {
+        return `<div class="d-flex align-items-center gap-2">
+            <a href="historial-prestamista.php?id=${d.id}" class="badge bg-secondary bg-opacity-10 text-secondary border-0 text-decoration-none" style="font-size: 0.75rem;" title="Historial"><i class="ti ti-history"></i> Movimientos</a>
+            
+            <a href="detalle-prestamista.php?id=${d.id}" class="badge bg-info bg-opacity-10 text-info border-0 text-decoration-none" style="font-size: 0.75rem;" title="Gestión"><i class="ti ti-eye"></i> Gestión</a>
+            
+            <button class="badge bg-warning bg-opacity-10 text-warning border-0 editar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Editar"><i class="ti ti-pencil"></i> Editar</button>
+            <button class="badge bg-danger bg-opacity-10 text-danger border-0 eliminar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Eliminar"><i class="ti ti-trash"></i> Eliminar</button>
+        </div>`;
+    }
+}
                 ],
                 order: [
                     [0, 'desc']

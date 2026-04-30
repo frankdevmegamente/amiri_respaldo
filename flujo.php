@@ -85,7 +85,17 @@ $serviciosDivisas = [
     <link rel="stylesheet" href="src/assets/css/layout-custom.css">
 
     <style>
-
+    .body-wrapper {
+            /* Aumentamos esto para librar completamente la altura del header azul */
+            padding-top: 100px !important; 
+        }
+        
+        .body-wrapper-inner, 
+        .body-wrapper .container-fluid {
+            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
+            padding-top: 15px !important;
+            margin-top: 0 !important;
+        }
     /* =========================================
    🌙 ESTILOS PARA TARJETAS DE RESUMEN EN MODO OSCURO (BLINDADO)
    ========================================= */
@@ -290,6 +300,30 @@ body[data-bs-theme="dark"] .header-prestamos, .dark-mode .header-prestamos,
 body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
     color: #fc4b6c !important; /* Rojo brillante */
 }
+/* =========================================
+           🎨 BADGES VIBRANTES (MODO OSCURO)
+           ========================================= */
+        [data-bs-theme="dark"] .table .badge.bg-success { background-color: rgba(19, 222, 185, 0.15) !important; color: #13DEB9 !important; background-image: none !important; }
+        [data-bs-theme="dark"] .table .badge.bg-danger { background-color: rgba(250, 137, 107, 0.15) !important; color: #FA896B !important; background-image: none !important; }
+        [data-bs-theme="dark"] .table .badge.bg-info { background-color: rgba(93, 135, 255, 0.15) !important; color: #5D87FF !important; background-image: none !important; }
+        [data-bs-theme="dark"] .table .badge.bg-warning { background-color: rgba(255, 174, 31, 0.15) !important; color: #FFAE1F !important; background-image: none !important; }
+        [data-bs-theme="dark"] .table .badge.bg-primary { background-color: rgba(93, 135, 255, 0.15) !important; color: #5D87FF !important; background-image: none !important; }
+        [data-bs-theme="dark"] .table .badge.bg-secondary { background-color: rgba(140, 158, 168, 0.15) !important; color: #8c9ea8 !important; background-image: none !important; }
+        
+        /* Badges Especiales de Cripto/Dólares en Flujo */
+        [data-bs-theme="dark"] .table .badge.badge-usd { background-color: rgba(37, 99, 235, 0.15) !important; background-image: none !important; color: #3b82f6 !important; }
+        [data-bs-theme="dark"] .table .badge.badge-usdt { background-color: rgba(16, 185, 129, 0.15) !important; background-image: none !important; color: #10b981 !important; }
+
+        /* =========================================
+           📦 CAJA BLANCA DE INVOLUCRADOS (MODO OSCURO)
+           ========================================= */
+        [data-bs-theme="dark"] .table>tbody>tr>td .bg-light {
+            background-color: #252f43 !important; /* Fondo gris oscuro / azulado */
+            border-color: #2c344c !important; /* Borde oscuro sutil */
+        }
+        [data-bs-theme="dark"] .table>tbody>tr>td .text-dark {
+            color: #e9ecef !important; /* Cambia las letras negras a blanco/gris claro */
+        }
     </style>
 
 </head>
@@ -886,7 +920,10 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
         var table = $('#tablaFlujo').DataTable({
 
-            ajax: { url: 'api/flujo-lista.php?servicios_ids=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15', dataSrc: 'data' },
+        processing: true,
+            serverSide: true,
+
+            ajax: { url: 'api/flujo-lista.php?servicios_ids=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17', dataSrc: 'data' },
 
             columns: [
                 {
@@ -961,7 +998,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                 {
                     data: null, 
                     title: 'Movimiento',
-                    width: '320px',
+                    width: '100px',
                     render: function (data, type, row) {
                         let html = '<div style="font-size:0.85rem; line-height: 1.5; min-width: 280px;">';
                         
@@ -970,6 +1007,8 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                         if (row.cliente  && row.cliente.trim())  personaHtml += '<div class="mb-1"><i class="ti ti-user text-primary"></i> <strong class="text-dark">Cliente:</strong> <span class="text-muted">' + row.cliente + '</span></div>';
                         if (row.proveedor && row.proveedor.trim()) personaHtml += '<div class="mb-1"><i class="ti ti-building text-info"></i> <strong class="text-dark">Proveedor:</strong> <span class="text-muted">' + row.proveedor + '</span></div>';
                         if (row.promotor  && row.promotor.trim())  personaHtml += '<div class="mb-1"><i class="ti ti-user-star text-warning"></i> <strong class="text-dark">Promotor:</strong> <span class="text-muted">' + row.promotor + '</span></div>';
+                        if (row.prestamista && row.prestamista.trim()) personaHtml += '<div class="mb-1"><i class="ti ti-businessplan text-danger"></i> <strong class="text-dark">Prestamista:</strong> <span class="text-muted">' + row.prestamista + '</span></div>';
+                        if (row.beneficiario && row.beneficiario.trim()) personaHtml += '<div class="mb-1"><i class="ti ti-users text-success"></i> <strong class="text-dark">Beneficiario:</strong> <span class="text-muted">' + row.beneficiario + '</span></div>';
                         
                         if (personaHtml) {
                             html += '<div class="p-2 mb-2 rounded bg-light border border-light-subtle">' + personaHtml + '</div>';
@@ -1037,7 +1076,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
             // Recargar la tabla con la nueva vista
             let vistaActual = $(e.target).data('vista');
-            let nuevaUrl = 'api/flujo-lista.php?servicios_ids=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15&vista=' + vistaActual;
+            let nuevaUrl = 'api/flujo-lista.php?servicios_ids=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17&vista=' + vistaActual;
             table.ajax.url(nuevaUrl).load();
         });
 
@@ -1051,6 +1090,14 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
             $.getJSON('api/flujo-resumen.php?tipo=saldos&moneda=TODAS', function (data) {
                 let html = '', totalMxn = 0;
                 if (data.cuentas && data.cuentas.length) {
+                    
+                    // ✨ MAGIA APLICADA: Ordenar de mayor a menor basado en el valor real
+                    data.cuentas.sort(function(a, b) {
+                        let mxnA = a.tipo_moneda === 'MXN' ? parseFloat(a.saldo_actual || 0) : parseFloat(a.valor_mxn || 0);
+                        let mxnB = b.tipo_moneda === 'MXN' ? parseFloat(b.saldo_actual || 0) : parseFloat(b.valor_mxn || 0);
+                        return mxnB - mxnA; // El mayor arriba, el menor abajo
+                    });
+
                     data.cuentas.forEach(function (c) {
                         let saldo = parseFloat(c.saldo_actual || 0);
                         let mxn   = c.tipo_moneda === 'MXN' ? saldo : parseFloat(c.valor_mxn || 0);
@@ -1058,9 +1105,9 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                         let montoDisplay = mostrarEnMXN
                             ? '$' + formatMXN(mxn) + ' MXN'
                             : (c.tipo_moneda === 'MXN' ? '$' + formatMXN(saldo) + ' MXN' : formatNativo(saldo) + ' ' + c.tipo_moneda);
-                        let badge = c.tipo_moneda === 'USD'  ? '<span class="badge badge-usd">USD</span>' :
-                                    c.tipo_moneda === 'USDT' ? '<span class="badge badge-usdt">USDT</span>' :
-                                    '<span class="badge bg-secondary">MXN</span>';
+                        let badge = c.tipo_moneda === 'USD'  ? '<span class="badge bg-primary bg-opacity-10 text-primary border-0">USD</span>' :
+                                    c.tipo_moneda === 'USDT' ? '<span class="badge bg-info bg-opacity-10 text-info border-0">USDT</span>' :
+                                    '<span class="badge bg-success bg-opacity-10 text-success border-0">MXN</span>';
                         let nombreCuenta = c.nombre;
                         if (c.banco && c.banco.trim()) {
                             nombreCuenta += ' (' + c.banco + ')';
@@ -1125,7 +1172,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                             <td>${nombre}</td>
 
-                            <td><span class="badge bg-warning text-dark">${c.tipo_cuenta_nombre || 'Capital'}</span></td>
+                            <td><span class="badge bg-warning bg-opacity-10 text-warning border-0">${c.tipo_cuenta_nombre || 'Capital'}</span></td>
 
                             <td class="text-end fw-bold">${montoDisplay}</td>
 
@@ -1175,9 +1222,8 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                     let montoDisplay = '$' + formatMXN(mxn) + ' MXN';
 
-                    let badgeCls = e.tipo === 'Prestamista' ? 'bg-danger' :
-
-                                   e.tipo_moneda === 'USD'  ? 'badge-usd' : 'badge-usdt';
+                    let badgeCls = e.tipo === 'Prestamista' ? 'bg-danger bg-opacity-10 text-danger border-0' :
+                                   e.tipo_moneda === 'USD'  ? 'bg-primary bg-opacity-10 text-primary border-0' : 'bg-info bg-opacity-10 text-info border-0';
 
                     let nombreCell = e.tipo === 'Proveedor'
 
@@ -1955,20 +2001,13 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                                 } else {
 
                                     lista.forEach(function (c) {
-
-                                        let tipo = c.tipo_cuenta == 1 ? 'Bancaria' : 'Caja';
-
-                                        let nombreCuenta = c.nombre;
-
-                                        if (c.banco && c.banco.trim()) {
-
-                                            nombreCuenta += ' (' + c.banco + ')';
-
-                                        }
-
-                                        html += `<option value="${c.id}" data-saldo="${c.saldo_actual}" data-tipo="${c.tipo_cuenta}">${nombreCuenta} (${tipo} - $${formatMXN(c.saldo_actual)})</option>`;
-
-                                    });
+    let nombreCuenta = c.nombre;
+    if (c.banco && c.banco.trim()) {
+        nombreCuenta += ' (' + c.banco + ')';
+    }
+    // Quitamos la variable 'tipo' (Bancaria/Caja) del texto visible
+    html += `<option value="${c.id}" data-saldo="${c.saldo_actual}" data-tipo="${c.tipo_cuenta}">${nombreCuenta} ($${formatMXN(c.saldo_actual)})</option>`;
+});
 
                                 }
 
@@ -1979,30 +2018,24 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
 
                             function buildOpcionesDestino(excluirId) {
-
-                                let html = '<option value="">-- Selecciona una cuenta --</option>';
-
-                                const lista = todasCuentas.filter(c => c.id != excluirId);
-
-                                if (!lista.length) {
-
-                                    html += '<option disabled>No hay cuentas disponibles</option>';
-
-                                } else {
-
-                                    lista.forEach(function (c) {
-
-                                        let tipo = c.tipo_cuenta == 1 ? 'Bancaria' : 'Caja';
-
-                                        html += `<option value="${c.id}" data-tipo="${c.tipo_cuenta}">${c.nombre} (${tipo} - $${formatMXN(c.saldo_actual)})</option>`;
-
-                                    });
-
-                                }
-
-                                return html;
-
-                            }
+    let html = '<option value="">-- Selecciona una cuenta --</option>';
+    const lista = todasCuentas.filter(c => c.id != excluirId);
+    if (!lista.length) {
+        html += '<option disabled>No hay cuentas disponibles</option>';
+    } else {
+        lista.forEach(function (c) {
+            // Lógica para mostrar el banco
+            let nombreCuenta = c.nombre;
+            if (c.banco && c.banco.trim()) {
+                nombreCuenta += ' (' + c.banco + ')';
+            }
+            
+            // Quitamos la variable 'tipo' (Bancaria/Caja) del texto visible
+            html += `<option value="${c.id}" data-tipo="${c.tipo_cuenta}">${nombreCuenta} ($${formatMXN(c.saldo_actual)})</option>`;
+        });
+    }
+    return html;
+}
 
 
 
@@ -2389,11 +2422,11 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
 
 
-            if (data.cliente_nombre)  html += `<div class="col-md-4"><strong><i class="ti ti-user"></i> Cliente:</strong><br>${data.cliente_nombre}</div>`;
-
-            if (data.proveedor_nombre) html += `<div class="col-md-4"><strong><i class="ti ti-building"></i> Proveedor:</strong><br>${data.proveedor_nombre}</div>`;
-
-            if (data.promotor_nombre)  html += `<div class="col-md-4"><strong><i class="ti ti-user-star"></i> Promotor:</strong><br>${data.promotor_nombre}</div>`;
+            if (data.cliente_nombre)  html += `<div class="col-md-4 mb-2"><strong><i class="ti ti-user"></i> Cliente:</strong><br>${data.cliente_nombre}</div>`;
+            if (data.proveedor_nombre) html += `<div class="col-md-4 mb-2"><strong><i class="ti ti-building"></i> Proveedor:</strong><br>${data.proveedor_nombre}</div>`;
+            if (data.promotor_nombre)  html += `<div class="col-md-4 mb-2"><strong><i class="ti ti-user-star"></i> Promotor:</strong><br>${data.promotor_nombre}</div>`;
+            if (data.prestamista_nombre) html += `<div class="col-md-4 mb-2"><strong><i class="ti ti-businessplan"></i> Prestamista:</strong><br>${data.prestamista_nombre}</div>`;
+            if (data.beneficiario_nombre) html += `<div class="col-md-4 mb-2"><strong><i class="ti ti-users"></i> Beneficiario:</strong><br>${data.beneficiario_nombre}</div>`;
 
 
 

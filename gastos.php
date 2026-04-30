@@ -43,6 +43,17 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 </head>
 
 <style>
+        .body-wrapper {
+            /* Aumentamos esto para librar completamente la altura del header azul */
+            padding-top: 100px !important; 
+        }
+        
+        .body-wrapper-inner, 
+        .body-wrapper .container-fluid {
+            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
+            padding-top: 15px !important;
+            margin-top: 0 !important;
+        }
      body[data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;

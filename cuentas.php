@@ -43,6 +43,17 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
     <style>
+            .body-wrapper {
+            /* Aumentamos esto para librar completamente la altura del header azul */
+            padding-top: 100px !important; 
+        }
+        
+        .body-wrapper-inner, 
+        .body-wrapper .container-fluid {
+            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
+            padding-top: 15px !important;
+            margin-top: 0 !important;
+        }
         #cuentasTab .nav-link.active {
             color: #5D87FF !important;
             background-color: transparent !important;
@@ -497,7 +508,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                         <button type="button" class="btn btn-success" id="btnDescargarImagen" onclick="descargarImagenCuenta()">
                             <i class="ti ti-download"></i> Descargar Imagen
-                        </button>Ñ
+                        </button>
                     </div>
                 </div>
             </div>

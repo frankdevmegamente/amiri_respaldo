@@ -58,66 +58,45 @@ try {
 
     
 
-    // Ahora obtener TODOS los movimientos del mismo grupo
-
+    // Obtenemos los movimientos con los datos del préstamo original vinculados
     $sql = "
-
         SELECT 
-
             fm.*,
-
             s.nombre as servicio_nombre,
-
             co.nombre as cuenta_origen_nombre,
             co.banco as cuenta_origen_banco,
-
             cd.nombre as cuenta_destino_nombre,
             cd.banco as cuenta_destino_banco,
-
             cl.nombre as cliente_nombre,
-
             cl.porcentaje_amiri,
-
             cl.porcentaje_promotor,
-
             pr.nombre as promotor_nombre,
+            prov.nombre as proveedor_nombre,
 
-            prov.nombre as proveedor_nombre
+            -- INFO EXTRA PARA IDENTIFICAR PRÉSTAMOS
+            CASE 
+                WHEN fm.servicio_id = 14 THEN (SELECT CONCAT('Préstamo del ', DATE_FORMAT(fecha, '%d/%m/%Y'), ' por $', FORMAT(monto, 2)) FROM deudas_empresa WHERE id = fm.referencia_id)
+                WHEN fm.servicio_id = 17 THEN (SELECT CONCAT('Préstamo a ', persona_nombre, ' ($', FORMAT(monto_total, 2), ')') FROM prestamos_otorgados WHERE id = fm.referencia_id)
+                ELSE fm.descripcion 
+            END as descripcion
 
         FROM movimientos fm
-
         LEFT JOIN servicios s ON fm.servicio_id = s.id
-
         LEFT JOIN cuentas co ON fm.cuenta_origen_id = co.id
-
         LEFT JOIN cuentas cd ON fm.cuenta_destino_id = cd.id
-
         LEFT JOIN clientes cl ON fm.cliente_id = cl.id
-
         LEFT JOIN promotores pr ON cl.promotor_id = pr.id
-
         LEFT JOIN proveedores prov ON fm.proveedor_id = prov.id
-
         WHERE fm.grupo_id = ?
-
         ORDER BY 
-
             CASE fm.tipo
-
                 WHEN 'salida' THEN 1
-
                 WHEN 'entrada' THEN 2
-
                 WHEN 'comision' THEN 3
-
                 WHEN 'traspaso' THEN 4
-
                 ELSE 5
-
             END,
-
             fm.id
-
     ";
 
 

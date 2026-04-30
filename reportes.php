@@ -47,6 +47,17 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <link rel="stylesheet" href="src/assets/css/layout-custom.css">
 
     <style>
+                .body-wrapper {
+            /* Aumentamos esto para librar completamente la altura del header azul */
+            padding-top: 100px !important; 
+        }
+        
+        .body-wrapper-inner, 
+        .body-wrapper .container-fluid {
+            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
+            padding-top: 15px !important;
+            margin-top: 0 !important;
+        }
 
         .card-stat {
 
@@ -176,6 +187,99 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }
+
+        /* Dark mode styles for stat cards info boxes */
+        [data-bs-theme="dark"] .card-stat .bg-light {
+            background-color: #1e293b !important;
+            color: #e2e8f0 !important;
+            border-color: #334155 !important;
+        }
+
+        [data-bs-theme="dark"] .card-stat .bg-light .text-muted {
+            color: #cbd5e1 !important;
+        }
+
+        [data-bs-theme="dark"] .card-stat .bg-light .text-dark {
+            color: #e2e8f0 !important;
+        }
+
+        [data-bs-theme="dark"] .card-stat .bg-light .text-danger {
+            color: #f87171 !important;
+        }
+
+        [data-bs-theme="dark"] .card-stat .bg-light .text-primary {
+            color: #60a5fa !important;
+        }
+
+        [data-bs-theme="dark"] .card-stat .bg-light .text-info {
+            color: #22d3ee !important;
+        }
+
+        [data-bs-theme="dark"] .card-stat .bg-light .text-warning {
+            color: #fbbf24 !important;
+        }
+        body[data-bs-theme="dark"] .card,
+        body[data-bs-theme="dark"] .page-breadcrumb,
+        body[data-bs-theme="dark"] .page-breadcrumb h3,
+        body[data-bs-theme="dark"] .card-header,
+        body[data-bs-theme="dark"] .card-body,
+        body[data-bs-theme="dark"] .modal-content,
+        body[data-bs-theme="dark"] .modal-header,
+        body[data-bs-theme="dark"] .modal-footer {
+            background-color: #1f2535 !important;
+            border-color: #2b3350 !important;
+            color: #e6ecff !important;
+        }
+
+        body[data-bs-theme="dark"] .card {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        body[data-bs-theme="dark"] .table,
+        body[data-bs-theme="dark"] .table thead th,
+        body[data-bs-theme="dark"] .table tbody td,
+        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+            background-color: #1f2535 !important;
+            color: #e6ecff !important;
+            border-color: #2b3350 !important;
+        }
+
+        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
+            background-color: #232b3c !important;
+        }
+
+        body[data-bs-theme="dark"] .form-control,
+        body[data-bs-theme="dark"] .form-select,
+        body[data-bs-theme="dark"] .input-group-text,
+        body[data-bs-theme="dark"] .form-control-plaintext,
+        body[data-bs-theme="dark"] .alert,
+        body[data-bs-theme="dark"] .badge,
+        body[data-bs-theme="dark"] .nav-tabs .nav-link {
+            background-color: #232b3c !important;
+            color: #e6ecff !important;
+            border-color: #2b3350 !important;
+        }
+
+        body[data-bs-theme="dark"] .nav-tabs .nav-link.active {
+            color: #ffffff !important;
+            border-bottom-color: #5d87ff !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-light {
+            background-color: rgba(255, 255, 255, 0.06) !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
+            background-color: rgba(93, 135, 255, 0.12) !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-success.bg-opacity-10 {
+            background-color: rgba(25, 135, 84, 0.12) !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-warning.bg-opacity-10 {
+            background-color: rgba(255, 193, 7, 0.12) !important;
+        }
     </style>
 
 </head>
@@ -205,23 +309,25 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
 
                     <!-- Header -->
-
-                    <div class="row mb-4 mt-2">
-
+                    <div class="row mb-4">
                         <div class="col-12">
+                            <div class="card shadow-sm border-0 rounded-4" style="position: relative; overflow: hidden;">
+                                
+                                <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #5D87FF; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                                <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
 
-                            <div class="d-flex align-items-center justify-content-between">
-
-                                <h3 class="mb-0">
-
-                                    <i class="ti ti-chart-bar"></i> Reportes y Estadísticas
-
-                                </h3>
-
+                                <div class="card-body p-4" style="position: relative; z-index: 1;">
+                                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            <i class="ti ti-chart-bar fs-5"></i>
+                                        </div>
+                                        <h5 class="card-title fw-semibold mb-0">Reportes y Estadísticas</h5>
+                                    </div>
+                                    
+                                    <p class="text-muted mb-0">Visualiza métricas y estadísticas del sistema en tiempo real</p>
+                                </div>
                             </div>
-
                         </div>
-
                     </div>
 
 
@@ -327,142 +433,120 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     <!-- Tarjetas de Resumen -->
 
                     <div class="row mb-4" id="tarjetasResumen">
-
-                        <!-- Ganancia Total -->
-
+                        
                         <div class="col-xl-3 col-md-6 mb-3">
-
-                            <div class="card card-stat border-0 shadow-sm h-100">
-
+                            <div class="card card-stat border-0 shadow-sm h-100" id="cardNeta">
                                 <div class="card-body">
-
-                                    <div class="d-flex align-items-center">
-
-                                        <div class="stat-icon bg-success bg-opacity-10 text-success me-3">
-
-                                            <i class="ti ti-trending-up"></i>
-
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="stat-icon bg-success bg-opacity-10 text-success me-3" id="iconNetaBg">
+                                            <i class="ti ti-trending-up" id="iconNeta"></i>
                                         </div>
-
                                         <div class="flex-grow-1">
                                             <p class="text-muted mb-1 small">Ganancia Neta</p>
                                             <h4 class="mb-0 fw-bold" id="statGananciaTotal">$0.00</h4>
-                                            <div id="statGastosDetalle" class="mt-1" style="font-size: 0.8rem; line-height: 1.2;"></div>
                                         </div>
-
                                     </div>
-
+                                    <div class="bg-light rounded p-2 small mt-2 border">
+                                        <div class="d-flex justify-content-between text-muted mb-1">
+                                            <span>(+) Bruta:</span> <span id="lblFormulaBruta" class="fw-bold text-dark">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between text-danger mb-1">
+                                            <span>(-) Gastos Fijos:</span> <span id="lblGastosFijos">-$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between text-danger border-bottom pb-1">
+                                            <span>(-) Gastos Var:</span> <span id="lblGastosVariables">-$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mt-1 fw-bold">
+                                            <span>(=) NETO:</span> <span id="lblFormulaNeta">$0.00</span>
+                                        </div>
+                                    </div>
                                 </div>
-
                             </div>
-
                         </div>
 
-
-
-                        <!-- Comisiones AMIRI -->
-
                         <div class="col-xl-3 col-md-6 mb-3">
-
                             <div class="card card-stat border-0 shadow-sm h-100">
-
                                 <div class="card-body">
-
-                                    <div class="d-flex align-items-center">
-
+                                    <div class="d-flex align-items-center mb-3">
                                         <div class="stat-icon bg-primary bg-opacity-10 text-primary me-3">
-
                                             <i class="ti ti-building-bank"></i>
-
                                         </div>
-
                                         <div class="flex-grow-1">
-
                                             <p class="text-muted mb-1 small">Comisiones AMIRI</p>
-
                                             <h4 class="mb-0 fw-bold" id="statComisionesAmiri">$0.00</h4>
-
                                         </div>
-
                                     </div>
-
+                                    <div class="bg-light rounded p-2 small mt-2 border">
+                                        <div class="d-flex justify-content-between text-muted mb-1">
+                                            <span>(+) Retención Total:</span> <span id="lblComisionesTotales" class="fw-bold text-dark">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between text-danger border-bottom pb-1">
+                                            <span>(-) Pago Promotores:</span> <span id="lblComisionesPromotores">-$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mt-1 fw-bold text-primary">
+                                            <span>(=) AMIRI LIBRE:</span> <span id="lblComisionesAmiriNeto">$0.00</span>
+                                        </div>
+                                    </div>
                                 </div>
-
                             </div>
-
                         </div>
 
-
-
-                        <!-- Ganancia Divisas -->
-
                         <div class="col-xl-3 col-md-6 mb-3">
-
                             <div class="card card-stat border-0 shadow-sm h-100">
-
                                 <div class="card-body">
-
-                                    <div class="d-flex align-items-center">
-
+                                    <div class="d-flex align-items-center mb-3">
                                         <div class="stat-icon bg-info bg-opacity-10 text-info me-3">
-
                                             <i class="ti ti-currency-dollar"></i>
-
                                         </div>
-
                                         <div class="flex-grow-1">
-
                                             <p class="text-muted mb-1 small">Ganancia Divisas</p>
-
                                             <h4 class="mb-0 fw-bold" id="statGananciaDivisas">$0.00</h4>
-
                                         </div>
-
                                     </div>
-
+                                    <div class="bg-light rounded p-2 small mt-2 border">
+                                        <div class="d-flex justify-content-between text-muted mb-1">
+                                            <span>(+) Utilidad USDT:</span> <span id="lblUtilidadUSDT" class="fw-bold text-dark">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between text-muted border-bottom pb-1">
+                                            <span>(+) Utilidad USD:</span> <span id="lblUtilidadUSD" class="fw-bold text-dark">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mt-1 fw-bold text-info">
+                                            <span>(=) TOTAL CRIPTO:</span> <span id="lblUtilidadTotal">$0.00</span>
+                                        </div>
+                                    </div>
                                 </div>
-
                             </div>
-
                         </div>
 
-
-
-                        <!-- Ventas de Efectivo -->
-
                         <div class="col-xl-3 col-md-6 mb-3">
-
                             <div class="card card-stat border-0 shadow-sm h-100">
-
                                 <div class="card-body">
-
-                                    <div class="d-flex align-items-center">
-
+                                    <div class="d-flex align-items-center mb-3">
                                         <div class="stat-icon bg-warning bg-opacity-10 text-warning me-3">
-
                                             <i class="ti ti-cash"></i>
-
                                         </div>
-
                                         <div class="flex-grow-1">
-
                                             <p class="text-muted mb-1 small">Ventas de Efectivo</p>
-
                                             <h4 class="mb-0 fw-bold" id="statVentasEfectivo">$0.00</h4>
-
-                                            <small class="text-muted" id="statVentasCantidad">0 operaciones</small>
-
                                         </div>
-
                                     </div>
-
+                                    <div class="bg-light rounded p-2 small mt-2 border">
+                                        <div class="d-flex justify-content-between text-muted mb-1">
+                                            <span><i class="ti ti-receipt text-warning"></i> Operaciones:</span> <span id="lblVentasOperaciones" class="fw-bold text-dark">0</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between text-muted border-bottom pb-1">
+                                            <span><i class="ti ti-chart-dots text-warning"></i> Ticket Promedio:</span> <span id="lblVentasPromedio" class="fw-bold text-dark">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mt-1 fw-bold text-warning">
+                                            <span><i class="ti ti-percentage"></i> Margen Promedio:</span> <span id="lblVentasMargen">0.00%</span>
+                                        </div>
+                                    </div>
                                 </div>
-
                             </div>
-
                         </div>
 
                     </div>
+                    
 
 
 
@@ -963,21 +1047,16 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     </div>
 
 
-
-    <script src="src/assets/libs/jquery/dist/jquery.min.js"></script>
-
+<script src="src/assets/libs/jquery/dist/jquery.min.js"></script>
     <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script src="src/assets/js/sidebarmenu.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
     <script src="src/assets/js/dark-mode.js"></script>
-
     <script src="src/assets/js/utils.js"></script>
-
     <script src="src/assets/js/pantalla-completa.js"></script>
 
 
@@ -1074,52 +1153,67 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
 
 
-        // Cargar resumen
-
+        // Cargar resumen con desglose detallado
         function cargarResumen() {
-
             $.getJSON(`api/reportes.php?tipo=resumen&${getParams()}`, function(data) {
-
-                // Ahora mostramos la ganancia neta real
-                $('#statGananciaTotal').text('$' + formatoNumero(data.ganancia_neta));
                 
-                // Imprimimos el desglose de los gastos en la tarjeta
-                $('#statGastosDetalle').html(`
-                    <span class="text-danger fw-bold">Gastos: -$${formatoNumero(data.gastos_total)}</span><br>
-                    <span class="text-muted">Fijos: $${formatoNumero(data.gastos_fijos)} | Variables: $${formatoNumero(data.gastos_variables)}</span>
-                `);
+                // 1. Llenar Ganancia Neta y su Mini-Calculadora
+                const neta = parseFloat(data.ganancia_neta) || 0;
+                $('#statGananciaTotal').text('$' + formatoNumero(neta));
+                $('#lblFormulaBruta').text('$' + formatoNumero(data.ganancia_bruta));
+                $('#lblGastosFijos').text('-$' + formatoNumero(data.gastos_fijos));
+                $('#lblGastosVariables').text('-$' + formatoNumero(data.gastos_variables));
+                $('#lblFormulaNeta').text('$' + formatoNumero(neta));
+
+                // Colores para ganancia/pérdida
+                if(neta < 0) {
+                    $('#statGananciaTotal, #lblFormulaNeta').removeClass('text-success').addClass('text-danger');
+                    $('#iconNetaBg').removeClass('bg-success text-success').addClass('bg-danger text-danger');
+                    $('#iconNeta').removeClass('ti-trending-up').addClass('ti-trending-down');
+                } else {
+                    $('#statGananciaTotal, #lblFormulaNeta').removeClass('text-danger').addClass('text-success');
+                    $('#iconNetaBg').removeClass('bg-danger text-danger').addClass('bg-success text-success');
+                    $('#iconNeta').removeClass('ti-trending-down').addClass('ti-trending-up');
+                }
+
+                // 2. Llenar Comisiones AMIRI (Suma y Resta)
+                let amiri = parseFloat(data.comisiones_amiri) || 0;
+                let promotor = parseFloat(data.comisiones_promotores) || 0;
+                let totalRetencion = amiri + promotor;
+
+                $('#statComisionesAmiri, #lblComisionesAmiriNeto').text('$' + formatoNumero(amiri));
+                $('#lblComisionesTotales').text('$' + formatoNumero(totalRetencion));
+                $('#lblComisionesPromotores').text('-$' + formatoNumero(promotor));
+
+                // 3. Llenar Ganancia Divisas (USDT vs USD)
+                let usd = parseFloat(data.ganancia_usd) || 0;
+                let usdt = parseFloat(data.ganancia_usdt) || 0;
                 
-                $('#statComisionesAmiri').text('$' + formatoNumero(data.comisiones_amiri));
-                // ... el resto se queda igual
+                $('#statGananciaDivisas, #lblUtilidadTotal').text('$' + formatoNumero(data.ganancia_divisas_total));
+                $('#lblUtilidadUSDT').text('$' + formatoNumero(usdt));
+                $('#lblUtilidadUSD').text('$' + formatoNumero(usd));
 
-                $('#statGananciaDivisas').text('$' + formatoNumero(data.ganancia_divisas_total));
+                // 4. Llenar Ventas de Efectivo (Analíticas)
+                let ventasTotales = parseFloat(data.ventas_efectivo_total) || 0;
+                let operaciones = parseInt(data.ventas_efectivo_cantidad) || 0;
+                let ticketPromedio = operaciones > 0 ? (ventasTotales / operaciones) : 0;
+                let margen = ventasTotales > 0 ? ((totalRetencion / ventasTotales) * 100) : 0;
 
-                $('#statVentasEfectivo').text('$' + formatoNumero(data.ventas_efectivo_total));
+                $('#statVentasEfectivo').text('$' + formatoNumero(ventasTotales));
+                $('#lblVentasOperaciones').text(operaciones);
+                $('#lblVentasPromedio').text('$' + formatoNumero(ticketPromedio));
+                $('#lblVentasMargen').text(margen.toFixed(2) + '%');
 
-                $('#statVentasCantidad').text(data.ventas_efectivo_cantidad + ' operaciones');
-
-
-
-                // Actualizar rango de fechas
-
+                // Actualizar texto del rango de fechas superior
                 const periodoTexto = {
-
                     'dia': 'Hoy',
-
                     'semana': 'Esta Semana',
-
                     'mes': 'Este Mes',
-
                     'anio': 'Este Año',
-
                     'rango': 'Rango Personalizado'
-
                 };
-
                 $('#rangoFechas').text(periodoTexto[$('#selectPeriodo').val()]);
-
             });
-
         }
 
 

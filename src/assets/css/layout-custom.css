@@ -336,3 +336,74 @@ body.loading #main-wrapper {
   padding-right: 2.2rem !important; /* Le da espacio a la derecha para la flecha */
   min-width: 75px; /* Asegura que la cajita no se haga muy pequeña */
 }
+/* ============================================
+   REESTRUCTURACIÓN: SIDEBAR COMPLETO Y HEADER A LA DERECHA
+   ============================================ */
+
+@media (min-width: 1200px) {
+  /* 1. Forzar al sidebar a ocupar todo el alto desde arriba */
+  .left-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    z-index: 100 !important;
+    width: 200px !important;
+  }
+
+  /* 2. Fijar el header arriba, pero restándole el ancho del sidebar */
+  .app-topstrip {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: calc(100% - 200px) !important;
+    z-index: 90 !important;
+  }
+
+  /* 3. Empujar el contenido principal */
+  .body-wrapper {
+    margin-left: 200px !important;
+    padding-top: 65px !important;
+  }
+
+  /* 4. Ajustes cuando el sidebar colapsa (modo mini) */
+  #main-wrapper.sidebar-mini .left-sidebar {
+    width: 60px !important;
+  }
+  #main-wrapper.sidebar-mini .app-topstrip {
+    width: calc(100% - 60px) !important;
+  }
+  #main-wrapper.sidebar-mini .body-wrapper {
+    margin-left: 60px !important;
+  }
+}
+
+/* ============================================
+   AJUSTES EXCLUSIVOS PARA MÓVILES Y TABLETS
+   ============================================ */
+@media (max-width: 1199.98px) {
+  /* El header ocupa el 100% de la pantalla */
+  .app-topstrip {
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+  }
+
+  /* El contenido no tiene margen izquierdo en móvil */
+  .body-wrapper {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Ocultamos el sidebar por defecto empujándolo hacia la izquierda */
+  .left-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    width: 200px !important;
+  }
+
+  /* Cuando se active la clase 'show-sidebar' (al presionar la hamburguesa), el menú entra a la pantalla */
+  #main-wrapper.show-sidebar .left-sidebar {
+    transform: translateX(0);
+  }
+}

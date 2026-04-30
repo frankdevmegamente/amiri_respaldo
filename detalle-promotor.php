@@ -129,13 +129,33 @@ try {
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
     <style>
+    .body-wrapper {
+            /* Aumentamos esto para librar completamente la altura del header azul */
+            padding-top: 100px !important; 
+        }
+        
+        .body-wrapper-inner, 
+        .body-wrapper .container-fluid {
+            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
+            padding-top: 15px !important;
+            margin-top: 0 !important;
+        }
+        
+        #tabsPromotor .nav-link {
+            color: #6c757d;
+        }
 
-        .card-stats h3 { font-size: 1.8rem; font-weight: 700; }
+        #tabsPromotor .nav-link.active {
+            color: #5D87FF; /* Morado Amiri */
+            background-color: transparent;
+            border-bottom: 2px solid #5D87FF;
+            font-weight: 600;
+        }
+        #tabsPromotor .nav-link:not(.active):hover {
+            color: #5D87FF; /* Morado Amiri al pasar el mouse */
+        }
 
-        .table-salida { color: #fa896b !important; } /* Rojo para los pagos realizados */
-
-        .table-entrada { color: #13deb9 !important; } /* Verde para comisiones ganadas */
- body[data-bs-theme="dark"] .logo-modo-claro,
+        body[data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
         }
@@ -143,6 +163,69 @@ try {
         body[data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro {
             display: block !important;
+        }
+
+        body[data-bs-theme="dark"] .card,
+        body[data-bs-theme="dark"] .page-breadcrumb,
+        body[data-bs-theme="dark"] .page-breadcrumb h3,
+        body[data-bs-theme="dark"] .card-header,
+        body[data-bs-theme="dark"] .card-body,
+        body[data-bs-theme="dark"] .modal-content,
+        body[data-bs-theme="dark"] .modal-header,
+        body[data-bs-theme="dark"] .modal-footer {
+            background-color: #1f2535 !important;
+            border-color: #2b3350 !important;
+            color: #e6ecff !important;
+        }
+
+        body[data-bs-theme="dark"] .card {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        body[data-bs-theme="dark"] .table,
+        body[data-bs-theme="dark"] .table thead th,
+        body[data-bs-theme="dark"] .table tbody td,
+        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+            background-color: #1f2535 !important;
+            color: #e6ecff !important;
+            border-color: #2b3350 !important;
+        }
+
+        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
+            background-color: #232b3c !important;
+        }
+
+        body[data-bs-theme="dark"] .form-control,
+        body[data-bs-theme="dark"] .form-select,
+        body[data-bs-theme="dark"] .input-group-text,
+        body[data-bs-theme="dark"] .form-control-plaintext,
+        body[data-bs-theme="dark"] .alert,
+        body[data-bs-theme="dark"] .badge,
+        body[data-bs-theme="dark"] .nav-tabs .nav-link {
+            background-color: #232b3c !important;
+            color: #e6ecff !important;
+            border-color: #2b3350 !important;
+        }
+
+        body[data-bs-theme="dark"] .nav-tabs .nav-link.active {
+            color: #ffffff !important;
+            border-bottom-color: #5d87ff !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-light {
+            background-color: rgba(255, 255, 255, 0.06) !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
+            background-color: rgba(93, 135, 255, 0.12) !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-success.bg-opacity-10 {
+            background-color: rgba(25, 135, 84, 0.12) !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-warning.bg-opacity-10 {
+            background-color: rgba(255, 193, 7, 0.12) !important;
         }
     </style>
 
@@ -168,134 +251,156 @@ try {
             <div class="body-wrapper-inner">
                 <div class="container-fluid px-4" style="max-width: 100%;">
                     
-                    <div class="card bg-light-info shadow-none position-relative overflow-hidden mb-4 mt-2">
-                        <div class="card-body px-4 py-3">
-                            <div class="row align-items-center">
-                                <div class="col-9">
-                                    <h4 class="fw-semibold mb-8">Detalle de Comisiones</h4>
-                                    <nav aria-label="breadcrumb">
-                                        <ol class="breadcrumb">
-                                            <li class="breadcrumb-item"><a class="text-muted" href="promotores.php">Promotores</a></li>
-                                            <li class="breadcrumb-item active" aria-current="page"><?= htmlspecialchars($promotor['nombre']) ?></li>
-                                        </ol>
-                                    </nav>
-                                </div>
-                                <div class="col-3 text-end">
-                                    <a href="promotores.php" class="btn btn-outline-primary">Volver</a>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="page-breadcrumb d-flex align-items-center mb-3 mt-2">
+                                <h3 class="mb-0"><i class="ti ti-user"></i> <?= htmlspecialchars($promotor['nombre']) ?></h3>
+                                <a href="promotores.php" class="btn btn-secondary ms-auto"><i class="ti ti-arrow-left"></i> Volver a Promotores</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtros -->
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            <div class="card shadow-sm border-0 rounded-4">
+                                <div class="card-body p-4">
+                                    <div class="row align-items-end">
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-bold">Filtrar por:</label>
+                                            <select class="form-select" id="tipoFiltro">
+                                                <option value="mes">Mes</option>
+                                                <option value="anio">Año</option>
+                                                <option value="rango">Rango Personalizado</option>
+                                                <option value="todo" selected>Todo el Historial</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2" id="filtroMes" style="display:none;">
+                                            <label class="form-label">Mes</label>
+                                            <select class="form-select" id="selectMes">
+                                                <option value="01">Enero</option>
+                                                <option value="02">Febrero</option>
+                                                <option value="03">Marzo</option>
+                                                <option value="04">Abril</option>
+                                                <option value="05">Mayo</option>
+                                                <option value="06">Junio</option>
+                                                <option value="07">Julio</option>
+                                                <option value="08">Agosto</option>
+                                                <option value="09">Septiembre</option>
+                                                <option value="10">Octubre</option>
+                                                <option value="11">Noviembre</option>
+                                                <option value="12">Diciembre</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2" id="filtroAnio" style="display:none;">
+                                            <label class="form-label">Año</label>
+                                            <select class="form-select" id="selectAnio">
+                                                <?php 
+                                                $anioActual = date('Y');
+                                                for($i = $anioActual; $i >= 2024; $i--): 
+                                                ?>
+                                                    <option value="<?= $i ?>" <?= $i == $anioActual ? 'selected' : '' ?>><?= $i ?></option>
+                                                <?php endfor; ?>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2" id="filtroDesde" style="display:none;">
+                                            <label class="form-label">Desde</label>
+                                            <input type="date" class="form-control" id="fechaDesde">
+                                        </div>
+                                        <div class="col-md-2" id="filtroHasta" style="display:none;">
+                                            <label class="form-label">Hasta</label>
+                                            <input type="date" class="form-control" id="fechaHasta" value="<?= date('Y-m-d') ?>">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button class="btn btn-primary w-100" id="btnAplicarFiltro">
+                                                <i class="ti ti-filter"></i> Aplicar
+                                            </button>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button class="btn btn-danger w-100" id="btnGenerarPDF">
+                                                <i class="ti ti-file-text"></i> Generar PDF
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="card shadow-sm mb-4">
-                        <div class="card-body">
-                            <div class="row align-items-end">
-                                <div class="col-md-2">
-                                    <label class="form-label fw-bold">Filtrar por:</label>
-                                    <select class="form-select" id="tipoFiltro">
-                                        <option value="mes">Mes</option>
-                                        <option value="anio">Año</option>
-                                        <option value="rango">Rango Personalizado</option>
-                                        <option value="todo" selected>Todo el Historial</option>
-                                    </select>
+                    <!-- Tarjetas de Totales -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card shadow-sm border-0 rounded-4 border-start border-success border-4 h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                            <i class="ti ti-cash fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Comisiones Totales Generadas</p>
+                                            <h4 class="text-success fw-bolder mb-0" id="comisionesTotal">$0.00</h4>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-2" id="filtroMes" style="display:none;">
-                                    <label class="form-label">Mes</label>
-                                    <select class="form-select" id="selectMes">
-                                        <option value="01">Enero</option>
-                                        <option value="02">Febrero</option>
-                                        <option value="03">Marzo</option>
-                                        <option value="04">Abril</option>
-                                        <option value="05">Mayo</option>
-                                        <option value="06">Junio</option>
-                                        <option value="07">Julio</option>
-                                        <option value="08">Agosto</option>
-                                        <option value="09">Septiembre</option>
-                                        <option value="10">Octubre</option>
-                                        <option value="11">Noviembre</option>
-                                        <option value="12">Diciembre</option>
-                                    </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card shadow-sm border-0 rounded-4 border-start border-primary border-4 h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                            <i class="ti ti-check fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Total Pagado al Promotor</p>
+                                            <h4 class="text-primary fw-bolder mb-0" id="comisionesPagadas">$0.00</h4>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-2" id="filtroAnio" style="display:none;">
-                                    <label class="form-label">Año</label>
-                                    <select class="form-select" id="selectAnio">
-                                        <?php 
-                                        $anioActual = date('Y');
-                                        for($i = $anioActual; $i >= 2024; $i--): 
-                                        ?>
-                                            <option value="<?= $i ?>" <?= $i == $anioActual ? 'selected' : '' ?>><?= $i ?></option>
-                                        <?php endfor; ?>
-                                    </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card shadow-sm border-0 rounded-4 border-start border-danger border-4 h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                            <i class="ti ti-clock fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Saldo Pendiente de Pago</p>
+                                            <h4 class="text-danger fw-bolder mb-0" id="comisionesPendientes">$0.00</h4>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-2" id="filtroDesde" style="display:none;">
-                                    <label class="form-label">Desde</label>
-                                    <input type="date" class="form-control" id="fechaDesde">
-                                </div>
-                                <div class="col-md-2" id="filtroHasta" style="display:none;">
-                                    <label class="form-label">Hasta</label>
-                                    <input type="date" class="form-control" id="fechaHasta" value="<?= date('Y-m-d') ?>">
-                                </div>
-                                <div class="col-md-2">
-                                    <button class="btn btn-primary w-100" id="btnAplicarFiltro">
-                                        <i class="ti ti-filter"></i> Aplicar
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Comisiones -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card shadow-sm border-0 rounded-4">
+                                <div class="card-header bg-white d-flex justify-content-between align-items-center border-0 pt-4 px-4">
+                                    <h5 class="mb-0 fw-semibold"><i class="ti ti-list-details me-2"></i>Historial de Comisiones y Pagos</h5>
+                                    <button class="btn btn-primary" id="btnPagarComisiones">
+                                        <i class="ti ti-cash"></i> Registrar Pago
                                     </button>
                                 </div>
-                                <div class="col-md-2">
-                                    <button class="btn btn-danger w-100" id="btnGenerarPDF">
-                                        <i class="ti ti-file-text"></i> Generar PDF
-                                    </button>
+                                <div class="card-body p-4">
+                                    <div class="table-responsive">
+                                        <table id="tablaComisiones" class="table table-hover align-middle" style="width:100%">
+                                            <thead>
+                                                <tr>
+                                                    <th>Fecha</th>
+                                                    <th>Descripción / Servicio</th>
+                                                    <th>Tipo</th>
+                                                    <th>Monto</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row card-stats">
-                        <div class="col-md-4">
-                            <div class="card shadow-sm border-start border-success border-4 h-100">
-                                <div class="card-body">
-                                    <h6 class="text-muted">Comisiones Totales Generadas</h6>
-                                    <h3 class="text-success" id="comisionesTotal">$0.00</h3>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card shadow-sm border-start border-primary border-4 h-100">
-                                <div class="card-body">
-                                    <h6 class="text-muted">Total Pagado al Promotor</h6>
-                                    <h3 class="text-primary" id="comisionesPagadas">$0.00</h3>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card shadow-sm border-start border-danger border-4 h-100">
-                                <div class="card-body">
-                                    <h6 class="text-muted">Saldo Pendiente de Pago</h6>
-                                    <h3 class="text-danger" id="comisionesPendientes">$0.00</h3>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Historial de Comisiones y Pagos</h5>
-                            <button class="btn btn-primary" id="btnPagarComisiones">
-                                <i class="ti ti-cash"></i> Registrar Pago
-                            </button>
-                        </div>
-                        <div class="card-body p-4">
-                            <div class="table-responsive">
-                                <table id="tablaComisiones" class="table table-hover align-middle" style="width:100%">
-                                    <thead>
-                                        <tr>
-                                            <th>Fecha</th>
-                                            <th>Descripción / Servicio</th>
-                                            <th>Tipo</th>
-                                            <th>Monto</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
                             </div>
                         </div>
                     </div>

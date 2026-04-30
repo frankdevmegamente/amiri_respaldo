@@ -54,7 +54,7 @@ try {
 
     // Columnas de ordenamiento (sin prefijo porque son del subquery agrupado)
 
-    $columns = ['fecha', 'servicio', 'moneda', 'total_entradas', 'total_salidas'];
+    $columns = ['grupo_id', 'fecha', 'tipo_principal', 'servicio', 'cantidad_movimientos', 'monto_principal', 'moneda'];
 
     $orderColumn = isset($columns[$orderColumnIndex]) ? $columns[$orderColumnIndex] : 'fecha';
 
@@ -233,10 +233,8 @@ try {
 
     
 
-    // Subquery para datos agrupados
-
+    // Subquery para datos agrupados con identificación de beneficiarios
     $subquery = "
-
         SELECT 
             MIN(fm.id) as id,
             fm.grupo_id,
@@ -251,68 +249,62 @@ try {
             GROUP_CONCAT(DISTINCT fm.tipo ORDER BY fm.tipo) as tipos,
 
             CASE 
-
                 WHEN SUM(CASE WHEN fm.tipo = 'traspaso' THEN 1 ELSE 0 END) > 0 THEN 'Traspaso'
-
                 WHEN SUM(CASE WHEN fm.tipo = 'entrada' THEN 1 ELSE 0 END) > 0 AND SUM(CASE WHEN fm.tipo = 'salida' THEN 1 ELSE 0 END) > 0 THEN 'Entrada/Salida'
-
                 WHEN SUM(CASE WHEN fm.tipo = 'entrada' THEN 1 ELSE 0 END) > 0 THEN 'Entrada'
-
                 WHEN SUM(CASE WHEN fm.tipo = 'salida' THEN 1 ELSE 0 END) > 0 THEN 'Salida'
-
                 ELSE 'Otro'
-
             END as tipo_principal,
 
             fm.moneda,
 
             SUM(CASE WHEN fm.tipo = 'entrada' THEN fm.monto ELSE 0 END) as total_entradas,
-
             SUM(CASE WHEN fm.tipo = 'salida' THEN fm.monto ELSE 0 END) as total_salidas,
-
             SUM(CASE WHEN fm.tipo = 'comision' THEN fm.monto ELSE 0 END) as total_comisiones,
 
-            GREATEST(
-
-                MAX(CASE WHEN fm.tipo = 'entrada' THEN fm.monto ELSE 0 END),
-
-                MAX(CASE WHEN fm.tipo = 'salida' THEN fm.monto ELSE 0 END),
-
-                MAX(CASE WHEN fm.tipo = 'traspaso' THEN fm.monto ELSE 0 END)
-
-            ) as monto_principal,
+            -- Suma total para pagos/cobros múltiples
+            CASE 
+                WHEN COUNT(*) > 1 AND MAX(fm.servicio_id) IN (14, 17) THEN SUM(fm.monto)
+                ELSE GREATEST(
+                    MAX(CASE WHEN fm.tipo = 'entrada' THEN fm.monto ELSE 0 END),
+                    MAX(CASE WHEN fm.tipo = 'salida' THEN fm.monto ELSE 0 END),
+                    MAX(CASE WHEN fm.tipo = 'traspaso' THEN fm.monto ELSE 0 END)
+                )
+            END as monto_principal,
 
             GROUP_CONCAT(DISTINCT NULLIF(co.nombre, '') SEPARATOR ' | ') as cuentas_origen,
             GROUP_CONCAT(DISTINCT NULLIF(cd.nombre, '') SEPARATOR ' | ') as cuentas_destino,
 
             MAX(COALESCE(cl.nombre, '')) as cliente,
-
             MAX(COALESCE(p.nombre, '')) as proveedor,
-
             MAX(COALESCE(pr.nombre, '')) as promotor,
+            MAX(COALESCE(pres.nombre, '')) as prestamista, -- Nombre del prestamista
 
             MAX(fm.paridad) as paridad,
 
-            MAX(fm.descripcion) as descripcion
+            -- DESCRIPCIÓN INTELIGENTE CON NOMBRES
+            CASE 
+                -- Si es pago múltiple a prestamistas (Servicio 14)
+                WHEN COUNT(*) > 1 AND MAX(fm.servicio_id) = 14 THEN 
+                    CONCAT('Pago múltiple (', COUNT(*), '): ', GROUP_CONCAT(DISTINCT pres.nombre SEPARATOR ', '))
+                
+                -- Si es cobro múltiple de préstamos otorgados (Servicio 17)
+                WHEN COUNT(*) > 1 AND MAX(fm.servicio_id) = 17 THEN 
+                    CONCAT('Cobro múltiple (', COUNT(*), ')')
+                
+                ELSE MAX(fm.descripcion)
+            END as descripcion
 
         FROM movimientos fm
-
         LEFT JOIN servicios s ON fm.servicio_id = s.id
-
         LEFT JOIN cuentas co ON fm.cuenta_origen_id = co.id
-
         LEFT JOIN cuentas cd ON fm.cuenta_destino_id = cd.id
-
         LEFT JOIN clientes cl ON fm.cliente_id = cl.id
-
         LEFT JOIN proveedores p ON fm.proveedor_id = p.id
-
         LEFT JOIN promotores pr ON fm.promotor_id = pr.id
-
+        LEFT JOIN prestamistas pres ON fm.prestamista_id = pres.id -- UNIÓN VITAL
         WHERE $whereClause
-
         GROUP BY fm.grupo_id, fm.fecha, s.nombre, fm.moneda
-
     ";
 
     

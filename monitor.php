@@ -337,6 +337,17 @@ $metricas = obtenerMetricas($pdo);
     <link rel="stylesheet" href="src/assets/css/layout-custom.css">
 
     <style>
+                .body-wrapper {
+            /* Aumentamos esto para librar completamente la altura del header azul */
+            padding-top: 100px !important; 
+        }
+        
+        .body-wrapper-inner, 
+        .body-wrapper .container-fluid {
+            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
+            padding-top: 15px !important;
+            margin-top: 0 !important;
+        }
 
         .metric-card {
 
@@ -357,11 +368,81 @@ $metricas = obtenerMetricas($pdo);
         .status-danger { color: #fa896b; }
 
         .log-stats {
-
             font-size: 0.85rem;
-
         }
 
+        body[data-bs-theme="dark"] .logo-modo-claro,
+        .dark-mode .logo-modo-claro {
+            display: none !important;
+        }
+
+        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        .dark-mode .logo-modo-oscuro {
+            display: block !important;
+        }
+
+        body[data-bs-theme="dark"] .card,
+        body[data-bs-theme="dark"] .page-breadcrumb,
+        body[data-bs-theme="dark"] .page-breadcrumb h3,
+        body[data-bs-theme="dark"] .card-header,
+        body[data-bs-theme="dark"] .card-body,
+        body[data-bs-theme="dark"] .modal-content,
+        body[data-bs-theme="dark"] .modal-header,
+        body[data-bs-theme="dark"] .modal-footer {
+            background-color: #1f2535 !important;
+            border-color: #2b3350 !important;
+            color: #e6ecff !important;
+        }
+
+        body[data-bs-theme="dark"] .card {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        body[data-bs-theme="dark"] .table,
+        body[data-bs-theme="dark"] .table thead th,
+        body[data-bs-theme="dark"] .table tbody td,
+        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+            background-color: #1f2535 !important;
+            color: #e6ecff !important;
+            border-color: #2b3350 !important;
+        }
+
+        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
+            background-color: #232b3c !important;
+        }
+
+        body[data-bs-theme="dark"] .form-control,
+        body[data-bs-theme="dark"] .form-select,
+        body[data-bs-theme="dark"] .input-group-text,
+        body[data-bs-theme="dark"] .form-control-plaintext,
+        body[data-bs-theme="dark"] .alert,
+        body[data-bs-theme="dark"] .badge,
+        body[data-bs-theme="dark"] .nav-tabs .nav-link {
+            background-color: #232b3c !important;
+            color: #e6ecff !important;
+            border-color: #2b3350 !important;
+        }
+
+        body[data-bs-theme="dark"] .nav-tabs .nav-link.active {
+            color: #ffffff !important;
+            border-bottom-color: #5d87ff !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-light {
+            background-color: rgba(255, 255, 255, 0.06) !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
+            background-color: rgba(93, 135, 255, 0.12) !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-success.bg-opacity-10 {
+            background-color: rgba(25, 135, 84, 0.12) !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-warning.bg-opacity-10 {
+            background-color: rgba(255, 193, 7, 0.12) !important;
+        }
     </style>
 
 </head>
@@ -383,22 +464,28 @@ $metricas = obtenerMetricas($pdo);
         <div class="body-wrapper">
             <div class="container-fluid px-4" style="max-width: 100%;">
                 
-                <div class="card bg-light-info shadow-none position-relative overflow-hidden mb-4 mt-2">
-                    <div class="card-body px-4 py-3">
-                        <div class="row align-items-center">
-                            <div class="col-9">
-                                <h4 id="myElement" class="fw-semibold mb-8"></h4>
-                                <nav aria-label="breadcrumb">
-                                    <ol class="breadcrumb">
-                                        <li class="breadcrumb-item"><a href="index.php">Dashboard</a></li>
-                                        <li class="breadcrumb-item active">Monitor</li>
-                                    </ol>
-                                </nav>
-                            </div>
-                            <div class="col-3 text-end">
-                                <button class="btn btn-primary" onclick="location.reload()">
-                                    <i class="ti ti-refresh"></i> Actualizar
-                                </button>
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card shadow-sm border-0 rounded-4" style="position: relative; overflow: hidden;">
+                            
+                            <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #5D87FF; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                            <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+
+                            <div class="card-body p-4" style="position: relative; z-index: 1;">
+                                <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            <i class="ti ti-device-heart-monitor fs-5"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="card-title fw-semibold mb-0">Monitor del Sistema</h5>
+                                            <p class="text-muted mb-0">Monitorea el estado y rendimiento del sistema en tiempo real</p>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary" onclick="location.reload()">
+                                        <i class="ti ti-refresh"></i> Actualizar
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

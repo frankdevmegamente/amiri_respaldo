@@ -250,28 +250,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             
 
-            registrarAuditoria($pdo, [
-
+           registrarAuditoria($pdo, [
                 'accion' => 'INSERT',
-
                 'modulo' => 'clientes',
-
                 'tabla' => 'cuentas',
-
                 'registro_id' => $result['cuenta_id'],
-
                 'descripcion' => "Creó cuenta automática para cliente: Caja - {$data['nombre']}",
-
                 'datos_nuevos' => [
-
                     'id' => $result['cuenta_id'],
-
                     'nombre' => "Caja - {$data['nombre']}",
-
-                    'tipo_moneda' => $data['tipo_moneda']
-
+                    'tipo_moneda' => 'MXN' // Lo dejamos fijo porque las cajas de clientes nacen en MXN
                 ]
-
             ]);
 
             

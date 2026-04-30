@@ -45,6 +45,17 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 </head>
 
 <style>
+        .body-wrapper {
+            /* Aumentamos esto para librar completamente la altura del header azul */
+            padding-top: 100px !important; 
+        }
+        
+        .body-wrapper-inner, 
+        .body-wrapper .container-fluid {
+            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
+            padding-top: 15px !important;
+            margin-top: 0 !important;
+        }
      body[data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
@@ -583,12 +594,18 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     data: null,
                     render: d => {
                         let botones = '<div class="d-flex align-items-center gap-2">';
+                        
+                        // 1. NUEVO BOTÓN DE HISTORIAL (Siempre visible)
+                        botones += `<a href="historial-proveedor.php?id=${d.id}" class="badge bg-secondary bg-opacity-10 text-secondary border-0 text-decoration-none" style="font-size: 0.75rem;" title="Historial"><i class="ti ti-history"></i> Movimientos</a>`;
+
+                        // 2. LÓGICA EXISTENTE DE PAGOS CONDICIONALES
                         const tieneAdeudoUsd  = d.acepta_usd  && parseFloat(d.saldo_usd  || 0) > 0.001;
                         const tieneAdeudoUsdt = d.acepta_usdt && parseFloat(d.saldo_usdt || 0) > 0.001;
                         
                         if (tieneAdeudoUsd)  botones += `<button class="badge bg-primary bg-opacity-10 text-primary border-0 pagar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" data-moneda="USD"><i class="ti ti-cash"></i> Pagar USD</button>`;
                         if (tieneAdeudoUsdt) botones += `<button class="badge bg-info bg-opacity-10 text-info border-0 pagar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" data-moneda="USDT"><i class="ti ti-cash"></i> Pagar USDT</button>`;
                         
+                        // 3. BOTONES DE EDITAR Y ELIMINAR
                         botones += `<button class="badge bg-warning bg-opacity-10 text-warning border-0 editar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Editar"><i class="ti ti-pencil"></i> Editar</button>`;
                         botones += `<button class="badge bg-danger bg-opacity-10 text-danger border-0 eliminar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Eliminar"><i class="ti ti-trash"></i> Eliminar</button>`;
                         

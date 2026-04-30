@@ -14,14 +14,10 @@ if (!isset($pagina_actual)) {
 
 <aside class="left-sidebar">
 
-  <div class="brand-logo d-flex align-items-center justify-content-between">
-
+  <div class="brand-logo d-flex align-items-center justify-content-center border-bottom border-light border-opacity-10 py-2">
     <a href="./index.php" class="text-nowrap logo-img">
-
-      <img src="src/assets/images/logos/logo2-sin-fondo.png" alt="Logo Amiri" class="logo-modo-claro" style="height: 45px; margin-top:20px; max-width: 100%; object-fit: contain;" />
-
-<img src="src/assets/images/logos/logo2-blanco-sin-fondo.png" alt="Logo Amiri" class="logo-modo-oscuro" style="height: 45px; margin-top:20px; max-width: 100%; object-fit: contain; display: none;" />
-
+      <img src="src/assets/images/logos/logo2.png" alt="Amiri App Logo" class="logo-modo-claro" style="max-width: 100%; width: auto; height: 40px;" />
+      <img src="src/assets/images/logos/logo2-blanco-sin-fondo.png" alt="Amiri App Logo" class="logo-modo-oscuro" style="max-width: 100%; width: auto; height: 40px; display: none;" />
     </a>
 
     <ul class="navbar-nav">
@@ -162,6 +158,13 @@ if (!isset($pagina_actual)) {
 
           </li>
 
+          <li class="sidebar-item <?= in_array($pagina_actual, ['prestamos-otorgados.php']) ? 'active' : '' ?>">
+            <a class="sidebar-link" href="prestamos-otorgados.php" aria-expanded="false">
+              <i class="ti ti-cash-banknote"></i>
+              <span class="hide-menu">Préstamos Otorgados</span>
+            </a>
+          </li>
+
           <li class="sidebar-item <?= in_array($pagina_actual, ['gastos.php']) ? 'active' : '' ?>">
 
             <a class="sidebar-link" href="gastos.php" aria-expanded="false">
@@ -185,6 +188,10 @@ if (!isset($pagina_actual)) {
             </a>
 
           </li>
+
+      
+
+          
  
         
         <li class="sidebar-item">
@@ -310,13 +317,12 @@ if (!isset($pagina_actual)) {
     // Restaurar estado inmediatamente (sin flash)
     if (wrapper && localStorage.getItem(STORAGE_KEY) === '1') {
       wrapper.classList.add('sidebar-mini');
-      wrapper.setAttribute('data-sidebartype', 'mini-sidebar'); // <--- ¡Línea nueva agregada!
+      wrapper.setAttribute('data-sidebartype', 'mini-sidebar'); 
     }
 
     window.addEventListener('load', function() {
       var btn = document.getElementById('sidebarCollapseBtn');
-      if (!btn || !wrapper) return;
-
+      
       function initTooltips() {
         document.querySelectorAll('#sidebarnav .sidebar-link').forEach(function(el) {
           var span = el.querySelector('.hide-menu');
@@ -337,18 +343,32 @@ if (!isset($pagina_actual)) {
         });
       }
 
-      if (wrapper.classList.contains('sidebar-mini')) initTooltips();
+      if (wrapper && wrapper.classList.contains('sidebar-mini')) initTooltips();
 
-      btn.addEventListener('click', function() {
-        var isMini = wrapper.classList.toggle('sidebar-mini');
-        
-        // <--- ¡Línea mágica agregada para recorrer el contenedor! --->
-        wrapper.setAttribute('data-sidebartype', isMini ? 'mini-sidebar' : 'full');
-        
-        localStorage.setItem(STORAGE_KEY, isMini ? '1' : '0');
-        if (isMini) initTooltips();
-        else destroyTooltips();
+      if (btn && wrapper) {
+          btn.addEventListener('click', function() {
+            var isMini = wrapper.classList.toggle('sidebar-mini');
+            
+            wrapper.setAttribute('data-sidebartype', isMini ? 'mini-sidebar' : 'full');
+            
+            localStorage.setItem(STORAGE_KEY, isMini ? '1' : '0');
+            if (isMini) initTooltips();
+            else destroyTooltips();
+          });
+      }
+      
+      // --- CONTROLADOR DE HAMBURGUESA CORREGIDO ---
+      var botonesMenu = document.querySelectorAll('.sidebartoggler');
+      
+      botonesMenu.forEach(function(boton) {
+        boton.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (wrapper) {
+            wrapper.classList.toggle('show-sidebar');
+          }
+        });
       });
+      
     });
   })();
 </script>

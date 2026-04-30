@@ -47,6 +47,17 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 </head>
 
 <style>
+        .body-wrapper {
+            /* Aumentamos esto para librar completamente la altura del header azul */
+            padding-top: 100px !important; 
+        }
+        
+        .body-wrapper-inner, 
+        .body-wrapper .container-fluid {
+            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
+            padding-top: 15px !important;
+            margin-top: 0 !important;
+        }
      body[data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
@@ -278,6 +289,38 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
         </div>
 
 
+        <div class="modal fade" id="modalDetalles" tabindex="-1">
+    <div class="modal-dialog modal-xl"> <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="ti ti-list-details"></i> Historial de Movimientos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table id="tablaMovimientos" class="table table-hover align-middle w-100">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Servicio</th>
+                                <th>Tipo</th>
+                                <th>Moneda</th>
+                                <th>Monto</th>
+                                <th>Descripción</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
         <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;"></div>
 
@@ -459,14 +502,20 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                         data: 'creado_en',
                         render: d => d ? new Date(d).toLocaleDateString('es-MX') : ''
                     },
-                    {
-                        data: null,
-                        render: function(d) {
-                            let btnEditar = `<button class="badge bg-warning bg-opacity-10 text-warning border-0 editar me-2" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Editar"><i class="ti ti-pencil"></i> Editar</button>`;
-                            let btnEliminar = `<button class="badge bg-danger bg-opacity-10 text-danger border-0 eliminar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Eliminar"><i class="ti ti-trash"></i> Eliminar</button>`;
-                            return `<div class="d-flex align-items-center">${btnEditar}${btnEliminar}</div>`;
-                        }
-                    }
+                    // Dentro de la configuración de columnas de tu DataTable en promotores.php
+{
+    data: null,
+    render: function(d) {
+        return `<div class="d-flex align-items-center gap-2">
+            <a href="historial-promotor.php?id=${d.id}" class="badge bg-info bg-opacity-10 text-info border-0 text-decoration-none" style="font-size: 0.75rem;" title="Historial"><i class="ti ti-history"></i> Movimientos</a>
+            
+            <a href="detalle-promotor.php?id=${d.id}" class="badge bg-primary bg-opacity-10 text-primary border-0 text-decoration-none" style="font-size: 0.75rem;" title="Comisiones"><i class="ti ti-cash"></i> Comisiones</a>
+            
+            <button class="badge bg-warning bg-opacity-10 text-warning border-0 editar" data-id="${d.id}"><i class="ti ti-pencil"></i></button>
+            <button class="badge bg-danger bg-opacity-10 text-danger border-0 eliminar" data-id="${d.id}"><i class="ti ti-trash"></i></button>
+        </div>`;
+    }
+}
 
                 ],
 
@@ -649,6 +698,70 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                 }
 
             });
+
+            let tablaMovimientos; // Variable global para la tabla secundaria
+
+$('#tablaPromotores').on('click', '.detalles', function() {
+    const idPromotor = $(this).data('id');
+
+    // Mostramos el modal
+    $('#modalDetalles').modal('show');
+
+    // Si la tabla de movimientos ya estaba abierta antes, la destruimos para cargar los datos del nuevo promotor
+    if ($.fn.DataTable.isDataTable('#tablaMovimientos')) {
+        $('#tablaMovimientos').DataTable().destroy();
+    }
+
+    // Inicializamos el DataTable de movimientos
+    tablaMovimientos = $('#tablaMovimientos').DataTable({
+        ajax: {
+            url: `api/obtener_movimientos.php?tipo=promotor&id=${idPromotor}`,
+            dataSrc: '' // Como nuestra API devuelve un array directo, lo dejamos vacío
+        },
+        columns: [
+            {
+                data: 'fecha',
+                render: d => d ? new Date(d).toLocaleDateString('es-MX') : ''
+            },
+            { 
+                data: 'servicio', 
+                render: d => d ? `<span class="fw-semibold">${d}</span>` : '<span class="text-muted">N/A</span>' 
+            },
+            {
+                data: 'tipo',
+                render: function(d) {
+                    if(!d) return '';
+                    let tipoLower = d.toLowerCase();
+                    if(tipoLower === 'entrada') return '<span class="badge bg-success bg-opacity-10 text-success border-0">Entrada</span>';
+                    if(tipoLower === 'salida') return '<span class="badge bg-danger bg-opacity-10 text-danger border-0">Salida</span>';
+                    if(tipoLower === 'comision') return '<span class="badge bg-warning bg-opacity-10 text-warning border-0">Comisión</span>';
+                    return `<span class="badge bg-secondary bg-opacity-10 text-secondary border-0 capitalize">${d}</span>`;
+                }
+            },
+            { data: 'moneda' },
+            {
+                data: 'monto',
+                render: d => d ? `<span class="fw-bold">$${parseFloat(d).toFixed(2)}</span>` : '$0.00'
+            },
+            { data: 'descripcion' },
+            {
+                data: 'estado',
+                render: function(d) {
+                    if(!d) return '';
+                    let estadoLower = d.toLowerCase();
+                    if(estadoLower === 'completado' || estadoLower === 'aprobado') return '<span class="text-success fw-bold"><i class="ti ti-check"></i> '+d+'</span>';
+                    if(estadoLower === 'pendiente') return '<span class="text-warning fw-bold"><i class="ti ti-clock"></i> '+d+'</span>';
+                    if(estadoLower === 'cancelado') return '<span class="text-danger fw-bold"><i class="ti ti-x"></i> '+d+'</span>';
+                    return d;
+                }
+            }
+        ],
+        order: [[0, 'desc']], // Ordenar por fecha más reciente
+        language: {
+            url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' // Español
+        }
+    });
+});
 
         </script>
 

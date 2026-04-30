@@ -139,21 +139,19 @@ try {
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
     <style>
-
-        /* Opcional: Añadir un poco de espacio */
-
-        .detalle-container {
-
-            margin-top: 20px;
-
+    .body-wrapper {
+            /* Aumentamos esto para librar completamente la altura del header azul */
+            padding-top: 100px !important; 
+        }
+        
+        .body-wrapper-inner, 
+        .body-wrapper .container-fluid {
+            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
+            padding-top: 15px !important;
+            margin-top: 0 !important;
         }
 
-    </style>
-
-</head>
-
-<style>
-     body[data-bs-theme="dark"] .logo-modo-claro,
+        body[data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
         }
@@ -162,7 +160,73 @@ try {
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }
-</style>
+
+        body[data-bs-theme="dark"] .card,
+        body[data-bs-theme="dark"] .page-breadcrumb,
+        body[data-bs-theme="dark"] .page-breadcrumb h3,
+        body[data-bs-theme="dark"] .card-header,
+        body[data-bs-theme="dark"] .card-body,
+        body[data-bs-theme="dark"] .modal-content,
+        body[data-bs-theme="dark"] .modal-header,
+        body[data-bs-theme="dark"] .modal-footer,
+        body[data-bs-theme="dark"] .table-light {
+            background-color: #1f2535 !important;
+            border-color: #2b3350 !important;
+            color: #e6ecff !important;
+        }
+
+        body[data-bs-theme="dark"] .card {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        body[data-bs-theme="dark"] .table,
+        body[data-bs-theme="dark"] .table thead th,
+        body[data-bs-theme="dark"] .table tbody td,
+        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+            background-color: #1f2535 !important;
+            color: #e6ecff !important;
+            border-color: #2b3350 !important;
+        }
+
+        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
+            background-color: #232b3c !important;
+        }
+
+        body[data-bs-theme="dark"] .form-control,
+        body[data-bs-theme="dark"] .form-select,
+        body[data-bs-theme="dark"] .input-group-text,
+        body[data-bs-theme="dark"] .form-control-plaintext,
+        body[data-bs-theme="dark"] .alert,
+        body[data-bs-theme="dark"] .badge,
+        body[data-bs-theme="dark"] .nav-tabs .nav-link {
+            background-color: #232b3c !important;
+            color: #e6ecff !important;
+            border-color: #2b3350 !important;
+        }
+
+        body[data-bs-theme="dark"] .nav-tabs .nav-link.active {
+            color: #ffffff !important;
+            border-bottom-color: #5d87ff !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-light {
+            background-color: rgba(255, 255, 255, 0.06) !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
+            background-color: rgba(93, 135, 255, 0.12) !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-success.bg-opacity-10 {
+            background-color: rgba(25, 135, 84, 0.12) !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-warning.bg-opacity-10 {
+            background-color: rgba(255, 193, 7, 0.12) !important;
+        }
+    </style>
+
+</head>
 
 <body>
 
@@ -194,49 +258,87 @@ try {
                     </div>
 
                     <div class="row mb-4">
+                        <!-- Información del Prestamista -->
                         <div class="col-md-6">
-                            <div class="card shadow-sm h-100">
-                                <div class="card-header bg-primary text-white">
-                                    <h5 class="card-title mb-0"><i class="ti ti-info-circle"></i> Información del Prestamista</h5>
-                                </div>
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <h5><strong>• Nombre:</strong> <?= htmlspecialchars($prestamista['nombre']) ?></h5>
+                            <div class="card shadow-sm border-0 rounded-4 h-100" style="position: relative; overflow: hidden;">
+                                
+                                <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #5D87FF; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                                <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+
+                                <div class="card-body p-4" style="position: relative; z-index: 1;">
+                                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            <i class="ti ti-user fs-5"></i>
                                         </div>
+                                        <h5 class="card-title fw-semibold mb-0">Información del Prestamista</h5>
                                     </div>
-                                    <br>
-                                    <div class="row">
+                                    
+                                    <div class="row g-4">
                                         <div class="col-md-12">
-                                            <h5><strong>• Teléfono:</strong> <?= htmlspecialchars($prestamista['telefono'] ?? 'N/A') ?></h5>
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-light text-secondary rounded d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                                    <i class="ti ti-id fs-5"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Nombre</p>
+                                                    <h6 class="fw-bold mb-0 fs-5 mt-1"><?= htmlspecialchars($prestamista['nombre']) ?></h6>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <br>
-                                    <div class="row">
                                         <div class="col-md-12">
-                                            <h5><strong>• Email:</strong> <?= htmlspecialchars($prestamista['email'] ?? 'N/A') ?></h5>
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-light text-secondary rounded d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                                    <i class="ti ti-phone fs-5"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Teléfono</p>
+                                                    <h6 class="fw-bold mb-0 fs-5 mt-1"><?= htmlspecialchars($prestamista['telefono'] ?? 'N/A') ?></h6>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <br>
-                                    <div class="row">
                                         <div class="col-md-12">
-                                            <h5><strong>• Dirección:</strong> <?= htmlspecialchars($prestamista['direccion'] ?? 'N/A') ?></h5>
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-light text-secondary rounded d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                                    <i class="ti ti-mail fs-5"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Email</p>
+                                                    <h6 class="fw-bold mb-0 fs-5 mt-1"><?= htmlspecialchars($prestamista['email'] ?? 'N/A') ?></h6>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-light text-secondary rounded d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                                    <i class="ti ti-map-pin fs-5"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Dirección</p>
+                                                    <h6 class="fw-bold mb-0 fs-5 mt-1"><?= htmlspecialchars($prestamista['direccion'] ?? 'N/A') ?></h6>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Formulario Nuevo Préstamo -->
                         <div class="col-md-6">
-                            <div class="card shadow-sm h-100">
-                                <div class="card-header bg-success text-white">
-                                    <h5 class="card-title mb-0"><i class="ti ti-plus"></i> Agregar Nuevo Préstamo</h5>
-                                </div>
-                                <div class="card-body">
+                            <div class="card shadow-sm border-0 rounded-4 h-100">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                                        <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            <i class="ti ti-plus fs-5"></i>
+                                        </div>
+                                        <h5 class="card-title fw-semibold mb-0">Agregar Nuevo Préstamo</h5>
+                                    </div>
+                                    
                                     <form id="formNuevoPrestamo">
                                         <input type="hidden" name="prestamista_id" value="<?= $prestamista['id'] ?>">
                                         <div class="row">
-                                            <div class="col-md-6">
-                                                <label class="form-label">
+                                            <div class="col-md-12 mb-3">
+                                                <label class="form-label fw-bold">
                                                     Monto
                                                     <span id="montoFormateadoNuevo" class="text-success fw-bold ms-2"></span>
                                                 </label>
@@ -246,13 +348,11 @@ try {
                                                     <input type="hidden" name="monto" id="montoInput" required>
                                                 </div>
                                             </div>
-                                            <div class="col-md-6">
+                                            <div class="col-md-6 mb-3">
                                                 <label class="form-label">Fecha</label>
                                                 <input type="date" class="form-control" name="fecha" value="<?= date('Y-m-d') ?>" required>
                                             </div>
-                                        </div>
-                                        <div class="row mt-2">
-                                            <div class="col-md-12">
+                                            <div class="col-md-6 mb-3">
                                                 <label class="form-label">Cuenta de Destino</label>
                                                 <select class="form-select" name="cuenta_id" required>
                                                     <option value="">Selecciona una cuenta</option>
@@ -266,17 +366,13 @@ try {
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
-                                        </div>
-                                        <input type="hidden" name="estado" value="pendiente">
-                                        <div class="row mt-2">
-                                            <div class="col-md-12">
+                                            <input type="hidden" name="estado" value="pendiente">
+                                            <div class="col-md-12 mb-3">
                                                 <label class="form-label">Descripción</label>
-                                                <textarea class="form-control" name="descripcion" rows="2"></textarea>
+                                                <input type="text" class="form-control" name="descripcion" placeholder="Descripción opcional">
                                             </div>
-                                        </div>
-                                        <div class="row mt-3">
                                             <div class="col-md-12">
-                                                <button type="submit" class="btn btn-success"><i class="ti ti-plus"></i> Agregar Préstamo</button>
+                                                <button type="submit" class="btn btn-success w-100"><i class="ti ti-plus me-2"></i>Agregar Préstamo</button>
                                             </div>
                                         </div>
                                     </form>
@@ -287,24 +383,31 @@ try {
 
                     <div class="row">
                         <div class="col-12">
-                            <div class="card">
-                                <div class="card-body p-4 table-responsive">
-                                    <table id="tablaPrestamos" class="table table-hover align-middle w-100">
-                                        <thead>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>Fecha</th>
-                                                <th>Monto</th>
-                                                <th>Descripción</th>
-                                                <th>Estado</th>
-                                                <th>Monto Pagado</th>
-                                                <th>Fecha Pago</th>
-                                                <th>Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            </tbody>
-                                    </table>
+                            <div class="card shadow-sm border-0 rounded-4">
+                                <div class="card-header bg-white d-flex justify-content-between align-items-center border-0 pt-4 px-4">
+                                    <h5 class="mb-0 fw-semibold"><i class="ti ti-list-details me-2"></i>Préstamos Pendientes</h5>
+                                    <button id="btnPagarSeleccionados" class="btn btn-success btn-sm" style="display: none;">
+                                        <i class="ti ti-cash"></i> Pagar Seleccionados (<span id="countSeleccionados">0</span>)
+                                    </button>
+                                </div>
+                                <div class="card-body p-4">
+                                    <div class="table-responsive">
+                                        <table id="tablaPrestamos" class="table table-hover w-100">
+                                            <thead>
+                                                <tr>
+                                                    <th style="width: 30px;"><input type="checkbox" id="checkAllPrestamos"></th>
+                                                    <th>Fecha</th>
+                                                    <th>Monto</th>
+                                                    <th>Descripción</th>
+                                                    <th>Estado</th>
+                                                    <th>Pagado</th>
+                                                    <th>Fecha Pago</th>
+                                                    <th>Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -339,7 +442,9 @@ try {
 
                         <input type="hidden" id="montoPagadoHidden">
 
+                        
                         <div class="modal-body">
+    <div id="contenedorPagosMultiples" class="mb-3 p-3 bg-light border rounded" style="display: none;"></div>
 
                             <div class="row mb-2">
 
@@ -656,21 +761,20 @@ try {
 
 
             const tablaPrestamos = $('#tablaPrestamos').DataTable({
-
                 ajax: {
-
                     url: 'api/prestamos-prestamistas.php?prestamista_id=<?= $prestamista_id ?>',
-
                     dataSrc: ""
-
                 },
-
-                columns: [{
-
-                        data: 'id'
-
+                columns: [
+                    {
+                        data: null,
+                        orderable: false,
+                        render: function(data, type, row) {
+                            if (row.estado === 'pagado') return ''; // Ocultar si ya está pagado
+                            let pendiente = parseFloat(row.monto) - parseFloat(row.monto_pagado);
+                            return `<input type="checkbox" class="check-prestamo form-check-input" data-id="${row.id}" data-pendiente="${pendiente}">`;
+                        }
                     },
-
                     {
                         data: 'fecha',
                         title: 'Fecha',
@@ -763,6 +867,73 @@ try {
                 }
             });
 
+            
+            /* ============================================================
+               LÓGICA DE PAGO MÚLTIPLE
+            ============================================================ */
+            $(document).on('change', '#checkAllPrestamos', function() {
+                $('.check-prestamo').prop('checked', $(this).prop('checked')).trigger('change');
+            });
+
+            $(document).on('change', '.check-prestamo', function() {
+                let seleccionados = $('.check-prestamo:checked');
+                let totalPendiente = 0;
+                
+                seleccionados.each(function() {
+                    totalPendiente += parseFloat($(this).data('pendiente'));
+                });
+
+                if (seleccionados.length > 0) {
+                    $('#btnPagarSeleccionados').fadeIn();
+                    $('#countSeleccionados').text(seleccionados.length);
+                } else {
+                    $('#btnPagarSeleccionados').fadeOut();
+                    $('#checkAllPrestamos').prop('checked', false);
+                }
+            });
+
+            $('#btnPagarSeleccionados').click(function() {
+                let ids = [];
+                let htmlPagos = '<h6 class="mb-3 text-primary"><i class="ti ti-list-check"></i> Especifica cuánto abonar a cada préstamo:</h6>';
+                
+                $('.check-prestamo:checked').each(function() {
+                    let id = $(this).data('id');
+                    let pendiente = parseFloat($(this).data('pendiente'));
+                    ids.push(id);
+
+                    // Cambiamos 'mb-2' por 'my-2' para que no choque con la función de ocultar
+                    htmlPagos += `
+                        <div class="row align-items-center my-2 pago-item" data-id="${id}" data-pendiente="${pendiente}">
+                            <div class="col-sm-6">
+                                <span class="fw-bold text-dark">Préstamo #${id}</span><br>
+                                <small class="text-danger">Pendiente: ${formatoMoneda(pendiente)}</small>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-success text-white border-success">$</span>
+                                    <input type="number" step="0.01" class="form-control border-success input-abono-multiple fw-bold" value="${pendiente.toFixed(2)}" max="${pendiente.toFixed(2)}">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                $('#contenedorPagosMultiples').html(htmlPagos).fadeIn();
+
+                // OCULTAMOS CON CUIDADO SOLO LAS FILAS VIEJAS
+                $('#montoTotalDisplay').closest('.row').hide();
+                $('#estadoActualDisplay').closest('.row').hide();
+                $('#descripcionDisplay').closest('.row').hide();
+                $('#montoPagarFormatted').closest('.row.mb-3').hide(); 
+                
+                $('#cuentaPagoSelect').val('');
+                $('#btnLiquidarDeudaPrestamista').hide();
+                $('#resumenPago').hide();
+                $('#editarFechaPago').val("<?= date('Y-m-d') ?>");
+
+                $('#formEditarPrestamo').data('modo', 'masivo').data('ids', ids);
+                $('#modalPagarPrestamo').modal('show');
+            });
 
 
             /* ============================================================
@@ -774,7 +945,17 @@ try {
 
 
             $('#tablaPrestamos').on('click', '.pagar', function() {
-
+                $('#contenedorPagosMultiples').hide().empty();
+                
+                // VOLVEMOS A MOSTRAR LAS FILAS VIEJAS CON CUIDADO
+                $('#montoTotalDisplay').closest('.row').show();
+                $('#estadoActualDisplay').closest('.row').show();
+                $('#descripcionDisplay').closest('.row').show();
+                $('#montoPagarFormatted').closest('.row.mb-3').show(); 
+                
+                $('#montoPagarFormatted').prop('readonly', false); 
+                $('#formEditarPrestamo').data('modo', 'individual');
+                
                 const id = $(this).data("id");
 
 
@@ -804,10 +985,8 @@ try {
                     $('#fechaDisplay').text(data.fecha);
 
                     $('#descripcionDisplay').text(data.descripcion || "N/A");
-
-                    $('#montoPagarFormatted').val("");
-
-                    $('#montoPagarHidden').val("");
+$('#montoPagarFormatted').val("").prop('readonly', false); // <-- Aquí quitamos el candado
+$('#montoPagarHidden').val("");
 
                     $('#montoFormateadoPago').text(''); // Limpiar formato visual
 
@@ -1085,150 +1264,66 @@ try {
 
 
             $(document).on('click', '#btnGuardarEdicion', function() {
-
-
-
-                console.log("CLICK EN GUARDAR PAGO"); // <-- ESTO DEBE SALIR SI TRABAJA
-
-                console.log("Monto total:", $('#montoTotalDisplay').text());
-
-                console.log("Monto pagado anterior (hidden):", $('#montoPagadoHidden').val());
-
-                console.log("Monto a pagar ingresado:", $('#montoPagarFormatted').val());
-
-                console.log("Cuenta de pago:", $('#cuentaPagoSelect').val());
-
-
-
-                const id = $('#editarId').val();
-
-                const montoAPagar = parseMoneda($('#montoPagarFormatted').val());
-
                 const cuentaPagoId = $('#cuentaPagoSelect').val();
-
-                // AQUÍ LE AGREGAMOS LA HORA AL PAGO
                 const fechaElegida = $('#editarFechaPago').val();
                 const horaActual = new Date().toTimeString().split(' ')[0];
                 const fechaPagoCompletada = fechaElegida ? (fechaElegida + ' ' + horaActual) : '';
 
+                if (!cuentaPagoId) return alert("Selecciona una cuenta de pago.");
 
+                let modoPago = $('#formEditarPrestamo').data('modo');
+                let arrayPagos = []; // Aquí guardaremos la lista exacta de qué pagar
 
-                if (montoAPagar <= 0) {
+                if (modoPago === 'masivo') {
+                    // Recolectamos lo que el usuario escribió en cada casillita
+                    $('.pago-item').each(function() {
+                        let id = $(this).data('id');
+                        let abono = parseFloat($(this).find('.input-abono-multiple').val()) || 0;
+                        if (abono > 0) {
+                            arrayPagos.push({ id: id, abono: abono });
+                        }
+                    });
 
-                    return alert("Ingresa un monto válido.");
-
+                    if (arrayPagos.length === 0) return alert("Ingresa al menos un monto mayor a $0.00.");
+                } else {
+                    // Pago individual normal
+                    const id = $('#editarId').val();
+                    const montoAPagar = parseMoneda($('#montoPagarFormatted').val());
+                    if (montoAPagar <= 0) return alert("Ingresa un monto válido.");
+                    arrayPagos.push({ id: id, abono: montoAPagar });
                 }
 
-
-
-                if (!cuentaPagoId) {
-
-                    return alert("Selecciona una cuenta de pago.");
-
-                }
-
-
-
-                const montoTotal = parseMoneda($('#montoTotalDisplay').text());
-
-                const montoPagadoAnterior = parseMoneda($('#montoPagadoHidden').val() || 0);
-
-
-
-                let nuevoMontoPagado = montoPagadoAnterior + montoAPagar;
-
-
-
-                let nuevoEstado = "pendiente";
-
-                if (nuevoMontoPagado >= montoTotal) {
-
-                    nuevoEstado = "pagado";
-
-                    nuevoMontoPagado = montoTotal;
-
-                } else if (nuevoMontoPagado > 0) {
-
-                    nuevoEstado = "parcial";
-
-                }
-
-
-
-                console.log("Enviando datos:", {
-
-                    id,
-
-                    monto_a_pagar: montoAPagar,
-
-                    cuenta_pago_id: cuentaPagoId,
-
-                    fecha_pago: fechaPagoCompletada
-
-                });
-
-
+                // Deshabilitar botón para evitar doble clic
+                const btnOriginal = $(this).html();
+                $(this).html('<i class="ti ti-loader"></i> Procesando...').prop('disabled', true);
 
                 $.ajax({
-
                     url: 'api/prestamos-prestamistas.php',
-
                     method: 'PUT',
-
                     contentType: 'application/json',
-
                     data: JSON.stringify({
-
-                        id: id,
-
-                        monto_a_pagar: montoAPagar,
-
+                        pagos: arrayPagos, // Enviamos el arreglo con las instrucciones exactas
                         cuenta_pago_id: cuentaPagoId,
-
                         fecha_pago: fechaPagoCompletada
-
                     }),
-
                     success: function(response) {
-
-                        console.log('Respuesta API:', response);
-
                         if (response.success) {
-
-                            // Cerrar modal
-
                             $('#modalPagarPrestamo').modal('hide');
-
-
-
-                            // Recargar DataTable
-
-                            tablaPrestamos.ajax.reload(null, false); // false = mantener página actual
-
+                            tablaPrestamos.ajax.reload(null, false);
+                            $('#btnPagarSeleccionados').fadeOut();
+                            $('#checkAllPrestamos').prop('checked', false);
                             showToast("Pago registrado correctamente", "success");
-
                         }
-
                     },
-
                     error: function(xhr) {
-
-                        console.error('ERROR AJAX:', xhr.responseJSON);
-
                         let msg = "Error al guardar";
-
-                        try {
-
-                            msg = xhr.responseJSON?.error || msg;
-
-                        } catch (e) {}
-
+                        try { msg = xhr.responseJSON?.error || msg; } catch (e) {}
                         showToast(msg, "error");
-
+                    },
+                    complete: function() {
+                        $('#btnGuardarEdicion').html(btnOriginal).prop('disabled', false);
                     }
-
                 });
-
             });
 
 
@@ -1239,7 +1334,19 @@ try {
 
             ============================================================ */
 
-
+/* ============================================================
+               CANDADO VISUAL: EVITAR SOBREPAGOS EN ABONOS MÚLTIPLES
+            ============================================================ */
+            $(document).on('input', '.input-abono-multiple', function() {
+                let max = parseFloat($(this).attr('max')) || 0;
+                let val = parseFloat($(this).val()) || 0;
+                
+                // Si el usuario escribe más de lo que debe, lo topamos al máximo
+                if (val > max) {
+                    $(this).val(max.toFixed(2));
+                    showToast("No puedes abonar más del saldo pendiente", "warning");
+                }
+            });
 
             // Formatear monto en tiempo real para nuevo préstamo
 

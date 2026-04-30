@@ -1,6 +1,6 @@
  <!-- App Topstrip -->
 
- <div class="app-topstrip bg-dark py-2 px-3 w-100 d-flex align-items-center justify-content-between">
+ <div class="app-topstrip bg-dark py-2 px-3 d-flex align-items-center justify-content-between">
 
    <div class="d-flex align-items-center gap-3">
 

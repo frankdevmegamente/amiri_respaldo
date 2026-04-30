@@ -332,9 +332,9 @@ try {
 
 
 
-        // Obtener cuenta de comisiones de AMIRI (buscar por nombre)
+        // Obtener cuenta de comisiones de AMIRI usando el tipo de cuenta correcto
 
-        $stmt = $pdo->query("SELECT id, saldo_actual FROM cuentas WHERE nombre LIKE '%AMIRI%' AND activo = 1 LIMIT 1");
+        $stmt = $pdo->query("SELECT id, saldo_actual FROM cuentas WHERE tipo_cuenta = 3 AND activo = 1 LIMIT 1");
 
         $cuentaAmiri = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -389,18 +389,19 @@ try {
 
 
         // Calcular total de gastos y su desglose (Fijos / Variables)
-        $sqlGastos = "SELECT 
-                        COALESCE(SUM(fm.monto), 0) as total,
-                        COALESCE(SUM(CASE WHEN g.clasificacion = 'fijo' THEN fm.monto ELSE 0 END), 0) as fijos,
-                        COALESCE(SUM(CASE WHEN g.clasificacion = 'variable' THEN fm.monto ELSE 0 END), 0) as variables
-                      FROM movimientos fm
-                      LEFT JOIN gastos g ON fm.gasto_id = g.id
-                      WHERE fm.tipo = 'salida' AND fm.activo = 1 
-                      AND fm.estado = 'activo' AND (g.id IS NULL OR g.activo = 1)
-                      AND fm.cuenta_origen_id = :cuentaId";
-        
+        $sqlGastos = "
+            SELECT
+                COALESCE(SUM(g.monto), 0) as total,
+                COALESCE(SUM(CASE WHEN g.clasificacion = 'fijo' THEN g.monto ELSE 0 END), 0) as fijos,
+                COALESCE(SUM(CASE WHEN g.clasificacion = 'variable' THEN g.monto ELSE 0 END), 0) as variables
+            FROM movimientos fm
+            LEFT JOIN gastos g ON fm.gasto_id = g.id
+            WHERE fm.tipo = 'salida' AND fm.activo = 1
+            AND (fm.estado = 'activo' OR fm.estado IS NULL) AND (g.id IS NULL OR g.activo = 1)
+            AND fm.cuenta_origen_id = :cuentaId";
+
         $sqlGastos .= $filtroFecha;
-        
+
         $stmtGastos = $pdo->prepare($sqlGastos);
         $stmtGastos->execute($params);
         $gastosRow = $stmtGastos->fetch(PDO::FETCH_ASSOC);
@@ -459,37 +460,25 @@ try {
 
 
 
-    // === DESGLOSE DE CAPITAL (Entradas específicas en 'flujo') ===
+    // === DESGLOSE DE CAPITAL (desde movimientos y deudas_clientes) ===
+    // CAPITAL: solo tipo 3 (igual que el card de Capital) + deudas_clientes + promotores
+    // NO incluir tipo 4 ni 5: esas cuentas se suman via deudas_clientes y promotores para evitar doble conteo
+    $stmtCap = $pdo->prepare("SELECT COALESCE(SUM(saldo_actual),0) AS total FROM cuentas WHERE activo=1 AND tipo_cuenta = 3 AND fecha_creacion >= ?");
+    $stmtCap->execute([$fecha_inicio]);
+    $cliente_efectivo = (float)$stmtCap->fetch(PDO::FETCH_ASSOC)['total'];
 
-    $stmt = $pdo->prepare("
+    $stmtCliMxn = $pdo->prepare("SELECT COALESCE(SUM(monto_neto_cliente-monto_pagado),0) AS total FROM deudas_clientes WHERE estado IN('pendiente','parcial') AND activo=1 AND (moneda='MXN' OR moneda IS NULL) AND fecha >= ?");
+    $stmtCliMxn->execute([$fecha_inicio]);
+    $cliente_efectivo += (float)$stmtCliMxn->fetch(PDO::FETCH_ASSOC)['total'];
 
-        SELECT
+    $stmtProm = $pdo->prepare("SELECT COALESCE(SUM(c.saldo_actual),0) AS total FROM promotores p INNER JOIN cuentas c ON p.cuenta_id=c.id WHERE p.activo=1 AND p.es_interno=0 AND c.saldo_actual>0.01 AND p.fecha_creacion >= ?");
+    $stmtProm->execute([$fecha_inicio]);
+    $promotor_efectivo = (float)$stmtProm->fetch(PDO::FETCH_ASSOC)['total'];
 
-            COALESCE(SUM(CASE WHEN concepto = 'Cliente' THEN monto ELSE 0 END) +
-
-                     SUM(CASE WHEN concepto = 'Venta de Efectivo' THEN monto * (1 - (COALESCE(porcentaje_amiri_usado, 0) + COALESCE(porcentaje_promotor_usado, 0)) / 100) ELSE 0 END), 0) as cliente_efectivo,
-
-            COALESCE(SUM(monto * (porcentaje_promotor_usado / 100)), 0) as promotor_efectivo,
-
-            COALESCE(SUM(monto * (porcentaje_amiri_usado / 100)), 0) as comisiones_amiri
-
-        FROM flujo
-
-        WHERE tipo = 'entrada'
-
-          AND fecha >= ?
-
-    ");
-
-    $stmt->execute([$fecha_inicio]);
-
-    $capital_data = $stmt->fetch();
-
-    $cliente_efectivo = (float) $capital_data['cliente_efectivo'];
-
-    $promotor_efectivo = (float) $capital_data['promotor_efectivo'];
-
-    $comisiones_amiri = (float) $capital_data['comisiones_amiri'];
+    // Comisiones AMIRI desde deudas_clientes
+    $stmtCom = $pdo->prepare("SELECT COALESCE(SUM(comision_amiri),0) AS total FROM deudas_clientes WHERE activo=1 AND fecha >= ?");
+    $stmtCom->execute([$fecha_inicio]);
+    $comisiones_amiri = (float)$stmtCom->fetch(PDO::FETCH_ASSOC)['total'];
 
     $capital_total = $cliente_efectivo + $promotor_efectivo + $comisiones_amiri;
 
@@ -525,30 +514,19 @@ try {
 
 
 
-    // === PRÉSTAMOS POR BENEFICIARIO (caja) en flujo (opcional, se mantiene por compatibilidad) ===
-
+    // === PRÉSTAMOS POR BENEFICIARIO (desde deudas_empresa) ===
     $stmt = $pdo->prepare("
-
         SELECT
-
-            caja,
-
-            SUM(monto) as total
-
-        FROM flujo
-
-        WHERE tipo = 'salida'
-
-          AND concepto = 'Préstamo'
-
-          AND fecha >= ?
-
-        GROUP BY caja
-
+            p.nombre as caja,
+            SUM(de.monto - de.monto_pagado) as total
+        FROM deudas_empresa de
+        JOIN prestamistas p ON de.prestamista_id = p.id
+        WHERE de.estado IN ('pendiente', 'parcial')
+        AND de.activo = 1
+        AND de.fecha >= ?
+        GROUP BY p.id, p.nombre
     ");
-
     $stmt->execute([$fecha_inicio]);
-
     $prestamos_por_caja = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 

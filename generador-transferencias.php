@@ -28,57 +28,7 @@ try {
 
 $mensaje = '';
 
-// 2. PROCESAR SUBIDA DEL MACHOTE (CSV) - CON FILTRO ANTI-DUPLICADOS
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['archivo_csv'])) {
-    $file = $_FILES['archivo_csv'];
-    if ($file['error'] === UPLOAD_ERR_OK) {
-        $handle = fopen($file['tmp_name'], "r");
-        $row = 0;
-        
-        $insertados = 0;
-        $reactivados = 0;
-        $duplicados = 0;
-        
-        $checkStmt = $pdo->prepare("SELECT id, estado FROM directorio_depositos WHERE nombre = ? AND cuenta = ? AND banco = ? LIMIT 1");
-        $insertStmt = $pdo->prepare("INSERT INTO directorio_depositos (nombre, banco, cuenta, clabe, estado) VALUES (?, ?, ?, ?, 'activo')");
-        $updateStmt = $pdo->prepare("UPDATE directorio_depositos SET estado = 'activo', clabe = ? WHERE id = ?");
-        
-        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-            $row++;
-            if ($row === 1) continue;
-            
-            $nombre = trim($data[0] ?? '');
-            if (empty($nombre)) continue;
-            
-            $banco = trim($data[1] ?? '');
-            $cuenta = trim($data[2] ?? '');
-            $clabe = trim($data[3] ?? '');
-            
-            $checkStmt->execute([$nombre, $cuenta, $banco]);
-            $clienteExistente = $checkStmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($clienteExistente) {
-                if ($clienteExistente['estado'] === 'inactivo') {
-                    $updateStmt->execute([$clabe, $clienteExistente['id']]);
-                    $reactivados++;
-                } else {
-                    $duplicados++;
-                }
-            } else {
-                $insertStmt->execute([$nombre, $banco, $cuenta, $clabe]);
-                $insertados++;
-            }
-        }
-        fclose($handle);
-        
-        $mensaje = "<div class='alert alert-success alert-dismissible fade show' role='alert'>
-                        <i class='ti ti-check me-2'></i> <strong>Archivo procesado:</strong> $insertados nuevos, $reactivados reactivados y se omitieron $duplicados duplicados.
-                        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                    </div>";
-    } else {
-        $mensaje = "<div class='alert alert-danger'>Error al subir el archivo.</div>";
-    }
-}
 
 // 3. ELIMINAR CLIENTE DEL DIRECTORIO (SOFT DELETE)
 if (isset($_GET['delete_id'])) {
@@ -119,6 +69,17 @@ sort($bancos_unicos);
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <style>
+                .body-wrapper {
+            /* Aumentamos esto para librar completamente la altura del header azul */
+            padding-top: 100px !important; 
+        }
+        
+        .body-wrapper-inner, 
+        .body-wrapper .container-fluid {
+            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
+            padding-top: 15px !important;
+            margin-top: 0 !important;
+        }
         .ticket-wrapper {
             background-color: #f4f6f9;
             padding: 40px;
@@ -131,7 +92,7 @@ sort($bancos_unicos);
             background: #ffffff;
             width: 100%;
             max-width: 580px;
-            border-radius: 12px;
+            border-radius: 0px;
             padding: 35px;
             box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
             color: #2A3547;
@@ -305,6 +266,43 @@ sort($bancos_unicos);
     color: #e9ecef;
     border-color: #2c344c;
 }
+/* =========================================
+           📱 AJUSTES EXCLUSIVOS PARA MÓVIL
+           ========================================= */
+        @media (max-width: 768px) {
+            /* 1. Ajuste del encabezado y logo en móvil */
+            .logo-container-ticket {
+                max-width: 75% !important; /* Le damos más espacio al logo en pantallas pequeñas */
+            }
+            .logo-container-ticket img {
+                height: 35px !important; /* Logo un poco más pequeño para que no se amontone */
+                width: auto !important;
+            }
+            .ticket-title {
+                font-size: 14px !important;
+                white-space: normal !important;
+                text-align: right;
+            }
+
+            /* 2. Ajuste de márgenes del ticket */
+            .ticket-wrapper { padding: 15px 10px !important; }
+            .ticket-card { padding: 20px 15px !important; }
+            
+            .client-amount {
+                min-width: auto !important;
+                font-size: 14px !important;
+                padding: 6px 10px !important;
+            }
+            .client-name { font-size: 13px !important; }
+            .client-account { font-size: 11px !important; }
+            
+            .client-row { padding-right: 30px !important; }
+            .btn-quitar-item {
+                transform: translateY(-50%) !important;
+                top: 50% !important;
+                right: 0 !important;
+            }
+        }
     </style>
 </head>
 
@@ -325,15 +323,21 @@ sort($bancos_unicos);
 
                     <div class="card shadow-sm border-0 rounded-4 mb-4">
                         <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h5 class="card-title fw-semibold mb-0"><i class="ti ti-users"></i> Directorio de Clientes</h5>
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-outline-secondary" onclick="descargarMachote()">
-                                        <i class="ti ti-download"></i> Descargar Machote
-                                    </button>
-                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalUpload">
-                                        <i class="ti ti-upload"></i> Subir Excel (CSV)
-                                    </button>
+                            <div class="row align-items-center mb-3">
+                                <div class="col-12 col-md-auto mb-3 mb-md-0">
+                                    <h5 class="card-title fw-semibold mb-0"><i class="ti ti-users"></i> Directorio de Clientes</h5>
+                                </div>
+                                
+                                <div class="col-12 col-md-auto ms-md-auto">
+                                    <div class="d-flex flex-column flex-md-row gap-2">
+                                        <a href="src/assets/machote_clientes.xlsx" download class="btn btn-sm btn-outline-secondary px-3 py-2 text-nowrap d-flex justify-content-center align-items-center">
+                                            <i class="ti ti-download me-1"></i> Descargar Machote
+                                        </a>
+                                        
+                                        <button class="btn btn-sm btn-primary px-3 py-2 text-nowrap d-flex justify-content-center align-items-center" data-bs-toggle="modal" data-bs-target="#modalUpload">
+                                            <i class="ti ti-upload me-1"></i> Subir Excel (XLSX)
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -363,12 +367,26 @@ sort($bancos_unicos);
     <td><span class="badge bg-primary bg-opacity-10 text-primary border-0 py-1 px-2" style="font-size: 0.8rem;"><?= htmlspecialchars($c['banco']) ?></span></td>
     
     <td><?= htmlspecialchars($c['clabe']) ?></td>
-    
     <td class="text-center">
+    <button class="badge bg-primary bg-opacity-10 text-primary border-0 me-1 btn-editar-cliente" 
+            style="padding: 8px 12px; cursor: pointer;"
+            data-id="<?= $c['id'] ?>"
+            data-nombre="<?= htmlspecialchars($c['nombre']) ?>"
+            data-banco="<?= htmlspecialchars($c['banco']) ?>"
+            data-cuenta="<?= htmlspecialchars($c['cuenta']) ?>"
+            data-clabe="<?= htmlspecialchars($c['clabe']) ?>">
+        <i class="ti ti-edit"></i>
+    </button>
+    <a href="?delete_id=<?= $c['id'] ?>" class="badge bg-danger bg-opacity-10 text-danger border-0" style="padding: 8px 12px; text-decoration: none; font-size: 0.85rem;" onclick="return confirm('¿Eliminar cliente?')">
+            <i class="ti ti-trash"></i>
+        </a>
+</td>
+    
+    <!-- <td class="text-center">
         <a href="?delete_id=<?= $c['id'] ?>" class="badge bg-danger bg-opacity-10 text-danger border-0" style="padding: 8px 12px; text-decoration: none; font-size: 0.85rem;" onclick="return confirm('¿Eliminar cliente?')">
             <i class="ti ti-trash"></i>
         </a>
-    </td>
+    </td> -->
 </tr>
 <?php endforeach; ?>
                                         <?php endif; ?>
@@ -450,9 +468,9 @@ sort($bancos_unicos);
                                         <div class="fs-large text-success-custom fw-bolder" id="outTotal" style="font-size: 26px;">$0.00 MXN</div>
                                     </div>
 
-                                    <div class="text-center mt-4">
+                                    <!-- <div class="text-center mt-4">
                                         <span class="text-muted-custom" style="font-size: 10px;">Generado el: <span id="outFechaHoy"></span></span>
-                                    </div>
+                                    </div> -->
 
                                 </div>
                             </div>
@@ -465,26 +483,62 @@ sort($bancos_unicos);
     </div>
 
     <div class="modal fade" id="modalUpload" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="" method="POST" enctype="multipart/form-data">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Subir Machote de Clientes</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="text-muted small">Asegúrate de haber llenado el machote de Excel y haberlo guardado como <strong>CSV (Delimitado por comas)</strong>.</p>
-                        <input class="form-control" type="file" name="archivo_csv" accept=".csv" required>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Subir y Guardar</button>
-                    </div>
-                </form>
-            </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formSubirExcel">
+                <div class="modal-header">
+                    <h5 class="modal-title">Subir Machote de Clientes</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small">Sube tu archivo de Excel llenado <strong>(.xlsx)</strong>.</p>
+                    <input class="form-control" type="file" id="archivo_excel" accept=".xlsx" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnProcesarExcel">Subir y Guardar</button>
+                </div>
+            </form>
         </div>
     </div>
+</div>
 
+<div class="modal fade" id="modalEditarCliente" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="formEditarCliente">
+                <div class="modal-header">
+                    <h5 class="modal-title">Editar Cliente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="edit_id">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre Completo</label>
+                        <input type="text" class="form-control" name="nombre" id="edit_nombre" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Banco</label>
+                        <input type="text" class="form-control" name="banco" id="edit_banco">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cuenta</label>
+                        <input type="text" class="form-control" name="cuenta" id="edit_cuenta">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">CLABE</label>
+                        <input type="text" class="form-control" name="clabe" id="edit_clabe">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>                                            
     <script src="src/assets/libs/jquery/dist/jquery.min.js"></script>
     <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="src/assets/js/sidebarmenu.js"></script>
@@ -493,16 +547,46 @@ sort($bancos_unicos);
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
-        function descargarMachote() {
-            let csvContent = "data:text/csv;charset=utf-8,Nombre,Banco,Cuenta,Clabe\n";
-            var encodedUri = encodeURI(csvContent);
-            var link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "machote_clientes_transferencias.csv");
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
+        // Al hacer clic en el botón editar de la tabla
+$(document).on('click', '.btn-editar-cliente', function() {
+    const d = $(this).data();
+    $('#edit_id').val(d.id);
+    $('#edit_nombre').val(d.nombre);
+    $('#edit_banco').val(d.banco);
+    $('#edit_cuenta').val(d.cuenta);
+    $('#edit_clabe').val(d.clabe);
+    $('#modalEditarCliente').modal('show');
+});
+
+// Enviar el formulario de edición
+$('#formEditarCliente').on('submit', function(e) {
+    e.preventDefault();
+    const btn = $(this).find('button[type="submit"]');
+    btn.prop('disabled', true).html('<i class="ti ti-loader ti-spin"></i> Guardando...');
+
+    $.ajax({
+        url: 'api/editar-cliente-directorio.php',
+        method: 'POST',
+        data: $(this).serialize(),
+        dataType: 'json', // 🔥 ESTO ES CLAVE: Obligamos a leerlo como JSON
+        success: function(res) {
+            if (res && res.success) {
+                // Cerramos el modal por elegancia y recargamos la página al instante
+                $('#modalEditarCliente').modal('hide');
+                location.reload();
+            } else {
+                alert('Error al guardar: ' + (res.error || 'Respuesta inválida'));
+                btn.prop('disabled', false).text('Guardar Cambios');
+            }
+        },
+        error: function(xhr, status, error) {
+            // 🔥 Si el servidor manda basura o falla, lo atrapamos aquí para que no se quede trabado
+            console.error("Error del servidor: ", xhr.responseText);
+            alert('El cliente se guardó, pero hubo un detalle de conexión. Recargando...');
+            location.reload(); 
         }
+    });
+});
 
         function getColorBanco(bancoNombre) {
             const b = (bancoNombre || '').toLowerCase().trim();
@@ -541,6 +625,45 @@ sort($bancos_unicos);
         }
 
         $(document).ready(function() {
+
+        // Procesar el Excel subido
+            document.getElementById('formSubirExcel').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                let file = document.getElementById('archivo_excel').files[0];
+                if (!file) return;
+
+                let btn = document.getElementById('btnProcesarExcel');
+                btn.innerHTML = '<i class="ti ti-loader ti-spin"></i> Procesando...';
+                btn.disabled = true;
+
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    let data = new Uint8Array(e.target.result);
+                    let workbook = XLSX.read(data, {type: 'array'});
+                    
+                    let primeraHoja = workbook.SheetNames[0];
+                    let filas = XLSX.utils.sheet_to_json(workbook.Sheets[primeraHoja], {header: 1});
+                    filas.shift(); // Quitar encabezados
+                    
+                    $.ajax({
+                        url: 'api/procesar-excel-depositos.php', // Reutilizamos tu misma API
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(filas),
+                        success: function(response) {
+                            if(response.success) {
+                                location.reload();
+                            } else {
+                                alert("Error: " + response.error);
+                                btn.innerHTML = 'Subir y Guardar';
+                                btn.disabled = false;
+                            }
+                        }
+                    });
+                };
+                reader.readAsArrayBuffer(file);
+            });
             
             $('#buscadorDirectorio').on('keyup', function() {
                 let value = $(this).val().toLowerCase();
@@ -674,27 +797,42 @@ sort($bancos_unicos);
                 btn.html('<i class="ti ti-loader ti-spin me-2"></i> Generando...');
                 btn.prop('disabled', true);
 
+                // --- 🚀 PASO 1: "Desplegar" el ticket para la captura ---
+                // Eliminamos max-width y forzamos un ancho perfecto para que html2canvas lo "vea" bien.
+                const originalMaxWidth = ticket.style.maxWidth;
+                const originalWidth = ticket.style.width;
+                ticket.style.maxWidth = 'none'; // Quitamos la restricción
+                ticket.style.width = '580px';    // Forzamos el ancho óptimo que definiste en CSS
+
+                // --- PASO 2: Generar la captura ---
                 html2canvas(ticket, {
-                    backgroundColor: '#ffffff',
-                    scale: 3,
+                    backgroundColor: null, // Mantenemos la transparencia que querías
+                    scale: 3,             // Alta resolución
                     logging: false
                 }).then(canvas => {
                     const enlace = document.createElement('a');
                     const fechaTxt = new Date().toISOString().slice(0,10);
-                    enlace.download = `Transferencias_Masivas_Amiri_${fechaTxt}.png`;
+                    enlace.download = `Deposito_Masivo_Amiri_${fechaTxt}.png`;
                     enlace.href = canvas.toDataURL("image/png");
                     enlace.click();
 
+                    // --- 🔄 PASO 3: Restaurar el estado original ---
+                    ticket.style.maxWidth = originalMaxWidth;
+                    ticket.style.width = originalWidth;
+
                     $('.btn-quitar-item').show();
-                    btn.html(textoOriginal);
-                    btn.prop('disabled', false);
+                    btn.html(textoOriginal).prop('disabled', false);
                     showToast('¡Ticket generado con éxito!', 'success');
                 }).catch(err => {
                     console.error(err);
+                    
+                    // Aseguramos restaurar el estado incluso si hay error
+                    ticket.style.maxWidth = originalMaxWidth;
+                    ticket.style.width = originalWidth;
+
                     $('.btn-quitar-item').show();
                     showToast('Hubo un error al generar la imagen', 'error');
-                    btn.html(textoOriginal);
-                    btn.prop('disabled', false);
+                    btn.html(textoOriginal).prop('disabled', false);
                 });
             });
         });

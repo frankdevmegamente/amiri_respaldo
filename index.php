@@ -43,6 +43,17 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 </head>
 
 <style>
+      .body-wrapper {
+            /* Aumentamos esto para librar completamente la altura del header azul */
+            padding-top: 100px !important; 
+        }
+        
+        .body-wrapper-inner, 
+        .body-wrapper .container-fluid {
+            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
+            padding-top: 15px !important;
+            margin-top: 0 !important;
+        }
    body[data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
@@ -51,6 +62,78 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         body[data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro {
             display: block !important;
+        }
+        /* =========================================
+           🌙 REGLAS PARA MODO OSCURO (Dashboard Principal)
+           ========================================= */
+        
+        /* 1. Tarjetas Generales y Textos */
+        [data-bs-theme="dark"] .card {
+            background-color: #1a2234 !important;
+            border-color: #2c344c !important;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2) !important;
+        }
+        
+        [data-bs-theme="dark"] .text-gray { color: #e9ecef !important; }
+        [data-bs-theme="dark"] .text-muted { color: #8c9ea8 !important; }
+        
+        /* 2. Encabezado Azul de la tarjeta de la Gráfica */
+        [data-bs-theme="dark"] .card-header.bg-primary {
+            background-color: rgba(93, 135, 255, 0.15) !important;
+            border-bottom: 1px solid #2c344c !important;
+            padding: 16px 20px !important; /* Mismo tamaño que en flujo */
+        }
+        
+        [data-bs-theme="dark"] .card-header.bg-primary h5,
+        [data-bs-theme="dark"] .card-header.bg-primary i {
+            color: #5D87FF !important; /* Azul neón brillante */
+            font-weight: 700 !important;
+        }
+
+        /* 3. Inputs y Selectores (Filtros de Mes, Año, etc.) */
+        [data-bs-theme="dark"] .form-label { color: #e9ecef !important; }
+        [data-bs-theme="dark"] .form-control,
+        [data-bs-theme="dark"] .form-select {
+            background-color: #252f43 !important;
+            border-color: #2c344c !important;
+            color: #e9ecef !important;
+        }
+        
+        /* 4. Tarjetas de Resumen (Comisiones, Gastos, Remanente) */
+        [data-bs-theme="dark"] .border-success { border-color: #13DEB9 !important; background-color: rgba(19, 222, 185, 0.05) !important; }
+        [data-bs-theme="dark"] .border-danger { border-color: #FA896B !important; background-color: rgba(250, 137, 107, 0.05) !important; }
+        [data-bs-theme="dark"] .border-info { border-color: #5D87FF !important; background-color: rgba(93, 135, 255, 0.05) !important; }
+        
+        [data-bs-theme="dark"] .text-success { color: #13DEB9 !important; }
+        [data-bs-theme="dark"] .text-danger { color: #FA896B !important; }
+        [data-bs-theme="dark"] .text-info { color: #5D87FF !important; }
+        [data-bs-theme="dark"] .text-warning { color: #FFAE1F !important; }
+        [data-bs-theme="dark"] .text-primary { color: #5D87FF !important; }
+        
+        /* 5. Vencer los estilos fijos (color: #666) de las tarjetas Cripto */
+        [data-bs-theme="dark"] .card-title[style] { color: #e9ecef !important; }
+        [data-bs-theme="dark"] #usd-mxn,
+        [data-bs-theme="dark"] #btc-usd,
+        [data-bs-theme="dark"] #eth-usd,
+        [data-bs-theme="dark"] #usdt-usd { color: #e9ecef !important; }
+        [data-bs-theme="dark"] .cambio-positivo { color: #13DEB9 !important; }
+        [data-bs-theme="dark"] .cambio-negativo { color: #FA896B !important; }
+        
+        /* 6. Arreglar los colores de la Gráfica (ApexCharts) */
+        [data-bs-theme="dark"] .apexcharts-text { fill: #8c9ea8 !important; }
+        [data-bs-theme="dark"] .apexcharts-gridline { stroke: #2c344c !important; }
+        [data-bs-theme="dark"] .apexcharts-tooltip {
+            background: #1a2234 !important;
+            border: 1px solid #2c344c !important;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3) !important;
+        }
+        [data-bs-theme="dark"] .apexcharts-tooltip-title {
+            background: #252f43 !important;
+            border-bottom: 1px solid #2c344c !important;
+            color: #e9ecef !important;
+        }
+        [data-bs-theme="dark"] .apexcharts-tooltip-text {
+            color: #e9ecef !important;
         }
 </style>
 

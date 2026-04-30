@@ -620,422 +620,254 @@ class MovimientoCorreccionService {
 
      */
 
+    /**
+     * Anula todos los movimientos de un grupo
+     * * @param int $grupo_id ID del grupo de movimientos
+     * @param string $motivo Razón de la anulación
+     * @param int $usuario_id ID del usuario que anula
+     * @return array Resultado de la operación
+     */
     public function anularPorGrupo($grupo_id, $motivo, $usuario_id) {
-
         try {
-
             $this->pdo->beginTransaction();
-
             
-
             // Obtener todos los movimientos del grupo
-
             $stmt = $this->pdo->prepare("SELECT * FROM movimientos WHERE grupo_id = ? AND estado = 'activo'");
-
             $stmt->execute([$grupo_id]);
-
             $movimientos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
             
-
             if (empty($movimientos)) {
-
                 throw new Exception("No se encontraron movimientos activos en el grupo #$grupo_id");
-
             }
-
-            
-
-            // Crear nuevo grupo para los reversos
-
-            $stmt = $this->pdo->query("SELECT COALESCE(MAX(grupo_id), 0) + 1 FROM movimientos");
-
-            $nuevo_grupo = $stmt->fetchColumn();
-
-            
-
-            $reversos = [];
-
-            
-
-            foreach ($movimientos as $mov) {
-
-                // Crear movimiento de REVERSO
-
-                $monto_reverso = -$mov['monto'];
-
-                $descripcion_reverso = "REVERSO: Anulación de grupo #$grupo_id - " . ($mov['descripcion'] ?? '');
-
-                
-
-                $stmt = $this->pdo->prepare("
-
-                    INSERT INTO movimientos (
-
-                        grupo_id, fecha, servicio_id, tipo, moneda, monto,
-
-                        cuenta_origen_id, cuenta_destino_id, cliente_id, promotor_id,
-
-                        proveedor_id, prestamista_id, paridad, descripcion,
-
-                        es_reverso, movimiento_original_id, motivo_correccion,
-
-                        usuario_id, estado, activo
-
-                    ) VALUES (
-
-                        ?, CURDATE(), ?, 'ajuste', ?, ?,
-
-                        ?, ?, ?, ?,
-
-                        ?, ?, ?, ?,
-
-                        1, ?, ?,
-
-                        ?, 'activo', 1
-
-                    )
-
-                ");
-
-                
-
-                $stmt->execute([
-
-                    $nuevo_grupo,
-
-                    $mov['servicio_id'],
-
-                    $mov['moneda'],
-
-                    $monto_reverso,
-
-                    $mov['cuenta_destino_id'],  // Invertir origen/destino
-
-                    $mov['cuenta_origen_id'],
-
-                    $mov['cliente_id'],
-
-                    $mov['promotor_id'],
-
-                    $mov['proveedor_id'],
-
-                    $mov['prestamista_id'],
-
-                    $mov['paridad'],
-
-                    $descripcion_reverso,
-
-                    $mov['id'],
-
-                    $motivo,
-
-                    $usuario_id
-
-                ]);
-
-                
-
-                $reverso_id = $this->pdo->lastInsertId();
-
-                $reversos[] = $reverso_id;
-
-                
-
-                // Revertir saldos
-
-                $this->revertirSaldos($mov, $reverso_id, $descripcion_reverso);
-
-                
-
-                // Marcar original como anulado
-
-                $stmt = $this->pdo->prepare("
-
-                    UPDATE movimientos 
-
-                    SET estado = 'anulado',
-
-                        motivo_correccion = ?,
-
-                        corregido_por_usuario_id = ?,
-
-                        corregido_en = NOW()
-
-                    WHERE id = ?
-
-                ");
-
-                $stmt->execute([$motivo, $usuario_id, $mov['id']]);
-
-            }
-
-            
 
             // ═══════════════════════════════════════════════════════════════════
-
-            // Cleanup específico por servicio: restaurar tablas secundarias
-
+            // CANDADO DE TITANIO (Anti-Paradojas)
             // ═══════════════════════════════════════════════════════════════════
-
-
-
-            // Servicio 1 — Venta de Efectivo: desactivar deuda generada
-
-            $this->pdo->prepare(
-
-                "UPDATE deudas_clientes SET activo = 0
-
-                 WHERE movimiento_venta_id = ? AND activo = 1"
-
-            )->execute([$grupo_id]);
-
-
-
-            // Servicio 10 — Préstamo de Prestamista: desactivar deuda_empresa creada
-
-            foreach ($movimientos as $mov) {
-
-                if ((int)$mov['servicio_id'] === 10 && !empty($mov['prestamista_id'])) {
-
-                    $this->pdo->prepare(
-
-                        "UPDATE deudas_empresa SET activo = 0
-
-                         WHERE prestamista_id = ? AND monto = ? AND activo = 1
-
-                         ORDER BY id DESC LIMIT 1"
-
-                    )->execute([$mov['prestamista_id'], abs($mov['monto'])]);
-
-                }
-
-            }
-
-
-
-            // Servicio 11 — Pago a Proveedor: restaurar cuenta virtual del proveedor
-
-            // (saldo_actual en divisa + valor_mxn) que no tiene cuenta_destino_id en el movimiento
-
-            foreach ($movimientos as $mov) {
-
-                if ((int)$mov['servicio_id'] === 11 && !empty($mov['proveedor_id'])) {
-
-                    $desc = $mov['descripcion'] ?? '';
-
-                    $monedaProv = (stripos($desc, 'USDT') !== false) ? 'USDT' : 'USD';
-
-                    $stmtProv = $this->pdo->prepare(
-
-                        "SELECT cuenta_usd_id, cuenta_usdt_id, cuenta_id FROM proveedores WHERE id = ?"
-
-                    );
-
-                    $stmtProv->execute([$mov['proveedor_id']]);
-
-                    $prov = $stmtProv->fetch(PDO::FETCH_ASSOC);
-
-                    if ($prov) {
-
-                        $cuentaProvId = ($monedaProv === 'USD')
-
-                            ? ($prov['cuenta_usd_id'] ?? $prov['cuenta_id'])
-
-                            : ($prov['cuenta_usdt_id'] ?? $prov['cuenta_id']);
-
-                        if ($cuentaProvId) {
-
-                            $montoDivisa = ($mov['paridad'] > 0)
-
-                                ? round(abs($mov['monto']) / $mov['paridad'], 8)
-
-                                : 0;
-
-                            $this->pdo->prepare(
-
-                                "UPDATE cuentas SET saldo_actual = saldo_actual + ?, valor_mxn = valor_mxn + ? WHERE id = ?"
-
-                            )->execute([$montoDivisa, abs($mov['monto']), $cuentaProvId]);
-
-                        }
-
+            foreach ($movimientos as $m) {
+                $s_id = (int)$m['servicio_id'];
+                $ref_id = $m['referencia_id'] ?? null;
+                
+                if ($s_id === 10) { // Préstamo de Prestamista
+                    if ($ref_id) {
+                        $check = $this->pdo->prepare("SELECT COUNT(*) FROM movimientos WHERE referencia_id = ? AND servicio_id = 14 AND estado = 'activo'");
+                        $check->execute([$ref_id]);
+                        if ($check->fetchColumn() > 0) throw new Exception("🚨 No puedes anular este préstamo porque tiene pagos registrados. Anula los pagos primero.");
+                    } else {
+                        $check = $this->pdo->prepare("SELECT COUNT(*) FROM movimientos WHERE prestamista_id = ? AND servicio_id = 14 AND estado = 'activo'");
+                        $check->execute([$m['prestamista_id']]);
+                        if ($check->fetchColumn() > 0) throw new Exception("🚨 No puedes anular este préstamo porque el prestamista tiene pagos registrados. Anula los pagos primero.");
                     }
-
                 }
 
+                if ($s_id === 16 && $ref_id) { // Préstamo Otorgado a Tercero
+                    $check = $this->pdo->prepare("SELECT COUNT(*) FROM movimientos WHERE referencia_id = ? AND servicio_id = 17 AND estado = 'activo'");
+                    $check->execute([$ref_id]);
+                    if ($check->fetchColumn() > 0) throw new Exception("🚨 No puedes anular este préstamo porque ya le hiciste cobros. Anula los cobros primero.");
+                }
+            }
+            
+            // Crear nuevo grupo para los reversos
+            $stmt = $this->pdo->query("SELECT COALESCE(MAX(grupo_id), 0) + 1 FROM movimientos");
+            $nuevo_grupo = $stmt->fetchColumn();
+            
+            $reversos = [];
+            
+            foreach ($movimientos as $mov) {
+                // Crear movimiento de REVERSO
+                $monto_reverso = -$mov['monto'];
+                $descripcion_reverso = "REVERSO: Anulación de grupo #$grupo_id - " . ($mov['descripcion'] ?? '');
+                
+                $stmt = $this->pdo->prepare("
+                    INSERT INTO movimientos (
+                        grupo_id, fecha, servicio_id, tipo, moneda, monto,
+                        cuenta_origen_id, cuenta_destino_id, cliente_id, promotor_id,
+                        proveedor_id, prestamista_id, paridad, descripcion,
+                        es_reverso, movimiento_original_id, motivo_correccion,
+                        usuario_id, estado, activo
+                    ) VALUES (
+                        ?, CURDATE(), ?, 'ajuste', ?, ?,
+                        ?, ?, ?, ?,
+                        ?, ?, ?, ?,
+                        1, ?, ?,
+                        ?, 'activo', 1
+                    )
+                ");
+                
+                $stmt->execute([
+                    $nuevo_grupo,
+                    $mov['servicio_id'],
+                    $mov['moneda'],
+                    $monto_reverso,
+                    $mov['cuenta_destino_id'],  // Invertir origen/destino
+                    $mov['cuenta_origen_id'],
+                    $mov['cliente_id'],
+                    $mov['promotor_id'],
+                    $mov['proveedor_id'],
+                    $mov['prestamista_id'],
+                    $mov['paridad'],
+                    $descripcion_reverso,
+                    $mov['id'],
+                    $motivo,
+                    $usuario_id
+                ]);
+                
+                $reverso_id = $this->pdo->lastInsertId();
+                $reversos[] = $reverso_id;
+                
+                // Revertir saldos
+                $this->revertirSaldos($mov, $reverso_id, $descripcion_reverso);
+                
+                // Marcar original como anulado
+                $stmt = $this->pdo->prepare("
+                    UPDATE movimientos 
+                    SET estado = 'anulado', motivo_correccion = ?, corregido_por_usuario_id = ?, corregido_en = NOW()
+                    WHERE id = ?
+                ");
+                $stmt->execute([$motivo, $usuario_id, $mov['id']]);
+            }
+            
+            // ═══════════════════════════════════════════════════════════════════
+            // CLEANUP ESPECÍFICO (Restauración Matemática Exacta)
+            // ═══════════════════════════════════════════════════════════════════
+
+            // Servicio 1 — Venta de Efectivo
+            $this->pdo->prepare("UPDATE deudas_clientes SET activo = 0 WHERE movimiento_venta_id = ? AND activo = 1")->execute([$grupo_id]);
+
+            // Servicio 10 — Préstamo de Prestamista
+            foreach ($movimientos as $mov) {
+                if ((int)$mov['servicio_id'] === 10) {
+                    if (!empty($mov['referencia_id'])) {
+                        $this->pdo->prepare("UPDATE deudas_empresa SET activo = 0 WHERE id = ?")->execute([$mov['referencia_id']]);
+                    } elseif (!empty($mov['prestamista_id'])) {
+                        $this->pdo->prepare("UPDATE deudas_empresa SET activo = 0 WHERE prestamista_id = ? AND monto = ? AND activo = 1 ORDER BY id DESC LIMIT 1")->execute([$mov['prestamista_id'], abs($mov['monto'])]);
+                    }
+                }
             }
 
-
-
-            // Servicio 12 — Gasto: desactivar registro en gastos
-
+            // Servicio 11 — Pago a Proveedor
             foreach ($movimientos as $mov) {
+                if ((int)$mov['servicio_id'] === 11 && !empty($mov['proveedor_id'])) {
+                    $desc = $mov['descripcion'] ?? '';
+                    $monedaProv = (stripos($desc, 'USDT') !== false) ? 'USDT' : 'USD';
+                    $stmtProv = $this->pdo->prepare("SELECT cuenta_usd_id, cuenta_usdt_id, cuenta_id FROM proveedores WHERE id = ?");
+                    $stmtProv->execute([$mov['proveedor_id']]);
+                    $prov = $stmtProv->fetch(PDO::FETCH_ASSOC);
+                    if ($prov) {
+                        $cuentaProvId = ($monedaProv === 'USD') ? ($prov['cuenta_usd_id'] ?? $prov['cuenta_id']) : ($prov['cuenta_usdt_id'] ?? $prov['cuenta_id']);
+                        if ($cuentaProvId) {
+                            $montoDivisa = ($mov['paridad'] > 0) ? round(abs($mov['monto']) / $mov['paridad'], 8) : 0;
+                            $this->pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual + ?, valor_mxn = valor_mxn + ? WHERE id = ?")->execute([$montoDivisa, abs($mov['monto']), $cuentaProvId]);
+                        }
+                    }
+                }
+            }
 
+            // Servicio 12 — Gasto
+            foreach ($movimientos as $mov) {
                 if ((int)$mov['servicio_id'] === 12 && !empty($mov['gasto_id'])) {
-
-                    $this->pdo->prepare("UPDATE gastos SET activo = 0 WHERE id = ?")
-
-                        ->execute([$mov['gasto_id']]);
-
+                    $this->pdo->prepare("UPDATE gastos SET activo = 0 WHERE id = ?")->execute([$mov['gasto_id']]);
                     break;
-
                 }
-
             }
 
-
-
-            // Servicio 13 — Pago a Cliente: restaurar monto_pagado y estado en deudas_clientes
-
+            // Servicio 13 — Pago a Cliente
             foreach ($movimientos as $mov) {
-
                 if ((int)$mov['servicio_id'] === 13) {
-
                     $montoPago = abs($mov['monto']);
-
                     $this->pdo->prepare("
-
                         UPDATE deudas_clientes
-
-                        SET monto_pagado        = GREATEST(0.00, monto_pagado - ?),
-
-                            estado             = CASE WHEN GREATEST(0.00, monto_pagado - ?) <= 0.00
-
-                                                      THEN 'pendiente' ELSE 'parcial' END,
-
-                            movimiento_pago_id = NULL,
-
-                            fecha_pago         = NULL
-
-                        WHERE movimiento_pago_id = ? AND activo = 1
-
-                    ")->execute([$montoPago, $montoPago, $grupo_id]);
-
-                    break;
-
-                }
-
-            }
-
-
-
-            // Servicio 14 — Pago de Préstamo: restaurar monto_pagado y estado en deudas_empresa
-
-            foreach ($movimientos as $mov) {
-
-                if ((int)$mov['servicio_id'] === 14 && !empty($mov['prestamista_id'])) {
-
-                    $montoPago = abs($mov['monto']);
-
-                    $this->pdo->prepare("
-
-                        UPDATE deudas_empresa
-
                         SET monto_pagado = GREATEST(0.00, monto_pagado - ?),
-
-                            estado       = CASE WHEN GREATEST(0.00, monto_pagado - ?) <= 0.00
-
-                                                THEN 'pendiente' ELSE 'parcial' END,
-
-                            fecha_pago   = NULL
-
-                        WHERE prestamista_id = ? AND activo = 1
-
-                        ORDER BY actualizado_en DESC
-
-                        LIMIT 1
-
-                    ")->execute([$montoPago, $montoPago, $mov['prestamista_id']]);
-
+                            estado = CASE WHEN GREATEST(0.00, monto_pagado - ?) <= 0.00 THEN 'pendiente' ELSE 'parcial' END,
+                            movimiento_pago_id = NULL, fecha_pago = NULL
+                        WHERE movimiento_pago_id = ? AND activo = 1
+                    ")->execute([$montoPago, $montoPago, $grupo_id]);
                     break;
-
                 }
-
             }
 
-
-
-            // Servicio 15 — Pago de Comisión a Promotor: desactivar registro en pagos_promotores
-
+           // Servicio 14 — Pago de Préstamo a Prestamista (Dinero que Amiri paga)
             foreach ($movimientos as $mov) {
-
-                if ((int)$mov['servicio_id'] === 15) {
-
-                    $this->pdo->prepare(
-
-                        "UPDATE pagos_promotores SET activo = 0 WHERE movimiento_id = ?"
-
-                    )->execute([$mov['id']]);
-
+                if ((int)$mov['servicio_id'] === 14) {
+                    $montoPago = abs($mov['monto']);
+                    if (!empty($mov['referencia_id'])) {
+                        $this->pdo->prepare("
+                            UPDATE deudas_empresa 
+                            SET monto_pagado = GREATEST(0.00, monto_pagado - ?), 
+                                estado = CASE WHEN GREATEST(0.00, monto_pagado - ?) <= 0.00 THEN 'pendiente' ELSE 'parcial' END,
+                                fecha_pago = CASE WHEN (monto_pagado - ?) <= 0.00 THEN NULL ELSE fecha_pago END
+                            WHERE id = ?
+                        ")->execute([$montoPago, $montoPago, $montoPago, $mov['referencia_id']]);
+                    } elseif (!empty($mov['prestamista_id'])) {
+                        $this->pdo->prepare("
+                            UPDATE deudas_empresa 
+                            SET monto_pagado = GREATEST(0.00, monto_pagado - ?), 
+                                estado = CASE WHEN GREATEST(0.00, monto_pagado - ?) <= 0.00 THEN 'pendiente' ELSE 'parcial' END,
+                                fecha_pago = CASE WHEN (monto_pagado - ?) <= 0.00 THEN NULL ELSE fecha_pago END
+                            WHERE prestamista_id = ? AND activo = 1 
+                            ORDER BY actualizado_en DESC LIMIT 1
+                        ")->execute([$montoPago, $montoPago, $montoPago, $mov['prestamista_id']]);
+                    }
                 }
-
             }
 
+            // Servicio 15 — Pago de Comisión a Promotor
+            foreach ($movimientos as $mov) {
+                if ((int)$mov['servicio_id'] === 15) {
+                    $this->pdo->prepare("UPDATE pagos_promotores SET activo = 0 WHERE movimiento_id = ?")->execute([$mov['id']]);
+                }
+            }
 
+            // Servicio 16 — Préstamo Otorgado (Nuevo Módulo)
+            foreach ($movimientos as $mov) {
+                if ((int)$mov['servicio_id'] === 16 && !empty($mov['referencia_id'])) {
+                    $this->pdo->prepare("UPDATE prestamos_otorgados SET activo = 0 WHERE id = ?")->execute([$mov['referencia_id']]);
+                }
+            }
+
+            // Servicio 17 — Cobro Préstamo Otorgado (Dinero que Amiri recupera)
+            foreach ($movimientos as $mov) {
+                if ((int)$mov['servicio_id'] === 17 && !empty($mov['referencia_id'])) {
+                    $montoPago = abs($mov['monto']);
+                    $this->pdo->prepare("
+                        UPDATE prestamos_otorgados
+                        SET monto_pagado = GREATEST(0.00, monto_pagado - ?),
+                            estado = CASE WHEN GREATEST(0.00, monto_pagado - ?) <= 0.00 THEN 'pendiente' ELSE 'parcial' END
+                        WHERE id = ?
+                    ")->execute([$montoPago, $montoPago, $mov['referencia_id']]);
+                }
+            }
 
             // Registrar auditoría
-
             $this->registrarAuditoria([
-
                 'accion' => 'ANULAR_GRUPO',
-
                 'modulo' => 'flujo',
-
                 'tabla' => 'movimientos',
-
                 'registro_id' => $grupo_id,
-
                 'descripcion' => "Anuló grupo de movimientos #$grupo_id ($motivo). " . count($movimientos) . " movimientos anulados.",
-
                 'datos_anteriores' => ['grupo_id' => $grupo_id, 'movimientos' => count($movimientos)],
-
                 'datos_nuevos' => ['nuevo_grupo' => $nuevo_grupo, 'reversos' => $reversos]
-
             ]);
-
             
-
             $this->pdo->commit();
-
             
-
             return [
-
                 'success' => true,
-
                 'message' => 'Grupo de movimientos anulado correctamente',
-
                 'grupo_original' => $grupo_id,
-
                 'grupo_reverso' => $nuevo_grupo,
-
                 'reverso_id' => $reversos[0] ?? null,
-
                 'movimientos_anulados' => count($movimientos)
-
             ];
-
             
-
         } catch (Exception $e) {
-
             if ($this->pdo->inTransaction()) {
-
                 $this->pdo->rollBack();
-
             }
-
             return [
-
                 'success' => false,
-
                 'error' => $e->getMessage()
-
             ];
-
         }
-
     }
 
     
