@@ -113,48 +113,106 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         body[data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
 
         /* =========================================
-           📱 MÓVIL (DISEÑO MODERNO Y COMPACTO TIPO APP)
+           📱 MÓVIL (IDÉNTICO A ESCRITORIO, VERSIÓN MINIATURA)
            ========================================= */
         @media (max-width: 768px) {
             .ticket-card {
-                padding: 20px 15px; /* Reducir márgenes */
-                border-radius: 16px; /* Bordes redondeados modernos */
-                border: 1px solid #ebf1f6;
+                padding: 20px; /* Menos espacio en los bordes para que quepa más info */
+                max-width: 100%;
             }
-            [data-bs-theme="dark"] .ticket-card { border-color: #2c344c; }
-            
-            .ticket-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom-width: 2px; }
-            .ticket-header img { height: 28px !important; }
-            .ticket-title { font-size: 14px; }
-            
-            /* Aquí el Grid se rompe en 2 columnas para celular */
-            .responsive-grid {
-                display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-                margin-bottom: 15px;
-            }
-            
-            /* Quitamos las líneas punteadas y el formato fila */
-            .responsive-grid .grid-item { display: block; padding: 0; border-bottom: none; }
-            .responsive-grid .grid-item > div:nth-child(2) { margin-top: 6px; } /* Separa la moneda hacia abajo */
-            
-            .commission-section { padding: 15px 0; margin-bottom: 5px; }
-            .fs-large { font-size: 20px; }
-            .badge-moneda { padding: 4px 10px; font-size: 11px; }
-            .text-muted-custom { font-size: 11px; margin-bottom: 4px; }
 
-            /* El Total se vuelve una tarjeta de color vibrante */
+            .ticket-header {
+                margin-bottom: 10px;
+                padding-bottom: 10px;
+            }
+
+            .ticket-header img {
+                height: 24px !important; /* Logo mini */
+            }
+
+            .ticket-title {
+                font-size: 11px;
+            }
+
+            /* 1. FORZAMOS QUE TODO SIGA EN HORIZONTAL COMO EN PC */
+            .responsive-grid .grid-item {
+                display: flex !important; 
+                flex-direction: row !important;
+                justify-content: space-between !important; 
+                align-items: center !important;
+                padding: 10px 0 !important;
+            }
+
+            .responsive-grid .grid-item > div:nth-child(1) { text-align: left; }
+            .responsive-grid .grid-item > div:nth-child(2) { margin-top: 0 !important; }
+
+            .commission-section {
+                padding: 10px 0;
+            }
+
+            /* 2. ACHICAMOS TEXTOS PARA EVITAR QUE BRINQUEN DE RENGLÓN */
+            .text-muted-custom {
+                font-size: 9px; 
+                margin-bottom: 2px;
+            }
+
+            .fs-large {
+                font-size: 16px; /* Números más compactos */
+            }
+
+            .badge-moneda {
+                padding: 4px 8px;
+                font-size: 9px;
+            }
+
+            .commission-section span, 
+            .commission-section strong {
+                font-size: 11px !important;
+            }
+
+            #outComisionTotal {
+                font-size: 12px !important;
+            }
+
+            /* 3. FILA DE TOTAL IDÉNTICA A ESCRITORIO (Sin gradientes) */
             .ticket-row.total-row {
-                background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
-                padding: 20px 15px; flex-direction: column; align-items: flex-start;
-                gap: 5px; margin-top: 20px; border-radius: 12px;
+                padding: 12px 15px !important;
+                margin-top: 15px !important;
+                flex-direction: row !important; /* Obligamos a que estén lado a lado */
+                justify-content: space-between !important;
+                align-items: center !important;
+                background: #f8faff !important; /* Fondo gris claro original */
+                border: none !important;
             }
-            .ticket-row.total-row .text-muted-custom { color: rgba(255,255,255,0.8) !important; }
-            .ticket-row.total-row .text-success-custom { color: #ffffff !important; font-size: 26px; }
 
-            /* Modo oscuro para la tarjeta del total en móvil */
             [data-bs-theme="dark"] .ticket-row.total-row {
-                background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-                border: 1px solid #374151;
+                background: #252f43 !important; /* Fondo oscuro original */
+            }
+
+            .ticket-row.total-row .text-muted-custom { 
+                color: #5d87ff !important; 
+                font-size: 10px !important;
+            }
+            
+            .ticket-row.total-row .text-success-custom { 
+                color: #36c76c !important; 
+                font-size: 16px !important; 
+            }
+
+            /* 4. COMPACTAMOS LAS OBSERVACIONES AL MÁXIMO */
+            .observaciones-section {
+                padding: 10px !important;
+                margin-top: 10px !important;
+            }
+
+            .observaciones-section .text-primary-custom {
+                font-size: 9px !important;
+                margin-bottom: 2px !important;
+            }
+
+            #outObservacionesTxt {
+                font-size: 10px !important; /* Letra pequeñita para que quepa mucho texto */
+                line-height: 1.1 !important; /* Juntamos los renglones */
             }
         }
         

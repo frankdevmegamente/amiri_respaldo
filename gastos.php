@@ -1,5 +1,5 @@
 <?php
-
+date_default_timezone_set('America/Mexico_City');
 require_once __DIR__ . '/src/config/session.php';
 
 if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_rol'] !== 'admin') {

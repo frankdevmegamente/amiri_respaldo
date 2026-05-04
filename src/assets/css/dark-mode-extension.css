@@ -123,6 +123,52 @@ body[data-bs-theme="dark"] .badge.bg-light {
   color: #ffffff !important;
 }
 
+body[data-bs-theme="dark"] .badge.bg-success.bg-opacity-10,
+body[data-bs-theme="dark"] .badge.bg-info.bg-opacity-10,
+body[data-bs-theme="dark"] .badge.bg-primary.bg-opacity-10,
+body[data-bs-theme="dark"] .badge.bg-danger.bg-opacity-10,
+body[data-bs-theme="dark"] .badge.bg-warning.bg-opacity-10,
+body[data-bs-theme="dark"] .badge.bg-secondary.bg-opacity-10,
+body[data-bs-theme="dark"] .badge.bg-light.bg-opacity-10 {
+  background-image: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+body[data-bs-theme="dark"] .badge.bg-success.bg-opacity-10 {
+  background-color: rgba(19, 222, 185, 0.15) !important;
+  color: #13deb9 !important;
+}
+
+body[data-bs-theme="dark"] .badge.bg-info.bg-opacity-10 {
+  background-color: rgba(93, 135, 255, 0.15) !important;
+  color: #5d87ff !important;
+}
+
+body[data-bs-theme="dark"] .badge.bg-primary.bg-opacity-10 {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  color: #3b82f6 !important;
+}
+
+body[data-bs-theme="dark"] .badge.bg-danger.bg-opacity-10 {
+  background-color: rgba(220, 53, 69, 0.15) !important;
+  color: #f05464 !important;
+}
+
+body[data-bs-theme="dark"] .badge.bg-warning.bg-opacity-10 {
+  background-color: rgba(255, 174, 31, 0.15) !important;
+  color: #ffae1f !important;
+}
+
+body[data-bs-theme="dark"] .badge.bg-secondary.bg-opacity-10 {
+  background-color: rgba(140, 158, 168, 0.15) !important;
+  color: #8c9ea8 !important;
+}
+
+body[data-bs-theme="dark"] .badge.bg-light.bg-opacity-10 {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #e9ecef !important;
+}
+
 /* Modal en Modo Oscuro */
 
 body[data-bs-theme="dark"] .modal-content {

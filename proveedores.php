@@ -119,6 +119,28 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     color: #e9ecef !important;
 }
 
+[data-bs-theme="dark"] .badge.badge-moneda.bg-success.bg-opacity-10,
+[data-bs-theme="dark"] .badge.badge-moneda.bg-info.bg-opacity-10,
+[data-bs-theme="dark"] .badge.badge-moneda.bg-secondary.bg-opacity-10 {
+    background-image: none !important;
+    border: 0 !important;
+}
+
+[data-bs-theme="dark"] .badge.badge-moneda.bg-success.bg-opacity-10 {
+    background-color: rgba(19, 222, 185, 0.15) !important;
+    color: #13DEB9 !important;
+}
+
+[data-bs-theme="dark"] .badge.badge-moneda.bg-info.bg-opacity-10 {
+    background-color: rgba(93, 135, 255, 0.15) !important;
+    color: #5D87FF !important;
+}
+
+[data-bs-theme="dark"] .badge.badge-moneda.bg-secondary.bg-opacity-10 {
+    background-color: rgba(140, 158, 168, 0.15) !important;
+    color: #8c9ea8 !important;
+}
+
 /* Inputs del buscador de DataTables */
 [data-bs-theme="dark"] .dataTables_wrapper select,
 [data-bs-theme="dark"] .dataTables_wrapper input {
@@ -279,7 +301,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                                     <label class="form-check-label" for="chkUsd">
 
-                                        <span class="badge bg-success">USD</span> Dólares
+                                        <span class="badge badge-moneda bg-success bg-opacity-10 text-success border-0" style="font-size: 0.75rem;">USD</span> Dólares
 
                                     </label>
 
@@ -291,7 +313,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                                     <label class="form-check-label" for="chkUsdt">
 
-                                        <span class="badge bg-info">USDT</span> Tether
+                                        <span class="badge badge-moneda bg-info bg-opacity-10 text-info border-0" style="font-size: 0.75rem;">USDT</span> Tether
 
                                     </label>
 
@@ -365,7 +387,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                                 <span class="fw-bold fs-6" id="nombreProveedorDisplay"></span>
 
-                                <span id="badgeMonedaProveedor" class="badge bg-success">USD</span>
+                                <span id="badgeMonedaProveedor" class="badge badge-moneda bg-success bg-opacity-10 text-success border-0" style="font-size: 0.85rem;">USD</span>
 
                             </div>
 
@@ -530,11 +552,11 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                         let badges = '';
 
-                        if (row.acepta_usd)  badges += '<span class="badge bg-success me-1">USD</span>';
+                        if (row.acepta_usd)  badges += '<span class="badge badge-moneda bg-success bg-opacity-10 text-success border-0 me-1" style="font-size: 0.75rem;">USD</span>';
 
-                        if (row.acepta_usdt) badges += '<span class="badge bg-info">USDT</span>';
+                        if (row.acepta_usdt) badges += '<span class="badge badge-moneda bg-info bg-opacity-10 text-info border-0 me-1" style="font-size: 0.75rem;">USDT</span>';
 
-                        if (!badges) badges = '<span class="badge bg-secondary">-</span>';
+                        if (!badges) badges = '<span class="badge badge-moneda bg-secondary bg-opacity-10 text-secondary border-0" style="font-size: 0.75rem;">-</span>';
 
                         return badges;
 
@@ -554,9 +576,9 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                         let cuentas = '';
 
-                        if (row.cuenta_usd_nombre)  cuentas += `<div><span class="badge bg-success me-1">USD</span>${row.cuenta_usd_nombre}</div>`;
+                        if (row.cuenta_usd_nombre)  cuentas += `<div><span class="badge badge-moneda bg-success bg-opacity-10 text-success border-0 me-1" style="font-size: 0.75rem;">USD</span>${row.cuenta_usd_nombre}</div>`;
 
-                        if (row.cuenta_usdt_nombre) cuentas += `<div><span class="badge bg-info me-1">USDT</span>${row.cuenta_usdt_nombre}</div>`;
+                        if (row.cuenta_usdt_nombre) cuentas += `<div><span class="badge badge-moneda bg-info bg-opacity-10 text-info border-0 me-1" style="font-size: 0.75rem;">USDT</span>${row.cuenta_usdt_nombre}</div>`;
 
                         return cuentas || '<span class="text-muted">Sin caja</span>';
 

@@ -48,10 +48,12 @@
 
 @media (min-width: 1200px) {
   .left-sidebar {
+    width: 450px;
     transition: width 0.25s ease;
   }
 
   .body-wrapper {
+    margin-left: 450px;
     transition: margin-left 0.25s ease;
   }
 

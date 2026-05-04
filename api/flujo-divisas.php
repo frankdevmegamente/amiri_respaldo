@@ -347,235 +347,157 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
 
         } else {
-
             /**
-
-             * VENTA de divisas (pago inmediato):
-
-             * 1. Entrada MXN a cuenta empresa seleccionada
-
-             * 2. FIFO aplicado de inmediato: descuenta de inventario_monedas y saldo wallet
-
-             * 3. Ganancia (TC venta - TC compra) × cantidad → Utilidades AMIRI (id=1)
-
-             * 4. Movimiento de salida del wallet por cuenta
-
-             * 5. Registro vinculado al cliente para historial/reportes (sin adeudo)
-
+             * VENTA de divisas:
+             * 1. Entrada MXN a cuenta empresa seleccionada (CONTADO SIEMPRE)
+             * 2. FIFO aplicado de inmediato: descuenta de inventario y wallet
+             * 3. Reparto de Ganancia: Comisión Promotor y Utilidad Neta Amiri
+             * 4. Registro vinculado al cliente (sin crear deuda)
              */
 
-
-
             if (!$cuenta_id) {
-
                 throw new Exception('Debes seleccionar una cuenta MXN para recibir el pago del cliente');
-
             }
 
+            // --- 1. OBTENER DATOS DEL PROMOTOR ---
+            $porcentaje_promotor = 0;
+            $promotor_id = null;
+            $cuenta_promotor_id = null;
 
+            if ($cliente_id) {
+                $stmtCli = $pdo->prepare("
+                    SELECT c.promotor_id, c.porcentaje_promotor, p.cuenta_id AS cuenta_promotor_id 
+                    FROM clientes c 
+                    LEFT JOIN promotores p ON c.promotor_id = p.id 
+                    WHERE c.id = ?
+                ");
+                $stmtCli->execute([$cliente_id]);
+                $cli = $stmtCli->fetch(PDO::FETCH_ASSOC);
+                if ($cli) {
+                    $promotor_id = $cli['promotor_id'];
+                    $cuenta_promotor_id = $cli['cuenta_promotor_id'];
+                    $porcentaje_promotor = floatval($cli['porcentaje_promotor']);
+                }
+            }
 
-            // 1. Registrar entrada de MXN a la cuenta empresa
-
+            // 2. Registrar entrada de MXN a la cuenta empresa (Caja) INMEDIATA
             $stmtMov->execute([
-
                 $grupo_id, $fecha, $servicio_id, 'entrada', 'MXN', $total_mxn,
-
                 null, $cuenta_id, $cliente_id, $proveedor_id, $tipo_cambio,
-
                 "Venta de $cantidad $moneda a TC $tipo_cambio"
-
             ]);
-
             $movimiento_venta_id = $pdo->lastInsertId();
 
-
-
             $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual + ? WHERE id = ?")
-
                 ->execute([$total_mxn, $cuenta_id]);
 
-
-
-            // 2. FIFO: consumir inventario de la moneda y descontar wallets
-
+            // 3. FIFO: consumir inventario de la moneda y descontar wallets
             $stmtFIFO = $pdo->prepare("
-
                 SELECT im.id, im.cantidad_restante, im.paridad, im.cuenta_id
-
                 FROM inventario_monedas im
-
                 INNER JOIN cuentas c ON im.cuenta_id = c.id
-
                 WHERE im.moneda = :moneda AND im.activo = 1 AND im.cantidad_restante > 0
-
                   AND c.tipo_cuenta IN (1, 2)
-
                 ORDER BY im.fecha ASC
-
             ");
-
             $stmtFIFO->execute(['moneda' => $moneda]);
-
             $lotes = $stmtFIFO->fetchAll(PDO::FETCH_ASSOC);
 
-
-
             if (empty($lotes)) {
-
                 throw new Exception("No hay inventario de $moneda disponible para vender");
-
             }
 
-
-
             $stmtConsumo = $pdo->prepare("
-
                 INSERT INTO consumos_inventario
-
                     (movimiento_id, inventario_id, cantidad_consumida, paridad_compra, paridad_venta, ganancia)
-
                 VALUES (?, ?, ?, ?, ?, ?)
-
             ");
-
             $stmtDeductInv = $pdo->prepare("
-
                 UPDATE inventario_monedas SET cantidad_restante = cantidad_restante - ? WHERE id = ?
-
             ");
-
-
 
             $pendiente        = $cantidad;
-
             $gananciaTotal    = 0;
-
-            $walletDeductions = []; // [cuenta_id => cantidad]
-
-
+            $walletDeductions = [];
 
             foreach ($lotes as $lote) {
-
                 if ($pendiente <= 0.001) break;
-
                 $consumir     = min($pendiente, floatval($lote['cantidad_restante']));
-
                 $gananciaLote = $consumir * ($tipo_cambio - floatval($lote['paridad']));
-
                 $gananciaTotal += $gananciaLote;
 
-
-
                 $stmtConsumo->execute([
-
                     $movimiento_venta_id, $lote['id'], $consumir,
-
                     $lote['paridad'], $tipo_cambio, $gananciaLote
-
                 ]);
-
-
-
-                // Descontar del inventario FIFO
 
                 $stmtDeductInv->execute([$consumir, $lote['id']]);
 
-
-
-                // Acumular deducción por cuenta de wallet
-
                 $wId = $lote['cuenta_id'];
-
                 $walletDeductions[$wId] = ($walletDeductions[$wId] ?? 0) + $consumir;
 
-
-
                 $pendiente -= $consumir;
-
             }
-
-
 
             if ($pendiente > 0.001) {
-
                 throw new Exception("Inventario insuficiente de $moneda. Faltan " . round($pendiente, 4) . " unidades");
-
             }
 
-
-
-            // 3. Descontar del saldo de cada cuenta wallet y registrar movimiento de salida
-
+            // Descontar del saldo de cada cuenta wallet
             $stmtWallet = $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?");
-
             foreach ($walletDeductions as $wId => $wCantidad) {
-
                 $stmtWallet->execute([$wCantidad, $wId]);
-
                 $stmtMov->execute([
-
                     $grupo_id, $fecha, $servicio_id, 'salida', $moneda, $wCantidad,
-
                     $wId, null, $cliente_id, $proveedor_id, $tipo_cambio,
-
                     "Salida de $wCantidad $moneda del wallet por venta"
-
                 ]);
-
             }
 
+            // --- 4. REPARTO DE GANANCIAS (COMISION PROMOTOR) ---
+            $comision_promotor = 0;
+            if ($promotor_id && $cuenta_promotor_id) {
+                // La comisión del promotor se calcula sobre el volumen en MXN
+                $comision_promotor = $total_mxn * ($porcentaje_promotor / 100);
+            }
+            
+            $utilidad_amiri = $gananciaTotal - $comision_promotor;
 
-
-            // 4. Acreditar ganancia a Utilidades AMIRI (id=1)
-
-            if (abs($gananciaTotal) > 0.001) {
-
+            // Acreditar Utilidad Amiri
+            if (abs($utilidad_amiri) > 0.001) {
                 $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual + ? WHERE id = 1")
-
-                    ->execute([$gananciaTotal]);
-
+                    ->execute([$utilidad_amiri]);
                 $stmtMov->execute([
-
-                    $grupo_id, $fecha, $servicio_id, 'comision', 'MXN', $gananciaTotal,
-
+                    $grupo_id, $fecha, $servicio_id, 'comision', 'MXN', $utilidad_amiri,
                     null, 1, $cliente_id, $proveedor_id, $tipo_cambio,
-
-                    "Utilidad FIFO por venta de $cantidad $moneda a TC $tipo_cambio"
-
+                    "Utilidad neta FIFO por venta de $cantidad $moneda"
                 ]);
-
             }
 
+            // Pagar comisión al promotor
+            if ($comision_promotor > 0.001) {
+                $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual + ? WHERE id = ?")
+                    ->execute([$comision_promotor, $cuenta_promotor_id]);
+                $stmtMov->execute([
+                    $grupo_id, $fecha, $servicio_id, 'comision', 'MXN', $comision_promotor,
+                    null, $cuenta_promotor_id, $cliente_id, $promotor_id, $tipo_cambio,
+                    "Comisión Promotor por venta de $cantidad $moneda"
+                ]);
+            }
 
-
-            // 5. Registro histórico vinculado al cliente (sin actualizar saldo de cuenta cliente)
-
+            // 5. Registro histórico (sin deuda)
             if ($cliente_id) {
-
                 $stmtCli = $pdo->prepare("SELECT cuenta_id FROM clientes WHERE id = ?");
-
                 $stmtCli->execute([$cliente_id]);
-
                 $cliData = $stmtCli->fetch(PDO::FETCH_ASSOC);
-
                 if ($cliData && $cliData['cuenta_id']) {
-
                     $stmtMov->execute([
-
                         $grupo_id, $fecha, $servicio_id, 'entrada', $moneda, $cantidad,
-
                         null, $cliData['cuenta_id'], $cliente_id, $proveedor_id, $tipo_cambio,
-
                         "Registro venta: $cantidad $moneda a TC $tipo_cambio al cliente"
-
                     ]);
-
-                    // No se actualiza el saldo de la cuenta del cliente — solo es registro histórico
-
                 }
-
             }
-
         }
 
         

@@ -404,6 +404,7 @@ try {
                                                 <table id="tablaVentas" class="table table-hover align-middle" style="width:100%">
                                                     <thead>
                                                         <tr>
+                                                            <th style="width: 40px;"></th>
                                                             <th>ID</th>
                                                             <th>Fecha</th>
                                                             <th>Total recibido</th>
@@ -450,6 +451,12 @@ try {
         </div>
 
 
+        <!-- Botón flotante para pagos múltiples -->
+        <div id="btnPagarMultipleContainer" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1050;">
+            <button class="btn btn-warning shadow-lg px-4 py-2" id="btnPagarMultiple" style="border-radius: 50px; font-weight: bold;">
+                <i class="ti ti-cash me-2"></i> Pagar (<span id="contadorSeleccionadas">0</span>) Ventas
+            </button>
+        </div>
 
         <!-- Modal Pagar Venta -->
 
@@ -866,11 +873,23 @@ try {
 
                 },
 
-                columns: [{
+                columns: [
+                    {
+                        data: null,
+                        orderable: false,
+                        className: 'text-center',
+                        render: function(data) {
+                            if (data.estado !== 'pagado') {
+                                return `<input type="checkbox" class="form-check-input pago-checkbox shadow-sm" style="cursor:pointer; width: 1.2rem; height: 1.2rem;" data-id="${data.id}" data-pendiente="${data.monto_neto_cliente - data.monto_pagado}">`;
+                            }
+                            return '';
+                        }
+                    },
+                    {
                         data: 'id'
                     },
                     {
-                        data: 'fecha', // <-- Ahora jalamos la fecha operativa real
+                        data: 'fecha', // <-- Ahora jalamos la fecha operativa real
                         render: function(data, type, row) {
                             if (!data) return '';
                             // Formatear fecha operativa de YYYY-MM-DD a DD/MM/YYYY
@@ -1008,13 +1027,12 @@ try {
                     }
 
                 ],
-
+                columnDefs: [
+                    { targets: 0, orderable: false }
+                ],
                 order: [
-
                     [1, "desc"]
-
                 ]
-
             });
 
 
@@ -1024,7 +1042,69 @@ try {
                MODAL - ABRIR Y CARGAR DATOS
 
             ============================================================ */
+            // Lógica para Selección Múltiple
+            let ventasSeleccionadas = [];
+            let totalPendienteMultiple = 0;
 
+            $('#tablaVentas tbody').on('change', '.pago-checkbox', function() {
+                const id = $(this).data('id');
+                const pendiente = parseFloat($(this).data('pendiente'));
+
+                if ($(this).is(':checked')) {
+                    ventasSeleccionadas.push(id);
+                    totalPendienteMultiple += pendiente;
+                } else {
+                    ventasSeleccionadas = ventasSeleccionadas.filter(val => val !== id);
+                    totalPendienteMultiple -= pendiente;
+                }
+
+                $('#contadorSeleccionadas').text(ventasSeleccionadas.length);
+
+                if (ventasSeleccionadas.length > 1) {
+                    $('#btnPagarMultipleContainer').fadeIn();
+                } else {
+                    $('#btnPagarMultipleContainer').fadeOut();
+                }
+            });
+
+            // Al hacer clic en el botón de pago múltiple
+            $('#btnPagarMultiple').on('click', function() {
+                $('#ventaId').val(ventasSeleccionadas.join(',')); // Enviar IDs separados por coma
+                $('#montoTotalDisplay').html(`<em>Pago Múltiple (${ventasSeleccionadas.length} ventas)</em>`);
+                $('#fechaDisplay').text('-');
+                $('#comisionAmiriDisplay').text('-');
+                $('#comisionPromotorDisplay').text('-');
+                $('#montoNetoDisplay').text('-');
+                $('#estadoActualDisplay').html(`<em>Varias ventas</em>`);
+                
+                $('#saldoPendienteDisplay').text(formatoMonedaDinamica(totalPendienteMultiple, 'MXN'));
+                
+                $('#badgeMoneda').attr('class', 'badge border-0 bg-primary bg-opacity-10 text-primary').text('MXN');
+                $('#montoPagarFormatted').data('moneda', 'MXN');
+
+                $('#saldoCuentaCliente').text(formatoMoneda(<?= $cliente['cuenta_saldo'] ?? 0 ?>));
+
+                $('#montoPagarFormatted').val("");
+                $('#montoPagarHidden').val("");
+                $('#cuentaPagoSelect').val("");
+                $('#montoFormateado').text('');
+                $('#btnLiquidarDeuda').hide();
+
+                $('#montoPagarFormatted').data('pendiente', totalPendienteMultiple);
+                $('#montoPagarFormatted').data('saldo-cliente', <?= $cliente['cuenta_saldo'] ?? 0 ?>);
+
+                actualizarResumenPago(totalPendienteMultiple, 0, 0);
+                $('#resumenPago').show();
+
+                $('#modalPagarVenta').modal("show");
+            });
+
+            // Limpiar selección cuando la tabla se recargue
+            tablaVentas.on('draw', function() {
+                ventasSeleccionadas = [];
+                totalPendienteMultiple = 0;
+                $('#btnPagarMultipleContainer').hide();
+            });
 
 
             $('#tablaVentas').on('click', '.pagar', function() {

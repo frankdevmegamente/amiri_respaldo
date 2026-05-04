@@ -5,5 +5,10 @@
         "dompdf/dompdf": "^2.0",
         "spomky-labs/otphp": "^11.4",
         "endroid/qr-code": "^6.0"
+    },
+    "config": {
+        "platform": {
+            "php": "8.2.12"
+        }
     }
 }

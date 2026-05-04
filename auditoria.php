@@ -168,7 +168,6 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
         body[data-bs-theme="dark"] .input-group-text,
         body[data-bs-theme="dark"] .form-control-plaintext,
         body[data-bs-theme="dark"] .alert,
-        body[data-bs-theme="dark"] .badge,
         body[data-bs-theme="dark"] .nav-tabs .nav-link {
             background-color: #232b3c !important;
             color: #e6ecff !important;
@@ -186,14 +185,32 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
 
         body[data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
             background-color: rgba(93, 135, 255, 0.12) !important;
+            color: #3B82F6 !important;
         }
 
         body[data-bs-theme="dark"] .bg-success.bg-opacity-10 {
             background-color: rgba(25, 135, 84, 0.12) !important;
+            color: #13DEB9 !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-info.bg-opacity-10 {
+            background-color: rgba(23, 162, 184, 0.12) !important;
+            color: #5D87FF !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-danger.bg-opacity-10 {
+            background-color: rgba(220, 53, 69, 0.12) !important;
+            color: #F05464 !important;
+        }
+
+        body[data-bs-theme="dark"] .bg-secondary.bg-opacity-10 {
+            background-color: rgba(108, 117, 125, 0.12) !important;
+            color: #8C9EA8 !important;
         }
 
         body[data-bs-theme="dark"] .bg-warning.bg-opacity-10 {
             background-color: rgba(255, 193, 7, 0.12) !important;
+            color: #FFAE1F !important;
         }
     </style>
 
@@ -573,15 +590,15 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
 
                             const badges = {
 
-                                'LOGIN': 'bg-info',
+                                'LOGIN': 'bg-info bg-opacity-10 text-info border-0',
 
-                                'LOGOUT': 'bg-secondary',
+                                'LOGOUT': 'bg-secondary bg-opacity-10 text-secondary border-0',
 
-                                'INSERT': 'bg-success',
+                                'INSERT': 'bg-success bg-opacity-10 text-success border-0',
 
-                                'UPDATE': 'bg-warning',
+                                'UPDATE': 'bg-warning bg-opacity-10 text-warning border-0',
 
-                                'DELETE': 'bg-danger'
+                                'DELETE': 'bg-danger bg-opacity-10 text-danger border-0'
 
                             };
 
@@ -623,7 +640,7 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
 
                         render: function(data, type, row) {
 
-                            return `<button class="btn btn-sm btn-primary" onclick="verDetalles(${row.id})">
+                            return `<button class="badge bg-primary bg-opacity-10 text-primary border-0" onclick="verDetalles(${row.id})" style="cursor:pointer; font-size:0.75rem;">
 
                                 <i class="ti ti-eye"></i> Ver
 
@@ -671,7 +688,7 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
 
                 $('#det-usuario').text(data.usuario_nombre || 'Desconocido');
 
-                $('#det-accion').html(`<span class="badge bg-primary">${data.accion}</span>`);
+                $('#det-accion').html(`<span class="badge bg-primary bg-opacity-10 text-primary border-0">${data.accion}</span>`);
 
                 $('#det-modulo').text(data.modulo);
 
