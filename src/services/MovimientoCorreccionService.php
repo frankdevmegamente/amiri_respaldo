@@ -774,14 +774,26 @@ class MovimientoCorreccionService {
             foreach ($movimientos as $mov) {
                 if ((int)$mov['servicio_id'] === 13) {
                     $montoPago = abs($mov['monto']);
-                    $this->pdo->prepare("
-                        UPDATE deudas_clientes
-                        SET monto_pagado = GREATEST(0.00, monto_pagado - ?),
-                            estado = CASE WHEN GREATEST(0.00, monto_pagado - ?) <= 0.00 THEN 'pendiente' ELSE 'parcial' END,
-                            movimiento_pago_id = NULL, fecha_pago = NULL
-                        WHERE movimiento_pago_id = ? AND activo = 1
-                    ")->execute([$montoPago, $montoPago, $grupo_id]);
-                    break;
+                    if (!empty($mov['referencia_id'])) {
+                        $this->pdo->prepare("
+                            UPDATE deudas_clientes
+                            SET monto_pagado = GREATEST(0.00, monto_pagado - ?),
+                                estado = CASE WHEN GREATEST(0.00, monto_pagado - ?) <= 0.00 THEN 'pendiente' ELSE 'parcial' END,
+                                movimiento_pago_id = CASE WHEN (monto_pagado - ?) <= 0.00 THEN NULL ELSE movimiento_pago_id END,
+                                fecha_pago = CASE WHEN (monto_pagado - ?) <= 0.00 THEN NULL ELSE fecha_pago END
+                            WHERE id = ?
+                        ")->execute([$montoPago, $montoPago, $montoPago, $montoPago, $mov['referencia_id']]);
+                    } elseif (!empty($mov['cliente_id'])) {
+                        $this->pdo->prepare("
+                            UPDATE deudas_clientes
+                            SET monto_pagado = GREATEST(0.00, monto_pagado - ?),
+                                estado = CASE WHEN GREATEST(0.00, monto_pagado - ?) <= 0.00 THEN 'pendiente' ELSE 'parcial' END,
+                                movimiento_pago_id = CASE WHEN (monto_pagado - ?) <= 0.00 THEN NULL ELSE movimiento_pago_id END,
+                                fecha_pago = CASE WHEN (monto_pagado - ?) <= 0.00 THEN NULL ELSE fecha_pago END
+                            WHERE cliente_id = ? AND activo = 1 AND monto_pagado >= ?
+                            ORDER BY id DESC LIMIT 1
+                        ")->execute([$montoPago, $montoPago, $montoPago, $montoPago, $mov['cliente_id'], $montoPago]);
+                    }
                 }
             }
 
@@ -798,14 +810,15 @@ class MovimientoCorreccionService {
                             WHERE id = ?
                         ")->execute([$montoPago, $montoPago, $montoPago, $mov['referencia_id']]);
                     } elseif (!empty($mov['prestamista_id'])) {
+                        // Fallback seguro: filtrar también por monto_pagado >= reverso
                         $this->pdo->prepare("
                             UPDATE deudas_empresa 
                             SET monto_pagado = GREATEST(0.00, monto_pagado - ?), 
                                 estado = CASE WHEN GREATEST(0.00, monto_pagado - ?) <= 0.00 THEN 'pendiente' ELSE 'parcial' END,
                                 fecha_pago = CASE WHEN (monto_pagado - ?) <= 0.00 THEN NULL ELSE fecha_pago END
-                            WHERE prestamista_id = ? AND activo = 1 
-                            ORDER BY actualizado_en DESC LIMIT 1
-                        ")->execute([$montoPago, $montoPago, $montoPago, $mov['prestamista_id']]);
+                            WHERE prestamista_id = ? AND activo = 1 AND monto_pagado >= ?
+                            ORDER BY id DESC LIMIT 1
+                        ")->execute([$montoPago, $montoPago, $montoPago, $mov['prestamista_id'], $montoPago]);
                     }
                 }
             }
@@ -826,14 +839,30 @@ class MovimientoCorreccionService {
 
             // Servicio 17 — Cobro Préstamo Otorgado (Dinero que Amiri recupera)
             foreach ($movimientos as $mov) {
-                if ((int)$mov['servicio_id'] === 17 && !empty($mov['referencia_id'])) {
+                if ((int)$mov['servicio_id'] === 17) {
                     $montoPago = abs($mov['monto']);
-                    $this->pdo->prepare("
-                        UPDATE prestamos_otorgados
-                        SET monto_pagado = GREATEST(0.00, monto_pagado - ?),
-                            estado = CASE WHEN GREATEST(0.00, monto_pagado - ?) <= 0.00 THEN 'pendiente' ELSE 'parcial' END
-                        WHERE id = ?
-                    ")->execute([$montoPago, $montoPago, $mov['referencia_id']]);
+                    
+                    if (!empty($mov['referencia_id'])) {
+                        $this->pdo->prepare("
+                            UPDATE prestamos_otorgados
+                            SET estado = CASE WHEN GREATEST(0.00, monto_pagado - ?) <= 0.00 THEN 'pendiente' ELSE 'parcial' END,
+                                monto_pagado = GREATEST(0.00, monto_pagado - ?)
+                            WHERE id = ?
+                        ")->execute([$montoPago, $montoPago, $mov['referencia_id']]);
+                    } 
+                    elseif (!empty($mov['beneficiario'])) {
+                        $nombres = explode(',', $mov['beneficiario']);
+                        $nombre_limpio = trim($nombres[0]);
+
+                        // Fallback seguro: filtrar también por monto_pagado >= reverso
+                        $this->pdo->prepare("
+                            UPDATE prestamos_otorgados
+                            SET estado = CASE WHEN GREATEST(0.00, monto_pagado - ?) <= 0.00 THEN 'pendiente' ELSE 'parcial' END,
+                                monto_pagado = GREATEST(0.00, monto_pagado - ?)
+                            WHERE persona_nombre = ? AND estado != 'pendiente' AND monto_pagado >= ?
+                            ORDER BY id DESC LIMIT 1
+                        ")->execute([$montoPago, $montoPago, $nombre_limpio, $montoPago]);
+                    }
                 }
             }
 

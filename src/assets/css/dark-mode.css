@@ -196,3 +196,29 @@ body[data-bs-theme="dark"] .bootstrap-input-spinner .btn {
 body[data-bs-theme="dark"] .bootstrap-input-spinner .btn:hover {
   background-color: #2c344c !important;
 }
+
+/* ===== Overrides para colores hardcodeados en layout-custom.css ===== */
+
+body[data-bs-theme="dark"] .dataTable tbody td,
+body[data-bs-theme="dark"] .table tbody td {
+  color: #e9ecef !important;
+  border-bottom: 1px solid #2c344c !important;
+}
+
+body[data-bs-theme="dark"] .dataTable thead th,
+body[data-bs-theme="dark"] .table thead th {
+  background-color: #1a2234 !important;
+  color: #adb5bd !important;
+  border-bottom: 2px solid #2c344c !important;
+}
+
+body[data-bs-theme="dark"] thead[style*="sticky"] {
+  background-color: #1a2234 !important;
+}
+
+body[data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter input,
+body[data-bs-theme="dark"] .dataTables_wrapper .dataTables_length select {
+  background-color: #1a2234;
+  border-color: #2c344c;
+  color: #e9ecef;
+}

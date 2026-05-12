@@ -17,6 +17,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <link rel="stylesheet" href="src/assets/css/styles.min.css" />
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
     <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
+    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -127,11 +128,23 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             }
 
             .ticket-header img {
-                height: 24px !important; /* Logo mini */
+                height: 28px !important; /* Logo mini */
             }
 
             .ticket-title {
                 font-size: 11px;
+            }
+
+            .ticket-wrapper {
+                padding: 0 10px;
+            }
+
+            .ticket-row {
+                padding: 15px 0;
+            }
+
+            .commission-section {
+                padding: 15px 0;
             }
 
             /* 1. FORZAMOS QUE TODO SIGA EN HORIZONTAL COMO EN PC */
@@ -196,7 +209,9 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             
             .ticket-row.total-row .text-success-custom { 
                 color: #36c76c !important; 
-                font-size: 16px !important; 
+                font-size: 14px !important;
+                text-align: right;
+                word-break: break-word;
             }
 
             /* 4. COMPACTAMOS LAS OBSERVACIONES AL MÁXIMO */
@@ -216,59 +231,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             }
         }
         
-        /* =========================================
-           📱 ESTILOS RESPONSIVOS PARA MÓVIL
-           ========================================= */
-        @media (max-width: 768px) {
-            .ticket-card {
-                padding: 25px 20px; /* Reducir padding en móvil */
-                max-width: 100%; /* Ocupar todo el ancho disponible */
-            }
 
-            .ticket-header img {
-                height: 35px !important; /* Logo más pequeño en móvil */
-            }
-
-            .ticket-title {
-                font-size: 14px; /* Título más pequeño */
-            }
-
-            .fs-large {
-                font-size: 22px; /* Números más pequeños */
-            }
-
-            .text-success-custom {
-                font-size: 28px; /* Total más pequeño pero aún prominente */
-            }
-
-            .ticket-row {
-                padding: 15px 0; /* Menos padding en filas */
-            }
-
-            .commission-section {
-                padding: 15px 0;
-            }
-
-            .ticket-row.total-row {
-                padding: 20px 15px; /* Ajustar padding del total */
-                margin-top: 20px;
-            }
-
-            .observaciones-section {
-                padding: 15px; /* Menos padding en observaciones */
-            }
-
-            /* Ajustar el contenedor del preview para que no se desface */
-            .ticket-wrapper {
-                padding: 0 10px; /* Pequeño padding lateral */
-            }
-
-            /* Asegurar que el total se vea bien alineado */
-            .ticket-row.total-row .text-success-custom {
-                text-align: right;
-                word-break: break-word; /* Evitar que se rompa el texto */
-            }
-        }
 
         @media (max-width: 480px) {
             .ticket-card {
@@ -281,7 +244,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             }
 
             .ticket-header img {
-                height: 30px !important; /* Logo aún más pequeño */
+                height: 24px !important; /* Logo aún más pequeño */
             }
 
             .fs-large {
@@ -337,7 +300,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold">Cantidad</label>
                                         <div class="input-group">
-                                            <input type="number" step="0.01" class="form-control" id="inputCantidad" value="">
+                                            <input type="text" step="0.01" class="form-control" id="inputCantidad" value="">
                                             <span class="input-group-text bg-light text-muted fw-bold" id="labelMonedaAddon">USDT</span>
                                         </div>
                                     </div>
@@ -345,14 +308,14 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                         <label class="form-label fw-semibold" id="lblTcBase">Tipo de Cambio Base</label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-light">$</span>
-                                            <input type="number" step="0.01" class="form-control" id="inputTcBase" value="">
+                                            <input type="text" step="0.01" class="form-control" id="inputTcBase" value="">
                                         </div>
                                     </div>
                                     
                                     <div class="mb-3" id="grupoComisionInput">
                                         <label class="form-label fw-semibold">Comisión (%)</label>
                                         <div class="input-group">
-                                            <input type="number" step="0.01" class="form-control" id="inputMargen" value="">
+                                            <input type="text" step="0.01" class="form-control" id="inputMargen" value="">
                                             <span class="input-group-text bg-light">%</span>
                                         </div>
                                     </div>

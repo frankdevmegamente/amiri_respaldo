@@ -60,7 +60,18 @@ try {
 
             $totalSaldos = $totalSaldosMxn + $totalSaldosDiv;
 
+            // Sumar préstamos otorgados pendientes al activo (dinero prestado que NOS deben)
+            $stmtPrestOtorg = $pdo->query("SELECT COALESCE(SUM(monto_total - monto_pagado), 0) AS total FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1");
+            $totalPrestamosOtorgados = (float)$stmtPrestOtorg->fetch(PDO::FETCH_ASSOC)['total'];
+            $totalSaldos += $totalPrestamosOtorgados;
 
+            // Sumar gastos activos que NO descontaron de Comisiones AMIRI
+            // (los gastos nuevos solo descuentan de la cuenta seleccionada,
+            //  los viejos ya tienen su contraparte en capital, no se duplican)
+            $totalGastosSinCapital = 0;
+            $stmtGastos = $pdo->query("SELECT COALESCE(SUM(monto), 0) AS total FROM gastos g WHERE g.activo = 1 AND (SELECT COUNT(*) FROM movimientos WHERE gasto_id = g.id AND cuenta_origen_id = (SELECT id FROM cuentas WHERE tipo_cuenta = 3 AND activo = 1 LIMIT 1)) = 0");
+            $totalGastosSinCapital = (float)$stmtGastos->fetch(PDO::FETCH_ASSOC)['total'];
+            $totalSaldos += $totalGastosSinCapital;
 
             // CAPITAL: solo tipo 3 (igual que el card de Capital) + deudas_clientes + promotores
 
@@ -103,7 +114,6 @@ try {
             }
 
 
-
             // OBLIGACIONES: prestamistas MXN + proveedores tipo 6 (MXN saldo_actual, USD/USDT valor_mxn)
 
             $stmtPrest = $pdo->query("SELECT COALESCE(SUM(monto-monto_pagado),0) AS total FROM deudas_empresa WHERE estado IN('pendiente','parcial') AND activo=1");
@@ -130,6 +140,34 @@ try {
 
             $diferencia = round($totalSaldos - $totalCapital - $totalObligaciones, 2);
             
+            // Construir explicación de la diferencia
+            $explicacion = [];
+            $componentes = [];
+            if ($totalPrestamosOtorgados > 0) {
+                $stmtDet = $pdo->query("SELECT persona_nombre, (monto_total - monto_pagado) AS pendiente FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1 ORDER BY persona_nombre");
+                $detalles = [];
+                foreach ($stmtDet as $r) {
+                    $detalles[] = $r['persona_nombre'] . ': $' . number_format($r['pendiente'], 2);
+                }
+                $explicacion[] = [
+                    'tipo' => 'prestamos_otorgados',
+                    'concepto' => 'Préstamos otorgados pendientes',
+                    'monto' => $totalPrestamosOtorgados,
+                    'detalle' => implode(', ', $detalles)
+                ];
+                $componentes[] = 'Préstamos otorgados: $' . number_format($totalPrestamosOtorgados, 2);
+            }
+            $diferenciaBase = round($diferencia, 2);
+            if (abs($diferenciaBase) > 0.05) {
+                $explicacion[] = [
+                    'tipo' => 'diferencia_neta',
+                    'concepto' => 'Diferencia neta sin asignar',
+                    'monto' => $diferenciaBase,
+                    'detalle' => 'Combinación de saldos de cuentas, capital y obligaciones'
+                ];
+                $componentes[] = 'Diferencia neta: $' . number_format($diferenciaBase, 2);
+            }
+
             // Absorber discrepancias microscópicas de redondeo de divisas (hasta 5 centavos)
             if (abs($diferencia) <= 0.05) {
                 $diferencia = 0.00;
@@ -145,7 +183,11 @@ try {
 
                 'total_prestamos' => $totalObligaciones,
 
-                'total_proveedor' => $totalProveedores
+                'total_proveedor' => $totalProveedores,
+
+                'explicacion'     => $explicacion,
+
+                'resumen'         => !empty($componentes) ? implode(' | ', $componentes) : ''
 
             ]);
 
@@ -335,7 +377,17 @@ try {
 
         $totalSaldos = (float)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-        
+        // Sumar préstamos otorgados pendientes al activo
+        $totalPrestamosOtorgados = 0;
+        if ($moneda === 'MXN' || $moneda === 'TODAS') {
+            $stmtPrestOtorg = $pdo->query("SELECT COALESCE(SUM(monto_total - monto_pagado), 0) AS total FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1");
+            $totalPrestamosOtorgados = (float)$stmtPrestOtorg->fetch(PDO::FETCH_ASSOC)['total'];
+            $totalSaldos += $totalPrestamosOtorgados;
+
+            // Sumar gastos activos que NO descontaron de Comisiones AMIRI
+            $stmtGastos = $pdo->query("SELECT COALESCE(SUM(monto), 0) AS total FROM gastos g WHERE g.activo = 1 AND (SELECT COUNT(*) FROM movimientos WHERE gasto_id = g.id AND cuenta_origen_id = (SELECT id FROM cuentas WHERE tipo_cuenta = 3 AND activo = 1 LIMIT 1)) = 0");
+            $totalSaldos += (float)$stmtGastos->fetch(PDO::FETCH_ASSOC)['total'];
+        }
 
         // 2. Total CAPITAL (tipo 3=Capital + tipo 4=Cliente + tipo 5=Promotor)
 
@@ -444,6 +496,13 @@ try {
 
         
 
+        // Query préstamos otorgados pendientes para explicación
+        $totalPrestamosOtorgados = 0;
+        if ($moneda === 'MXN' || $moneda === 'TODAS') {
+            $stmtPO = $pdo->query("SELECT COALESCE(SUM(monto_total - monto_pagado), 0) AS total FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1");
+            $totalPrestamosOtorgados = (float)$stmtPO->fetch(PDO::FETCH_ASSOC)['total'];
+        }
+
         $totalSaldos = round($totalSaldos, 2);
         $totalCapital = round($totalCapital, 2);
         $totalPrestamos = round($totalPrestamos, 2);
@@ -455,7 +514,35 @@ try {
         } else {
             $diferencia = round($totalSaldos - ($totalCapital + $totalPrestamos), 2);
         }
-        
+
+        // Construir explicación
+        $explicacion = [];
+        $componentes = [];
+        if ($totalPrestamosOtorgados > 0) {
+            $stmtDet = $pdo->query("SELECT persona_nombre, (monto_total - monto_pagado) AS pendiente FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1 ORDER BY persona_nombre");
+            $detalles = [];
+            foreach ($stmtDet as $r) {
+                $detalles[] = $r['persona_nombre'] . ': $' . number_format($r['pendiente'], 2);
+            }
+            $explicacion[] = [
+                'tipo' => 'prestamos_otorgados',
+                'concepto' => 'Préstamos otorgados pendientes',
+                'monto' => $totalPrestamosOtorgados,
+                'detalle' => implode(', ', $detalles)
+            ];
+            $componentes[] = 'Préstamos otorgados: $' . number_format($totalPrestamosOtorgados, 2);
+        }
+        $diferenciaBase = round($diferencia, 2);
+        if (abs($diferenciaBase) > 0.05) {
+            $explicacion[] = [
+                'tipo' => 'diferencia_neta',
+                'concepto' => 'Diferencia neta sin asignar',
+                'monto' => $diferenciaBase,
+                'detalle' => 'Combinación de saldos de cuentas, capital y obligaciones'
+            ];
+            $componentes[] = 'Diferencia neta: $' . number_format($diferenciaBase, 2);
+        }
+
         // Absorber discrepancias de redondeo
         if (abs($diferencia) <= 0.05) {
             $diferencia = 0.00;
@@ -471,7 +558,11 @@ try {
 
             'total_prestamos' => $totalPrestamos,
 
-            'total_proveedor' => $totalProveedoresAdeudos
+            'total_proveedor' => $totalProveedoresAdeudos,
+
+            'explicacion'     => $explicacion,
+
+            'resumen'         => !empty($componentes) ? implode(' | ', $componentes) : ''
 
         ]);
 
@@ -497,7 +588,7 @@ try {
 
             $stmt = $pdo->query("
 
-                SELECT p.nombre, COALESCE(SUM(pp.monto - pp.monto_pagado), 0) AS total_adeudado, 'Prestamista' AS tipo, 'MXN' AS tipo_moneda
+                SELECT p.id, p.nombre, COALESCE(SUM(pp.monto - pp.monto_pagado), 0) AS total_adeudado, 'Prestamista' AS tipo, 'MXN' AS tipo_moneda
 
                 FROM prestamistas p
 
@@ -579,7 +670,7 @@ try {
 
         $sql = "
 
-            SELECT p.nombre, 'USD' AS tipo_moneda,
+            SELECT p.id, p.nombre, 'USD' AS tipo_moneda,
 
                    COALESCE(c.saldo_actual, 0) AS saldo_actual,
 
@@ -597,7 +688,7 @@ try {
 
 
 
-            SELECT p.nombre, 'USDT' AS tipo_moneda,
+            SELECT p.id, p.nombre, 'USDT' AS tipo_moneda,
 
                    COALESCE(c.saldo_actual, 0) AS saldo_actual,
 

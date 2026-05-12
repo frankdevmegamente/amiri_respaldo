@@ -50,3 +50,4 @@
 [2026-04-28 15:57:49] [INFO] Préstamo creado exitosamente {"prestamo_id":"3"}
 [2026-04-28 15:58:10] [INFO] Préstamo creado exitosamente {"prestamo_id":"4"}
 [2026-04-28 15:58:16] [INFO] Préstamo creado exitosamente {"prestamo_id":"5"}
+[2026-05-07 12:22:54] [INFO] Test de logging desde script de pruebas

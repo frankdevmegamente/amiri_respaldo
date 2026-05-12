@@ -118,6 +118,7 @@ sort($bancos_unicos);
     <link rel="stylesheet" href="src/assets/css/styles.min.css" />
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
     <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
+    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     
@@ -487,7 +488,7 @@ sort($bancos_unicos);
                                         <label class="form-label fw-semibold">3. Monto a Depositar</label>
                                         <div class="input-group">
                                             <span class="input-group-text bg-light">$</span>
-                                            <input type="number" step="0.01" class="form-control" id="inputMonto" placeholder="Ej. 15000.00">
+                                            <input type="text" step="0.01" class="form-control" id="inputMonto" placeholder="Ej. 15000.00">
                                         </div>
                                     </div>
 

@@ -3,10 +3,9 @@
 // api/flujo.php
 
 require_once __DIR__ . '/../src/config/api-middleware.php';
-
 require_once __DIR__ . '/../src/config/db.php';
-
 require_once __DIR__ . '/../src/config/validator.php';
+require_once __DIR__ . '/../src/config/helpers.php';
 
 
 
@@ -94,8 +93,6 @@ if ($cliente_id) {
 
         $promotor_id = $clienteData['promotor_id'];
 
-
-
         if ($promotor_id) {
 
             $stmtPromotor = $pdo->prepare("SELECT cuenta_id FROM promotores WHERE id = ?");
@@ -122,13 +119,9 @@ try {
 
     $pdo->beginTransaction();
 
-
-
     // Generar un ID único para agrupar todos los movimientos de esta operación
 
     $grupo_id = round(microtime(true) * 1000); // timestamp en milisegundos
-
-
 
     // Obtener el ID del servicio por su nombre
 
@@ -146,39 +139,8 @@ try {
 
     $servicio_id = $servicioResult['id'];
 
-
-
-    // Helper para actualizar saldos (solo MXN)
-
-    $actualizarSaldo = function($cuenta_id, $monto, $tipo_operacion) use ($pdo) {
-
-        if (!$cuenta_id) return false;
-
-        $operador = ($tipo_operacion === 'entrada') ? '+' : '-';
-
-        $sql = "UPDATE cuentas SET saldo_actual = saldo_actual " . $operador . " ? WHERE id = ?";
-
-        $stmt = $pdo->prepare($sql);
-
-        if (!$stmt) {
-
-            throw new Exception('Error al preparar sentencia SQL: ' . $sql);
-
-        }
-
-        $result = $stmt->execute([$monto, $cuenta_id]);
-
-        if (!$result) {
-
-            throw new Exception('Error al actualizar saldo para cuenta ' . $cuenta_id . ': ' . json_encode($stmt->errorInfo()));
-
-        }
-
-        return true;
-
-    };
-
-
+    // Usar la función centralizada de helpers.php que SÍ registra en historial_saldos
+    // $actualizarSaldo = function($cuenta_id, $monto, $tipo_operacion) use ($pdo) { ... }  // ELIMINADO
 
     // Preparar statement para insertar en movimientos
 
@@ -191,8 +153,6 @@ try {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
 
     ");
-
-
 
     if ($servicio === 'Venta de Efectivo') {
 
@@ -218,52 +178,36 @@ try {
         $montoAlCliente = round($monto - $comAmiri - $comPromotor, 2);
 
         $stmtMovimiento->execute([
-
-            $grupo_id, $fecha, $servicio_id, 'entrada', 'MXN', $monto, 
-
-            null, $cuenta_id, $cliente_id, null, null, null, null, 1, $servicio . ' - dinero recibido del cliente'
-
-        ]);
-
-        $actualizarSaldo($cuenta_id, $monto, 'entrada');
-
-        $stmtMovimiento->execute([
-
             $grupo_id, $fecha, $servicio_id, 'entrada', 'MXN', $montoAlCliente, 
-
             null, $cuenta_cliente_id, $cliente_id, null, null, null, null, 1, $servicio . ' - efectivo recibido neto'
-
         ]);
-
-        $actualizarSaldo($cuenta_cliente_id, $montoAlCliente, 'entrada');
+        $mov_id2 = $pdo->lastInsertId();
+        actualizarSaldoCuenta($pdo, $cuenta_cliente_id, $montoAlCliente, 'entrada', $mov_id2, $servicio . ' - efectivo recibido neto');
 
         if ($comAmiri > 0) {
-
             $stmtMovimiento->execute([
-
                 $grupo_id, $fecha, $servicio_id, 'comision', 'MXN', $comAmiri, 
-
                 null, 1, null, null, null, null, null, 1, 'Comisión Amiri - ' . $servicio
-
             ]);
-
-            $actualizarSaldo(1, $comAmiri, 'entrada');
-
+            $mov_id3 = $pdo->lastInsertId();
+            actualizarSaldoCuenta($pdo, 1, $comAmiri, 'entrada', $mov_id3, 'Comisión Amiri - ' . $servicio);
         }
-
         if ($comPromotor > 0 && $cuenta_promotor_id) {
-
             $stmtMovimiento->execute([
-
                 $grupo_id, $fecha, $servicio_id, 'comision', 'MXN', $comPromotor, 
-
                 null, $cuenta_promotor_id, null, $promotor_id, null, null, null, 1, 'Comisión Promotor - ' . $servicio
-
             ]);
-
-            $actualizarSaldo($cuenta_promotor_id, $comPromotor, 'entrada');
-
+            $mov_id4 = $pdo->lastInsertId();
+            actualizarSaldoCuenta($pdo, $cuenta_promotor_id, $comPromotor, 'entrada', $mov_id4, 'Comisión Promotor - ' . $servicio);
         }
+
+        // Registrar el ingreso a la cuenta seleccionada (Caja, Banco, etc.)
+        $stmtMovimiento->execute([
+            $grupo_id, $fecha, $servicio_id, 'entrada', 'MXN', $monto,
+            null, $cuenta_id, $cliente_id, null, null, null, null, 1, 'Ingreso por ' . $servicio
+        ]);
+        $mov_id_cuenta = $pdo->lastInsertId();
+        actualizarSaldoCuenta($pdo, $cuenta_id, $monto, 'entrada', $mov_id_cuenta, 'Ingreso por ' . $servicio);
 
         $stmtVenta = $pdo->prepare("INSERT INTO deudas_clientes (cliente_id, cuenta_cliente_id, movimiento_venta_id, monto_total, comision_amiri, comision_promotor, monto_neto_cliente, fecha, descripcion, estado, activo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendiente', 1)");
 
@@ -327,9 +271,9 @@ try {
 
         ]);
 
-        $actualizarSaldo($origen_id, $monto, 'salida');
+        actualizarSaldoCuenta($pdo, $origen_id, $monto, 'salida');
 
-        $actualizarSaldo($destino_id, $monto, 'entrada');
+        actualizarSaldoCuenta($pdo, $destino_id, $monto, 'entrada');
 
     } else if ($servicio === 'Retiro de Efectivo') {
 
@@ -373,6 +317,14 @@ try {
 
         }
 
+        // Validar saldo suficiente
+        $stmtSaldo = $pdo->prepare("SELECT saldo_actual FROM cuentas WHERE id = ?");
+        $stmtSaldo->execute([$cuenta_bancaria_id]);
+        $saldoActual = (float)$stmtSaldo->fetchColumn();
+        if ($monto > $saldoActual + 0.001) {
+            throw new Exception('Saldo insuficiente en la cuenta bancaria. Disponible: $' . number_format($saldoActual, 2) . ' MXN');
+        }
+
         $tipo_retiro_texto = $tipo_retiro == 'sin_tarjeta' ? 'Sin Tarjeta' : 'Cobro en Cheque';
 
         $descripcion = "Retiro de Efectivo - {$tipo_retiro_texto}";
@@ -383,17 +335,15 @@ try {
 
         ]);
 
-        $actualizarSaldo($cuenta_bancaria_id, $monto, 'salida');
+        actualizarSaldoCuenta($pdo, $cuenta_bancaria_id, $monto, 'salida');
 
-        $actualizarSaldo($caja_efectivo_id, $monto, 'entrada');
+        actualizarSaldoCuenta($pdo, $caja_efectivo_id, $monto, 'entrada');
 
     } else {
 
         throw new Exception('Servicio no reconocido: ' . $servicio);
 
     }
-
-
 
     $pdo->commit();
 
@@ -414,4 +364,3 @@ try {
     exit;
 
 }
-

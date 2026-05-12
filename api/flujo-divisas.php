@@ -21,10 +21,9 @@
 
 
 require_once __DIR__ . '/../src/config/api-middleware.php';
-
 require_once __DIR__ . '/../src/config/db.php';
-
 require_once __DIR__ . '/../src/config/auditoria.php';
+require_once __DIR__ . '/../src/config/helpers.php';
 
 
 
@@ -118,9 +117,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         
 
-        // Calcular total en MXN
-
-        $total_mxn = $cantidad * $tipo_cambio;
+        // Calcular total en MXN (respetar total manual si el usuario lo ingresó)
+        if (isset($_POST['total_mxn']) && $_POST['total_mxn'] !== '') {
+            $total_mxn = round(floatval($_POST['total_mxn']), 2);
+            // Recalcular TC efectivo para que ganancia FIFO coincida con el total real
+            if ($cantidad > 0) {
+                $tipo_cambio = round($total_mxn / $cantidad, 6);
+            }
+        } else {
+            $total_mxn = round($cantidad * $tipo_cambio, 2);
+        }
 
         
 

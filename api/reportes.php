@@ -54,15 +54,35 @@ try {
         case 'resumen':
             $resultado = [];
             
-            // 1. Comisiones AMIRI (ventas de efectivo)
+            // 1. Comisiones AMIRI total (todos los estados)
             $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_amiri), 0) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1");
             $stmt->execute([$fechaInicio, $fechaFin]);
             $resultado['comisiones_amiri'] = (float)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
             
-            // 2. Comisiones Promotores
+            // 1b. Comisiones AMIRI cobradas (solo pagado)
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_amiri), 0) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'pagado'");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $resultado['comisiones_amiri_cobradas'] = (float)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
+            
+            // 1c. Comisiones AMIRI por cobrar (pendiente + parcial)
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_amiri), 0) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1 AND estado IN ('pendiente','parcial')");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $resultado['comisiones_amiri_por_cobrar'] = (float)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
+            
+            // 2. Comisiones Promotores total (todos los estados)
             $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_promotor), 0) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1");
             $stmt->execute([$fechaInicio, $fechaFin]);
             $resultado['comisiones_promotores'] = (float)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
+            
+            // 2b. Comisiones Promotores cobradas (solo pagado)
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_promotor), 0) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'pagado'");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $resultado['comisiones_promotores_cobradas'] = (float)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
+            
+            // 2c. Comisiones Promotores por cobrar (pendiente + parcial)
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_promotor), 0) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1 AND estado IN ('pendiente','parcial')");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $resultado['comisiones_promotores_por_cobrar'] = (float)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
             
             // 3. Total ventas de efectivo
             $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto_total), 0) as total, COUNT(*) as cantidad FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1");
@@ -112,9 +132,10 @@ try {
             $resultado['gastos_fijos'] = (float)$gastos['gastos_fijos'];
             $resultado['gastos_variables'] = (float)$gastos['gastos_variables'];
 
-            // 7. Totales calculados (CORREGIDO: Ya no usa la variable vieja)
-            $resultado['ganancia_bruta'] = $resultado['comisiones_amiri'] + $resultado['ganancia_divisas_total'];
-            $resultado['ganancia_neta'] = $resultado['ganancia_bruta'] - $resultado['gastos_total']; 
+            // 7. Totales calculados (solo comisiones cobradas en ganancia real)
+            $resultado['ganancia_bruta'] = $resultado['comisiones_amiri_cobradas'] + $resultado['ganancia_divisas_total'];
+            $resultado['ganancia_bruta_por_cobrar'] = $resultado['comisiones_amiri_por_cobrar'];
+            $resultado['ganancia_neta'] = $resultado['ganancia_bruta'] - $resultado['gastos_total'];
             
             echo json_encode($resultado);
             break;

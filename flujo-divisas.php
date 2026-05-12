@@ -2138,7 +2138,7 @@ $serviciosDivisas = [
 
                             <label class="form-label">Cantidad de ${moneda} <span class="text-muted">(monto a comprar)</span></label>
 
-                            <input type="number" step="0.01" class="form-control input-cantidad" required>
+                            <input type="text" step="0.01" class="form-control input-cantidad" required>
 
                         </div>
 
@@ -2146,7 +2146,7 @@ $serviciosDivisas = [
 
                             <label class="form-label">Tipo de Cambio <span class="text-muted">(solo para reportes)</span></label>
 
-                            <input type="number" step="0.0001" class="form-control input-tc" required>
+                            <input type="text" step="0.0001" class="form-control input-tc" required>
 
                         </div>
 
@@ -2154,9 +2154,9 @@ $serviciosDivisas = [
 
                             <label class="form-label">Total MXN <span class="text-muted">(referencia)</span></label>
 
-                            <input type="text" class="form-control input-total-mxn bg-light" readonly>
+                            <input type="text" step="0.01" class="form-control input-total-mxn-editable" required>
 
-                            <small class="text-muted">Este valor solo se guarda para calcular ganancias en reportes</small>
+                            <small class="text-muted">Ingresa el total o edita el TC para calcularlo automáticamente</small>
 
                         </div>
 
@@ -2172,7 +2172,7 @@ $serviciosDivisas = [
 
                             <label class="form-label">Cantidad de ${moneda} <span class="text-muted">(monto a vender al cliente)</span></label>
 
-                            <input type="number" step="0.01" class="form-control input-cantidad" required>
+                            <input type="text" step="0.01" class="form-control input-cantidad" required>
 
                         </div>
 
@@ -2180,7 +2180,7 @@ $serviciosDivisas = [
 
                             <label class="form-label">Tipo de Cambio <span class="text-muted">(precio por ${moneda} en MXN)</span></label>
 
-                            <input type="number" step="0.0001" class="form-control input-tc" required>
+                            <input type="text" step="0.0001" class="form-control input-tc" required>
 
                         </div>
 
@@ -2192,13 +2192,13 @@ $serviciosDivisas = [
 
                                 <span class="input-group-text">$</span>
 
-                                <input type="text" class="form-control input-total-mxn bg-light fw-bold" readonly>
+                                <input type="text" step="0.01" class="form-control input-total-mxn-editable fw-bold" required>
 
                                 <span class="input-group-text">MXN</span>
 
                             </div>
 
-                            <small class="text-success"><i class="ti ti-arrow-right"></i> Este monto se sumará a la cuenta seleccionada</small>
+                            <small class="text-success"><i class="ti ti-arrow-right"></i> Ingresa el total o edita TC para calcularlo automáticamente</small>
 
                         </div>
 
@@ -2208,17 +2208,43 @@ $serviciosDivisas = [
 
 
 
-                // Calcular total MXN automáticamente
+                // Calcular total MXN (bidireccional: cantidad×TC ↔ total)
 
-                $(document).off('input', '.input-cantidad, .input-tc').on('input', '.input-cantidad, .input-tc', function() {
+                $(document).off('input', '.input-cantidad, .input-tc, .input-total-mxn-editable').on('input', '.input-cantidad, .input-tc, .input-total-mxn-editable', function(e) {
+
+                    let $target  = $(e.target);
 
                     let cantidad = parseFloat($('.input-cantidad').val()) || 0;
 
-                    let tc = parseFloat($('.input-tc').val()) || 0;
+                    let tc       = parseFloat($('.input-tc').val()) || 0;
 
-                    let total = cantidad * tc;
+                    let total    = parseFloat(($('.input-total-mxn-editable').val() || '').replace(/,/g, '')) || 0;
 
-                    $('.input-total-mxn').val('$' + formatoNumero(total));
+                    if ($target.hasClass('input-total-mxn-editable')) {
+
+                        // Editaron el Total MXN → recalcular TC
+
+                        if (cantidad > 0 && total > 0) {
+
+                            tc = total / cantidad;
+
+                            $('.input-tc').val(tc.toFixed(4));
+
+                        }
+
+                    } else {
+
+                        // Editaron cantidad o TC → recalcular Total MXN
+
+                        if (cantidad > 0 && tc > 0) {
+
+                            total = cantidad * tc;
+
+                            $('.input-total-mxn-editable').val(total.toFixed(2));
+
+                        }
+
+                    }
 
                 });
 
@@ -2248,7 +2274,9 @@ $serviciosDivisas = [
 
                     cantidad: $('.input-cantidad').val(),
 
-                    tipo_cambio: $('.input-tc').val()
+                    tipo_cambio: $('.input-tc').val(),
+
+                    total_mxn: ($('.input-total-mxn-editable').val() || '').replace(/,/g, '')
 
                 };
 

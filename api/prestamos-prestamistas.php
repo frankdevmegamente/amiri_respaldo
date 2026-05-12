@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../src/config/api-middleware.php';
 require_once __DIR__ . '/../src/config/db.php';
+require_once __DIR__ . '/../src/config/helpers.php';
 
 initApi(); 
 requireAdmin(); 
@@ -98,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
             $abono_solicitado = (float)$p['abono'];
             if ($abono_solicitado <= 0) continue;
 
-            $stmtD = $pdo->prepare("SELECT monto, monto_pagado, prestamista_id FROM deudas_empresa WHERE id = ? AND activo = 1");
+            $stmtD = $pdo->prepare("SELECT monto, monto_pagado, prestamista_id FROM deudas_empresa WHERE id = ? AND activo = 1 FOR UPDATE");
             $stmtD->execute([$id]);
             $deuda = $stmtD->fetch(PDO::FETCH_ASSOC);
 
@@ -126,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         }
 
         // --- 2. VALIDACIÓN DE LA CAJA REAL ---
-        $stmtS = $pdo->prepare("SELECT saldo_actual FROM cuentas WHERE id = ?");
+        $stmtS = $pdo->prepare("SELECT saldo_actual FROM cuentas WHERE id = ? FOR UPDATE");
         $stmtS->execute([$cuenta_id]);
         if ($stmtS->fetchColumn() < $total_real_a_pagar) {
             throw new Exception("Saldo insuficiente en caja. Necesitas $" . number_format($total_real_a_pagar, 2));
@@ -138,16 +139,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         foreach ($pagos_reales as $p) {
             $nuevo_pagado = $p['monto_pagado'] + $p['abono'];
             $estado = ($nuevo_pagado >= $p['monto'] - 0.01) ? 'pagado' : 'parcial';
-
+            
             $pdo->prepare("UPDATE deudas_empresa SET monto_pagado = ?, estado = ?, fecha_pago = ? WHERE id = ?")
                 ->execute([$nuevo_pagado, $estado, $fecha_pago, $p['id']]);
-
-            $pdo->prepare("INSERT INTO movimientos (grupo_id, fecha, tipo, monto, moneda, descripcion, cuenta_origen_id, prestamista_id, usuario_id, servicio_id, referencia_id, activo) VALUES (?, ?, 'salida', ?, 'MXN', ?, ?, ?, ?, 14, ?, 1)")
-                ->execute([$g_id, $fecha_pago, $p['abono'], "Abono manual a préstamo #{$p['id']}", $cuenta_id, $p['prestamista_id'], $_SESSION['usuario_id'], $p['id']]);
+            
+            // Registrar movimiento de salida (pago al prestamista)
+            $stmtMov = $pdo->prepare("INSERT INTO movimientos (grupo_id, fecha, tipo, monto, moneda, descripcion, cuenta_origen_id, prestamista_id, usuario_id, servicio_id, referencia_id, activo) VALUES (?, ?, 'salida', ?, 'MXN', ?, ?, ?, ?, 14, ?, 1)");
+            $stmtMov->execute([$g_id, $fecha_pago, $p['abono'], "Abono manual a préstamo #{$p['id']}", $cuenta_id, $p['prestamista_id'], $_SESSION['usuario_id'], $p['id']]);
+            $movimiento_id = $pdo->lastInsertId();
+            
+            // Restar saldo de cuenta origen con registro en historial_saldos
+            actualizarSaldoCuenta($pdo, $cuenta_id, $p['abono'], 'salida', $movimiento_id, "Abono manual a préstamo #{$p['id']}");
         }
-
-        $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?")
-            ->execute([$total_real_a_pagar, $cuenta_id]);
         
         $pdo->commit();
         echo json_encode(['success' => true]);
@@ -172,9 +175,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         if ($d['monto_pagado'] > 0) throw new Exception("No se puede eliminar con abonos existentes");
 
         $pdo->prepare("UPDATE deudas_empresa SET activo = 0 WHERE id = ?")->execute([$id]);
-        $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?")->execute([$d['monto'], $d['cuenta_id']]);
         
-        $pdo->prepare("UPDATE movimientos SET estado = 'anulado' WHERE referencia_id = ? AND servicio_id = 10")->execute([$id]);
+        // Restar saldo de cuenta usando función centralizada que registra en historial_saldos
+        $stmtSaldo = $pdo->prepare("SELECT saldo_actual FROM cuentas WHERE id = ? FOR UPDATE");
+        $stmtSaldo->execute([$d['cuenta_id']]);
+        $saldo_anterior = (float)$stmtSaldo->fetchColumn();
+        $saldo_nuevo = $saldo_anterior - $d['monto'];
+        $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?")->execute([$saldo_nuevo, $d['cuenta_id']]);
+        
+        // Registrar en historial_saldos
+        $stmtMov = $pdo->prepare("SELECT id FROM movimientos WHERE referencia_id = ? AND servicio_id = 10 AND estado = 'activo' ORDER BY id DESC LIMIT 1");
+        $stmtMov->execute([$id]);
+        $movimiento = $stmtMov->fetch(PDO::FETCH_ASSOC);
+        $movimiento_id = $movimiento ? $movimiento['id'] : null;
+        
+        $pdo->prepare("INSERT INTO historial_saldos (cuenta_id, movimiento_id, tipo, monto, saldo_anterior, saldo_nuevo) VALUES (?, ?, 'salida', ?, ?, ?)")
+            ->execute([$d['cuenta_id'], $movimiento_id, $d['monto'], $saldo_anterior, $saldo_nuevo]);
+        
+        // Anular movimiento en flujo
+        $pdo->prepare("UPDATE movimientos SET estado = 'anulado', motivo_correccion = 'Préstamo eliminado manualmente desde el panel' WHERE referencia_id = ? AND servicio_id = 10")->execute([$id]);
 
         $pdo->commit();
         echo json_encode(['success' => true]);
@@ -303,16 +322,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
 
         // Registrar en movimientos con prestamista_id Y grupo_id
-
         // servicio_id = 10 (Préstamo de Prestamista)
-
         // moneda = MXN por defecto para préstamos
-
-        $pdo->prepare("
+        $stmtMov = $pdo->prepare("
             INSERT INTO movimientos
             (grupo_id, fecha, tipo, monto, moneda, descripcion, cuenta_destino_id, prestamista_id, usuario_id, servicio_id, referencia_id, activo)
-            VALUES (?, ?, 'entrada', ?, 'MXN', ?, ?, ?, ?, 10, ?, 1)
-        ")->execute([
+            VALUES (?, ?, 'entrada', ?, 'MXN', ?, ?, ?, 10, ?, 1)
+        ");
+        $stmtMov->execute([
             $grupo_id,
             $fecha,
             $monto,
@@ -322,16 +339,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['usuario_id'],
             $prestamo_id // <--- EL HILO CONDUCTOR (ID de la deuda)
         ]);
-
-
-
-        $pdo->prepare("
-
-            UPDATE cuentas SET saldo_actual = saldo_actual + ?
-
-            WHERE id = ?
-
-        ")->execute([$monto, $cuenta_id]);
+        $movimiento_id = $pdo->lastInsertId();
+        
+        // Actualizar saldo usando la función centralizada que registra en historial_saldos
+        actualizarSaldoCuenta($pdo, $cuenta_id, $monto, 'entrada', $movimiento_id, 'Préstamo de ' . $prestamista_nombre);
 
         
 

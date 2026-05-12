@@ -135,6 +135,7 @@ try {
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css      " />
 
     <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
+    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
 
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
@@ -797,7 +798,7 @@ try {
                                 infoExtra = `<br><small class="text-muted" style="font-size: 0.7rem;"><i class="ti ti-device-floppy"></i> Capturado: ${captura}</small>`;
                             }
                             
-                            return `<span class="fw-bold text-dark">${fechaOperacion}</span>${infoExtra}`;
+                            return `<span class="fw-bold text-body">${fechaOperacion}</span>${infoExtra}`;
                         }
                     },
 
@@ -843,7 +844,7 @@ try {
                             let captura = typeof formatearFechaHora === 'function' ? formatearFechaHora(data) : data;
                             let infoExtra = `<br><small class="text-muted" style="font-size: 0.7rem;"><i class="ti ti-device-floppy"></i> Capturado: ${captura}</small>`;
                             
-                            return `<span class="fw-bold text-dark">${fechaOperacion}</span>${infoExtra}`;
+                            return `<span class="fw-bold text-body">${fechaOperacion}</span>${infoExtra}`;
                         }
                     },
                     {
@@ -905,13 +906,13 @@ try {
                     htmlPagos += `
                         <div class="row align-items-center my-2 pago-item" data-id="${id}" data-pendiente="${pendiente}">
                             <div class="col-sm-6">
-                                <span class="fw-bold text-dark">Préstamo #${id}</span><br>
+                                <span class="fw-bold text-body">Préstamo #${id}</span><br>
                                 <small class="text-danger">Pendiente: ${formatoMoneda(pendiente)}</small>
                             </div>
                             <div class="col-sm-6">
                                 <div class="input-group input-group-sm">
                                     <span class="input-group-text bg-success text-white border-success">$</span>
-                                    <input type="number" step="0.01" class="form-control border-success input-abono-multiple fw-bold" value="${pendiente.toFixed(2)}" max="${pendiente.toFixed(2)}">
+                                    <input type="text" step="0.01" class="form-control border-success input-abono-multiple fw-bold" value="${pendiente.toFixed(2)}" max="${pendiente.toFixed(2)}">
                                 </div>
                             </div>
                         </div>
@@ -1309,10 +1310,8 @@ $('#montoPagarHidden').val("");
                     success: function(response) {
                         if (response.success) {
                             $('#modalPagarPrestamo').modal('hide');
-                            tablaPrestamos.ajax.reload(null, false);
-                            $('#btnPagarSeleccionados').fadeOut();
-                            $('#checkAllPrestamos').prop('checked', false);
-                            showToast("Pago registrado correctamente", "success");
+                            showToast("Pago registrado correctamente. Redirigiendo a Flujo...", "success");
+                            setTimeout(() => { window.location.href = 'flujo.php'; }, 1500);
                         }
                     },
                     error: function(xhr) {

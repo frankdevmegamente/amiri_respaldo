@@ -18,6 +18,8 @@ return [
 
     'password' => 'rjmgiiefddeiusrl',
 
+    'encryption' => 'tls',
+
     'from_email' => 'no-reply@amiri.com',
 
     'from_name' => 'Amiri App'

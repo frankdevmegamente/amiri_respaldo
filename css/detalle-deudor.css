@@ -1,0 +1,17 @@
+body[data-bs-theme="dark"] .card {
+  background: #1a2234;
+  border-color: #2c344c;
+}
+body[data-bs-theme="dark"] .table {
+  color: #e9ecef;
+}
+body[data-bs-theme="dark"] .table thead th {
+  background-color: #1a2234 !important;
+  color: #e9ecef;
+}
+body[data-bs-theme="dark"] .card-header.bg-white {
+  background-color: #1a2234 !important;
+}
+body[data-bs-theme="dark"] .card-header.bg-success {
+  background-color: #0e6b4a !important;
+}

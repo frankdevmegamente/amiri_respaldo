@@ -165,24 +165,34 @@ try {
 
 
     // Registrar pago a cliente con servicio_id = 13 (Pago a Cliente)
-
-    $stmtFlujo = $pdo->prepare("INSERT INTO movimientos (grupo_id, fecha, servicio_id, tipo, moneda, monto, cuenta_origen_id, cuenta_destino_id, cliente_id, paridad, descripcion, activo) VALUES (?,?,13,'salida',?,?,?,?,?,?,?,1)");
-
+    $stmtFlujo = $pdo->prepare("INSERT INTO movimientos (grupo_id, fecha, servicio_id, tipo, moneda, monto, cuenta_origen_id, cuenta_destino_id, cliente_id, paridad, descripcion, activo) VALUES (?,?,13,'salida',?,?,?,?,?,?,1)");
     $stmtFlujo->execute([$grupo_id, $fecha, $moneda, $monto, $cuenta_pago_id, $cuenta_cliente_id, $cliente_id, $paridad, $descripcion]);
+    $movimiento_id = $pdo->lastInsertId();
 
+    // Actualizar saldos y registrar en historial_saldos
+    // 1. Cuenta origen (salida)
+    $stmtSaldoOrig = $pdo->prepare("SELECT saldo_actual FROM cuentas WHERE id = ? FOR UPDATE");
+    $stmtSaldoOrig->execute([$cuenta_pago_id]);
+    $saldo_anterior_orig = (float)$stmtSaldoOrig->fetchColumn();
+    $saldo_nuevo_orig = $saldo_anterior_orig - $monto_mxn;
+    
+    $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?")
+        ->execute([$saldo_nuevo_orig, $cuenta_pago_id]);
+    
+    $pdo->prepare("INSERT INTO historial_saldos (cuenta_id, movimiento_id, tipo, monto, saldo_anterior, saldo_nuevo) VALUES (?, ?, 'salida', ?, ?, ?)")
+        ->execute([$cuenta_pago_id, $movimiento_id, $monto_mxn, $saldo_anterior_orig, $saldo_nuevo_orig]);
 
-
-    // Actualizar saldos
-
-    $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?")
-
-        ->execute([$monto_mxn, $cuenta_pago_id]);
-
-
-
-    $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual + ? WHERE id = ?")
-
-        ->execute([$monto_mxn, $cuenta_cliente_id]);
+    // 2. Cuenta destino cliente (entrada)
+    $stmtSaldoDest = $pdo->prepare("SELECT saldo_actual FROM cuentas WHERE id = ? FOR UPDATE");
+    $stmtSaldoDest->execute([$cuenta_cliente_id]);
+    $saldo_anterior_dest = (float)$stmtSaldoDest->fetchColumn();
+    $saldo_nuevo_dest = $saldo_anterior_dest + $monto_mxn;
+    
+    $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?")
+        ->execute([$saldo_nuevo_dest, $cuenta_cliente_id]);
+    
+    $pdo->prepare("INSERT INTO historial_saldos (cuenta_id, movimiento_id, tipo, monto, saldo_anterior, saldo_nuevo) VALUES (?, ?, 'entrada', ?, ?, ?)")
+        ->execute([$cuenta_cliente_id, $movimiento_id, $monto_mxn, $saldo_anterior_dest, $saldo_nuevo_dest]);
 
 
 

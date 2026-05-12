@@ -1,31 +1,66 @@
-# Archivos de entorno
-.env
-.env.*
-!.env.example
-
-# Archivos subidos por usuarios
-uploads/*
-!uploads/.gitkeep
-
-# Dependencias
-node_modules/
-
-# Configuraciones del editor
-.vscode/
-.idea/
-*.sublime-project
-*.sublime-workspace
-
-# Logs
-*.log
-logs/
-
-# Sistema operativo
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# Temporales
-*.tmp
-*.temp
-*.cache
+# Archivos de entorno
+vendor/
+composer.zip
+*.zip
+node_modules/
+
+.env
+
+.env.*
+
+!.env.example
+
+
+
+# Archivos subidos por usuarios
+
+uploads/*
+
+!uploads/.gitkeep
+
+
+
+# Dependencias
+
+node_modules/
+
+
+
+# Configuraciones del editor
+
+.vscode/
+
+.idea/
+
+*.sublime-project
+
+*.sublime-workspace
+
+
+
+# Logs
+
+*.log
+
+logs/
+
+
+
+# Sistema operativo
+
+.DS_Store
+
+Thumbs.db
+
+desktop.ini
+
+
+
+# Temporales
+
+*.tmp
+
+*.temp
+
+*.cache
+

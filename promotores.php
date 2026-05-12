@@ -41,6 +41,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css  " />
 
     <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
+    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
 
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 

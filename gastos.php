@@ -37,6 +37,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
 
     <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
+    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
 
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
@@ -313,7 +314,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                                     <span class="input-group-text">$</span>
 
-                                    <input type="number" step="0.01" class="form-control" name="monto" id="inputMonto" required min="0.01" placeholder="0.00">
+                                    <input type="text" step="0.01" class="form-control" name="monto" id="inputMonto" required min="0.01" placeholder="0.00">
 
                                 </div>
 

@@ -286,7 +286,7 @@ try {
 
                                     <div class="alert alert-danger text-center border-0" role="alert" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);">
 
-                                      <i class="ti ti-alert-circle"></i> <?= $error ?>
+                                      <i class="ti ti-alert-circle"></i> <?= htmlspecialchars($error) ?>
 
                                     </div>
 
@@ -523,10 +523,7 @@ try {
 
 
     <script src="src/assets/libs/jquery/dist/jquery.min.js"></script>
-
     <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script src="src/assets/libs/jquery/dist/jquery.min.js"></script>
 
     <script>
 

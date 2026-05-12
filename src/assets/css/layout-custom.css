@@ -40,92 +40,7 @@
   color: white !important;
 }
 
-/* ============================================
 
-   SIDEBAR COLAPSABLE (Desktop ≥ 1200px)
-
-   ============================================ */
-
-@media (min-width: 1200px) {
-  .left-sidebar {
-    width: 450px;
-    transition: width 0.25s ease;
-  }
-
-  .body-wrapper {
-    margin-left: 450px;
-    transition: margin-left 0.25s ease;
-  }
-
-  /* Estado mini: solo iconos */
-
-  #main-wrapper.sidebar-mini .left-sidebar {
-    width: 70px;
-
-    overflow: hidden;
-  }
-
-  #main-wrapper.sidebar-mini .body-wrapper {
-    margin-left: 70px;
-  }
-
-  /* Ocultar textos */
-
-  #main-wrapper.sidebar-mini .hide-menu {
-    display: none;
-  }
-
-  /* Centrar iconos de los links */
-
-  #main-wrapper.sidebar-mini .sidebar-nav ul .sidebar-item .sidebar-link {
-    justify-content: center;
-
-    padding-left: 0;
-
-    padding-right: 0;
-  }
-
-  /* Sección separadora: mostrar icono, ocultar texto */
-
-  #main-wrapper.sidebar-mini .nav-small-cap {
-    justify-content: center;
-  }
-
-  #main-wrapper.sidebar-mini .nav-small-cap .nav-small-cap-icon {
-    display: block;
-  }
-
-  /* Logo: ocultar imagen, centrar área */
-
-  #main-wrapper.sidebar-mini .brand-logo .logo-img {
-    display: none;
-  }
-
-  #main-wrapper.sidebar-mini .brand-logo {
-    justify-content: center;
-
-    padding: 16px 0;
-  }
-
-  /* Expandir contenido: quitar max-width fijo y ajustar padding */
-  #main-wrapper.sidebar-mini .body-wrapper .container-fluid,
-  #main-wrapper.sidebar-mini .body-wrapper .container-sm,
-  #main-wrapper.sidebar-mini .body-wrapper .container-md,
-  #main-wrapper.sidebar-mini .body-wrapper .container-lg,
-  #main-wrapper.sidebar-mini .body-wrapper .container-xl,
-  #main-wrapper.sidebar-mini .body-wrapper .container-xxl {
-    max-width: 100% !important; /* ¡Con esto vencemos al estilo del HTML! */
-    padding-left: 25px !important;
-    padding-right: 25px !important;
-    margin: 0 auto !important;
-    transition: max-width 0.3s ease-in-out;
-  }
-
-  #main-wrapper.sidebar-mini .body-wrapper {
-    margin-left: 70px !important;
-    width: calc(100% - 70px) !important;
-  }
-}
 
 /* ============================================
 
@@ -339,44 +254,88 @@ body.loading #main-wrapper {
   min-width: 75px; /* Asegura que la cajita no se haga muy pequeña */
 }
 /* ============================================
-   REESTRUCTURACIÓN: SIDEBAR COMPLETO Y HEADER A LA DERECHA
+   SIDEBAR COMPLETO Y HEADER FIJO (Desktop ≥ 1200px)
    ============================================ */
 
 @media (min-width: 1200px) {
-  /* 1. Forzar al sidebar a ocupar todo el alto desde arriba */
   .left-sidebar {
     position: fixed !important;
     top: 0 !important;
     left: 0 !important;
     height: 100vh !important;
     z-index: 100 !important;
-    width: 200px !important;
+    width: 260px !important;
+    transition: width 0.25s ease;
   }
 
-  /* 2. Fijar el header arriba, pero restándole el ancho del sidebar */
   .app-topstrip {
     position: fixed !important;
     top: 0 !important;
     right: 0 !important;
-    width: calc(100% - 200px) !important;
+    width: calc(100% - 260px) !important;
     z-index: 90 !important;
   }
 
-  /* 3. Empujar el contenido principal */
   .body-wrapper {
-    margin-left: 200px !important;
+    margin-left: 260px !important;
     padding-top: 65px !important;
+    transition: margin-left 0.25s ease;
   }
 
-  /* 4. Ajustes cuando el sidebar colapsa (modo mini) */
+  /* ---- MODO MINI ---- */
   #main-wrapper.sidebar-mini .left-sidebar {
-    width: 60px !important;
+    width: 70px !important;
+    overflow: hidden;
   }
   #main-wrapper.sidebar-mini .app-topstrip {
-    width: calc(100% - 60px) !important;
+    width: calc(100% - 70px) !important;
   }
   #main-wrapper.sidebar-mini .body-wrapper {
-    margin-left: 60px !important;
+    margin-left: 70px !important;
+    width: calc(100% - 70px) !important;
+  }
+
+  /* Ocultar textos en mini */
+  #main-wrapper.sidebar-mini .hide-menu {
+    display: none;
+  }
+
+  /* Centrar iconos */
+  #main-wrapper.sidebar-mini .sidebar-nav ul .sidebar-item .sidebar-link {
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  /* Sección separadora en mini */
+  #main-wrapper.sidebar-mini .nav-small-cap {
+    justify-content: center;
+  }
+  #main-wrapper.sidebar-mini .nav-small-cap .nav-small-cap-icon {
+    display: block;
+  }
+
+  /* Logo en mini */
+  #main-wrapper.sidebar-mini .brand-logo .logo-img {
+    display: none;
+  }
+  #main-wrapper.sidebar-mini .brand-logo {
+    justify-content: center;
+    padding: 16px 0;
+  }
+
+  /* Expandir contenido en mini */
+  #main-wrapper.sidebar-mini .body-wrapper .container-fluid,
+  #main-wrapper.sidebar-mini .body-wrapper .container-sm,
+  #main-wrapper.sidebar-mini .body-wrapper .container-md,
+  #main-wrapper.sidebar-mini .body-wrapper .container-lg,
+  #main-wrapper.sidebar-mini .body-wrapper .container-xl,
+  #main-wrapper.sidebar-mini .body-wrapper .container-xxl {
+    max-width: 100% !important;
+    padding-left: 25px !important;
+    padding-right: 25px !important;
+    margin: 0 auto !important;
+    transition: max-width 0.3s ease-in-out;
   }
 }
 

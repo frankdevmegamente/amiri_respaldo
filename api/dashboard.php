@@ -463,7 +463,7 @@ try {
     // === DESGLOSE DE CAPITAL (desde movimientos y deudas_clientes) ===
     // CAPITAL: solo tipo 3 (igual que el card de Capital) + deudas_clientes + promotores
     // NO incluir tipo 4 ni 5: esas cuentas se suman via deudas_clientes y promotores para evitar doble conteo
-    $stmtCap = $pdo->prepare("SELECT COALESCE(SUM(saldo_actual),0) AS total FROM cuentas WHERE activo=1 AND tipo_cuenta = 3 AND fecha_creacion >= ?");
+    $stmtCap = $pdo->prepare("SELECT COALESCE(SUM(saldo_actual),0) AS total FROM cuentas WHERE activo=1 AND tipo_cuenta = 3 AND creado_en >= ?");
     $stmtCap->execute([$fecha_inicio]);
     $cliente_efectivo = (float)$stmtCap->fetch(PDO::FETCH_ASSOC)['total'];
 
@@ -471,12 +471,12 @@ try {
     $stmtCliMxn->execute([$fecha_inicio]);
     $cliente_efectivo += (float)$stmtCliMxn->fetch(PDO::FETCH_ASSOC)['total'];
 
-    $stmtProm = $pdo->prepare("SELECT COALESCE(SUM(c.saldo_actual),0) AS total FROM promotores p INNER JOIN cuentas c ON p.cuenta_id=c.id WHERE p.activo=1 AND p.es_interno=0 AND c.saldo_actual>0.01 AND p.fecha_creacion >= ?");
+    $stmtProm = $pdo->prepare("SELECT COALESCE(SUM(c.saldo_actual),0) AS total FROM promotores p INNER JOIN cuentas c ON p.cuenta_id=c.id WHERE p.activo=1 AND p.es_interno=0 AND c.saldo_actual>0.01 AND p.creado_en >= ?");
     $stmtProm->execute([$fecha_inicio]);
     $promotor_efectivo = (float)$stmtProm->fetch(PDO::FETCH_ASSOC)['total'];
 
     // Comisiones AMIRI desde deudas_clientes
-    $stmtCom = $pdo->prepare("SELECT COALESCE(SUM(comision_amiri),0) AS total FROM deudas_clientes WHERE activo=1 AND fecha >= ?");
+    $stmtCom = $pdo->prepare("SELECT COALESCE(SUM(comision_amiri),0) AS total FROM deudas_clientes WHERE activo=1 AND estado IN('pendiente','parcial') AND fecha >= ?");
     $stmtCom->execute([$fecha_inicio]);
     $comisiones_amiri = (float)$stmtCom->fetch(PDO::FETCH_ASSOC)['total'];
 
@@ -551,36 +551,14 @@ try {
 
     // ");
 
-    $stmt = $pdo->query("SELECT f.cuenta COLLATE utf8mb4_general_ci as cuenta,
-
-            SUM(CASE WHEN f.tipo = 'entrada' THEN f.monto ELSE -f.monto END) as saldo,
-
-            c.nombre COLLATE utf8mb4_general_ci as nombre_cuenta,
-
-            c.banco COLLATE utf8mb4_general_ci as banco_cuenta
-
-        FROM flujo f
-
-        LEFT JOIN cuentas c ON f.cuenta = c.nombre
-
-        GROUP BY f.cuenta
-
-        UNION
-
-        SELECT 
-
-            w.divisa COLLATE utf8mb4_general_ci AS cuenta,
-
-            SUM(w.cantidad_restante) AS saldo,
-
-            'ingresos_divisas' COLLATE utf8mb4_general_ci AS nombre_cuenta,
-
-            w.divisa COLLATE utf8mb4_general_ci AS banco_cuenta
-
-        FROM ingresos_divisas w
-
-        GROUP BY w.divisa
-
+    $stmt = $pdo->query("SELECT
+            c.nombre as cuenta,
+            c.saldo_actual as saldo,
+            c.nombre as nombre_cuenta,
+            c.banco as banco_cuenta
+        FROM cuentas c
+        WHERE c.activo = 1 AND c.saldo_actual != 0
+        ORDER BY c.nombre
         ");
 
     $saldos = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -616,21 +594,13 @@ try {
     // === FLUJO DIARIO (últimos 30 días) ===
 
     $stmt = $pdo->prepare("
-
         SELECT fecha,
-
-               SUM(CASE WHEN tipo = 'entrada' THEN monto ELSE 0 END) as entradas,
-
+               SUM(CASE WHEN tipo IN ('entrada','comision') THEN monto ELSE 0 END) as entradas,
                SUM(CASE WHEN tipo = 'salida' THEN monto ELSE 0 END) as salidas
-
-        FROM flujo
-
-        WHERE fecha >= DATE_SUB(CURDATE(), INTERVAL 29 DAY)
-
+        FROM movimientos
+        WHERE fecha >= DATE_SUB(CURDATE(), INTERVAL 29 DAY) AND activo = 1
         GROUP BY fecha
-
         ORDER BY fecha
-
     ");
 
     $stmt->execute();

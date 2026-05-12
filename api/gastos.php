@@ -110,46 +110,14 @@ try {
 
         $monto = (float)$_POST['monto'];
 
-        $saldoNuevo = $saldoAnterior - $monto;
+        $saldoNuevo = round($saldoAnterior - $monto, 2);
 
 
 
         // Actualizar saldo de la cuenta seleccionada
-
         $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?")
-
             ->execute([$saldoNuevo, $_POST['cuenta_id']]);
-
-
-
-        // TAMBIÉN descontar automáticamente de Comisiones AMIRI (tipo_cuenta = 3)
-
-        $stmtAmiri = $pdo->prepare("SELECT id, nombre, saldo_actual FROM cuentas WHERE tipo_cuenta = 3 AND activo = 1 LIMIT 1");
-
-        $stmtAmiri->execute();
-
-        $cuentaAmiri = $stmtAmiri->fetch(PDO::FETCH_ASSOC);
-
         
-
-        if ($cuentaAmiri) {
-
-            $saldoAnteriorAmiri = $cuentaAmiri['saldo_actual'];
-
-            $saldoNuevoAmiri = $saldoAnteriorAmiri - $monto;
-
-            
-
-            // Actualizar saldo de Comisiones AMIRI
-
-            $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?")
-
-                ->execute([$saldoNuevoAmiri, $cuentaAmiri['id']]);
-
-        }
-
-
-
         // Generar ID de grupo único para este gasto
 
         $grupo_id = round(microtime(true) * 1000);
@@ -216,75 +184,49 @@ try {
 
         ]);
 
-        
 
-        // Registrar movimiento también para Comisiones AMIRI
 
-        if ($cuentaAmiri) {
+        // Descontar también de la cuenta de Capital (Utilidades AMIRI)
+        $stmtCapital = $pdo->query("SELECT id, saldo_actual FROM cuentas WHERE tipo_cuenta = 3 AND activo = 1 LIMIT 1");
+        $capital = $stmtCapital->fetch(PDO::FETCH_ASSOC);
+        $capital_id = $capital ? (int)$capital['id'] : null;
 
-            // Crear segundo movimiento en movimientos para Comisiones AMIRI
+        if ($capital_id && (int)$_POST['cuenta_id'] !== $capital_id) {
+            $saldoCapitalAnterior = (float)$capital['saldo_actual'];
+            $saldoCapitalNuevo = round($saldoCapitalAnterior - $monto, 2);
 
-            $movimiento_id_amiri = $pdo->prepare("
-
-                INSERT INTO movimientos 
-
+            $stmtMovCapital = $pdo->prepare("
+                INSERT INTO movimientos
                 (grupo_id, fecha, tipo, monto, moneda, descripcion, cuenta_origen_id, cuenta_destino_id, usuario_id, gasto_id, servicio_id, activo)
-
                 VALUES (?, ?, 'salida', ?, 'MXN', ?, ?, NULL, ?, ?, 12, 1)
-
             ");
-
-            $descripcion_amiri = "Gasto (desde Comisiones AMIRI): {$datos_gasto['tipo_gasto_nombre']} - " . ($_POST['concepto'] ?? 'Sin concepto');
-
-            $movimiento_id_amiri->execute([
-
+            $descCapital = "Gasto (desde Comisiones AMIRI): {$datos_gasto['tipo_gasto_nombre']} - " . ($_POST['concepto'] ?? 'Sin concepto');
+            $stmtMovCapital->execute([
                 $grupo_id,
-
                 $fecha,
-
                 $monto,
-
-                $descripcion_amiri,
-
-                $cuentaAmiri['id'],
-
+                $descCapital,
+                $capital_id,
                 $_SESSION['usuario_id'],
-
                 $id
-
             ]);
+            $movCapitalId = $pdo->lastInsertId();
 
-            $flujo_movimiento_id_amiri = $pdo->lastInsertId();
-
-            
-
-            // Registrar en historial_saldos para Comisiones AMIRI
+            $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?")
+                ->execute([$saldoCapitalNuevo, $capital_id]);
 
             $pdo->prepare("
-
-                INSERT INTO historial_saldos 
-
+                INSERT INTO historial_saldos
                 (cuenta_id, movimiento_id, tipo, monto, saldo_anterior, saldo_nuevo)
-
                 VALUES (?, ?, 'salida', ?, ?, ?)
-
             ")->execute([
-
-                $cuentaAmiri['id'],
-
-                $flujo_movimiento_id_amiri,
-
+                $capital_id,
+                $movCapitalId,
                 $monto,
-
-                $saldoAnteriorAmiri,
-
-                $saldoNuevoAmiri
-
+                $saldoCapitalAnterior,
+                $saldoCapitalNuevo
             ]);
-
         }
-
-        
 
         // Registrar auditoría
 

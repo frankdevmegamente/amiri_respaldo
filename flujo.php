@@ -321,9 +321,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
             background-color: #252f43 !important; /* Fondo gris oscuro / azulado */
             border-color: #2c344c !important; /* Borde oscuro sutil */
         }
-        [data-bs-theme="dark"] .table>tbody>tr>td .text-dark {
-            color: #e9ecef !important; /* Cambia las letras negras a blanco/gris claro */
-        }
+
     </style>
 
 </head>
@@ -374,6 +372,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                                             <h1 class="mb-0 fw-bold" id="diferenciaMonto">$0.00</h1>
                                         </div>
                                     </div>
+                                    <div id="diferenciaDetalle" class="mt-2" style="font-size:0.85rem;"></div>
                                 </div>
                             </div>
                         </div>
@@ -958,7 +957,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                         }
                         
                         // La fecha operativa siempre manda arriba y en negritas
-                        return `<span class="fw-bold text-dark">${fechaOperacion}</span>${infoExtra}`;
+                        return `<span class="fw-bold text-body">${fechaOperacion}</span>${infoExtra}`;
                     }
                 },
                 {
@@ -974,7 +973,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                 },
                 {
                     data: 'servicio', title: 'Servicio',
-                    render: d => '<strong class="text-dark">' + d + '</strong>'
+                    render: d => '<strong class="text-body">' + d + '</strong>'
                 },
                 {
                     data: 'cantidad_movimientos', title: 'Movimientos',
@@ -1004,11 +1003,11 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                         
                         // 1. LA PERSONA (A quién se le paga o quién nos paga)
                         let personaHtml = '';
-                        if (row.cliente  && row.cliente.trim())  personaHtml += '<div class="mb-1"><i class="ti ti-user text-primary"></i> <strong class="text-dark">Cliente:</strong> <span class="text-muted">' + row.cliente + '</span></div>';
-                        if (row.proveedor && row.proveedor.trim()) personaHtml += '<div class="mb-1"><i class="ti ti-building text-info"></i> <strong class="text-dark">Proveedor:</strong> <span class="text-muted">' + row.proveedor + '</span></div>';
-                        if (row.promotor  && row.promotor.trim())  personaHtml += '<div class="mb-1"><i class="ti ti-user-star text-warning"></i> <strong class="text-dark">Promotor:</strong> <span class="text-muted">' + row.promotor + '</span></div>';
-                        if (row.prestamista && row.prestamista.trim()) personaHtml += '<div class="mb-1"><i class="ti ti-businessplan text-danger"></i> <strong class="text-dark">Prestamista:</strong> <span class="text-muted">' + row.prestamista + '</span></div>';
-                        if (row.beneficiario && row.beneficiario.trim()) personaHtml += '<div class="mb-1"><i class="ti ti-users text-success"></i> <strong class="text-dark">Beneficiario:</strong> <span class="text-muted">' + row.beneficiario + '</span></div>';
+                        if (row.cliente  && row.cliente.trim())  personaHtml += '<div class="mb-1"><i class="ti ti-user text-primary"></i> <strong class="text-body">Cliente:</strong> <span class="text-muted">' + row.cliente + '</span></div>';
+                        if (row.proveedor && row.proveedor.trim()) personaHtml += '<div class="mb-1"><i class="ti ti-building text-info"></i> <strong class="text-body">Proveedor:</strong> <span class="text-muted">' + row.proveedor + '</span></div>';
+                        if (row.promotor  && row.promotor.trim())  personaHtml += '<div class="mb-1"><i class="ti ti-user-star text-warning"></i> <strong class="text-body">Promotor:</strong> <span class="text-muted">' + row.promotor + '</span></div>';
+                        if (row.prestamista && row.prestamista.trim()) personaHtml += '<div class="mb-1"><i class="ti ti-businessplan text-danger"></i> <strong class="text-body">Prestamista:</strong> <span class="text-muted">' + row.prestamista + '</span></div>';
+                        if (row.beneficiario && row.beneficiario.trim()) personaHtml += '<div class="mb-1"><i class="ti ti-users text-success"></i> <strong class="text-body">Beneficiario:</strong> <span class="text-muted">' + row.beneficiario + '</span></div>';
                         
                         if (personaHtml) {
                             html += '<div class="p-2 mb-2 rounded bg-light border border-light-subtle">' + personaHtml + '</div>';
@@ -1032,19 +1031,19 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                         if (tipoMov === 'Salida') {
                             // Si es una salida (pago a cliente/proveedor), SOLO decimos de dónde salió el dinero
                             if (unicosOrigen.length) {
-                                html += '<div><i class="ti ti-arrow-up text-danger"></i> <strong class="text-dark">Salió de:</strong><br><span class="text-muted ps-3 d-block">• ' + unicosOrigen.join('<br>• ') + '</span></div>';
+                                html += '<div><i class="ti ti-arrow-up text-danger"></i> <strong class="text-body">Salió de:</strong><br><span class="text-muted ps-3 d-block">• ' + unicosOrigen.join('<br>• ') + '</span></div>';
                             }
                         }
                         else if (tipoMov === 'Entrada') {
                             // Si es una entrada, SOLO decimos a qué banco nuestro entró
                             if (unicosDestino.length) {
-                                html += '<div><i class="ti ti-arrow-down text-success"></i> <strong class="text-dark">Entró a:</strong><br><span class="text-muted ps-3 d-block">• ' + unicosDestino.join('<br>• ') + '</span></div>';
+                                html += '<div><i class="ti ti-arrow-down text-success"></i> <strong class="text-body">Entró a:</strong><br><span class="text-muted ps-3 d-block">• ' + unicosDestino.join('<br>• ') + '</span></div>';
                             }
                         }
                         else {
                             // Si es un Traspaso o movimiento combinado, mostramos ambas
-                            if (unicosOrigen.length) html += '<div><i class="ti ti-arrow-up text-danger"></i> <strong class="text-dark">Salió de:</strong><br><span class="text-muted ps-3 d-block">• ' + unicosOrigen.join('<br>• ') + '</span></div>';
-                            if (unicosDestino.length) html += '<div class="mt-1"><i class="ti ti-arrow-down text-success"></i> <strong class="text-dark">Entró a:</strong><br><span class="text-muted ps-3 d-block">• ' + unicosDestino.join('<br>• ') + '</span></div>';
+                            if (unicosOrigen.length) html += '<div><i class="ti ti-arrow-up text-danger"></i> <strong class="text-body">Salió de:</strong><br><span class="text-muted ps-3 d-block">• ' + unicosOrigen.join('<br>• ') + '</span></div>';
+                            if (unicosDestino.length) html += '<div class="mt-1"><i class="ti ti-arrow-down text-success"></i> <strong class="text-body">Entró a:</strong><br><span class="text-muted ps-3 d-block">• ' + unicosDestino.join('<br>• ') + '</span></div>';
                         }
                         
                         html += '</div>';
@@ -1193,126 +1192,111 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
 
         function cargarObligaciones() {
-
             let entries = [], loaded = 0;
 
-
-
             function render() {
-
                 loaded++;
-
-                if (loaded < 2) return;
-
-
+                if (loaded < 3) return; // <--- Cambiamos a 3 peticiones
 
                 let html = '', totalMxn = 0;
-
                 entries.forEach(function (e) {
-
                     let monto = parseFloat(e.monto || 0);
-
                     let mxn   = e.tipo_moneda === 'MXN' ? monto : parseFloat(e.valor_mxn || 0);
-
                     if (Math.abs(monto) < 0.01) return;
-
                     totalMxn += mxn;
 
-
-
                     let montoDisplay = '$' + formatMXN(mxn) + ' MXN';
+                    
+                    // Asignar colores según quién nos debe o a quién le debemos
+                    let badgeCls = 'bg-secondary bg-opacity-10 text-secondary border-0';
+                    if (e.tipo === 'Prestamista') badgeCls = 'bg-danger bg-opacity-10 text-danger border-0';
+                    else if (e.tipo === 'Proveedor') badgeCls = e.tipo_moneda === 'USD' ? 'bg-primary bg-opacity-10 text-primary border-0' : 'bg-info bg-opacity-10 text-info border-0';
+                    else if (e.tipo === 'Deudor') badgeCls = 'bg-warning bg-opacity-10 text-warning border-0';
 
-                    let badgeCls = e.tipo === 'Prestamista' ? 'bg-danger bg-opacity-10 text-danger border-0' :
-                                   e.tipo_moneda === 'USD'  ? 'bg-primary bg-opacity-10 text-primary border-0' : 'bg-info bg-opacity-10 text-info border-0';
-
-                    let nombreCell = e.tipo === 'Proveedor'
-
-                        ? `<a href="proveedores.php" class="text-decoration-none fw-semibold">${e.nombre}</a>`
-
-                        : e.nombre;
-
+                    let nombreCell = e.nombre;
+                    if (e.tipo === 'Prestamista') {
+                        nombreCell = `<a href="detalle-prestamista.php?id=${e.id || ''}" class="text-decoration-none fw-semibold text-danger">${e.nombre}</a>`;
+                    } else if (e.tipo === 'Proveedor') {
+                        nombreCell = `<a href="detalle-proveedor.php?id=${e.id || ''}" class="text-decoration-none fw-semibold text-info">${e.nombre}</a>`;
+                    } else if (e.tipo === 'Deudor') {
+                        // Si solo hay un préstamo, ir directo al detalle; si hay varios, ir a la página de deudor
+                        let enlace = (e.ids && e.ids.split(',').length === 1) 
+                            ? `detalle-prestamo-otorgado.php?id=${e.ids}` 
+                            : `detalle-deudor.php?nombre=${encodeURIComponent(e.nombre)}`;
+                        nombreCell = `<a href="${enlace}" class="text-decoration-none fw-semibold text-warning">${e.nombre}</a>`;
+                    }
+                        
                     html += `<tr>
-
                         <td>${nombreCell}</td>
-
                         <td><span class="badge ${badgeCls}">${e.tipo}</span></td>
-
                         <td class="text-end fw-bold">${montoDisplay}</td>
-
                     </tr>`;
-
                 });
-
                 if (!html) html = `<tr><td colspan="3" class="text-center text-muted py-3">Sin obligaciones pendientes</td></tr>`;
-
                 $('#obligacionesBody').html(html);
-
             }
 
-
-
-            // Prestamistas MXN
-
+            // 1. Prestamistas MXN (Lo que debemos nosotros)
             $.getJSON('api/flujo-resumen.php?tipo=prestamos&moneda=MXN', function (data) {
-
                 if (data && data.length) {
-
                     data.forEach(function (p) {
-
                         entries.push({
-
+                            id:          p.id || null,
                             nombre:      p.nombre,
-
                             tipo:        'Prestamista',
-
                             monto:       parseFloat(p.total_adeudado || 0),
-
                             tipo_moneda: 'MXN',
-
                             valor_mxn:   parseFloat(p.total_adeudado || 0)
-
                         });
-
                     });
-
                 }
-
                 render();
-
             }).fail(render);
 
-
-
-            // Proveedores USD/USDT
-
+            // 2. Proveedores USD/USDT (Lo que debemos nosotros)
             $.getJSON('api/flujo-resumen.php?tipo=proveedor&moneda=TODAS', function (data) {
-
                 if (data && data.proveedores) {
-
                     data.proveedores.forEach(function (p) {
-
                         entries.push({
-
+                            id:          p.id || null,
                             nombre:      p.nombre,
-
                             tipo:        'Proveedor',
-
                             monto:       parseFloat(p.saldo_actual || 0),
-
                             tipo_moneda: p.tipo_moneda,
-
                             valor_mxn:   parseFloat(p.valor_mxn || 0)
-
                         });
-
                     });
-
                 }
-
                 render();
-
             }).fail(render);
 
+            // 3. Préstamos Otorgados (Lo que NOS DEBEN a nosotros) <-- ¡LA NUEVA CONEXIÓN!
+            $.getJSON('api/prestamos-otorgados.php', function (data) {
+                if (data && data.length) {
+                    // Agrupamos por persona (por si le prestaste 2 veces al mismo)
+                    let agrupado = {};
+                    data.forEach(function (p) {
+                        let pendiente = parseFloat(p.monto_total) - parseFloat(p.monto_pagado);
+                        if (pendiente > 0.001) {
+                            if (!agrupado[p.persona_nombre]) agrupado[p.persona_nombre] = { total: 0, ids: [] };
+                            agrupado[p.persona_nombre].total += pendiente;
+                            agrupado[p.persona_nombre].ids.push(p.id);
+                        }
+                    });
+                    
+                    for (let persona in agrupado) {
+                        entries.push({
+                            nombre:      persona,
+                            tipo:        'Deudor',
+                            monto:       agrupado[persona].total,
+                            tipo_moneda: 'MXN',
+                            valor_mxn:   agrupado[persona].total,
+                            ids:         agrupado[persona].ids.join(',')
+                        });
+                    }
+                }
+                render();
+            }).fail(render);
         }
 
 
@@ -1333,56 +1317,65 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                 const $icon     = $('#diferenciaIcon');
 
+                const $detalle  = $('#diferenciaDetalle');
+
+                const expl      = data.explicacion || [];
+
+                const resumen   = data.resumen || '';
+
 
 
                 $monto.text('$' + formatMXN(diferencia) + ' MXN');
 
 
 
-                if (Math.abs(diferencia) < 0.01) {
-
-                    $card.removeClass('border-danger border-warning').addClass('border-success');
-
-                    $cardBody.css('background-color', 'rgba(25,135,84,0.1)');
-
-                    $monto.removeClass('text-danger text-warning').addClass('text-success');
-
-                    $icon.css('background-color', 'rgba(25,135,84,0.2)');
-
-                    $texto.html('<i class="ti ti-check-circle"></i> <strong>Todo cuadra correctamente</strong>');
-
-                } else if (diferencia < 0) {
-
-                    $card.removeClass('border-success border-warning').addClass('border-danger');
-
-                    $cardBody.css('background-color', 'rgba(220,53,69,0.1)');
-
-                    $monto.removeClass('text-success text-warning').addClass('text-danger');
-
-                    $icon.css('background-color', 'rgba(220,53,69,0.2)');
-
-                    $texto.html('<i class="ti ti-alert-triangle"></i> <strong>ALERTA:</strong> Falta dinero en el sistema');
-
-                } else {
-
-                    $card.removeClass('border-success border-danger').addClass('border-warning');
-
-                    $cardBody.css('background-color', 'rgba(255,193,7,0.1)');
-
-                    $monto.removeClass('text-success text-danger').addClass('text-warning');
-
-                    $icon.css('background-color', 'rgba(255,193,7,0.2)');
-
-                    $texto.html('<i class="ti ti-info-circle"></i> <strong>ATENCIÓN:</strong> Sobra dinero (revisar préstamos o capital)');
-
+                // Construir bloque de detalle (siempre visible cuando hay factores)
+                let detalleHtml = '';
+                if (expl.length > 0) {
+                    detalleHtml += '<div class="p-2 rounded" style="background-color:rgba(0,0,0,0.03);">';
+                    expl.forEach(function(item) {
+                        const icono = item.tipo === 'prestamos_otorgados' ? 'ti ti-hand-stop' : 'ti ti-info-circle';
+                        detalleHtml += '<div class="d-flex align-items-start mb-1">';
+                        detalleHtml += '<i class="' + icono + ' me-2 mt-1"></i>';
+                        detalleHtml += '<div><strong class="text-body">' + item.concepto + ':</strong> ';
+                        detalleHtml += '<span class="fw-bold">$' + formatMXN(Math.abs(item.monto)) + '</span>';
+                        if (item.detalle) {
+                            detalleHtml += '<br><small class="text-muted">' + item.detalle + '</small>';
+                        }
+                        detalleHtml += '</div></div>';
+                    });
+                    detalleHtml += '</div>';
                 }
 
-
+                if (Math.abs(diferencia) < 0.01) {
+                    $card.removeClass('border-danger border-warning border-info').addClass('border-success');
+                    $cardBody.css('background-color', 'rgba(25,135,84,0.1)');
+                    $monto.removeClass('text-danger text-warning text-info').addClass('text-success');
+                    $icon.css('background-color', 'rgba(25,135,84,0.2)');
+                    $texto.html('<i class="ti ti-check-circle"></i> <strong>Todo cuadra correctamente</strong>');
+                    $detalle.html('').hide();
+                } else if (diferencia < 0) {
+                    $card.removeClass('border-success border-warning border-info').addClass('border-danger');
+                    $cardBody.css('background-color', 'rgba(220,53,69,0.1)');
+                    $monto.removeClass('text-success text-warning text-info').addClass('text-danger');
+                    $icon.css('background-color', 'rgba(220,53,69,0.2)');
+                    let msg = '<i class="ti ti-alert-triangle"></i> <strong>ALERTA:</strong> Falta dinero en el sistema';
+                    if (resumen) msg += '<br><small class="text-muted">' + resumen + '</small>';
+                    $texto.html(msg);
+                    $detalle.html(detalleHtml).show();
+                } else {
+                    $card.removeClass('border-success border-danger border-info').addClass('border-warning');
+                    $cardBody.css('background-color', 'rgba(255,193,7,0.1)');
+                    $monto.removeClass('text-success text-danger text-info').addClass('text-warning');
+                    $icon.css('background-color', 'rgba(255,193,7,0.2)');
+                    let msg = '<i class="ti ti-info-circle"></i> <strong>ATENCIÓN:</strong> Sobra dinero (revisar préstamos o capital)';
+                    if (resumen) msg += '<br><small class="text-muted">' + resumen + '</small>';
+                    $texto.html(msg);
+                    $detalle.html(detalleHtml).show();
+                }
 
                 const desglose = ` | Saldos: $${formatMXN(data.total_saldos || 0)} − (Capital: $${formatMXN(data.total_capital || 0)} + Obligaciones: $${formatMXN(data.total_prestamos || 0)})`;
-
                 $texto.append(`<br><small class="text-muted">${desglose}</small>`);
-
             });
 
         }
@@ -1698,7 +1691,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                             <label class="form-label">Cantidad de ${moneda} <span class="text-muted">(monto a comprar)</span></label>
 
-                            <input type="number" step="0.01" class="form-control input-cantidad" required>
+                            <input type="text" step="0.01" class="form-control input-cantidad" required>
 
                         </div>
 
@@ -1709,14 +1702,14 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                             </label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input type="number" step="0.01" class="form-control input-total-mxn-editable fw-bold" required>
+                                <input type="text" step="0.01" class="form-control input-total-mxn-editable fw-bold" required>
                                 <span class="input-group-text">MXN</span>
                             </div>
                         </div>
                         <div class="mb-3">
                             <small class="text-muted label-formato-tc"></small>
                             <label class="form-label">Tipo de Cambio <span class="text-muted">(calculado o manual)</span></label>
-                            <input type="number" step="0.0001" class="form-control input-tc" required>
+                            <input type="text" step="0.0001" class="form-control input-tc" required>
                         </div>
 
                         <div class="mb-3">
@@ -1790,7 +1783,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                             <label class="form-label">Cantidad de ${moneda} <span class="text-muted">(monto a vender)</span></label>
 
-                            <input type="number" step="0.01" class="form-control input-cantidad" required>
+                            <input type="text" step="0.01" class="form-control input-cantidad" required>
 
                             <small id="disponibleDivisasInfo" class="text-muted"><i class="ti ti-loader ti-spin"></i> Consultando inventario...</small>
 
@@ -1803,7 +1796,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                             </label>
                             <div class="input-group">
                                 <span class="input-group-text">$</span>
-                                <input type="number" step="0.01" class="form-control input-total-mxn-editable fw-bold text-success" required>
+                                <input type="text" step="0.01" class="form-control input-total-mxn-editable fw-bold text-success" required>
                                 <span class="input-group-text">MXN</span>
                             </div>
                             <small class="text-success"><i class="ti ti-arrow-right"></i> Este monto se sumará a la cuenta seleccionada</small>
@@ -1811,7 +1804,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                         <div class="mb-3">
                             <small class="text-muted label-formato-tc"></small>
                             <label class="form-label">Tipo de Cambio <span class="text-muted">(calculado o manual)</span></label>
-                            <input type="number" step="0.0001" class="form-control input-tc" required>
+                            <input type="text" step="0.0001" class="form-control input-tc" required>
                         </div>
 
                     `);
@@ -1882,7 +1875,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                                 </label>
 
-                                <input type="number" step="0.01" class="form-control input-monto" id="inputMontoVenta" required>
+                                <input type="text" step="0.01" class="form-control input-monto" id="inputMontoVenta" required>
 
                             </div>
 
@@ -1894,7 +1887,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                                         <label class="form-label">% Amiri</label>
 
-                                        <input type="number" step="0.01" class="form-control input-porc-amiri" value="0" required>
+                                        <input type="text" step="0.01" class="form-control input-porc-amiri" value="0" required>
 
                                     </div>
 
@@ -1906,7 +1899,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                                         <label class="form-label">% Promotor</label>
 
-                                        <input type="number" step="0.01" class="form-control input-porc-promotor" value="0" required>
+                                        <input type="text" step="0.01" class="form-control input-porc-promotor" value="0" required>
 
                                     </div>
 
@@ -1920,7 +1913,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                                 <div class="input-group">
 
-                                    <input type="number" step="0.01" class="form-control input-retencion-total" value="0" disabled readonly>
+                                    <input type="text" step="0.01" class="form-control input-retencion-total" value="0" disabled readonly>
 
                                     <span class="input-group-text bg-info text-white"><i class="ti ti-percentage"></i></span>
 
@@ -1970,7 +1963,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                                 </label>
 
-                                <input type="number" step="0.01" class="form-control input-monto" id="inputMontoCambio" required>
+                                <input type="text" step="0.01" class="form-control input-monto" id="inputMontoCambio" required>
 
                                 <div id="warningMontoCambio" class="alert alert-warning py-1 px-2 mt-1 mb-0" style="display:none;font-size:0.875rem;"></div>
 
@@ -2115,7 +2108,9 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                                 </label>
 
-                                <input type="number" step="0.01" class="form-control input-monto" id="inputMontoRetiro" required>
+                                <input type="text" step="0.01" class="form-control input-monto" id="inputMontoRetiro" required>
+
+                                <div id="warningMontoRetiro" class="mt-2 text-danger fw-bold" style="display:none"></div>
 
                             </div>
 
@@ -2141,7 +2136,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                                     }
 
-                                    html += `<option value="${c.id}">${nombreCuenta} - $${formatMXN(c.saldo_actual)}</option>`;
+                                    html += `<option value="${c.id}" data-saldo="${c.saldo_actual}">${nombreCuenta} - $${formatMXN(c.saldo_actual)}</option>`;
 
                                 });
 
@@ -2215,7 +2210,18 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
             }
 
-
+            // Validar monto vs saldo origen en Retiro de Efectivo
+            if (servicioNombre === 'Retiro de Efectivo') {
+                const $warn = $('#warningMontoRetiro');
+                if ($warn.length) {
+                    const saldoOrigen = parseFloat($('#cuentaBancariaOrigen option:selected').attr('data-saldo')) || 0;
+                    if ($('#cuentaBancariaOrigen').val() && monto > 0 && monto > saldoOrigen + 0.001) {
+                        $warn.show().html(`<i class="ti ti-alert-triangle"></i> El monto (<strong>$${formatMXN(monto)}</strong>) supera el saldo disponible (<strong>$${formatMXN(saldoOrigen)}</strong> MXN)`);
+                    } else {
+                        $warn.hide();
+                    }
+                }
+            }
 
             if (servicioNombre === 'Venta de Efectivo') {
 
@@ -3054,6 +3060,8 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                     tipo_cambio:    $('.input-tc').val(),
 
+                    total_mxn:      ($('.input-total-mxn-editable').val() || '').replace(/,/g, ''),
+
                     tipo_pago:      $('.input-tipo-pago').val() || 'credito',
 
                     cuenta_pago_id: $('#cuentaPagoContadoSelect').val() || ''
@@ -3145,6 +3153,12 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                     payload.cuenta_bancaria_id = parseInt($('select[name="cuenta_bancaria_id"]').val()) || null;
 
                     payload.tipo_retiro        = $('select[name="tipo_retiro"]').val() || null;
+
+                    const saldoOrigen = parseFloat($('#cuentaBancariaOrigen option:selected').attr('data-saldo')) || 0;
+                    if (payload.monto > saldoOrigen + 0.001) {
+                        showToast('Saldo insuficiente. Disponible: $' + formatMXN(saldoOrigen) + ' MXN', 'error');
+                        return;
+                    }
 
                 }
 

@@ -62,6 +62,36 @@ class ClienteService {
 
         
 
+        // Verificar si ya existe un cliente con el mismo nombre
+
+        $existing = $this->clienteExiste($data['nombre']);
+
+        if ($existing) {
+
+            if ($existing['activo'] == 1) {
+
+                throw new ValidationException("Ya existe un cliente activo con el nombre '{$data['nombre']}'", [
+
+                    'nombre' => 'duplicado'
+
+                ]);
+
+            } else {
+
+                throw new ValidationException("El cliente '{$data['nombre']}' fue eliminado anteriormente", [
+
+                    'nombre' => 'eliminado',
+
+                    'cliente_eliminado_id' => (int)$existing['id']
+
+                ]);
+
+            }
+
+        }
+
+        
+
         try {
 
             $this->pdo->beginTransaction();
@@ -177,56 +207,51 @@ class ClienteService {
         
 
         $stmt = $this->pdo->prepare("
-
             UPDATE clientes 
-
             SET nombre = ?, 
-
                 contacto = ?, 
-
                 promotor_id = ?, 
-
                 retencion_total = ?, 
-
                 porcentaje_amiri = ?, 
-
                 porcentaje_promotor = ?,
-
                 opera_mxn = ?,
-
                 opera_usd = ?,
-
-                opera_usdt = ?
-
+                opera_usdt = ?,
+                activo = 1,
+                eliminado_en = NULL,
+                eliminado_por = NULL
             WHERE id = ?
-
         ");
 
         
 
-        return $stmt->execute([
-
+        $result = $stmt->execute([
             $data['nombre'],
-
             $data['contacto'] ?? '',
-
-            $data['promotor_id'], // Puede ser NULL
-
+            $data['promotor_id'],
             $data['retencion_total'] ?? 0,
-
             $data['porcentaje_amiri'] ?? 0,
-
             $data['porcentaje_promotor'] ?? 0,
-
             $data['opera_mxn'] ?? 1,
-
             $data['opera_usd'] ?? 0,
-
             $data['opera_usdt'] ?? 0,
-
             $id
-
         ]);
+
+        
+
+        // Reactivar la cuenta asociada si existe (para restauración de soft-delete)
+        if ($result) {
+            $stmtCta = $this->pdo->prepare("SELECT cuenta_id FROM clientes WHERE id = ?");
+            $stmtCta->execute([$id]);
+            $cuenta = $stmtCta->fetch(PDO::FETCH_ASSOC);
+            if ($cuenta && $cuenta['cuenta_id']) {
+                $stmtReact = $this->pdo->prepare("UPDATE cuentas SET activo = 1 WHERE id = ?");
+                $stmtReact->execute([$cuenta['cuenta_id']]);
+            }
+        }
+
+        return $result;
 
     }
 
@@ -398,6 +423,17 @@ class ClienteService {
 
         return $stmt->fetch() !== false;
 
+    }
+
+    
+
+    /**
+     * Verificar si ya existe un cliente con el mismo nombre (incluye soft-deleted)
+     */
+    private function clienteExiste($nombre) {
+        $stmt = $this->pdo->prepare("SELECT id, activo FROM clientes WHERE nombre = ?");
+        $stmt->execute([$nombre]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     

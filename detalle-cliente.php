@@ -151,6 +151,7 @@ try {
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
 
     <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
+    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
 
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
@@ -479,6 +480,8 @@ try {
                         <input type="hidden" id="ventaId" name="id">
 
                         <div class="modal-body">
+
+                            <div id="contenedorPagosMultiples" class="mb-3 p-3 bg-light border rounded" style="display: none;"></div>
 
                             <div class="row mb-2">
 
@@ -1069,33 +1072,44 @@ try {
 
             // Al hacer clic en el botón de pago múltiple
             $('#btnPagarMultiple').on('click', function() {
-                $('#ventaId').val(ventasSeleccionadas.join(',')); // Enviar IDs separados por coma
-                $('#montoTotalDisplay').html(`<em>Pago Múltiple (${ventasSeleccionadas.length} ventas)</em>`);
-                $('#fechaDisplay').text('-');
-                $('#comisionAmiriDisplay').text('-');
-                $('#comisionPromotorDisplay').text('-');
-                $('#montoNetoDisplay').text('-');
-                $('#estadoActualDisplay').html(`<em>Varias ventas</em>`);
+                let htmlPagos = '<h6 class="mb-3 text-primary"><i class="ti ti-list-check"></i> Especifica cuánto abonar a cada venta:</h6>';
+                let ids = [];
                 
-                $('#saldoPendienteDisplay').text(formatoMonedaDinamica(totalPendienteMultiple, 'MXN'));
-                
-                $('#badgeMoneda').attr('class', 'badge border-0 bg-primary bg-opacity-10 text-primary').text('MXN');
-                $('#montoPagarFormatted').data('moneda', 'MXN');
+                $('#tablaVentas .pago-checkbox:checked').each(function() {
+                    let id = $(this).data('id');
+                    let pendiente = parseFloat($(this).data('pendiente'));
+                    ids.push(id);
 
-                $('#saldoCuentaCliente').text(formatoMoneda(<?= $cliente['cuenta_saldo'] ?? 0 ?>));
+                    htmlPagos += `
+                        <div class="row align-items-center my-2 pago-item" data-id="${id}" data-pendiente="${pendiente}">
+                            <div class="col-sm-6">
+                                <span class="fw-bold text-dark">Venta #${id}</span><br>
+                                <small class="text-danger">Pendiente: ${formatoMoneda(pendiente)}</small>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-success text-white border-success">$</span>
+                                    <input type="text" step="0.01" class="form-control border-success input-abono-multiple fw-bold" value="${pendiente.toFixed(2)}" max="${pendiente.toFixed(2)}">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
 
-                $('#montoPagarFormatted').val("");
-                $('#montoPagarHidden').val("");
-                $('#cuentaPagoSelect').val("");
-                $('#montoFormateado').text('');
+                $('#contenedorPagosMultiples').html(htmlPagos).fadeIn();
+
+                // Ocultar filas individuales
+                $('#montoTotalDisplay').closest('.row').hide();
+                $('#comisionAmiriDisplay').closest('.row').hide();
+                $('#estadoActualDisplay').closest('.row').hide();
+                $('#montoPagarFormatted').closest('.row.mb-3').hide();
+
+                $('#cuentaPagoSelect').val('');
                 $('#btnLiquidarDeuda').hide();
+                $('#resumenPago').hide();
+                $('#fechaPago').val("<?= date('Y-m-d') ?>");
 
-                $('#montoPagarFormatted').data('pendiente', totalPendienteMultiple);
-                $('#montoPagarFormatted').data('saldo-cliente', <?= $cliente['cuenta_saldo'] ?? 0 ?>);
-
-                actualizarResumenPago(totalPendienteMultiple, 0, 0);
-                $('#resumenPago').show();
-
+                $('#formPagarVenta').data('modo', 'masivo').data('ids', ids);
                 $('#modalPagarVenta').modal("show");
             });
 
@@ -1107,92 +1121,63 @@ try {
             });
 
 
+            $(document).on('input', '.input-abono-multiple', function() {
+                let max = parseFloat($(this).attr('max')) || 0;
+                let val = parseFloat($(this).val()) || 0;
+                if (val > max) {
+                    $(this).val(max.toFixed(2));
+                    showToast("No puedes abonar más del saldo pendiente", "warning");
+                }
+            });
+
             $('#tablaVentas').on('click', '.pagar', function() {
+                $('#contenedorPagosMultiples').hide().empty();
+
+                $('#montoTotalDisplay').closest('.row').show();
+                $('#comisionAmiriDisplay').closest('.row').show();
+                $('#estadoActualDisplay').closest('.row').show();
+                $('#montoPagarFormatted').closest('.row.mb-3').show();
+
+                $('#montoPagarFormatted').prop('readonly', false);
+                $('#formPagarVenta').data('modo', 'individual');
 
                 const id = $(this).data("id");
 
-
-
                 $.get('api/ventas-efectivo-clientes.php?id=' + id, data => {
-
-                    // Determinar la moneda (por defecto MXN para registros existentes)
 
                     const moneda = data.moneda || 'MXN';
 
-                    
-
                     $('#ventaId').val(data.id);
-
                     $('#montoTotalDisplay').text(formatoMonedaDinamica(data.monto_total, moneda));
-
                     $('#fechaDisplay').text(data.fecha);
-
                     $('#comisionAmiriDisplay').text(formatoMonedaDinamica(data.comision_amiri, moneda));
-
                     $('#comisionPromotorDisplay').text(formatoMonedaDinamica(data.comision_promotor, moneda));
-
                     $('#montoNetoDisplay').text(formatoMonedaDinamica(data.monto_neto_cliente, moneda));
 
-
-
                     const pendiente = data.monto_neto_cliente - data.monto_pagado;
-
                     $('#saldoPendienteDisplay').text(formatoMonedaDinamica(pendiente, moneda));
-
                     $('#estadoActualDisplay').text(data.estado.charAt(0).toUpperCase() + data.estado.slice(1));
 
-                    
-
-                    // Mostrar badge de moneda
-
-                    // Mostrar badge de moneda (Estilo Soft Badge)
                     const badgeClass = moneda === 'MXN' ? 'bg-primary bg-opacity-10 text-primary' : (moneda === 'USD' ? 'bg-success bg-opacity-10 text-success' : 'bg-info bg-opacity-10 text-info');
                     $('#badgeMoneda').attr('class', 'badge border-0 ' + badgeClass).text(moneda);
 
-
-
-                    // Guardar moneda para uso posterior
-
                     $('#montoPagarFormatted').data('moneda', moneda);
-
-
-
-                    // Mostrar saldo disponible del cliente
-
                     $('#saldoCuentaCliente').text(formatoMoneda(<?= $cliente['cuenta_saldo'] ?? 0 ?>));
 
-
-
                     $('#montoPagarFormatted').val("");
-
                     $('#montoPagarHidden').val("");
-
                     $('#cuentaPagoSelect').val("");
-
-                    $('#montoFormateado').text(''); // Limpiar formato visual
-
-                    $('#btnLiquidarDeuda').hide(); // Ocultar botón al inicio
-
-
-
-                    // Guardar datos para validación
+                    $('#montoFormateado').text('');
+                    $('#btnLiquidarDeuda').hide();
 
                     $('#montoPagarFormatted').data('pendiente', pendiente);
-
                     $('#montoPagarFormatted').data('saldo-cliente', <?= $cliente['cuenta_saldo'] ?? 0 ?>);
 
-
-
                     actualizarResumenPago(data.monto_neto_cliente, data.monto_pagado, 0);
-
                     $('#resumenPago').show();
 
-
-
                     $('#modalPagarVenta').modal("show");
-
                 });
-
             });
 
 
@@ -1390,100 +1375,60 @@ try {
 
 
             $('#btnGuardarPago').on('click', function() {
-                const id = $('#ventaId').val();
-                const montoAPagar = parseMoneda($('#montoPagarHidden').val());
                 const cuentaPagoId = $('#cuentaPagoSelect').val();
-                
-                // --- CAPTURAMOS FECHA Y LE SUMAMOS LA HORA ---
                 const fechaElegida = $('#fechaPago').val();
                 const horaActual = new Date().toTimeString().split(' ')[0];
                 const fechaPagoCompleta = fechaElegida ? (fechaElegida + ' ' + horaActual) : '';
-                // ---------------------------------------------
-                
-                const pendiente = parseFloat($('#montoPagarFormatted').data('pendiente')) || 0;
-                const moneda = $('#montoPagarFormatted').data('moneda') || 'MXN';
+                const modoPago = $('#formPagarVenta').data('modo') || 'individual';
 
+                if (!cuentaPagoId) return alert("Selecciona una cuenta de pago.");
 
+                let arrayPagos = [];
 
-                if (montoAPagar <= 0) {
-
-                    return alert("Ingresa un monto válido.");
-
+                if (modoPago === 'masivo') {
+                    $('.pago-item').each(function() {
+                        let id = $(this).data('id');
+                        let abono = parseFloat($(this).find('.input-abono-multiple').val()) || 0;
+                        if (abono > 0) {
+                            arrayPagos.push({ id: id, abono: abono });
+                        }
+                    });
+                    if (arrayPagos.length === 0) return alert("Ingresa al menos un monto mayor a $0.00.");
+                } else {
+                    const id = $('#ventaId').val();
+                    const montoAPagar = parseMoneda($('#montoPagarHidden').val());
+                    if (montoAPagar <= 0) return alert("Ingresa un monto válido.");
+                    arrayPagos.push({ id: id, abono: montoAPagar });
                 }
 
-
-
-                if (!cuentaPagoId) {
-
-                    return alert("Selecciona una cuenta de destino.");
-
-                }
-
-
-
-                if (pendiente > 0 && montoAPagar > pendiente + 0.001) {
-
-                    $('#warningPagoExceso').show().html(`<i class="ti ti-alert-triangle"></i> No puedes pagar más del adeudo pendiente (<strong>${formatoMonedaDinamica(pendiente, moneda)}</strong>)`);
-
-                    showToast('El monto supera el adeudo pendiente (' + formatoMonedaDinamica(pendiente, moneda) + ')', 'warning');
-
-                    return;
-
-                }
-
-
+                const btnOriginal = $(this).html();
+                $(this).html('<i class="ti ti-loader"></i> Procesando...').prop('disabled', true);
 
                 $.ajax({
-
                     url: 'api/ventas-efectivo-clientes.php',
-
                     method: 'PUT',
-
                     contentType: 'application/json',
-
                     data: JSON.stringify({
-                        id: id,
-                        monto_a_pagar: montoAPagar,
+                        pagos: arrayPagos,
                         cuenta_pago_id: cuentaPagoId,
-                        fecha_pago: fechaPagoCompleta // <--- USAMOS LA NUEVA VARIABLE AQUÍ
+                        fecha_pago: fechaPagoCompleta
                     }),
-
                     success: function(response) {
-
                         if (response.success) {
-
                             $('#modalPagarVenta').modal('hide');
-
-                            tablaVentas.ajax.reload(null, false);
-
-                            showToast("Pago registrado correctamente", "success");
-
-
-
-                            // Recargar página para actualizar saldo del cliente
-
-                            setTimeout(() => location.reload(), 1500);
-
+                            showToast("Pago registrado correctamente. Redirigiendo a Flujo...", "success");
+                            setTimeout(() => { window.location.href = 'flujo.php'; }, 1500);
                         }
-
                     },
-
                     error: function(xhr) {
-
                         let msg = "Error al guardar pago";
-
-                        try {
-
-                            msg = xhr.responseJSON?.error || msg;
-
-                        } catch (e) {}
-
+                        try { msg = xhr.responseJSON?.error || msg; } catch (e) {}
                         showToast(msg, "error");
-
+                    },
+                    complete: function() {
+                        $('#btnGuardarPago').html(btnOriginal).prop('disabled', false);
                     }
-
                 });
-
             });
 
 

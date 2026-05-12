@@ -37,6 +37,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
   <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
 
   <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
+  <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
 
   <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
@@ -261,8 +262,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
               </div>
             </div>
           </div>
-
-          <div class="row" id="resumen-cards"></div>
 
           <div class="row mt-4">
             <div class="col-12 col-md-6 col-xl-3">

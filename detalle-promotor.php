@@ -483,7 +483,7 @@ try {
 
                             </label>
 
-                            <input type="number" step="0.01" class="form-control form-control-lg" name="monto_a_pagar" id="inputMontoPago" required>
+                            <input type="text" step="0.01" class="form-control form-control-lg" name="monto_a_pagar" id="inputMontoPago" required>
 
                             <div class="mt-2">
 
@@ -1033,15 +1033,9 @@ try {
                     data: JSON.stringify(formData),
 
                     success: function(response) {
-
                         $('#modalPagarComisiones').modal('hide');
-
-                        table.ajax.reload();
-
-                        actualizarTotales();
-
-                        alert("Pago registrado con éxito");
-
+                        alert("Pago registrado con éxito. Redirigiendo a Flujo...");
+                        setTimeout(() => { window.location.href = 'flujo.php'; }, 1500);
                     },
 
                     error: function(xhr) {

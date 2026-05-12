@@ -39,6 +39,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
 
     <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
+    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
 
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
@@ -331,7 +332,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                                     <label>Retención Total</label>
 
-                                    <input type="number" name="retencion_total" id="retencionTotal" class="form-control" readonly>
+                                    <input type="text" name="retencion_total" id="retencionTotal" class="form-control" readonly>
 
                                 </div>
 
@@ -339,7 +340,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                                     <label>% Amiri</label>
 
-                                    <input type="number" step="0.01" id="porcentajeAmiri" name="porcentaje_amiri" class="form-control">
+                                    <input type="text" step="0.01" id="porcentajeAmiri" name="porcentaje_amiri" class="form-control">
 
                                 </div>
 
@@ -347,7 +348,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                                     <label>% Promotor</label>
 
-                                    <input type="number" step="0.01" id="porcentajePromotor" name="porcentaje_promotor" class="form-control">
+                                    <input type="text" step="0.01" id="porcentajePromotor" name="porcentaje_promotor" class="form-control">
 
                                 </div>
 
@@ -720,19 +721,51 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
             
 
-            $.post('api/clientes.php', $('#formCliente').serialize(), () => {
-
-                $('#modalCliente').modal('hide');
-
-                $('#formCliente')[0].reset();
-
-                $('#id').val('');
-
-                tabla.ajax.reload();
-
-                showToast('Cliente guardado', 'success');
-
-            }, 'json');
+            $.ajax({
+                url: 'api/clientes.php',
+                method: 'POST',
+                data: $('#formCliente').serialize(),
+                dataType: 'json',
+                success: function() {
+                    $('#modalCliente').modal('hide');
+                    $('#formCliente')[0].reset();
+                    $('#id').val('');
+                    tabla.ajax.reload();
+                    showToast('Cliente guardado', 'success');
+                },
+                error: function(xhr) {
+                    let resp;
+                    try { resp = xhr.responseJSON; } catch (e) {}
+                    
+                    if (resp?.details?.cliente_eliminado_id) {
+                        const nombre = $('input[name="nombre"]').val();
+                        if (confirm(`El cliente "${nombre}" fue eliminado anteriormente. ¿Restaurarlo?`)) {
+                            const restoreId = resp.details.cliente_eliminado_id;
+                            $.ajax({
+                                url: 'api/clientes.php',
+                                method: 'POST',
+                                data: $('#formCliente').serialize() + '&id=' + restoreId,
+                                dataType: 'json',
+                                success: function() {
+                                    $('#modalCliente').modal('hide');
+                                    $('#formCliente')[0].reset();
+                                    $('#id').val('');
+                                    tabla.ajax.reload();
+                                    showToast('Cliente restaurado correctamente', 'success');
+                                },
+                                error: function(xhr2) {
+                                    let msg = 'Error al restaurar';
+                                    try { msg = xhr2.responseJSON?.error || msg; } catch (e) {}
+                                    showToast(msg, 'error');
+                                }
+                            });
+                        }
+                    } else {
+                        let msg = resp?.error || 'Error al guardar cliente';
+                        showToast(msg, 'error');
+                    }
+                }
+            });
 
         });
 

@@ -57,6 +57,7 @@ $twoFAEnabled = $user2FA['two_fa_enabled'] ?? false;
   <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
 
   <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
+  <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
 
   <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 

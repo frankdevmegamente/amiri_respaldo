@@ -148,7 +148,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $mail->Subject = 'Restablece tu contraseña - Amiri';
 
-                $reset_link = "http://localhost/AmiriAppProd/reset-password.php?token=" . urlencode($token);
+                $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+                $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+                $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+                $baseUrl = getenv('APP_URL') ?: "$protocol://$host$basePath";
+                $reset_link = rtrim($baseUrl, '/') . "/reset-password.php?token=" . urlencode($token);
 
                 $mail->Body = "
 

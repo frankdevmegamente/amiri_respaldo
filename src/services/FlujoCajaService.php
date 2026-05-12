@@ -534,7 +534,7 @@ class FlujoCajaService {
 
         // Insertar movimientos...
 
-        $total_mxn = $monto * $paridad;
+        $total_mxn = round($monto * $paridad, 2);
 
         
 

@@ -281,7 +281,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         ]);
 
-        jsonError($e->getMessage(), 400, $e->getErrors());
+        $errors = $e->getErrors();
+        if (isset($errors['cliente_eliminado_id'])) {
+            jsonError($e->getMessage(), 409, $errors);
+        } else {
+            jsonError($e->getMessage(), 400, $errors);
+        }
 
     } catch (Exception $e) {
 

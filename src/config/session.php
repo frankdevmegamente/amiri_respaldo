@@ -28,12 +28,11 @@ ini_set('session.use_strict_mode', 1);       // Rechazar IDs de sesión no inici
 
 
 
-// Tiempo de vida de la sesión (1 hora = 3600 segundos)
-// Tiempo de vida de la sesión (2 hora = 7200 segundos)
+// Tiempo de vida de la sesión (4 horas = 14400 segundos)
 
-ini_set('session.gc_maxlifetime', 7200);
+ini_set('session.gc_maxlifetime', 14400);
 
-ini_set('session.cookie_lifetime', 7200);
+ini_set('session.cookie_lifetime', 14400);
 
 
 
@@ -81,7 +80,7 @@ function regenerateSessionId() {
 
 function checkSessionTimeout() {
 
-    $timeout = 7200; // 2 horas en segundos
+    $timeout = 14400; // 4 horas en segundos
 
     
 
