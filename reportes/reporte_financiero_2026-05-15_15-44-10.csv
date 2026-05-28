@@ -1,0 +1,119 @@
+﻿REPORTE FINANCIERO AMIRI
+Generado: 2026-05-15 15:44:10 | BD: guiaspar_amiri_produccion
+
+=== RESUMEN MENSUAL (MXN) ===
+Mes;Ingresos MXN;Egresos MXN;Traspasos MXN;Ganancia FIFO;Comision Amiri;Comision Promotor;Gastos;Saldo Neto
+2026-04;8992409.84;6237394.21;2115133.94;37461.75;111847.88;6333.18;147881.73;2756443.53
+2026-05;12885467.06;10882432.5;4165623.7;28037.68;21686.14;9187.58;35466.11;2017292.27
+
+=== FLUJO POR MES Y MONEDA ===
+Mes;Moneda;Entradas;Salidas;Traspasos
+2026-04;MXN;8992409.84;6237394.21;2115133.94
+2026-04;USDT;289679.10;199113.92;0.00
+2026-05;MXN;12885467.06;10882432.50;4165623.70
+2026-05;USDT;436365.51;432020.51;0.00
+
+=== GANANCIAS FIFO POR MES ===
+Mes;Ganancia Total;Ganancias Positivas;Perdidas;Operaciones
+2026-04;37461.75;37462.50;-0.75;12
+2026-05;28037.68;29543.38;-1505.70;18
+
+=== VENTAS CON PERDIDA FIFO ===
+ID;Cantidad;Paridad Compra;Paridad Venta;Perdida;Fecha;Descripcion
+31;9485.84000000;17.15000000;17.06370000;-818.62799200;2026-05-11;"Venta de 9485.84 USDT a TC 17.0637"
+18;9267.69000000;17.57410000;17.50000000;-686.73582900;2026-05-06;"Venta de 11857.14 USDT a TC 17.5"
+15;5395.00000000;17.57410000;17.57400000;-0.53950000;2026-04-30;"Venta de 5395 USDT a TC 17.574"
+22;5.20000000;17.36050000;17.29550000;-0.33800000;2026-05-06;"Venta de 2425.26 USDT a TC 17.2955"
+16;2105.00000000;17.57410000;17.57400000;-0.21050000;2026-04-30;"Venta de 2105 USDT a TC 17.574"
+
+=== COMISIONES AMIRI Y PROMOTOR DEVENGADAS ===
+Mes;Comision Amiri;Comision Promotor;Operaciones
+2026-04;111847.88;6333.18;12
+2026-05;21686.14;9187.58;12
+
+=== GASTOS POR MES ===
+Mes;Categoria;Total;Cantidad
+2026-04;Retiro Utilidades;94811.73;1
+2026-04;Amiri Operaciones Integrales;20100.00;3
+2026-04;Nomina;20000.00;1
+2026-04;Azul;8500.00;2
+2026-04;Gas Kia;1800.00;3
+2026-04;Papeleria;1570.00;1
+2026-04;Cuentas Pro Amiri;1100.00;1
+2026-04;TOTAL;147881.73;12
+2026-05;Renta;16000.00;1
+2026-05;Comisiones Rojas;7966.11;3
+2026-05;Operativo;3800.00;1
+2026-05;Recargas;3600.00;1
+2026-05;Amiri Operaciones Integrales;2600.00;2
+2026-05;Gas Kia;1000.00;2
+2026-05;Cfe;500.00;1
+2026-05;TOTAL;35466.11;11
+
+=== PAGOS A PROMOTORES ===
+Mes;Promotor;Pagado
+2026-04;Adrian Sandoval;352.35
+2026-04;Kike Rizo;5468.83
+2026-04;Missael Jauregui;512.00
+2026-05;Adrian Sandoval;329.72
+2026-05;Emiliano Hurtado;240.00
+2026-05;Ernesto Sandoval;723.00
+2026-05;Kike Rizo;6659.80
+2026-05;Missael Jauregui;220.00
+
+=== SALDOS ACTUALES POR TIPO ===
+Tipo;Moneda;Total;Cuentas
+Bancaria;MXN;458422.35;6
+Caja;MXN;540131.63;1
+Caja;USDT;169737.15;2
+Capital;MXN;12818.50;1
+Cliente;MXN;2966.82;17
+Promotor;MXN;3882.37;7
+Proveedor;USD;0.00;4
+Proveedor;USDT;0.00;4
+
+=== DEUDAS ACTIVAS (EMPRESA DEBE) ===
+Prestamista;Saldo Pendiente;Total Prestado;Total Pagado
+Hyperion;2031887.47;2504238.07;472350.60
+Diego Alfredo H;698000.00;698000.00;0.00
+Yuyu;636000.00;636000.00;0.00
+Alejandro Mora;550000.00;550000.00;0.00
+
+=== DEUDAS ACTIVAS (CLIENTES DEBEN) ===
+Cliente;Moneda;Saldo Pendiente;Total Venta;Total Pagado
+Publico En General;MXN;83633.40;83633.40;0.00
+Osvaldo Vazquez - Joyero;MXN;3012.00;3012.00;0.00
+
+=== PRESTAMOS OTORGADOS ===
+Persona;Saldo Pendiente;Total Prestado
+Citlaly Azul;9590.00;9590.00
+Nataly Azul;8500.00;8500.00
+
+=== COMISIONES POR PROMOTOR ===
+Promotor;Pagado
+Kike Rizo;12128.63
+Missael Jauregui;732.00
+Ernesto Sandoval;723.00
+Adrian Sandoval;682.07
+Emiliano Hurtado;240.00
+AMIRI DIRECTO;0.00
+Ana Maria - Maestros Joyeros;0.00
+Alfonso Santos;0.00
+DEVENGADO TOTAL (deudas_clientes);15520.76
+
+=== MOVIMIENTOS POR SERVICIO ===
+Servicio;Moneda;Entradas;Salidas;Movimientos
+Préstamo de Prestamista;MXN;8964666.47;0.00;20
+Venta de Efectivo;MXN;8034741.92;0.00;109
+Venta de USDT;MXN;4878468.29;0.00;49
+Compra de USDT;USDT;447890.88;352980.70;29
+Venta de USDT;USDT;278153.73;278153.73;46
+Pago a Cliente;MXN;0.22;3939876.75;32
+Gasto;MXN;0.00;366695.68;57
+Pago de Préstamo;MXN;0.00;5048779.00;35
+Compra de USDT;MXN;0.00;1656030.89;5
+Pago de Comisión a Promotor;MXN;0.00;14505.70;18
+Retiro de Efectivo;MXN;0.00;0.00;13
+Pago a Proveedor;MXN;0.00;6075848.69;15
+Cambio de Flujo;MXN;0.00;0.00;32
+Préstamo Otorgado;MXN;0.00;18090.00;8

@@ -248,11 +248,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
                     WHERE id = ?
                 ")->execute([$nuevo_pagado, $nuevo_estado, explode(' ', $fecha_pago)[0], $grupo_id, $venta['id']]);
 
-                if ($venta['cuenta_cliente_id']) {
-                    $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?")
-                        ->execute([$abono_real, $venta['cuenta_cliente_id']]);
-                }
-
                 // Crear movimiento individual por cada deuda con referencia_id
                 $pdo->prepare("
                     INSERT INTO movimientos (grupo_id, fecha, servicio_id, tipo, moneda, monto, cuenta_origen_id, cuenta_destino_id, cliente_id, referencia_id, paridad, descripcion, activo)
@@ -272,6 +267,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 
                 $mov_id = $pdo->lastInsertId();
                 actualizarSaldoCuenta($pdo, $cuenta_pago_id, $abono_real, 'salida', $mov_id, "Pago a {$venta['cliente_nombre']} - Venta #{$venta['id']}");
+                if ($venta['cuenta_cliente_id']) {
+                    actualizarSaldoCuenta($pdo, $venta['cuenta_cliente_id'], $abono_real, 'salida', $mov_id, "Pago a {$venta['cliente_nombre']} - Venta #{$venta['id']}");
+                }
 
                 $cliente_nombre = $venta['cliente_nombre'];
             }
@@ -346,11 +344,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
                 WHERE id = ?
             ")->execute([$nuevo_pagado, $nuevo_estado, explode(' ', $fecha_pago)[0], $grupo_id, $venta['id']]);
 
-            if ($venta['cuenta_cliente_id']) {
-                $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?")
-                    ->execute([$abono_aplicado, $venta['cuenta_cliente_id']]);
-            }
-
             // Movimiento individual con referencia_id
             $pdo->prepare("
                 INSERT INTO movimientos (grupo_id, fecha, servicio_id, tipo, moneda, monto, cuenta_origen_id, cuenta_destino_id, cliente_id, referencia_id, paridad, descripcion, activo)
@@ -370,6 +363,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 
             $mov_id = $pdo->lastInsertId();
             actualizarSaldoCuenta($pdo, $cuenta_pago_id, $abono_aplicado, 'salida', $mov_id, "Pago a {$venta['cliente_nombre']} - Venta #{$venta['id']}");
+            if ($venta['cuenta_cliente_id']) {
+                actualizarSaldoCuenta($pdo, $venta['cuenta_cliente_id'], $abono_aplicado, 'salida', $mov_id, "Pago a {$venta['cliente_nombre']} - Venta #{$venta['id']}");
+            }
 
             $monto_restante -= $abono_aplicado;
         }

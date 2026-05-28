@@ -135,17 +135,13 @@ try {
 
 
             // 1. Restar MXN de la cuenta de pago
-
+            $pdo->exec("SET @hyperion_saldo_auth = 1");
             $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?")
-
                 ->execute([$monto_mxn, $cuenta_pago_id]);
 
-
-
             // 2. Reducir el adeudo del proveedor: saldo_actual (divisa) y valor_mxn
-
+            $pdo->exec("SET @hyperion_saldo_auth = 1");
             $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ?, valor_mxn = valor_mxn - ? WHERE id = ?")
-
                 ->execute([$monto_divisa, $monto_mxn, $cuentaProveedorId]);
 
 

@@ -282,7 +282,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Actualizar saldo de cuenta destino
 
-            $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual + ? WHERE id = ?")->execute([$cantidad, $cuenta_id]);
+            actualizarSaldoCuenta($pdo, $cuenta_id, $cantidad, 'entrada', $movimiento_id, "Compra de $cantidad $moneda a TC $tipo_cambio");
 
             
 
@@ -294,19 +294,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($cuenta_proveedor_id) {
 
-                    $stmtMov->execute([
+                        $stmtMov->execute([
 
-                        $grupo_id, $fecha, $servicio_id, 'salida', $moneda, $cantidad,
+                            $grupo_id, $fecha, $servicio_id, 'salida', $moneda, $cantidad,
 
-                        null, $cuenta_proveedor_id, $cliente_id, $proveedor_id, $tipo_cambio,
+                            null, $cuenta_proveedor_id, $cliente_id, $proveedor_id, $tipo_cambio,
 
-                        "Adeudo a proveedor: $cantidad $moneda (TC: $tipo_cambio)"
+                            "Adeudo a proveedor: $cantidad $moneda (TC: $tipo_cambio)"
 
-                    ]);
+                        ]);
+                        $mov_adeudo_id = $pdo->lastInsertId();
 
-                    $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual + ?, valor_mxn = valor_mxn + ? WHERE id = ?")
-
-                        ->execute([$cantidad, $total_mxn, $cuenta_proveedor_id]);
+                        actualizarSaldoCuenta($pdo, $cuenta_proveedor_id, $cantidad, 'entrada', $mov_adeudo_id, "Adeudo proveedor: $cantidad $moneda");
 
                 }
 
@@ -329,10 +328,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     "Pago de contado: $$total_mxn MXN por $cantidad $moneda (TC: $tipo_cambio)"
 
                 ]);
+                $mov_contado_id = $pdo->lastInsertId();
 
-                $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?")
-
-                    ->execute([$total_mxn, $cuenta_pago_id]);
+                actualizarSaldoCuenta($pdo, $cuenta_pago_id, $total_mxn, 'salida', $mov_contado_id, "Pago contado: $$total_mxn MXN por $cantidad $moneda");
 
             }
 
@@ -394,17 +392,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]);
             $movimiento_venta_id = $pdo->lastInsertId();
 
-            $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual + ? WHERE id = ?")
-                ->execute([$total_mxn, $cuenta_id]);
+            actualizarSaldoCuenta($pdo, $cuenta_id, $total_mxn, 'entrada', $movimiento_venta_id, "Venta de $cantidad $moneda a TC $tipo_cambio");
 
             // 3. FIFO: consumir inventario de la moneda y descontar wallets
             $stmtFIFO = $pdo->prepare("
                 SELECT im.id, im.cantidad_restante, im.paridad, im.cuenta_id
                 FROM inventario_monedas im
                 INNER JOIN cuentas c ON im.cuenta_id = c.id
-                WHERE im.moneda = :moneda AND im.activo = 1 AND im.cantidad_restante > 0
+                WHERE im.moneda = :moneda AND im.activo = 1 AND im.cantidad_restante > 0.001
                   AND c.tipo_cuenta IN (1, 2)
                 ORDER BY im.fecha ASC
+                FOR UPDATE
             ");
             $stmtFIFO->execute(['moneda' => $moneda]);
             $lotes = $stmtFIFO->fetchAll(PDO::FETCH_ASSOC);
@@ -428,9 +426,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             foreach ($lotes as $lote) {
                 if ($pendiente <= 0.001) break;
-                $consumir     = min($pendiente, floatval($lote['cantidad_restante']));
-                $gananciaLote = $consumir * ($tipo_cambio - floatval($lote['paridad']));
-                $gananciaTotal += $gananciaLote;
+                $cantidadRestante = (float) $lote['cantidad_restante'];
+                if ($cantidadRestante <= 0.001) continue;
+                $consumir     = min($pendiente, $cantidadRestante);
+                $gananciaLote = round($consumir * ($tipo_cambio - (float) $lote['paridad']), 2);
+                $gananciaTotal = round($gananciaTotal + $gananciaLote, 2);
 
                 $stmtConsumo->execute([
                     $movimiento_venta_id, $lote['id'], $consumir,
@@ -450,45 +450,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             // Descontar del saldo de cada cuenta wallet
-            $stmtWallet = $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?");
             foreach ($walletDeductions as $wId => $wCantidad) {
-                $stmtWallet->execute([$wCantidad, $wId]);
                 $stmtMov->execute([
                     $grupo_id, $fecha, $servicio_id, 'salida', $moneda, $wCantidad,
                     $wId, null, $cliente_id, $proveedor_id, $tipo_cambio,
                     "Salida de $wCantidad $moneda del wallet por venta"
                 ]);
+                $mov_wallet_id = $pdo->lastInsertId();
+                actualizarSaldoCuenta($pdo, $wId, $wCantidad, 'salida', $mov_wallet_id, "Salida wallet: $wCantidad $moneda por venta");
             }
 
             // --- 4. REPARTO DE GANANCIAS (COMISION PROMOTOR) ---
             $comision_promotor = 0;
             if ($promotor_id && $cuenta_promotor_id) {
                 // La comisión del promotor se calcula sobre el volumen en MXN
-                $comision_promotor = $total_mxn * ($porcentaje_promotor / 100);
+                $comision_promotor = round($total_mxn * ($porcentaje_promotor / 100), 2);
             }
             
-            $utilidad_amiri = $gananciaTotal - $comision_promotor;
+            $utilidad_amiri = round($gananciaTotal - $comision_promotor, 2);
 
             // Acreditar Utilidad Amiri
             if (abs($utilidad_amiri) > 0.001) {
-                $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual + ? WHERE id = 1")
-                    ->execute([$utilidad_amiri]);
                 $stmtMov->execute([
                     $grupo_id, $fecha, $servicio_id, 'comision', 'MXN', $utilidad_amiri,
                     null, 1, $cliente_id, $proveedor_id, $tipo_cambio,
                     "Utilidad neta FIFO por venta de $cantidad $moneda"
                 ]);
+                $mov_utilidad_id = $pdo->lastInsertId();
+                actualizarSaldoCuenta($pdo, 1, $utilidad_amiri, 'entrada', $mov_utilidad_id, "Utilidad neta FIFO por venta de $cantidad $moneda");
             }
 
             // Pagar comisión al promotor
             if ($comision_promotor > 0.001) {
-                $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual + ? WHERE id = ?")
-                    ->execute([$comision_promotor, $cuenta_promotor_id]);
                 $stmtMov->execute([
                     $grupo_id, $fecha, $servicio_id, 'comision', 'MXN', $comision_promotor,
                     null, $cuenta_promotor_id, $cliente_id, $promotor_id, $tipo_cambio,
                     "Comisión Promotor por venta de $cantidad $moneda"
                 ]);
+                $mov_comision_id = $pdo->lastInsertId();
+                actualizarSaldoCuenta($pdo, $cuenta_promotor_id, $comision_promotor, 'entrada', $mov_comision_id, "Comisión Promotor por venta de $cantidad $moneda");
             }
 
             // 5. Registro histórico (sin deuda)
@@ -698,7 +698,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 
 
-/* ===== DELETE ===== */
+/* ===== DELETE (Reversión con trazabilidad) ===== */
 
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
@@ -706,230 +706,138 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
     $grupo_id = $data['grupo_id'] ?? null;
 
-    
-
     if (!$grupo_id) {
-
         http_response_code(400);
-
         echo json_encode(['error' => 'grupo_id es requerido']);
-
         exit;
-
     }
-
-    
 
     try {
-
         $pdo->beginTransaction();
 
-
-
         // Obtener movimientos del grupo para revertir saldos
-
         $stmt = $pdo->prepare("SELECT * FROM movimientos WHERE grupo_id = ? AND activo = 1");
-
         $stmt->execute([$grupo_id]);
-
         $movimientos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
-
         if (empty($movimientos)) {
-
             throw new Exception('No se encontraron movimientos activos para este grupo');
-
         }
 
-
+        // Crear nuevo grupo para los movimientos reverso
+        $stmtMax = $pdo->query("SELECT COALESCE(MAX(grupo_id), 0) + 1 FROM movimientos");
+        $nuevo_grupo = intval($stmtMax->fetchColumn());
+        $reversos_creados = 0;
 
         $primerMov = $movimientos[0];
-
         $esCompra = in_array($primerMov['servicio_id'], [5, 6]); // 5=Compra USD, 6=Compra USDT
 
+        foreach ($movimientos as $mov) {
+            $monto_reverso = abs($mov['monto']);
+            $descripcion_reverso = 'REVERSO: ' . ($mov['descripcion'] ?? 'Movimiento #' . $mov['id']);
 
+            // 1. Crear movimiento reverso con cuentas invertidas y es_reverso=1
+            $stmtRev = $pdo->prepare("
+                INSERT INTO movimientos
+                (grupo_id, fecha, servicio_id, tipo, moneda, monto,
+                 cuenta_origen_id, cuenta_destino_id, cliente_id, promotor_id,
+                 proveedor_id, prestamista_id, paridad, descripcion,
+                 es_reverso, movimiento_original_id, estado, activo)
+                VALUES (?, CURDATE(), ?, 'ajuste', ?, ?,
+                        ?, ?, ?, ?,
+                        ?, ?, ?, ?,
+                        1, ?, 'activo', 1)
+            ");
+            $stmtRev->execute([
+                $nuevo_grupo, $mov['servicio_id'], $mov['moneda'], $monto_reverso,
+                $mov['cuenta_destino_id'], $mov['cuenta_origen_id'],
+                $mov['cliente_id'], $mov['promotor_id'],
+                $mov['proveedor_id'], $mov['prestamista_id'],
+                $mov['paridad'], $descripcion_reverso,
+                $mov['id']
+            ]);
+            $reverso_id = $pdo->lastInsertId();
+            $reversos_creados++;
 
-        if ($esCompra) {
+            // 2. Revertir saldos usando actualizarSaldoCuenta (respeta trigger)
+            $tipo = $mov['tipo'];
+            $moneda = $mov['moneda'];
 
-            foreach ($movimientos as $mov) {
-
-                // Revertir entrada de divisas al wallet
-
-                if ($mov['tipo'] === 'entrada' && $mov['cuenta_destino_id']
-
-                    && in_array($mov['moneda'], ['USD', 'USDT'])) {
-
-                    $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?")
-
-                        ->execute([$mov['monto'], $mov['cuenta_destino_id']]);
-
-                    // Revertir lotes FIFO creados por esta compra
-
-                    $pdo->prepare("UPDATE inventario_monedas SET activo = 0 WHERE movimiento_id = ?")
-
-                        ->execute([$mov['id']]);
-
-                }
-
-                // Revertir adeudo con proveedor (compra a crédito)
-
-                if ($mov['tipo'] === 'salida' && in_array($mov['moneda'], ['USD', 'USDT'])
-
-                    && $mov['cuenta_destino_id'] && $mov['proveedor_id']) {
-
-                    $valorMxnRevertir = $mov['monto'] * $mov['paridad'];
-
-                    $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ?, valor_mxn = valor_mxn - ? WHERE id = ?")
-
-                        ->execute([$mov['monto'], $valorMxnRevertir, $mov['cuenta_destino_id']]);
-
-                }
-
-                // Revertir pago de contado (salida MXN de cuenta de pago)
-
-                if ($mov['tipo'] === 'salida' && $mov['moneda'] === 'MXN' && $mov['cuenta_origen_id']) {
-
-                    $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual + ? WHERE id = ?")
-
-                        ->execute([$mov['monto'], $mov['cuenta_origen_id']]);
-
-                }
-
+            // ── COMPRA (servicio 5/6) ──────────────────────────────────
+            // Caso 1: Entrada USD/USDT a wallet
+            if ($esCompra && $tipo === 'entrada' && $mov['cuenta_destino_id'] && in_array($moneda, ['USD', 'USDT'])) {
+                actualizarSaldoCuenta($pdo, $mov['cuenta_destino_id'], $monto_reverso, 'salida', $reverso_id, $descripcion_reverso);
+                // Desactivar lote FIFO creado por esta compra
+                $pdo->prepare("UPDATE inventario_monedas SET activo = 0 WHERE movimiento_id = ?")->execute([$mov['id']]);
             }
 
-        } else {
-
-            // VENTA: revertir todos los efectos del nuevo modelo
-
-            $gananciaTotal = 0;
-
-
-
-            foreach ($movimientos as $mov) {
-
-                // Revertir entrada MXN a cuenta empresa + restaurar inventario FIFO
-
-                if ($mov['tipo'] === 'entrada' && $mov['moneda'] === 'MXN' && $mov['cuenta_destino_id']) {
-
-                    $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?")
-
-                        ->execute([$mov['monto'], $mov['cuenta_destino_id']]);
-
-
-
-                    // Restaurar inventario FIFO (consumos ligados a este movimiento MXN)
-
-                    $stmtConsumos = $pdo->prepare("
-
-                        SELECT ci.inventario_id, ci.cantidad_consumida, ci.ganancia
-
-                        FROM consumos_inventario ci WHERE ci.movimiento_id = ?
-
-                    ");
-
-                    $stmtConsumos->execute([$mov['id']]);
-
-                    foreach ($stmtConsumos->fetchAll(PDO::FETCH_ASSOC) as $consumo) {
-
-                        $pdo->prepare("UPDATE inventario_monedas SET cantidad_restante = cantidad_restante + ? WHERE id = ?")
-
-                            ->execute([$consumo['cantidad_consumida'], $consumo['inventario_id']]);
-
-                        $gananciaTotal += floatval($consumo['ganancia']);
-
-                    }
-
-
-
-                    // Backward compat: cancelar deudas_clientes si existieran (modelo anterior)
-
-                    $pdo->prepare("UPDATE deudas_clientes SET activo = 0 WHERE movimiento_venta_id = ? AND estado = 'pendiente'")
-
-                        ->execute([$mov['id']]);
-
-                }
-
-
-
-                // Revertir salida de divisas del wallet (nuevo modelo)
-
-                if ($mov['tipo'] === 'salida' && in_array($mov['moneda'], ['USD', 'USDT'])
-
-                    && $mov['cuenta_origen_id']) {
-
-                    $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual + ? WHERE id = ?")
-
-                        ->execute([$mov['monto'], $mov['cuenta_origen_id']]);
-
-                }
-
+            // Caso 2: Salida USD/USDT a proveedor (compra a crédito)
+            if ($esCompra && $tipo === 'salida' && in_array($moneda, ['USD', 'USDT']) && $mov['cuenta_destino_id'] && $mov['proveedor_id']) {
+                actualizarSaldoCuenta($pdo, $mov['cuenta_destino_id'], $monto_reverso, 'salida', $reverso_id, $descripcion_reverso);
+                // Revertir valor_mxn adicional (no cubierto por actualizarSaldoCuenta)
+                $valorMxn = round($mov['monto'] * $mov['paridad'], 2);
+                $pdo->prepare("UPDATE cuentas SET valor_mxn = GREATEST(0, valor_mxn - ?) WHERE id = ?")
+                    ->execute([$valorMxn, $mov['cuenta_destino_id']]);
             }
 
-
-
-            // Revertir ganancia de Utilidades AMIRI
-
-            if (abs($gananciaTotal) > 0.001) {
-
-                $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = 1")
-
-                    ->execute([$gananciaTotal]);
-
+            // Caso 3: Salida MXN por pago de contado (Compra)
+            if ($esCompra && $tipo === 'salida' && $moneda === 'MXN' && $mov['cuenta_origen_id']) {
+                actualizarSaldoCuenta($pdo, $mov['cuenta_origen_id'], $monto_reverso, 'entrada', $reverso_id, $descripcion_reverso);
             }
 
+            // ── VENTA (servicio 2/3) ───────────────────────────────────
+            // Caso 4: Entrada MXN a cuenta empresa + restaurar FIFO
+            if (!$esCompra && $tipo === 'entrada' && $moneda === 'MXN' && $mov['cuenta_destino_id']) {
+                actualizarSaldoCuenta($pdo, $mov['cuenta_destino_id'], $monto_reverso, 'salida', $reverso_id, $descripcion_reverso);
+                // Restaurar inventario FIFO (consumos ligados a este movimiento MXN)
+                $stmtConsumos = $pdo->prepare("
+                    SELECT ci.inventario_id, ci.cantidad_consumida
+                    FROM consumos_inventario ci WHERE ci.movimiento_id = ?
+                ");
+                $stmtConsumos->execute([$mov['id']]);
+                foreach ($stmtConsumos->fetchAll(PDO::FETCH_ASSOC) as $consumo) {
+                    $pdo->prepare("UPDATE inventario_monedas SET cantidad_restante = cantidad_restante + ? WHERE id = ?")
+                        ->execute([$consumo['cantidad_consumida'], $consumo['inventario_id']]);
+                }
+                // Backward compat: cancelar deudas_clientes (modelo anterior)
+                $pdo->prepare("UPDATE deudas_clientes SET activo = 0 WHERE movimiento_venta_id = ? AND estado = 'pendiente'")
+                    ->execute([$mov['id']]);
+            }
+
+            // Caso 5: Salida USD/USDT de wallet
+            if (!$esCompra && $tipo === 'salida' && in_array($moneda, ['USD', 'USDT']) && $mov['cuenta_origen_id']) {
+                actualizarSaldoCuenta($pdo, $mov['cuenta_origen_id'], $monto_reverso, 'entrada', $reverso_id, $descripcion_reverso);
+            }
+
+            // Caso 6: Comisión (entrada a cuenta destino — Utilidad o Promotor)
+            if (!$esCompra && $tipo === 'comision' && $mov['cuenta_destino_id']) {
+                actualizarSaldoCuenta($pdo, $mov['cuenta_destino_id'], $monto_reverso, 'salida', $reverso_id, $descripcion_reverso);
+            }
+
+            // 3. Marcar movimiento original como anulado
+            $pdo->prepare("UPDATE movimientos SET estado = 'anulado', activo = 0 WHERE id = ?")->execute([$mov['id']]);
         }
-
-
-
-        // Marcar movimientos como inactivos
-
-        $pdo->prepare("UPDATE movimientos SET activo = 0 WHERE grupo_id = ?")->execute([$grupo_id]);
-
-        
 
         // Registrar auditoría
-
         registrarAuditoria($pdo, [
-
             'accion' => 'DELETE',
-
             'modulo' => 'flujo_divisas',
-
             'tabla' => 'movimientos',
-
             'registro_id' => $grupo_id,
-
-            'descripcion' => "Eliminación de movimientos grupo #$grupo_id"
-
+            'descripcion' => "Reversión del grupo #$grupo_id ($reversos_creados movimientos)"
         ]);
 
-        
-
         $pdo->commit();
-
-        
-
-        echo json_encode(['success' => true, 'message' => 'Movimientos eliminados']);
-
-        
+        echo json_encode(['success' => true, 'message' => "Grupo revertido correctamente ($reversos_creados reversos)"]);
 
     } catch (Exception $e) {
-
         if ($pdo->inTransaction()) {
-
             $pdo->rollBack();
-
         }
-
         http_response_code(500);
-
         echo json_encode(['error' => $e->getMessage()]);
-
     }
-
     exit;
-
 }
 
 

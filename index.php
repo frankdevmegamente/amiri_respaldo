@@ -311,6 +311,61 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
               </div>
             </div>
           </div>
+          <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+              <h5 class="mb-0"><i class="ti ti-currency-tenge"></i> FIFO USDT</h5>
+              <ul class="nav nav-tabs card-header-tabs" id="fifoTabs">
+                <li class="nav-item">
+                  <a class="nav-link text-white active" data-bs-toggle="tab" href="#lotesTab">Lotes de Compra</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link text-white" data-bs-toggle="tab" href="#ventasTab">Ventas FIFO</a>
+                </li>
+              </ul>
+            </div>
+            <div class="card-body p-4">
+              <div class="tab-content">
+                <div class="tab-pane fade show active" id="lotesTab">
+                  <div class="table-responsive">
+                    <table class="table table-hover table-striped" id="lotesTable">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Lote</th>
+                          <th>Fecha Compra</th>
+                          <th>USDT Comprados</th>
+                          <th>Restante</th>
+                          <th>Precio Compra</th>
+                          <th>Total MXN</th>
+                          <th>Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="ventasTab">
+                  <div class="table-responsive">
+                    <table class="table table-hover" id="ventasTable">
+                      <thead class="table-dark">
+                        <tr>
+                          <th>Fecha Venta</th>
+                          <th>Descripción</th>
+                          <th>USDT Vendidos</th>
+                          <th>Total MXN</th>
+                          <th>Ganancia</th>
+                          <th>Detalle FIFO</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="text-center py-3" id="fifoLoading">
+                <span class="spinner-border spinner-border-sm me-2"></span>Cargando datos FIFO...
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -918,6 +973,86 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     // inicial
 
     cargarTipoDeCambioYCripto();
+
+    // ========================================
+
+    // FIFO USDT
+
+    // ========================================
+
+    async function cargarFifoUsdt() {
+      $('#fifoLoading').show();
+      try {
+        const resp = await fetch('api/dashboard.php?tipo=fifo_usdt');
+        const data = await resp.json();
+        $('#fifoLoading').hide();
+
+        if (data.error) { console.error('FIFO error:', data.error); return; }
+
+        // Render Lotes
+        const lotesTbody = $('#lotesTable tbody');
+        lotesTbody.empty();
+        data.lotes.forEach(l => {
+          const restante = parseFloat(l.cantidad_restante);
+          const original = parseFloat(l.cantidad_original);
+          let estado, badgeClass;
+          if (restante <= 0) {
+            estado = 'Consumido';
+            badgeClass = 'bg-success';
+          } else if (restante >= original) {
+            estado = 'Disponible';
+            badgeClass = 'bg-primary';
+          } else {
+            estado = 'Parcial';
+            badgeClass = 'bg-warning text-dark';
+          }
+          lotesTbody.append(`<tr>
+            <td>#${l.id}</td>
+            <td>${l.fecha.split(' ')[0]}</td>
+            <td class="text-end">${original.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+            <td class="text-end">${restante.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+            <td class="text-end">$${parseFloat(l.precio_compra).toFixed(2)}</td>
+            <td class="text-end">${formatoMoneda(l.total_mxn)}</td>
+            <td><span class="badge ${badgeClass}">${estado}</span></td>
+          </tr>`);
+        });
+
+        // Render Ventas
+        const ventasTbody = $('#ventasTable tbody');
+        ventasTbody.empty();
+        data.ventas.forEach(v => {
+          const gananciaClass = v.ganancia_total >= 0 ? 'text-success' : 'text-danger';
+          let consumosHtml = '<table class="table table-sm table-borderless mb-0" style="font-size:0.85em">';
+          consumosHtml += '<tr><th>Lote</th><th>Fecha Lote</th><th>USDT</th><th>Precio Compra</th><th>Precio Venta</th><th>Ganancia</th></tr>';
+          v.consumos.forEach(c => {
+            const gClass = c.ganancia >= 0 ? 'text-success' : 'text-danger';
+            consumosHtml += `<tr>
+              <td>#${c.lote_id}</td>
+              <td>${c.lote_fecha.split(' ')[0]}</td>
+              <td class="text-end">${c.cantidad.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+              <td class="text-end">$${c.precio_compra.toFixed(2)}</td>
+              <td class="text-end">$${c.precio_venta.toFixed(2)}</td>
+              <td class="text-end ${gClass}">${formatoMoneda(c.ganancia)}</td>
+            </tr>`;
+          });
+          consumosHtml += '</table>';
+
+          ventasTbody.append(`<tr>
+            <td>${v.fecha.split(' ')[0]}</td>
+            <td>${v.descripcion}</td>
+            <td class="text-end">${v.total_usdt.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}</td>
+            <td class="text-end">${formatoMoneda(v.total_mxn)}</td>
+            <td class="text-end ${gananciaClass} fw-bold">${formatoMoneda(v.ganancia_total)}</td>
+            <td>${consumosHtml}</td>
+          </tr>`);
+        });
+      } catch (err) {
+        console.error('Error cargando FIFO:', err);
+        $('#fifoLoading').html('<span class="text-danger">Error al cargar datos FIFO</span>');
+      }
+    }
+
+    cargarFifoUsdt();
 
   </script>
 

@@ -189,10 +189,24 @@ if (!isset($pagina_actual)) {
 
           </li>
 
-      
+          <li class="sidebar-item <?= in_array($pagina_actual, ['importar-sql.php']) ? 'active' : '' ?>">
+
+            <a class="sidebar-link" href="importar-sql.php" aria-expanded="false">
+
+              <i class="ti ti-database-import"></i>
+
+              <span class="hide-menu">Importar SQL</span>
+
+            </a>
+
+          </li>
+
+       
 
           
- 
+
+         
+  
         
         <li class="sidebar-item">
     <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
@@ -305,6 +319,32 @@ if (!isset($pagina_actual)) {
 
 </aside>
 
+<!-- Modal de sesión próxima a expirar -->
+<div class="modal fade" id="modalSessionTimeout" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalSessionTimeoutLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title w-100 text-center" id="modalSessionTimeoutLabel">
+          <i class="ti ti-clock-hour-4" style="font-size:3rem;color:#ffc107;"></i>
+        </h5>
+      </div>
+      <div class="modal-body text-center pt-3">
+        <h4 class="fw-bold mb-3">Sesi&oacute;n pr&oacute;xima a expirar</h4>
+        <p class="text-muted mb-0">Has estado 3 horas sin actividad en el sistema.</p>
+        <p class="text-muted">¿Deseas continuar utilizando la plataforma?</p>
+      </div>
+      <div class="modal-footer border-0 justify-content-center pt-0">
+        <button id="btnExtendSession" class="btn btn-primary btn-lg px-5">
+          <i class="ti ti-check me-2"></i>S&iacute;, continuar
+        </button>
+        <button id="btnLogoutSession" class="btn btn-outline-danger btn-lg px-4">
+          <i class="ti ti-logout me-2"></i>Cerrar sesi&oacute;n
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <button type="button" class="sidebar-overlay d-xl-none sidebartoggler" aria-label="Cerrar menú"></button>
 
 
@@ -372,3 +412,5 @@ if (!isset($pagina_actual)) {
     });
   })();
 </script>
+
+<script src="src/assets/js/session-timeout.js"></script>

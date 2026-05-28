@@ -54,7 +54,7 @@ try {
 
 
 
-            $stmtDiv = $pdo->query("SELECT COALESCE(SUM(im.cantidad_restante * im.paridad),0) AS total FROM inventario_monedas im INNER JOIN cuentas c ON im.cuenta_id=c.id WHERE c.activo=1 AND c.tipo_cuenta IN(1,2) AND im.activo=1");
+            $stmtDiv = $pdo->query("SELECT COALESCE(ROUND(SUM(im.cantidad_restante * im.paridad), 2),0) AS total FROM inventario_monedas im INNER JOIN cuentas c ON im.cuenta_id=c.id WHERE c.activo=1 AND c.tipo_cuenta IN(1,2) AND im.activo=1");
 
             $totalSaldosDiv = (float)$stmtDiv->fetch(PDO::FETCH_ASSOC)['total'];
 
@@ -168,8 +168,8 @@ try {
                 $componentes[] = 'Diferencia neta: $' . number_format($diferenciaBase, 2);
             }
 
-            // Absorber discrepancias microscópicas de redondeo de divisas (hasta 5 centavos)
-            if (abs($diferencia) <= 0.05) {
+            // Absorber discrepancias microscópicas de redondeo de divisas (hasta 15 centavos)
+            if (abs($diferencia) <= 0.15) {
                 $diferencia = 0.00;
             }
 

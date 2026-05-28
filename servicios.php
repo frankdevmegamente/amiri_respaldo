@@ -101,7 +101,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
                             <div class="card">
 
-                                <div class="card-body">
+                                <div class="card-body table-responsive">
 
                                     <table id="tablaServicios" class="table table-striped" style="width:100%">
 
@@ -315,6 +315,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
                 ],
 
+                scrollX: true,
                 order: [[0, 'desc']]
 
             });

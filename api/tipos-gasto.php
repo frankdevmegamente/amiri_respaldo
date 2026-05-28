@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         } else {
 
-            $stmt = $pdo->query("SELECT * FROM categorias_gasto ORDER BY nombre");
+            $stmt = $pdo->query("SELECT * FROM categorias_gasto WHERE activo = 1 ORDER BY nombre");
 
             return $stmt->fetchAll();
 

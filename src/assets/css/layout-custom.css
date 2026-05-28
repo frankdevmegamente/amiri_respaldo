@@ -368,3 +368,28 @@ body.loading #main-wrapper {
     transform: translateX(0);
   }
 }
+
+/* ============================================
+   MODAL DE SESIÓN PRÓXIMA A EXPIRAR
+   ============================================ */
+#modalSessionTimeout .modal-title .ti-clock-hour-4 {
+  display: block;
+  margin: 0 auto;
+}
+
+#modalSessionTimeout .modal-body h4 {
+  font-size: 1.35rem;
+}
+
+#modalSessionTimeout .modal-footer .btn {
+  min-width: 180px;
+}
+
+/* Asegurar que el modal esté por encima de todo */
+#modalSessionTimeout {
+  z-index: 99999;
+}
+
+.modal-backdrop + .modal-backdrop {
+  z-index: 99998;
+}

@@ -104,12 +104,12 @@ try {
             
             // 5. Ganancia REAL en divisas (utilidad FIFO exacta desglosada)
             // Utilidad de Dólares Físicos (Servicio ID 2 = Venta de USD)
-            $stmtUSD = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 2 AND tipo = 'comision' AND fecha BETWEEN ? AND ? AND activo = 1");
+            $stmtUSD = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 2 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
             $stmtUSD->execute([$fechaInicio, $fechaFin]);
             $gananciaUSD = (float)$stmtUSD->fetchColumn();
 
             // Utilidad de USDT (Servicio ID 3 = Venta de USDT)
-            $stmtUSDT = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 3 AND tipo = 'comision' AND fecha BETWEEN ? AND ? AND activo = 1");
+            $stmtUSDT = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 3 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
             $stmtUSDT->execute([$fechaInicio, $fechaFin]);
             $gananciaUSDT = (float)$stmtUSDT->fetchColumn();
 
@@ -132,10 +132,34 @@ try {
             $resultado['gastos_fijos'] = (float)$gastos['gastos_fijos'];
             $resultado['gastos_variables'] = (float)$gastos['gastos_variables'];
 
-            // 7. Totales calculados (solo comisiones cobradas en ganancia real)
-            $resultado['ganancia_bruta'] = $resultado['comisiones_amiri_cobradas'] + $resultado['ganancia_divisas_total'];
+            // 6b. Saldo acumulado de Utilidades AMIRI
+            $stmtUtil = $pdo->query("SELECT COALESCE(SUM(saldo_actual), 0) as total FROM cuentas WHERE tipo_cuenta = 3 AND activo = 1");
+            $resultado['utilidades_acumuladas'] = (float)$stmtUtil->fetchColumn();
+
+            // 7. Totales calculados (devengo: todas las comisiones, no solo cobradas)
+            $resultado['ganancia_bruta'] = $resultado['comisiones_amiri'] + $resultado['ganancia_divisas_total'];
             $resultado['ganancia_bruta_por_cobrar'] = $resultado['comisiones_amiri_por_cobrar'];
-            $resultado['ganancia_neta'] = $resultado['ganancia_bruta'] - $resultado['gastos_total'];
+            $resultado['resultado_bruta_menos_fijos'] = $resultado['ganancia_bruta'] - $resultado['gastos_fijos'];
+            $resultado['resultado_operativo_real'] = $resultado['ganancia_bruta'] - $resultado['gastos_total'];
+            $resultado['ganancia_neta'] = $resultado['resultado_operativo_real'];
+
+            // Metadata explicativa para tooltips en frontend
+            $resultado['_explicacion'] = [
+                'comisiones_amiri' => 'Suma de la columna comision_amiri en la tabla deudas_clientes (todos los estados: pagado + pendiente + parcial). Representa la comisión que AMIRI retiene por cada venta de efectivo.',
+                'comisiones_amiri_cobradas' => 'Suma de comision_amiri solo de registros con estado = pagado en deudas_clientes.',
+                'comisiones_amiri_por_cobrar' => 'Suma de comision_amiri de registros con estado pendiente o parcial — comisiones generadas pero aún no cobradas.',
+                'comisiones_promotores' => 'Suma de comision_promotor en deudas_clientes. Es la parte de la comisión que se paga al promotor que captó la venta.',
+                'ganancia_usd' => 'Utilidad FIFO generada por la compra/venta de Dólares Físicos (servicio Venta USD). Corresponde a movimientos tipo comision del servicio_id = 2.',
+                'ganancia_usdt' => 'Utilidad FIFO generada por la compra/venta de USDT (servicio Venta USDT). Corresponde a movimientos tipo comision del servicio_id = 3.',
+                'ganancia_divisas_total' => 'Suma de ganancia USD + ganancia USDT. Representa la utilidad total generada por operaciones de divisas (FIFO).',
+                'ventas_efectivo_total' => 'Suma de monto_total en deudas_clientes activas. Representa el volumen total de ventas de efectivo realizadas en el período.',
+                'ventas_efectivo_cantidad' => 'Número total de operaciones de venta de efectivo registradas en el período.',
+                'gastos_total' => 'Suma de todos los gastos operativos registrados en la tabla gastos (fijos + variables).',
+                'gastos_fijos' => 'Gastos operativos clasificados como fijos (renta, sueldos, servicios básicos, etc.).',
+                'gastos_variables' => 'Gastos operativos clasificados como variables (comisiones externas, transportes, etc.).',
+                'ganancia_bruta' => 'Resultado operativo antes de gastos. Fórmula: Comisiones AMIRI (devengadas) + Ganancia Divisas (FIFO). Representa el ingreso total generado por la operación.',
+                'resultado_operativo_real' => 'Ganancia o pérdida real del período. Fórmula: Ganancia Bruta - Gastos Totales. Refleja el resultado neto de las operaciones del negocio.',
+            ];
             
             echo json_encode($resultado);
             break;

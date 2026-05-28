@@ -520,6 +520,8 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
                 ],
 
+                scrollX: true,
+
                 order: [[0, 'desc']]
 
             });
@@ -757,6 +759,7 @@ $('#tablaPromotores').on('click', '.detalles', function() {
                 }
             }
         ],
+        scrollX: true,
         order: [[0, 'desc']], // Ordenar por fecha más reciente
         language: {
             url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' // Español

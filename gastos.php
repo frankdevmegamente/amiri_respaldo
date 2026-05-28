@@ -212,13 +212,14 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
-                                <div class="card-body p-4">
+                                <div class="card-body p-4 table-responsive">
                                     <table id="tablaGastos" class="table table-hover align-middle w-100">
                                         <thead>
     <tr>
         <th>Fecha</th>
         <th>Cuenta</th>
-        <th>Clasificación</th> <th>Tipo de Gasto</th>
+        <th>Tipo de Gasto</th>
+        <th>Clasificación</th>
         <th>Monto</th>
         <th>Concepto</th>
     </tr>
@@ -382,13 +383,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                     select.empty().append('<option value="">-- Selecciona un tipo --</option>');
 
-                    tipos.forEach(tipo => {
-
-                        // ✅ Ya no se verifica si está activo
-
-                        select.append(`<option value="${tipo.id}">${tipo.nombre}</option>`);
-
-                    });
+                    tipos.forEach(t => select.append(`<option value="${t.id}">${t.nombre}</option>`));
 
                 });
 
@@ -407,11 +402,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         title: 'Fecha',
                         render: function(data, type, row) {
                             if (!data) return 'N/A';
-                            
-                            // 1. Extraemos la fecha exacta ignorando zonas horarias
+                            if (type === 'sort') return data;
                             const soloFecha = data.split(' ')[0]; 
                             const partes = soloFecha.split('-'); 
-                            const fechaOperacion = `${partes[2]}/${partes[1]}/${partes[0]}`; 
+                            const fechaOperacion = `${partes[2]}/${partes[1]}/${partes[0]}`;
                             
                             // 2. La fecha de captura exacta
                             let infoExtra = '';
@@ -442,6 +436,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     },
                     { data: 'concepto' }
                 ],
+                scrollX: true,
                 order: [
                     [0, 'desc']
                 ],

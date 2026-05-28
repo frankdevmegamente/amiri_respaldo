@@ -432,7 +432,79 @@ try {
 
     }
 
+    // ============================================
 
+    // ENDPOINT: FIFO USDT
+
+    // ============================================
+
+    if (isset($_GET['tipo']) && $_GET['tipo'] === 'fifo_usdt') {
+
+        // 1. Lotes de compra USDT
+        $stmt = $pdo->prepare("
+            SELECT im.id, im.fecha, im.cantidad_original, im.cantidad_restante,
+                   im.paridad as precio_compra,
+                   ROUND(im.cantidad_original * im.paridad, 2) as total_mxn,
+                   m.descripcion
+            FROM inventario_monedas im
+            JOIN movimientos m ON im.movimiento_id = m.id
+            WHERE im.moneda = 'USDT' AND im.activo = 1
+            ORDER BY im.fecha ASC, im.id ASC
+        ");
+        $stmt->execute();
+        $lotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // 2. Ventas con consumos FIFO
+        $stmt = $pdo->prepare("
+            SELECT ci.movimiento_id as venta_id, mv.fecha as venta_fecha,
+                   mv.descripcion as venta_desc,
+                   ci.inventario_id as lote_id, ci.cantidad_consumida,
+                   ci.paridad_compra, ci.paridad_venta, ci.ganancia,
+                   im.fecha as lote_fecha
+            FROM consumos_inventario ci
+            JOIN inventario_monedas im ON ci.inventario_id = im.id
+            JOIN movimientos mv ON ci.movimiento_id = mv.id
+            WHERE im.moneda = 'USDT' AND mv.activo = 1
+            ORDER BY mv.fecha ASC, ci.inventario_id ASC
+        ");
+        $stmt->execute();
+        $consumos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Agrupar consumos por venta
+        $ventas = [];
+        foreach ($consumos as $c) {
+            $vid = $c['venta_id'];
+            if (!isset($ventas[$vid])) {
+                $ventas[$vid] = [
+                    'id' => $vid,
+                    'fecha' => $c['venta_fecha'],
+                    'descripcion' => $c['venta_desc'],
+                    'total_usdt' => 0,
+                    'total_mxn' => 0,
+                    'ganancia_total' => 0,
+                    'consumos' => []
+                ];
+            }
+            $ventas[$vid]['consumos'][] = [
+                'lote_id' => $c['lote_id'],
+                'cantidad' => (float)$c['cantidad_consumida'],
+                'precio_compra' => (float)$c['paridad_compra'],
+                'precio_venta' => (float)$c['paridad_venta'],
+                'ganancia' => (float)$c['ganancia'],
+                'lote_fecha' => $c['lote_fecha']
+            ];
+            $ventas[$vid]['total_usdt'] += (float)$c['cantidad_consumida'];
+            $ventas[$vid]['total_mxn'] += (float)$c['cantidad_consumida'] * (float)$c['paridad_venta'];
+            $ventas[$vid]['ganancia_total'] += (float)$c['ganancia'];
+        }
+        $ventas = array_values($ventas);
+
+        echo json_encode([
+            'lotes' => $lotes,
+            'ventas' => $ventas
+        ], JSON_NUMERIC_CHECK | JSON_UNESCAPED_UNICODE);
+        exit;
+    }
 
     // ============================================
 

@@ -385,7 +385,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                                 <div class="card-header header-saldos bg-success text-white fw-bold fs-5 py-3">
     <span><i class="ti ti-wallet"></i> SALDOS BANCARIOS</span>
 </div>
-                                <div class="card-body p-0" style="max-height: 500px; overflow-y: auto;">
+                                <div class="card-body p-0" style="max-height: 500px; overflow-y: auto; overflow-x: auto;">
                                     <table class="table table-sm table-striped mb-0">
                                         <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">
                                             <tr>
@@ -407,7 +407,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                                 <div class="card-header header-capital bg-warning text-white fw-bold fs-5 py-3">
     <span><i class="ti ti-building-bank"></i> CAPITAL</span>
 </div>
-                                <div class="card-body p-0" style="max-height: 500px; overflow-y: auto;">
+                                <div class="card-body p-0" style="max-height: 500px; overflow-y: auto; overflow-x: auto;">
                                     <table class="table table-sm table-striped mb-0">
                                         <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">
                                             <tr>
@@ -429,7 +429,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                                 <div class="card-header header-prestamos bg-danger text-white fw-bold fs-5 py-3">
     <span><i class="ti ti-coin"></i> PRÉSTAMOS / PROVEEDORES</span>
 </div>
-                                <div class="card-body p-0" style="max-height: 500px; overflow-y: auto;">
+                                <div class="card-body p-0" style="max-height: 500px; overflow-y: auto; overflow-x: auto;">
                                     <table class="table table-sm table-striped mb-0">
                                         <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">
                                             <tr>
@@ -483,7 +483,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                                         </li>
                                     </ul>
                                 </div>
-                                <div class="card-body p-4">
+                                <div class="card-body p-4 table-responsive">
                                     <table id="tablaFlujo" class="table table-hover align-middle w-100">
                                         <thead>
                                             <tr>
@@ -891,6 +891,35 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
         }
 
+        function buildEfectosReverso(res) {
+          var html = '<hr><h6 style="color:#ffc107;font-weight:600;margin-top:14px;"><i class="ti ti-list-details"></i> Efectos del Reverso:</h6>';
+          html += '<p class="text-muted" style="font-size:.85rem;margin-bottom:10px;">Se crear\u00e1n <strong>' + (res.total_movimientos_reverso || 0) + '</strong> movimiento(s) de reverso (tipo: ajuste) que afectar\u00e1n las siguientes cuentas:</p>';
+          if (res.efectos && res.efectos.length > 0) {
+            html += '<div style="border-radius:8px;padding:8px 12px;">';
+            $.each(res.efectos, function(i, e) {
+              var diffClass = e.diferencia >= 0 ? 'text-success' : 'text-danger';
+              var diffSign = e.diferencia >= 0 ? '+' : '';
+              html += '<div class="d-flex justify-content-between align-items-center py-1 border-bottom" style="font-size:.85rem;">' +
+                '<div><strong>' + (e.cuenta_nombre || '-') + '</strong></div>' +
+                '<div class="' + diffClass + '" style="font-weight:600;">$' + formatMXN(e.saldo_anterior) + ' <i class="ti ti-arrow-right"></i> $' + formatMXN(e.saldo_nuevo) + ' <span class="' + diffClass + '">(' + diffSign + '$' + formatMXN(Math.abs(e.diferencia)) + ')</span></div></div>';
+            });
+            html += '</div>';
+          }
+          if (res.deudas_afectadas && res.deudas_afectadas.length > 0) {
+            $.each(res.deudas_afectadas, function(i, d) {
+              html += '<div class="mt-2 bg-warning bg-opacity-10" style="border:1px solid rgba(255,193,7,0.2);border-radius:8px;padding:10px;font-size:.85rem;">';
+              html += '<strong><i class="ti ti-refresh"></i> ' + (d.entidad || '') + ' #' + d.id + ':</strong><br>';
+              if (d.accion) {
+                html += d.accion;
+              } else {
+                html += 'monto_pagado: <strong>$' + formatMXN(d.monto_pagado_anterior) + '</strong> <i class="ti ti-arrow-right"></i> <strong>$' + formatMXN(d.monto_pagado_nuevo) + '</strong> | ';
+                html += 'estado: <strong>' + (d.estado_anterior || '') + '</strong> <i class="ti ti-arrow-right"></i> <strong>' + (d.estado_nuevo || '') + '</strong>';
+              }
+              html += '</div>';
+            });
+          }
+          return html;
+        }
 
 
         // ─── Switch: mostrar en MXN o en moneda nativa ───────────────────────
@@ -999,7 +1028,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                     title: 'Movimiento',
                     width: '100px',
                     render: function (data, type, row) {
-                        let html = '<div style="font-size:0.85rem; line-height: 1.5; min-width: 280px;">';
+                        let html = '<div style="font-size:0.85rem; line-height: 1.5; min-width: 150px;">';
                         
                         // 1. LA PERSONA (A quién se le paga o quién nos paga)
                         let personaHtml = '';
@@ -1063,7 +1092,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
             order: [[1, 'desc']],
 
-            responsive: true
+            scrollX: true
 
         });
 
@@ -2779,6 +2808,8 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                         </table>
 
                     </div>
+
+                    ${res.efectos ? buildEfectosReverso(res) : ''}
 
                 `);
 

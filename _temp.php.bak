@@ -1,0 +1,9 @@
+<?php
+require_once __DIR__ . '/src/config/db.php';
+$p = getPDO();
+echo "=== movimientos ===\n";
+$s = $p->query('DESCRIBE movimientos');
+foreach ($s as $r) echo $r['Field'] . ' ' . $r['Type'] . "\n";
+echo "\n=== consumos_inventario ===\n";
+$s = $p->query('DESCRIBE consumos_inventario');
+foreach ($s as $r) echo $r['Field'] . ' ' . $r['Type'] . "\n";

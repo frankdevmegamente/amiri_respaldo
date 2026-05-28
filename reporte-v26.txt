@@ -1,0 +1,100 @@
+======================================================================
+  REPORTE COMPLETO - guiaspar_amiri_db_sandbox v26
+  vs amiri_sandbox_corregida (con correcciones)
+  Fecha: 19/05/2026
+======================================================================
+
+1. RESUMEN GENERAL
+------------------
+Indicador                      v26 (NUEVA)      Corregida      Diferencia
+─────────────────────────────────────────────────────────────────────
+Comisiones Amiri activas       $142,774.45     $62,793.24     +$79,981.21 ❌
+Comisiones Amiri erróneas      3                0              ❌
+FIFO Ganancias                 $95,460.90      $65,836.35     +$29,624.55
+Spread (C-V-I)                 -$103,901.86    $0.00          ❌ GRAVE
+Wallet (cuenta 51)             $142,114.22     $142,114.22    ✅
+Inventario restante            $142,114.22     $142,114.22    ✅
+Lotes inventario               18              18             ✅
+Consumos inventario            49              42             -7 duplicados
+Ecuación contable              $0.05           $0.00          ⚠️ casi 0
+Utilidades (cuenta 1)          -$8,896.47      -$8,484.82     -$411.65
+Deudas clientes pendientes     4 clientes      3 clientes     ❌
+Promotores con saldo           2               3              ❌
+Gastos totales                 $227,428.33     $227,016.73    +$411.60
+
+2. COMISIONES - ERRORES (B2)
+-----------------------------
+En v26 hay 3 registros con comisión incorrecta vs 0 en corregida:
+
+ ID  Cliente           Monto    Comisión Actual  Debería Ser   Diferencia
+ ─── ───────────────── ───────  ─────────────── ───────────── ──────────
+  2  Cliente Cancun    213,000    $1,448.40       $4,260.00    -$2,811.60
+  3  Público General    83,633   $83,633.40        $836.33    +$82,797.07
+  8  Cliente Cancun    21,300      $421.74          $426.00      -$4.26
+
+3. FIFO - CONSUMOS DUPLICADOS (B4)
+-----------------------------------
+En v26 hay 49 consumos vs 42 en corregida (7 de más):
+
+  Lote  Original  Consumos  Total Consumido  Exceso
+  ────  ────────  ────────  ───────────────  ─────────
+  15   165,000    23        202,342.35        +37,342.35
+  12    50,827     6         56,222.14         +5,395.00
+   1    14,487     3         21,031.89         +6,544.52
+   4    20,000     2         40,000.00        +20,000.00
+   5    34,615     2         69,229.58        +34,614.79
+  13     2,595     3          2,599.85             +4.80
+  19   100,757     2          1,216.05              0 🆗
+
+  SPREAD: Compras(467,890.88) - Ventas(429,678.51) - Inventario(142,114.22)
+        = -$103,901.86 (DEBE SER $0.00)
+
+4. DEUDAS CLIENTES PENDIENTES (B5)
+-----------------------------------
+v26 tiene 4 clientes con $968,292.40 pendiente:
+  - Raul Ortiz:          $710,660.00
+  - Miguel Cisneros:     $160,000.00
+  - Publico En General:   $83,633.40 ← ERRÓNEO (comisión mal puesta)
+  - Osvaldo Vázquez:      $13,999.00
+
+vs corregida: 3 clientes, $884,659.00 (sin Público General)
+
+5. PROMOTORES (B5)
+-------------------
+v26:
+  - Ernesto Sandoval:     $318.84
+  - Adrian Sandoval:      $70.00
+  - Kike Rizo:            $0.00 (no registrado aún)
+
+vs corregida:
+  - Kike Rizo:          $3,553.30 (estaba registrado)
+
+6. DEUDAS EMPRESA (B6)
+-----------------------
+  - Hyperion:          $2,283,426.84
+  - Diego Alfredo H:     $898,000.00
+  - Yuyu:               $244,850.00
+  Total OBLIGACIONES: $3,426,276.84
+
+7. GASTOS (B7)
+---------------
+v26: $227,428.33 vs corregida: $227,016.73 (diferencia +$411.60)
+
+8. ECUACIÓN CONTABLE (B3)
+---------------------------
+  SALDOS:  $4,045,108.37
+  CAPITAL:   $863,681.48
+  OBLIG:   $3,181,426.84 ← MENOR que corregida (diferencia por gastos)
+  DIF:            $0.05
+
+────────────────────────────────────────────────────────────────────
+
+PROXIMOS PASOS PARA CORREGIR v26:
+1. Eliminar consumos_inventario duplicados (7 registros)
+2. Ajustar cantidades en inventario_monedas (lotes 12, 15)
+3. Corregir comisiones erróneas (IDs 2, 3, 8)
+4. Recalcular ganancia FIFO
+5. Actualizar wallet si es necesario
+6. Ajustar Utilidades (cuenta 1) por diferencia
+7. Verificar ecuación contable = $0.00
+8. Aplicar fix código FIFO en PHP

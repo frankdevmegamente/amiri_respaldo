@@ -115,6 +115,7 @@ try {
 
 
         // Actualizar saldo de la cuenta seleccionada
+        $pdo->exec("SET @hyperion_saldo_auth = 1");
         $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?")
             ->execute([$saldoNuevo, $_POST['cuenta_id']]);
         
@@ -212,6 +213,7 @@ try {
             ]);
             $movCapitalId = $pdo->lastInsertId();
 
+            $pdo->exec("SET @hyperion_saldo_auth = 1");
             $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?")
                 ->execute([$saldoCapitalNuevo, $capital_id]);
 

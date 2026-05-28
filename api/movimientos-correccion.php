@@ -290,7 +290,97 @@ try {
 
                 $grupo = $stmtGrupo->fetchAll(PDO::FETCH_ASSOC);
 
-                echo json_encode(['success' => true, 'movimiento' => $ultimo, 'grupo' => $grupo]);
+                // Pre-calcular efectos del reverso
+                $cuentasMap = [];
+                $deudasAfectadas = [];
+
+                foreach ($grupo as $mov) {
+                    $montoAbs = abs((float)$mov['monto']);
+
+                    // Efecto en cuenta origen
+                    if (!empty($mov['cuenta_origen_id'])) {
+                        $tipoRev = ($mov['tipo'] === 'salida' || $mov['tipo'] === 'traspaso') ? 'entrada' : 'salida';
+                        $cid = $mov['cuenta_origen_id'];
+                        if (!isset($cuentasMap[$cid])) {
+                            $sC = $pdo->prepare("SELECT nombre, saldo_actual FROM cuentas WHERE id = ?");
+                            $sC->execute([$cid]);
+                            $c = $sC->fetch(PDO::FETCH_ASSOC);
+                            $cuentasMap[$cid] = ['nombre' => $c['nombre'], 'saldo' => (float)$c['saldo_actual'], 'ajuste' => 0];
+                        }
+                        $cuentasMap[$cid]['ajuste'] += $tipoRev === 'entrada' ? $montoAbs : -$montoAbs;
+                    }
+
+                    // Efecto en cuenta destino
+                    if (!empty($mov['cuenta_destino_id'])) {
+                        $tipoRev = ($mov['tipo'] === 'entrada' || $mov['tipo'] === 'traspaso' || $mov['tipo'] === 'comision') ? 'salida' : 'entrada';
+                        $cid = $mov['cuenta_destino_id'];
+                        if (!isset($cuentasMap[$cid])) {
+                            $sC = $pdo->prepare("SELECT nombre, saldo_actual FROM cuentas WHERE id = ?");
+                            $sC->execute([$cid]);
+                            $c = $sC->fetch(PDO::FETCH_ASSOC);
+                            $cuentasMap[$cid] = ['nombre' => $c['nombre'], 'saldo' => (float)$c['saldo_actual'], 'ajuste' => 0];
+                        }
+                        $cuentasMap[$cid]['ajuste'] += $tipoRev === 'entrada' ? $montoAbs : -$montoAbs;
+                    }
+
+                    // Cleanup específico por servicio
+                    $servId = (int)$mov['servicio_id'];
+                    if ($servId === 13 && !empty($mov['referencia_id'])) {
+                        $sD = $pdo->prepare("SELECT id, monto_pagado, estado FROM deudas_clientes WHERE id = ? AND activo = 1");
+                        $sD->execute([$mov['referencia_id']]);
+                        $deuda = $sD->fetch(PDO::FETCH_ASSOC);
+                        if ($deuda) {
+                            $nuevoPagado = max(0, (float)$deuda['monto_pagado'] - $montoAbs);
+                            $nuevoEstado = $nuevoPagado <= 0 ? 'pendiente' : 'parcial';
+                            $deudasAfectadas[] = [
+                                'entidad' => 'deudas_clientes',
+                                'id' => (int)$deuda['id'],
+                                'monto_pagado_anterior' => (float)$deuda['monto_pagado'],
+                                'monto_pagado_nuevo' => $nuevoPagado,
+                                'estado_anterior' => $deuda['estado'],
+                                'estado_nuevo' => $nuevoEstado
+                            ];
+                        }
+                    } elseif ($servId === 1 && !empty($mov['referencia_id'])) {
+                        $sD = $pdo->prepare("SELECT id, monto_pagado, estado FROM deudas_clientes WHERE id = ? AND activo = 1");
+                        $sD->execute([$mov['referencia_id']]);
+                        $deuda = $sD->fetch(PDO::FETCH_ASSOC);
+                        if ($deuda) {
+                            $deudasAfectadas[] = [
+                                'entidad' => 'deudas_clientes',
+                                'id' => (int)$deuda['id'],
+                                'monto_pagado_anterior' => (float)$deuda['monto_pagado'],
+                                'monto_pagado_nuevo' => (float)$deuda['monto_pagado'],
+                                'estado_anterior' => $deuda['estado'],
+                                'estado_nuevo' => $deuda['estado'],
+                                'accion' => 'Se restaurará a activo'
+                            ];
+                        }
+                    }
+                }
+
+                // Construir array de efectos
+                $efectos = [];
+                foreach ($cuentasMap as $cid => $c) {
+                    $nuevoSaldo = $c['saldo'] + $c['ajuste'];
+                    $efectos[] = [
+                        'cuenta_id' => $cid,
+                        'cuenta_nombre' => $c['nombre'],
+                        'saldo_anterior' => $c['saldo'],
+                        'saldo_nuevo' => $nuevoSaldo,
+                        'diferencia' => $c['ajuste'],
+                        'moneda' => $ultimo['moneda'] ?? 'MXN'
+                    ];
+                }
+
+                echo json_encode([
+                    'success' => true,
+                    'movimiento' => $ultimo,
+                    'grupo' => $grupo,
+                    'efectos' => $efectos,
+                    'deudas_afectadas' => $deudasAfectadas,
+                    'total_movimientos_reverso' => count($grupo)
+                ]);
 
                 break;
 

@@ -414,6 +414,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     }
 }
                 ],
+                scrollX: true,
+
                 order: [
                     [0, 'desc']
                 ],

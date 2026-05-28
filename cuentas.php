@@ -258,7 +258,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                         <div class="tab-pane fade show active" id="bancaria" role="tabpanel">
                             <div class="card">
-                                <div class="card-body p-4">
+                                <div class="card-body p-4 table-responsive">
                                     <table id="tablaCuentasBancarias" class="table table-hover align-middle w-100">
                                         <thead>
                                             <tr>
@@ -281,7 +281,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                         <div class="tab-pane fade" id="caja" role="tabpanel">
                             <div class="card">
-                                <div class="card-body p-4">
+                                <div class="card-body p-4 table-responsive">
                                     <table id="tablaCajas" class="table table-striped" style="width:100%">
                                         <thead>
                                             <tr>
@@ -556,6 +556,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                     columns: columnasBancarias(),
 
+                    scrollX: true,
+
                     order: [[0, 'desc']],
 
                     language: {
@@ -579,6 +581,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     },
 
                     columns: columnasCajas(),
+
+                    scrollX: true,
 
                     order: [[0, 'desc']],
 
@@ -973,27 +977,69 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             function descargarImagenCuenta() {
                 const btn = $('#btnDescargarImagen');
                 const textoOriginal = btn.html();
-                
-                // Mostrar estado de carga
+                const tarjeta = document.querySelector("#tarjetaCuentaAmiri");
+                const esModoOscuro = document.body.getAttribute('data-bs-theme') === 'dark' ||
+                                     document.body.classList.contains('dark-mode');
+
                 btn.prop('disabled', true).html('<i class="ti ti-loader ti-spin"></i> Generando...');
-                
-                html2canvas(document.querySelector("#tarjetaCuentaAmiri"), {
-                    scale: 3, // Muy alta calidad (retina)
-                    backgroundColor: null,
+
+                const estilosOriginales = {
+                    background: tarjeta.style.background,
+                    border: tarjeta.style.border,
+                    boxShadow: tarjeta.style.boxShadow,
+                    borderRadius: tarjeta.style.borderRadius,
+                    overflow: tarjeta.style.overflow
+                };
+                const logoClaro = tarjeta.querySelector('.logo-modo-claro');
+                const logoOscuro = tarjeta.querySelector('.logo-modo-oscuro');
+                const logoClaroDisplay = logoClaro ? logoClaro.style.display : null;
+                const logoOscuroDisplay = logoOscuro ? logoOscuro.style.display : null;
+
+                if (esModoOscuro) {
+                    tarjeta.style.background = '#1a2234';
+                    tarjeta.style.border = '1px solid #2c344c';
+                    tarjeta.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
+                    if (logoClaro) logoClaro.style.display = 'none';
+                    if (logoOscuro) logoOscuro.style.display = 'block';
+                }
+
+                tarjeta.style.borderRadius = '0';
+                tarjeta.style.overflow = 'visible';
+
+                html2canvas(tarjeta, {
+                    scale: 3,
+                    backgroundColor: esModoOscuro ? '#1a2234' : '#ffffff',
                     useCORS: true
                 }).then(canvas => {
+                    tarjeta.style.borderRadius = estilosOriginales.borderRadius;
+                    tarjeta.style.overflow = estilosOriginales.overflow;
+                    if (esModoOscuro) {
+                        tarjeta.style.background = estilosOriginales.background;
+                        tarjeta.style.border = estilosOriginales.border;
+                        tarjeta.style.boxShadow = estilosOriginales.boxShadow;
+                        if (logoClaro) logoClaro.style.display = logoClaroDisplay;
+                        if (logoOscuro) logoOscuro.style.display = logoOscuroDisplay;
+                    }
+
                     let link = document.createElement('a');
-                    link.download = `Datos_Bancarios_Amiri.png`;
+                    link.download = 'Datos_Bancarios_Amiri.png';
                     link.href = canvas.toDataURL('image/png');
                     link.click();
-                    
-                    // Restaurar botón
+
                     btn.prop('disabled', false).html(textoOriginal);
                     showToast('Imagen descargada correctamente', 'success');
                 }).catch(err => {
-                    console.error("Error generando imagen: ", err);
+                    tarjeta.style.borderRadius = estilosOriginales.borderRadius;
+                    tarjeta.style.overflow = estilosOriginales.overflow;
+                    if (esModoOscuro) {
+                        tarjeta.style.background = estilosOriginales.background;
+                        tarjeta.style.border = estilosOriginales.border;
+                        tarjeta.style.boxShadow = estilosOriginales.boxShadow;
+                        if (logoClaro) logoClaro.style.display = logoClaroDisplay;
+                        if (logoOscuro) logoOscuro.style.display = logoOscuroDisplay;
+                    }
                     btn.prop('disabled', false).html(textoOriginal);
-                    showToast("Hubo un error al generar la imagen", "error");
+                    showToast('Hubo un error al generar la imagen', 'error');
                 });
             }
 

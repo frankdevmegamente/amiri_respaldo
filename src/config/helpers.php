@@ -104,23 +104,26 @@ function actualizarSaldoCuenta($pdo, $cuenta_id, $monto, $tipo, $movimiento_id =
 
     $saldo_anterior = (float)$stmt->fetchColumn();
 
-    
+    // Redondear monto a 2 decimales para evitar acumulación de errores
+    $monto = round(abs($monto), 2);
 
-    // Calcular nuevo saldo
+    // Calcular nuevo saldo redondeado
 
     if ($tipo === 'entrada') {
 
-        $saldo_nuevo = $saldo_anterior + abs($monto);
+        $saldo_nuevo = round($saldo_anterior + $monto, 2);
 
     } else {
 
-        $saldo_nuevo = $saldo_anterior - abs($monto);
+        $saldo_nuevo = round($saldo_anterior - $monto, 2);
 
     }
 
     
 
     // Actualizar saldo en la cuenta
+    // La variable de sesión autoriza el trigger trg_cuentas_before_update
+    $pdo->exec("SET @hyperion_saldo_auth = 1");
 
     $stmt = $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?");
 

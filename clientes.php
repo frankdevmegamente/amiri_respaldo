@@ -183,7 +183,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     </div>
 
                     <div class="card">
-                        <div class="card-body p-4">
+                        <div class="card-body p-4 table-responsive">
                             <table id="tablaClientes" class="table table-hover align-middle w-100">
                                 <thead>
                                     <tr>

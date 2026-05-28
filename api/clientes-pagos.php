@@ -176,6 +176,7 @@ try {
     $saldo_anterior_orig = (float)$stmtSaldoOrig->fetchColumn();
     $saldo_nuevo_orig = $saldo_anterior_orig - $monto_mxn;
     
+    $pdo->exec("SET @hyperion_saldo_auth = 1");
     $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?")
         ->execute([$saldo_nuevo_orig, $cuenta_pago_id]);
     
@@ -188,6 +189,7 @@ try {
     $saldo_anterior_dest = (float)$stmtSaldoDest->fetchColumn();
     $saldo_nuevo_dest = $saldo_anterior_dest + $monto_mxn;
     
+    $pdo->exec("SET @hyperion_saldo_auth = 1");
     $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?")
         ->execute([$saldo_nuevo_dest, $cuenta_cliente_id]);
     

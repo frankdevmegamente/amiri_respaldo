@@ -65,6 +65,17 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         }
 
+        .tooltip-icon {
+            opacity: 0.5;
+            transition: opacity 0.15s;
+            vertical-align: middle;
+            margin-left: 2px;
+        }
+
+        .tooltip-icon:hover {
+            opacity: 1;
+        }
+
 
 
         .card-stat:hover {
@@ -442,22 +453,28 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                             <i class="ti ti-trending-up" id="iconNeta"></i>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <p class="text-muted mb-1 small">Ganancia Neta</p>
+                                            <p class="text-muted mb-1 small">
+                                                Ganancia Neta
+                                                <i class="ti ti-info-circle text-muted tooltip-icon" data-explica="resultado_operativo_real" style="cursor:help;font-size:14px;"></i>
+                                            </p>
                                             <h4 class="mb-0 fw-bold" id="statGananciaTotal">$0.00</h4>
                                         </div>
                                     </div>
                                     <div class="bg-light rounded p-2 small mt-2 border">
                                         <div class="d-flex justify-content-between text-muted mb-1">
-                                            <span>(+) Bruta:</span> <span id="lblFormulaBruta" class="fw-bold text-dark">$0.00</span>
+                                            <span>(+) Bruta: <i class="ti ti-info-circle text-muted tooltip-icon" data-explica="ganancia_bruta" style="cursor:help;font-size:12px;"></i></span> <span id="lblFormulaBruta" class="fw-bold text-dark">$0.00</span>
                                         </div>
                                         <div class="d-flex justify-content-between text-danger mb-1">
-                                            <span>(-) Gastos Fijos:</span> <span id="lblGastosFijos">-$0.00</span>
+                                            <span>(-) Gastos Fijos: <i class="ti ti-info-circle text-muted tooltip-icon" data-explica="gastos_fijos" style="cursor:help;font-size:12px;"></i></span> <span id="lblGastosFijos">-$0.00</span>
                                         </div>
-                                        <div class="d-flex justify-content-between text-danger border-bottom pb-1">
-                                            <span>(-) Gastos Var:</span> <span id="lblGastosVariables">-$0.00</span>
+                                        <div class="d-flex justify-content-between fw-bold text-success border-bottom pb-1 mb-1">
+                                            <span>(=) Bruta - Fijos:</span> <span id="lblBrutaMenosFijos">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between text-danger mb-1">
+                                            <span>(-) Gastos Var: <i class="ti ti-info-circle text-muted tooltip-icon" data-explica="gastos_variables" style="cursor:help;font-size:12px;"></i></span> <span id="lblGastosVariables">-$0.00</span>
                                         </div>
                                         <div class="d-flex justify-content-between mt-1 fw-bold">
-                                            <span>(=) NETO:</span> <span id="lblFormulaNeta">$0.00</span>
+                                            <span>(=) NETO: <i class="ti ti-info-circle text-muted tooltip-icon" data-explica="resultado_operativo_real" style="cursor:help;font-size:12px;"></i></span> <span id="lblFormulaNeta">$0.00</span>
                                         </div>
                                     </div>
                                 </div>
@@ -472,19 +489,28 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                             <i class="ti ti-building-bank"></i>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <p class="text-muted mb-1 small">Comisiones AMIRI</p>
+                                            <p class="text-muted mb-1 small">
+                                                Comisiones AMIRI
+                                                <i class="ti ti-info-circle text-muted tooltip-icon" data-explica="comisiones_amiri" style="cursor:help;font-size:14px;"></i>
+                                            </p>
                                             <h4 class="mb-0 fw-bold" id="statComisionesAmiri">$0.00</h4>
                                         </div>
                                     </div>
                                     <div class="bg-light rounded p-2 small mt-2 border">
                                         <div class="d-flex justify-content-between text-muted mb-1">
-                                            <span>(+) Retención Total:</span> <span id="lblComisionesTotales" class="fw-bold text-dark">$0.00</span>
+                                            <span>(+) Comisión AMIRI:</span> <span id="lblCardComisionAmiri" class="fw-bold text-dark">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between text-muted mb-1">
+                                            <span>(+) Ganancia Divisas:</span> <span id="lblCardGananciaDivisas" class="fw-bold text-dark">$0.00</span>
                                         </div>
                                         <div class="d-flex justify-content-between text-danger border-bottom pb-1">
-                                            <span>(-) Pago Promotores:</span> <span id="lblComisionesPromotores">-$0.00</span>
+                                            <span>(-) Gastos:</span> <span id="lblCardGastos">-$0.00</span>
                                         </div>
                                         <div class="d-flex justify-content-between mt-1 fw-bold text-primary">
-                                            <span>(=) AMIRI LIBRE:</span> <span id="lblComisionesAmiriNeto">$0.00</span>
+                                            <span>(=) Utilidades del mes:</span> <span id="lblCardUtilidades">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mt-1 pt-1 border-top text-muted small">
+                                            <span>Utilidades acum. (flujo):</span> <span id="lblUtilidadesAcumuladas">$0.00</span>
                                         </div>
                                     </div>
                                 </div>
@@ -499,16 +525,19 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                             <i class="ti ti-currency-dollar"></i>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <p class="text-muted mb-1 small">Ganancia Divisas</p>
+                                            <p class="text-muted mb-1 small">
+                                                Ganancia Divisas
+                                                <i class="ti ti-info-circle text-muted tooltip-icon" data-explica="ganancia_divisas_total" style="cursor:help;font-size:14px;"></i>
+                                            </p>
                                             <h4 class="mb-0 fw-bold" id="statGananciaDivisas">$0.00</h4>
                                         </div>
                                     </div>
                                     <div class="bg-light rounded p-2 small mt-2 border">
                                         <div class="d-flex justify-content-between text-muted mb-1">
-                                            <span>(+) Utilidad USDT:</span> <span id="lblUtilidadUSDT" class="fw-bold text-dark">$0.00</span>
+                                            <span>(+) Utilidad USDT: <i class="ti ti-info-circle text-muted tooltip-icon" data-explica="ganancia_usdt" style="cursor:help;font-size:12px;"></i></span> <span id="lblUtilidadUSDT" class="fw-bold text-dark">$0.00</span>
                                         </div>
                                         <div class="d-flex justify-content-between text-muted border-bottom pb-1">
-                                            <span>(+) Utilidad USD:</span> <span id="lblUtilidadUSD" class="fw-bold text-dark">$0.00</span>
+                                            <span>(+) Utilidad USD: <i class="ti ti-info-circle text-muted tooltip-icon" data-explica="ganancia_usd" style="cursor:help;font-size:12px;"></i></span> <span id="lblUtilidadUSD" class="fw-bold text-dark">$0.00</span>
                                         </div>
                                         <div class="d-flex justify-content-between mt-1 fw-bold text-info">
                                             <span>(=) TOTAL CRIPTO:</span> <span id="lblUtilidadTotal">$0.00</span>
@@ -526,13 +555,16 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                             <i class="ti ti-cash"></i>
                                         </div>
                                         <div class="flex-grow-1">
-                                            <p class="text-muted mb-1 small">Ventas de Efectivo</p>
+                                            <p class="text-muted mb-1 small">
+                                                Ventas de Efectivo
+                                                <i class="ti ti-info-circle text-muted tooltip-icon" data-explica="ventas_efectivo_total" style="cursor:help;font-size:14px;"></i>
+                                            </p>
                                             <h4 class="mb-0 fw-bold" id="statVentasEfectivo">$0.00</h4>
                                         </div>
                                     </div>
                                     <div class="bg-light rounded p-2 small mt-2 border">
                                         <div class="d-flex justify-content-between text-muted mb-1">
-                                            <span><i class="ti ti-receipt text-warning"></i> Operaciones:</span> <span id="lblVentasOperaciones" class="fw-bold text-dark">0</span>
+                                            <span><i class="ti ti-receipt text-warning"></i> Operaciones: <i class="ti ti-info-circle text-muted tooltip-icon" data-explica="ventas_efectivo_cantidad" style="cursor:help;font-size:12px;"></i></span> <span id="lblVentasOperaciones" class="fw-bold text-dark">0</span>
                                         </div>
                                         <div class="d-flex justify-content-between text-muted border-bottom pb-1">
                                             <span><i class="ti ti-chart-dots text-warning"></i> Ticket Promedio:</span> <span id="lblVentasPromedio" class="fw-bold text-dark">$0.00</span>
@@ -1163,6 +1195,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 $('#lblFormulaBruta').text('$' + formatoNumero(data.ganancia_bruta));
                 $('#lblGastosFijos').text('-$' + formatoNumero(data.gastos_fijos));
                 $('#lblGastosVariables').text('-$' + formatoNumero(data.gastos_variables));
+                $('#lblBrutaMenosFijos').text('$' + formatoNumero(data.resultado_bruta_menos_fijos));
                 $('#lblFormulaNeta').text('$' + formatoNumero(neta));
 
                 // Colores para ganancia/pérdida
@@ -1176,14 +1209,14 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     $('#iconNeta').removeClass('ti-trending-down').addClass('ti-trending-up');
                 }
 
-                // 2. Llenar Comisiones AMIRI (Suma y Resta)
-                let amiri = parseFloat(data.comisiones_amiri) || 0;
-                let promotor = parseFloat(data.comisiones_promotores) || 0;
-                let totalRetencion = amiri + promotor;
-
-                $('#statComisionesAmiri, #lblComisionesAmiriNeto').text('$' + formatoNumero(amiri));
-                $('#lblComisionesTotales').text('$' + formatoNumero(totalRetencion));
-                $('#lblComisionesPromotores').text('-$' + formatoNumero(promotor));
+                // 2. Llenar Comisiones AMIRI (Waterfall a Utilidades)
+                let totalRetencion = parseFloat(data.comisiones_amiri) + parseFloat(data.comisiones_promotores);
+                $('#statComisionesAmiri').text('$' + formatoNumero(data.comisiones_amiri));
+                $('#lblCardComisionAmiri').text('$' + formatoNumero(data.comisiones_amiri));
+                $('#lblCardGananciaDivisas').text('$' + formatoNumero(data.ganancia_divisas_total));
+                $('#lblCardGastos').text('-$' + formatoNumero(data.gastos_total));
+                $('#lblCardUtilidades').text('$' + formatoNumero(data.ganancia_neta));
+                $('#lblUtilidadesAcumuladas').text('$' + formatoNumero(data.utilidades_acumuladas));
 
                 // 3. Llenar Ganancia Divisas (USDT vs USD)
                 let usd = parseFloat(data.ganancia_usd) || 0;
@@ -1213,6 +1246,20 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     'rango': 'Rango Personalizado'
                 };
                 $('#rangoFechas').text(periodoTexto[$('#selectPeriodo').val()]);
+
+                // Inicializar tooltips con explicaciones
+                if (data._explicacion) {
+                    $('.tooltip-icon').each(function() {
+                        const key = $(this).data('explica');
+                        const texto = data._explicacion[key];
+                        if (texto) {
+                            $(this).attr('title', texto);
+                        }
+                    });
+                    // Destruir tooltips previos y recrear
+                    $('.tooltip-icon').tooltip('dispose');
+                    $('[title]').tooltip({ placement: 'top', trigger: 'hover' });
+                }
             });
         }
 

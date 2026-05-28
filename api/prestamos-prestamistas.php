@@ -21,11 +21,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
             echo json_encode($prestamo ?: ['error' => 'No encontrado']);
         } elseif ($prestamista_id > 0) {
-            $stmt = $pdo->prepare("SELECT * FROM deudas_empresa WHERE prestamista_id = ? AND activo = 1 ORDER BY id DESC");
+            $stmt = $pdo->prepare("SELECT * FROM deudas_empresa WHERE prestamista_id = ? AND activo = 1 ORDER BY estado = 'pagado', fecha DESC, id DESC");
             $stmt->execute([$prestamista_id]);
             echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         } else {
-            $stmt = $pdo->query("SELECT * FROM deudas_empresa WHERE activo = 1 ORDER BY id DESC");
+            $stmt = $pdo->query("SELECT * FROM deudas_empresa WHERE activo = 1 ORDER BY estado = 'pagado', fecha DESC, id DESC");
             echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         }
     } catch (Exception $e) {
@@ -64,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo->prepare("INSERT INTO movimientos (grupo_id, fecha, tipo, monto, moneda, descripcion, cuenta_destino_id, prestamista_id, usuario_id, servicio_id, referencia_id, activo) VALUES (?, ?, 'entrada', ?, 'MXN', ?, ?, ?, ?, 10, ?, 1)")
             ->execute([$grupo_id, $fecha, $monto, 'Préstamo de ' . $prestamista_nombre, $cuenta_id, $prestamista_id, $_SESSION['usuario_id'], $prestamo_id]);
 
+        $pdo->exec("SET @hyperion_saldo_auth = 1");
         $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual + ? WHERE id = ?")->execute([$monto, $cuenta_id]);
 
         $pdo->commit();
@@ -181,6 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         $stmtSaldo->execute([$d['cuenta_id']]);
         $saldo_anterior = (float)$stmtSaldo->fetchColumn();
         $saldo_nuevo = $saldo_anterior - $d['monto'];
+        $pdo->exec("SET @hyperion_saldo_auth = 1");
         $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?")->execute([$saldo_nuevo, $d['cuenta_id']]);
         
         // Registrar en historial_saldos
@@ -225,12 +227,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             }
         } elseif ($prestamista_id > 0) {
             // Busca las deudas específicas del prestamista para la tabla
-            $stmt = $pdo->prepare("SELECT * FROM deudas_empresa WHERE prestamista_id = ? AND activo = 1 ORDER BY id DESC");
+            $stmt = $pdo->prepare("SELECT * FROM deudas_empresa WHERE prestamista_id = ? AND activo = 1 ORDER BY estado = 'pagado', fecha DESC, id DESC");
             $stmt->execute([$prestamista_id]);
             echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         } else {
             // Muestra todas las deudas activas
-            $stmt = $pdo->query("SELECT * FROM deudas_empresa WHERE activo = 1 ORDER BY id DESC");
+            $stmt = $pdo->query("SELECT * FROM deudas_empresa WHERE activo = 1 ORDER BY estado = 'pagado', fecha DESC, id DESC");
             echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         }
     } catch (Exception $e) {
@@ -468,6 +470,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         ")->execute([$id]);
 
         // 4. RESTAR EL DINERO DE LA CAJA AUTOMÁTICAMENTE
+        $pdo->exec("SET @hyperion_saldo_auth = 1");
         $pdo->prepare("
             UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?
         ")->execute([$datos_anteriores['monto'], $datos_anteriores['cuenta_id']]);

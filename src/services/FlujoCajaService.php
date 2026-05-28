@@ -382,9 +382,11 @@ class FlujoCajaService {
 
             FROM inventario_monedas 
 
-            WHERE moneda = ? AND cuenta_id = ? AND cantidad_restante > 0
+            WHERE moneda = ? AND cuenta_id = ? AND cantidad_restante > 0.001
 
             ORDER BY fecha ASC
+
+            FOR UPDATE
 
         ");
 
@@ -410,11 +412,13 @@ class FlujoCajaService {
 
         foreach ($inventario as $item) {
 
-            if ($cantidadPendiente <= 0) break;
+            if ($cantidadPendiente <= 0.001) break;
 
-            
+            $cantidadRestante = (float) $item['cantidad_restante'];
 
-            $cantidadADescontar = min($cantidadPendiente, floatval($item['cantidad_restante']));
+            if ($cantidadRestante <= 0.001) continue;
+
+            $cantidadADescontar = min($cantidadPendiente, $cantidadRestante);
 
             
 
@@ -424,13 +428,17 @@ class FlujoCajaService {
 
                 SET cantidad_restante = cantidad_restante - ? 
 
-                WHERE id = ?
+                WHERE id = ? AND cantidad_restante >= ?
 
             ");
 
-            $stmt->execute([$cantidadADescontar, $item['id']]);
+            $stmt->execute([$cantidadADescontar, $item['id'], $cantidadADescontar]);
 
-            
+            if ($stmt->rowCount() === 0) {
+
+                throw new Exception("Concurrencia detectada: el lote #{$item['id']} ya no tiene inventario suficiente");
+
+            }
 
             $cantidadPendiente -= $cantidadADescontar;
 
@@ -438,9 +446,9 @@ class FlujoCajaService {
 
         
 
-        if ($cantidadPendiente > 0) {
+        if ($cantidadPendiente > 0.001) {
 
-            throw new Exception("Inventario insuficiente. Faltaron $cantidadPendiente unidades");
+            throw new Exception("Inventario insuficiente. Faltaron " . round($cantidadPendiente, 4) . " unidades");
 
         }
 

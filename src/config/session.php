@@ -28,11 +28,12 @@ ini_set('session.use_strict_mode', 1);       // Rechazar IDs de sesión no inici
 
 
 
-// Tiempo de vida de la sesión (4 horas = 14400 segundos)
+// Tiempo de vida de la sesión (3 horas 5 min = 11100 segundos)
+// 3h para el modal de inactividad + 5 min de buffer para que el usuario responda
 
-ini_set('session.gc_maxlifetime', 14400);
+ini_set('session.gc_maxlifetime', 11100);
 
-ini_set('session.cookie_lifetime', 14400);
+ini_set('session.cookie_lifetime', 11100);
 
 
 
@@ -49,6 +50,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 
 }
+
+// Verificar expiración por inactividad en cada petición
+checkSessionTimeout();
 
 
 
@@ -80,7 +84,7 @@ function regenerateSessionId() {
 
 function checkSessionTimeout() {
 
-    $timeout = 14400; // 4 horas en segundos
+    $timeout = 11100; // 3 horas 5 min en segundos (3h para modal + 5min buffer)
 
     
 

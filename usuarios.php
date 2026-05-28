@@ -413,9 +413,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                             return `<div class="d-flex align-items-center">${btnEditar}${btnEliminar}</div>`;
                         }
                     }
-                ] // <-- Aquí terminó el bloque que acabamos de pegar
-                // AGREGAR ESTO:
-                ,
+                ],
+                scrollX: true,
                 language: {
                     url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
                 }

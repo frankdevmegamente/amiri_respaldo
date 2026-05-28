@@ -317,9 +317,11 @@ try {
             $stmt->execute([$promotor_id, $cuenta_pago_id, $cuentaPromotorId, $monto, $fecha_pago, $movimiento_id, 'Pago de comisiones']);
 
             // Descontar caja origen
+            $pdo->exec("SET @hyperion_saldo_auth = 1");
             $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?")->execute([$monto, $cuenta_pago_id]);
 
             // Descontar caja virtual promotor
+            $pdo->exec("SET @hyperion_saldo_auth = 1");
             $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?")->execute([$monto, $cuentaPromotorId]);
             
             $pago_id = $pdo->lastInsertId();
