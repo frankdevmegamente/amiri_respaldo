@@ -895,6 +895,7 @@ try {
                         data: 'fecha', // <-- Ahora jalamos la fecha operativa real
                         render: function(data, type, row) {
                             if (!data) return '';
+                            if (type === 'sort' || type === 'type') return data;
                             // Formatear fecha operativa de YYYY-MM-DD a DD/MM/YYYY
                             const partes = data.split('-');
                             const fechaOperacion = partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : data;
@@ -1034,7 +1035,7 @@ try {
                     { targets: 0, orderable: false }
                 ],
                 order: [
-                    [1, "desc"]
+                    [2, "desc"]
                 ]
             });
 
@@ -1054,10 +1055,10 @@ try {
                 const pendiente = parseFloat($(this).data('pendiente'));
 
                 if ($(this).is(':checked')) {
-                    ventasSeleccionadas.push(id);
+                    ventasSeleccionadas.push({ id, pendiente });
                     totalPendienteMultiple += pendiente;
                 } else {
-                    ventasSeleccionadas = ventasSeleccionadas.filter(val => val !== id);
+                    ventasSeleccionadas = ventasSeleccionadas.filter(val => val.id !== id);
                     totalPendienteMultiple -= pendiente;
                 }
 
@@ -1072,29 +1073,32 @@ try {
 
             // Al hacer clic en el botón de pago múltiple
             $('#btnPagarMultiple').on('click', function() {
-                let htmlPagos = '<h6 class="mb-3 text-primary"><i class="ti ti-list-check"></i> Especifica cuánto abonar a cada venta:</h6>';
-                let ids = [];
+                let totalPend = 0;
+                let count = 0;
                 
                 $('#tablaVentas .pago-checkbox:checked').each(function() {
-                    let id = $(this).data('id');
-                    let pendiente = parseFloat($(this).data('pendiente'));
-                    ids.push(id);
+                    totalPend += parseFloat($(this).data('pendiente'));
+                    count++;
+                });
 
-                    htmlPagos += `
-                        <div class="row align-items-center my-2 pago-item" data-id="${id}" data-pendiente="${pendiente}">
-                            <div class="col-sm-6">
-                                <span class="fw-bold text-dark">Venta #${id}</span><br>
-                                <small class="text-danger">Pendiente: ${formatoMoneda(pendiente)}</small>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="input-group input-group-sm">
-                                    <span class="input-group-text bg-success text-white border-success">$</span>
-                                    <input type="text" step="0.01" class="form-control border-success input-abono-multiple fw-bold" value="${pendiente.toFixed(2)}" max="${pendiente.toFixed(2)}">
-                                </div>
+                let htmlPagos = `
+                    <div class="alert alert-info py-2 mb-3">
+                        <strong>${count} ventas seleccionadas</strong>
+                        &mdash; Total pendiente: ${formatoMoneda(totalPend)}
+                    </div>
+                    <div class="row align-items-center">
+                        <div class="col-sm-6">
+                            <label class="form-label fw-bold mb-0">Total a pagar</label>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                                <span class="input-group-text bg-success text-white border-success">$</span>
+                                <input type="text" step="0.01" class="form-control border-success fw-bold input-total-pago-multiple text-end" value="${totalPend.toFixed(2)}" max="${totalPend.toFixed(2)}">
                             </div>
                         </div>
-                    `;
-                });
+                    </div>
+                    <small class="text-muted mt-2 d-block">El pago se distribuirá en cascada: salda la primera venta, luego la siguiente.</small>
+                `;
 
                 $('#contenedorPagosMultiples').html(htmlPagos).fadeIn();
 
@@ -1109,7 +1113,7 @@ try {
                 $('#resumenPago').hide();
                 $('#fechaPago').val("<?= date('Y-m-d') ?>");
 
-                $('#formPagarVenta').data('modo', 'masivo').data('ids', ids);
+                $('#formPagarVenta').data('modo', 'masivo');
                 $('#modalPagarVenta').modal("show");
             });
 
@@ -1386,14 +1390,19 @@ try {
                 let arrayPagos = [];
 
                 if (modoPago === 'masivo') {
-                    $('.pago-item').each(function() {
+                    let totalPago = parseFloat($('.input-total-pago-multiple').val()) || 0;
+                    if (totalPago <= 0) return alert("Ingresa un monto mayor a $0.00.");
+                    let remaining = totalPago;
+                    $('#tablaVentas .pago-checkbox:checked').each(function() {
                         let id = $(this).data('id');
-                        let abono = parseFloat($(this).find('.input-abono-multiple').val()) || 0;
+                        let pendiente = parseFloat($(this).data('pendiente'));
+                        let abono = Math.min(remaining, pendiente);
                         if (abono > 0) {
-                            arrayPagos.push({ id: id, abono: abono });
+                            arrayPagos.push({ id, abono });
+                            remaining -= abono;
                         }
                     });
-                    if (arrayPagos.length === 0) return alert("Ingresa al menos un monto mayor a $0.00.");
+                    if (arrayPagos.length === 0) return alert("Ingresa un monto mayor a $0.00.");
                 } else {
                     const id = $('#ventaId').val();
                     const montoAPagar = parseMoneda($('#montoPagarHidden').val());
@@ -1467,6 +1476,7 @@ try {
                         data: 'fecha', // <-- Ahora jalamos la fecha operativa real
                         render: function(data, type, row) {
                             if (!data) return '';
+                            if (type === 'sort' || type === 'type') return data;
                             const partes = data.split('-');
                             const fechaOperacion = partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : data;
                             

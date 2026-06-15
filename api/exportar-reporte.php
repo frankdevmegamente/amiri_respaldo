@@ -313,85 +313,130 @@ switch ($reporte) {
         
 
         // Comisiones AMIRI
-
         $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_amiri), 0) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1");
-
         $stmt->execute([$fechaInicio, $fechaFin]);
-
         $comisionesAmiri = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-        
-
         // Comisiones Promotores
-
         $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_promotor), 0) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1");
-
         $stmt->execute([$fechaInicio, $fechaFin]);
-
         $comisionesPromotores = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-        
-
         // Ventas de efectivo
-
         $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto_total), 0) as total, COUNT(*) as cantidad FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1");
-
         $stmt->execute([$fechaInicio, $fechaFin]);
-
         $ventas = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        
+        // Ganancia Divisas (FIFO real: comisiones de servicios 2 y 3)
+        $stmtUSD = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 2 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
+        $stmtUSD->execute([$fechaInicio, $fechaFin]);
+        $gananciaUSD = (float)$stmtUSD->fetchColumn();
 
-        // Operaciones divisas
+        $stmtUSDT = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 3 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
+        $stmtUSDT->execute([$fechaInicio, $fechaFin]);
+        $gananciaUSDT = (float)$stmtUSDT->fetchColumn();
 
+        $gananciaDivisas = $gananciaUSD + $gananciaUSDT;
+        $gananciaBruta = $comisionesAmiri + $gananciaDivisas;
+
+        // Gastos operativos
         $stmt = $pdo->prepare("
-
             SELECT 
-
-                SUM(CASE WHEN servicio_id IN (2, 3) THEN monto * paridad ELSE 0 END) as mxn_recibido,
-
-                SUM(CASE WHEN servicio_id IN (5, 6) THEN monto * paridad ELSE 0 END) as mxn_gastado
-
-            FROM movimientos
-
-            WHERE moneda IN ('USD', 'USDT')
-
-            AND fecha BETWEEN ? AND ?
-
-            AND activo = 1
-
+                COALESCE(SUM(monto), 0) as total_gastos,
+                COALESCE(SUM(CASE WHEN clasificacion = 'fijo' THEN monto ELSE 0 END), 0) as gastos_fijos,
+                COALESCE(SUM(CASE WHEN clasificacion = 'variable' THEN monto ELSE 0 END), 0) as gastos_variables
+            FROM gastos
+            WHERE fecha BETWEEN ? AND ? AND activo = 1
         ");
-
         $stmt->execute([$fechaInicio, $fechaFin]);
+        $gastos = $stmt->fetch(PDO::FETCH_ASSOC);
+        $gastosTotal = (float)$gastos['total_gastos'];
+        $gastosFijos = (float)$gastos['gastos_fijos'];
+        $gastosVariables = (float)$gastos['gastos_variables'];
 
-        $divisas = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Utilidad del mes
+        $utilidadNeta = $gananciaBruta - $gastosTotal;
 
-        $gananciaDivisas = ($divisas['mxn_recibido'] ?? 0) - ($divisas['mxn_gastado'] ?? 0);
-
-        
+        // Utilidades acumuladas (flujo histórico)
+        $stmtUtil = $pdo->query("SELECT COALESCE(SUM(saldo_actual), 0) as total FROM cuentas WHERE tipo_cuenta = 3 AND activo = 1");
+        $utilidadesAcumuladas = (float)$stmtUtil->fetchColumn();
 
         $datos = [
-
             ['concepto' => 'Comisiones AMIRI', 'valor' => '$' . number_format($comisionesAmiri, 2)],
-
             ['concepto' => 'Comisiones Promotores', 'valor' => '$' . number_format($comisionesPromotores, 2)],
-
             ['concepto' => 'Total Ventas Efectivo', 'valor' => '$' . number_format($ventas['total'], 2)],
-
             ['concepto' => 'Cantidad Ventas', 'valor' => $ventas['cantidad']],
-
-            ['concepto' => 'Ganancia Divisas', 'valor' => '$' . number_format($gananciaDivisas, 2)],
-
-            ['concepto' => 'GANANCIA TOTAL', 'valor' => '$' . number_format($comisionesAmiri + $gananciaDivisas, 2)],
-
+            ['concepto' => 'Ganancia Divisas (USD + USDT)', 'valor' => '$' . number_format($gananciaDivisas, 2)],
+            ['concepto' => 'Ganancia Bruta', 'valor' => '$' . number_format($gananciaBruta, 2)],
+            ['concepto' => 'Gastos Fijos', 'valor' => '$' . number_format($gastosFijos, 2)],
+            ['concepto' => 'Gastos Variables', 'valor' => '$' . number_format($gastosVariables, 2)],
+            ['concepto' => 'Gastos Totales', 'valor' => '$' . number_format($gastosTotal, 2)],
+            ['concepto' => 'Utilidad del Mes', 'valor' => '$' . number_format($utilidadNeta, 2)],
+            ['concepto' => 'Utilidades Acum. (Flujo)', 'valor' => '$' . number_format($utilidadesAcumuladas, 2)],
         ];
 
         break;
 
+    case 'utilidades':
+        $titulo = 'Reporte de Utilidades';
+
+        $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_amiri), 0) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1");
+        $stmt->execute([$fechaInicio, $fechaFin]);
+        $comisiones = (float)$stmt->fetchColumn();
+
+        $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
+        $stmt->execute([$fechaInicio, $fechaFin]);
+        $divisas = (float)$stmt->fetchColumn();
+
+        $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total, COALESCE(SUM(CASE WHEN clasificacion = 'fijo' THEN monto ELSE 0 END), 0) as fijos, COALESCE(SUM(CASE WHEN clasificacion = 'variable' THEN monto ELSE 0 END), 0) as variables FROM gastos WHERE fecha BETWEEN ? AND ? AND activo = 1");
+        $stmt->execute([$fechaInicio, $fechaFin]);
+        $g = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $bruta = $comisiones + $divisas;
+        $neta = $bruta - (float)$g['total'];
+
+        $datos = [
+            ['concepto' => 'Comisiones AMIRI', 'valor' => '$' . number_format($comisiones, 2)],
+            ['concepto' => 'Ganancia Divisas (USD+USDT)', 'valor' => '$' . number_format($divisas, 2)],
+            ['concepto' => 'Utilidad Bruta', 'valor' => '$' . number_format($bruta, 2)],
+            ['concepto' => 'Gastos Fijos', 'valor' => '$' . number_format($g['fijos'], 2)],
+            ['concepto' => 'Gastos Variables', 'valor' => '$' . number_format($g['variables'], 2)],
+            ['concepto' => 'Gastos Totales', 'valor' => '$' . number_format($g['total'], 2)],
+            ['concepto' => 'Utilidad Neta', 'valor' => '$' . number_format($neta, 2)],
+        ];
+        $columnas = ['Concepto', 'Valor'];
+        break;
+
+    case 'servicios':
+        $titulo = 'Reporte de Servicios';
+
+        $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total, COUNT(*) as cantidad FROM movimientos WHERE servicio_id = 7 AND fecha BETWEEN ? AND ? AND activo = 1 AND tipo = 'traspaso'");
+        $stmt->execute([$fechaInicio, $fechaFin]);
+        $retiros = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $stmt = $pdo->prepare("SELECT COALESCE(SUM(dc.monto_total), 0) as total, COUNT(*) as cantidad FROM deudas_clientes dc WHERE dc.fecha BETWEEN ? AND ? AND dc.activo = 1");
+        $stmt->execute([$fechaInicio, $fechaFin]);
+        $depositos = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total, COUNT(*) as cantidad FROM movimientos WHERE servicio_id IN (11, 13, 14, 15) AND fecha BETWEEN ? AND ? AND activo = 1");
+        $stmt->execute([$fechaInicio, $fechaFin]);
+        $transferencias = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $datos = [
+            ['concepto' => 'Total Retiros Efectivo', 'valor' => '$' . number_format($retiros['total'], 2)],
+            ['concepto' => 'Cantidad Retiros', 'valor' => $retiros['cantidad']],
+            ['concepto' => 'Total Depósitos', 'valor' => '$' . number_format($depositos['total'], 2)],
+            ['concepto' => 'Cantidad Depósitos', 'valor' => $depositos['cantidad']],
+            ['concepto' => 'Total Transferencias', 'valor' => '$' . number_format($transferencias['total'], 2)],
+            ['concepto' => 'Cantidad Transferencias', 'valor' => $transferencias['cantidad']],
+        ];
+        $columnas = ['Concepto', 'Valor'];
+        break;
+
 }
-
-
-
+ 
+ 
+ 
 // Generar archivo según formato
 
 $nombreArchivo = 'reporte_' . $reporte . '_' . date('Y-m-d_H-i-s');
@@ -581,165 +626,166 @@ switch ($formato) {
     case 'pdf':
 
         $options = new Options();
-
         $options->set('isHtml5ParserEnabled', true);
-
         $options->set('isRemoteEnabled', true);
-
         $options->set('defaultFont', 'Arial');
-
-        
 
         $dompdf = new Dompdf($options);
 
-        
-
         // Generar HTML
+        $html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+            body { font-family: Arial, sans-serif; font-size: 11px; color: #333; margin: 20px; }
+            .header { background: #2c3e50; color: white; padding: 18px; margin-bottom: 18px; text-align: center; }
+            .header h1 { margin: 0; font-size: 20px; }
+            .header p { margin: 4px 0 0; color: #bdc3c7; font-size: 12px; }
+            .section { background: #fff; border: 1px solid #dee2e6; padding: 14px; margin-bottom: 12px; }
+            .s-title { font-size: 13px; font-weight: bold; padding-bottom: 7px; border-bottom: 2px solid; margin-bottom: 8px; }
+            .s-title.g { color: #28a745; border-color: #28a745; }
+            .s-title.r { color: #dc3545; border-color: #dc3545; }
+            .s-title.b { color: #007bff; border-color: #007bff; }
+            .s-title.p { color: #6f42c1; border-color: #6f42c1; }
+            table.info { width: 100%; border-collapse: collapse; }
+            table.info td { padding: 4px 6px; }
+            .lbl { color: #666; }
+            .val { font-weight: 600; }
+            .val.g { color: #28a745; }
+            .val.r { color: #dc3545; }
+            .val.b { color: #007bff; }
+            .val.p { color: #6f42c1; }
+            .val.d { color: #333; }
+            .bt { border-top: 2px solid #333; }
+            .bb { border-bottom: 1px dashed #ddd; }
+            table.detail { width: 100%; border-collapse: collapse; margin-top: 5px; }
+            table.detail td { padding: 5px 7px; border-bottom: 1px solid #eee; }
+            .footer { text-align: center; color: #999; font-size: 9px; margin-top: 18px; padding-top: 8px; border-top: 1px solid #eee; }
+        </style></head><body>';
 
-        $html = '<!DOCTYPE html>
+        if ($reporte === 'resumen') {
+            $fmt = function($n) { return '$' . number_format($n, 2); };
+            $diff = $utilidadesAcumuladas - $utilidadNeta;
+            $html .= '
+            <div class="header">
+                <h1>' . htmlspecialchars($titulo) . '</h1>
+                <p>Período: ' . $fechaInicio . ' al ' . $fechaFin . '</p>
+            </div>
 
-        <html>
-
-        <head>
-
-            <meta charset="UTF-8">
-
-            <style>
-
-                body { font-family: Arial, sans-serif; font-size: 12px; }
-
-                h1 { color: #333; font-size: 18px; text-align: center; margin-bottom: 5px; }
-
-                .periodo { text-align: center; color: #666; margin-bottom: 20px; }
-
-                table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-
-                th { background-color: #4472C4; color: white; padding: 10px; text-align: left; }
-
-                td { padding: 8px; border-bottom: 1px solid #ddd; }
-
-                tr:nth-child(even) { background-color: #f9f9f9; }
-
-                .totales { background-color: #E2EFDA; font-weight: bold; }
-
-                .text-right { text-align: right; }
-
-                .footer { margin-top: 20px; text-align: center; color: #999; font-size: 10px; }
-
-            </style>
-
-        </head>
-
-        <body>
-
-            <h1>' . htmlspecialchars($titulo) . '</h1>
-
-            <p class="periodo">Período: ' . $fechaInicio . ' al ' . $fechaFin . '</p>
-
-            <table>
-
-                <thead>
-
-                    <tr>';
-
-        
-
-        foreach ($columnas as $columna) {
-
-            $html .= '<th>' . htmlspecialchars($columna) . '</th>';
-
-        }
-
-        
-
-        $html .= '</tr>
-
-                </thead>
-
-                <tbody>';
-
-        
-
-        $totales = array_fill(0, count($columnas), 0);
-
-        
-
-        foreach ($datos as $registro) {
-
-            $html .= '<tr>';
-
-            $i = 0;
-
-            foreach ($registro as $valor) {
-
-                $class = is_numeric($valor) && $i > 0 ? 'text-right' : '';
-
-                if (is_numeric($valor) && $i > 0) {
-
-                    $totales[$i] += floatval($valor);
-
-                    $valor = number_format($valor, 2);
-
-                }
-
-                $html .= '<td class="' . $class . '">' . htmlspecialchars($valor) . '</td>';
-
-                $i++;
-
-            }
-
-            $html .= '</tr>';
-
-        }
-
-        
-
-        // Fila de totales
-
-        if ($reporte !== 'resumen' && count($datos) > 0) {
-
-            $html .= '<tr class="totales"><td>TOTALES</td>';
-
-            for ($i = 1; $i < count($columnas); $i++) {
-
-                $html .= '<td class="text-right">' . ($totales[$i] > 0 ? number_format($totales[$i], 2) : '') . '</td>';
-
-            }
-
-            $html .= '</tr>';
-
-        }
-
-        
-
-        $html .= '</tbody>
-
+            <table style="width:100%;border-collapse:collapse;margin-bottom:12px;" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td style="width:25%;padding:6px;border:1px solid #dee2e6;border-left:4px solid #28a745;text-align:center;">
+                        <div style="font-size:10px;color:#28a745;font-weight:600;">Ganancia Bruta</div>
+                        <div style="font-size:16px;font-weight:bold;color:#28a745;margin-top:3px;">' . $fmt($gananciaBruta) . '</div>
+                    </td>
+                    <td style="width:25%;padding:6px;border:1px solid #dee2e6;border-left:4px solid #dc3545;text-align:center;">
+                        <div style="font-size:10px;color:#dc3545;font-weight:600;">Gastos Totales</div>
+                        <div style="font-size:16px;font-weight:bold;color:#dc3545;margin-top:3px;">' . $fmt($gastosTotal) . '</div>
+                    </td>
+                    <td style="width:25%;padding:6px;border:1px solid #dee2e6;border-left:4px solid #007bff;text-align:center;">
+                        <div style="font-size:10px;color:#007bff;font-weight:600;">Utilidad del Mes</div>
+                        <div style="font-size:16px;font-weight:bold;color:#007bff;margin-top:3px;">' . $fmt($utilidadNeta) . '</div>
+                    </td>
+                    <td style="width:25%;padding:6px;border:1px solid #dee2e6;border-left:4px solid #6f42c1;text-align:center;">
+                        <div style="font-size:10px;color:#6f42c1;font-weight:600;">Flujo Acumulado</div>
+                        <div style="font-size:16px;font-weight:bold;color:#6f42c1;margin-top:3px;">' . $fmt($utilidadesAcumuladas) . '</div>
+                    </td>
+                </tr>
             </table>
 
-            <p class="footer">Generado el ' . date('d/m/Y H:i:s') . ' - AMIRI App</p>
+            <div class="section">
+                <div class="s-title g">(+) Ingresos</div>
+                <table class="info">
+                    <tr><td class="lbl">Comisiones AMIRI</td><td align="right" class="val g">' . $fmt($comisionesAmiri) . '</td></tr>
+                    <tr><td class="lbl">Ganancia Divisas (USD + USDT)</td><td align="right" class="val g">' . $fmt($gananciaDivisas) . '</td></tr>
+                    <tr><td class="lbl" style="font-weight:bold;padding-top:6px;" class="bt">Ganancia Bruta</td><td align="right" class="val g" style="font-weight:bold;padding-top:6px;" class="bt">' . $fmt($gananciaBruta) . '</td></tr>
+                </table>
+            </div>
 
-        </body>
+            <div class="section">
+                <div class="s-title r">(-) Gastos</div>
+                <table class="info">
+                    <tr><td class="lbl">Gastos Fijos</td><td align="right" class="val r">' . $fmt($gastosFijos) . '</td></tr>
+                    <tr><td class="lbl">Gastos Variables</td><td align="right" class="val r">' . $fmt($gastosVariables) . '</td></tr>
+                    <tr><td class="lbl" style="font-weight:bold;padding-top:6px;">Gastos Totales</td><td align="right" class="val r" style="font-weight:bold;padding-top:6px;">' . $fmt($gastosTotal) . '</td></tr>
+                </table>
+            </div>
 
-        </html>';
+            <div class="section">
+                <div class="s-title b">(=) Resultado del Período</div>
+                <table class="info">
+                    <tr><td class="lbl" style="font-size:14px;font-weight:bold;">Utilidad del Mes</td><td align="right" class="val b" style="font-size:15px;font-weight:bold;">' . $fmt($utilidadNeta) . '</td></tr>
+                </table>
+            </div>
 
-        
+            <div class="section">
+                <div class="s-title p">Histórico</div>
+                <table class="info">
+                    <tr><td class="lbl">Utilidades Acumuladas (Flujo)</td><td align="right" class="val d">' . $fmt($utilidadesAcumuladas) . '</td></tr>
+                    <tr><td class="lbl" style="border-bottom:1px dashed #ddd;padding-bottom:6px;">Diferencia (meses anteriores)</td><td align="right" class="val d" style="border-bottom:1px dashed #ddd;padding-bottom:6px;">' . $fmt($diff) . '</td></tr>
+                </table>
+                <table class="detail">
+                    <tr><td style="font-weight:bold;padding-top:7px;" colspan="2">Detalle completo</td></tr>
+                    <tr><td>Comisiones AMIRI</td><td align="right" style="font-weight:600;">' . $fmt($comisionesAmiri) . '</td></tr>
+                    <tr><td>Comisiones Promotores</td><td align="right" style="font-weight:600;">' . $fmt($comisionesPromotores) . '</td></tr>
+                    <tr><td>Total Ventas Efectivo</td><td align="right" style="font-weight:600;">' . $fmt($ventas['total']) . '</td></tr>
+                    <tr><td>Cantidad de Ventas</td><td align="right" style="font-weight:600;">' . $ventas['cantidad'] . '</td></tr>
+                </table>
+            </div>';
+        } else {
+            $html .= '
+            <div class="header">
+                <h1>' . htmlspecialchars($titulo) . '</h1>
+                <p>Período: ' . $fechaInicio . ' al ' . $fechaFin . '</p>
+            </div>
+            <div class="section">
+                <table class="detail">
+                    <thead>
+                        <tr style="background:#4472C4;color:white;">
+                            ' . implode('', array_map(function($c) { return '<th style="padding:8px;text-align:left;">' . htmlspecialchars($c) . '</th>'; }, $columnas)) . '
+                        </tr>
+                    </thead>
+                    <tbody>';
+
+            $totales = array_fill(0, count($columnas), 0);
+
+            foreach ($datos as $registro) {
+                $html .= '<tr>';
+                $i = 0;
+                foreach ($registro as $valor) {
+                    $html .= '<td style="padding:6px 8px;border-bottom:1px solid #eee;' . (is_numeric($valor) && $i > 0 ? 'text-align:right;' : '') . '">';
+                    if (is_numeric($valor) && $i > 0) {
+                        $totales[$i] += floatval($valor);
+                        $html .= number_format($valor, 2);
+                    } else {
+                        $html .= htmlspecialchars($valor);
+                    }
+                    $html .= '</td>';
+                    $i++;
+                }
+                $html .= '</tr>';
+            }
+
+            if (count($datos) > 0) {
+                $html .= '<tr style="background:#E2EFDA;font-weight:bold;">';
+                $html .= '<td style="padding:8px;">TOTALES</td>';
+                for ($i = 1; $i < count($columnas); $i++) {
+                    $html .= '<td style="padding:8px;text-align:right;">' . ($totales[$i] > 0 ? number_format($totales[$i], 2) : '') . '</td>';
+                }
+                $html .= '</tr>';
+            }
+
+            $html .= '</tbody></table></div>';
+        }
+
+        $html .= '<div class="footer">Generado el ' . date('d/m/Y H:i:s') . ' - AMIRI App</div>
+        </body></html>';
 
         $dompdf->loadHtml($html);
-
-        $dompdf->setPaper('A4', 'landscape');
-
+        $dompdf->setPaper('A4', 'portrait');
         $dompdf->render();
 
-        
-
         header('Content-Type: application/pdf');
-
         header('Content-Disposition: attachment;filename="' . $nombreArchivo . '.pdf"');
 
-        
-
         echo $dompdf->output();
-
         break;
 
 }

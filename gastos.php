@@ -402,7 +402,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         title: 'Fecha',
                         render: function(data, type, row) {
                             if (!data) return 'N/A';
-                            if (type === 'sort') return data;
+                            if (type === 'sort' || type === 'type') return data;
                             const soloFecha = data.split(' ')[0]; 
                             const partes = soloFecha.split('-'); 
                             const fechaOperacion = `${partes[2]}/${partes[1]}/${partes[0]}`;

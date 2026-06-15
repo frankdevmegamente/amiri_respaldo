@@ -199,9 +199,10 @@ try {
                 columns: [
                     { 
                         data: 'fecha',
-                        render: function(d) {
-                            if(!d) return 'N/A';
-                            const partes = d.split(' ')[0].split('-'); 
+                        render: function(data, type, row) {
+                            if(!data) return 'N/A';
+                            if (type === 'sort' || type === 'type') return data;
+                            const partes = data.split(' ')[0].split('-'); 
                             return `${partes[2]}/${partes[1]}/${partes[0]}`; 
                         }
                     },

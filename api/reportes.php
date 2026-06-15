@@ -159,6 +159,7 @@ try {
                 'gastos_variables' => 'Gastos operativos clasificados como variables (comisiones externas, transportes, etc.).',
                 'ganancia_bruta' => 'Resultado operativo antes de gastos. Fórmula: Comisiones AMIRI (devengadas) + Ganancia Divisas (FIFO). Representa el ingreso total generado por la operación.',
                 'resultado_operativo_real' => 'Ganancia o pérdida real del período. Fórmula: Ganancia Bruta - Gastos Totales. Refleja el resultado neto de las operaciones del negocio.',
+                'utilidades_acumuladas' => 'Saldo acumulado histórico de la cuenta "Utilidades AMIRI" (Capital). Incluye utilidades de períodos anteriores más el resultado del mes actual. La diferencia contra "Utilidades del mes" es el saldo arrastrado de meses previos.',
             ];
             
             echo json_encode($resultado);

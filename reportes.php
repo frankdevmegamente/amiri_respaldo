@@ -445,7 +445,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                     <div class="row mb-4" id="tarjetasResumen">
                         
-                        <div class="col-xl-3 col-md-6 mb-3">
+                        <div class="col-xl-4 col-md-6 mb-3">
                             <div class="card card-stat border-0 shadow-sm h-100" id="cardNeta">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-3">
@@ -462,62 +462,31 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                     </div>
                                     <div class="bg-light rounded p-2 small mt-2 border">
                                         <div class="d-flex justify-content-between text-muted mb-1">
-                                            <span>(+) Bruta: <i class="ti ti-info-circle text-muted tooltip-icon" data-explica="ganancia_bruta" style="cursor:help;font-size:12px;"></i></span> <span id="lblFormulaBruta" class="fw-bold text-dark">$0.00</span>
+                                            <span>(+) Bruta:</span> <span id="lblFormulaBruta" class="fw-bold text-dark">$0.00</span>
                                         </div>
-                                        <div class="d-flex justify-content-between text-danger mb-1">
-                                            <span>(-) Gastos Fijos: <i class="ti ti-info-circle text-muted tooltip-icon" data-explica="gastos_fijos" style="cursor:help;font-size:12px;"></i></span> <span id="lblGastosFijos">-$0.00</span>
+                                        <div class="d-flex justify-content-between text-danger mb-1" id="gastosToggle" style="cursor:pointer;">
+                                            <span><i class="ti ti-chevron-down" id="gastosChevron"></i> (-) Gastos:</span>
+                                            <span id="lblTotalGastos" class="fw-bold">$0.00</span>
                                         </div>
-                                        <div class="d-flex justify-content-between fw-bold text-success border-bottom pb-1 mb-1">
-                                            <span>(=) Bruta - Fijos:</span> <span id="lblBrutaMenosFijos">$0.00</span>
+                                        <div id="gastosDetalle" style="display:none;">
+                                            <div class="d-flex justify-content-between text-danger ps-3 mb-1">
+                                                <span>Gastos Fijos:</span> <span id="lblGastosFijos">$0.00</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between text-danger ps-3 mb-1">
+                                                <span>Gastos Variables:</span> <span id="lblGastosVariables">$0.00</span>
+                                            </div>
                                         </div>
-                                        <div class="d-flex justify-content-between text-danger mb-1">
-                                            <span>(-) Gastos Var: <i class="ti ti-info-circle text-muted tooltip-icon" data-explica="gastos_variables" style="cursor:help;font-size:12px;"></i></span> <span id="lblGastosVariables">-$0.00</span>
-                                        </div>
-                                        <div class="d-flex justify-content-between mt-1 fw-bold">
-                                            <span>(=) NETO: <i class="ti ti-info-circle text-muted tooltip-icon" data-explica="resultado_operativo_real" style="cursor:help;font-size:12px;"></i></span> <span id="lblFormulaNeta">$0.00</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-xl-3 col-md-6 mb-3">
-                            <div class="card card-stat border-0 shadow-sm h-100">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="stat-icon bg-primary bg-opacity-10 text-primary me-3">
-                                            <i class="ti ti-building-bank"></i>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <p class="text-muted mb-1 small">
-                                                Comisiones AMIRI
-                                                <i class="ti ti-info-circle text-muted tooltip-icon" data-explica="comisiones_amiri" style="cursor:help;font-size:14px;"></i>
-                                            </p>
-                                            <h4 class="mb-0 fw-bold" id="statComisionesAmiri">$0.00</h4>
-                                        </div>
-                                    </div>
-                                    <div class="bg-light rounded p-2 small mt-2 border">
-                                        <div class="d-flex justify-content-between text-muted mb-1">
-                                            <span>(+) Comisión AMIRI:</span> <span id="lblCardComisionAmiri" class="fw-bold text-dark">$0.00</span>
-                                        </div>
-                                        <div class="d-flex justify-content-between text-muted mb-1">
-                                            <span>(+) Ganancia Divisas:</span> <span id="lblCardGananciaDivisas" class="fw-bold text-dark">$0.00</span>
-                                        </div>
-                                        <div class="d-flex justify-content-between text-danger border-bottom pb-1">
-                                            <span>(-) Gastos:</span> <span id="lblCardGastos">-$0.00</span>
-                                        </div>
-                                        <div class="d-flex justify-content-between mt-1 fw-bold text-primary">
-                                            <span>(=) Utilidades del mes:</span> <span id="lblCardUtilidades">$0.00</span>
-                                        </div>
-                                        <div class="d-flex justify-content-between mt-1 pt-1 border-top text-muted small">
-                                            <span>Utilidades acum. (flujo):</span> <span id="lblUtilidadesAcumuladas">$0.00</span>
+                                        <div class="d-flex justify-content-between mt-1 fw-bold border-top pt-1">
+                                            <span>(=) NETO:</span> <span id="lblFormulaNeta">$0.00</span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="col-xl-3 col-md-6 mb-3">
+
+
+                        <div class="col-xl-4 col-md-6 mb-3">
                             <div class="card card-stat border-0 shadow-sm h-100">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-3">
@@ -547,7 +516,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                             </div>
                         </div>
 
-                        <div class="col-xl-3 col-md-6 mb-3">
+                        <div class="col-xl-4 col-md-6 mb-3">
                             <div class="card card-stat border-0 shadow-sm h-100">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-3">
@@ -1189,13 +1158,16 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         function cargarResumen() {
             $.getJSON(`api/reportes.php?tipo=resumen&${getParams()}`, function(data) {
                 
-                // 1. Llenar Ganancia Neta y su Mini-Calculadora
+                // 1. Llenar Ganancia Neta
                 const neta = parseFloat(data.ganancia_neta) || 0;
+                const gastosFijos = parseFloat(data.gastos_fijos) || 0;
+                const gastosVariables = parseFloat(data.gastos_variables) || 0;
+                const totalGastos = gastosFijos + gastosVariables;
                 $('#statGananciaTotal').text('$' + formatoNumero(neta));
                 $('#lblFormulaBruta').text('$' + formatoNumero(data.ganancia_bruta));
-                $('#lblGastosFijos').text('-$' + formatoNumero(data.gastos_fijos));
-                $('#lblGastosVariables').text('-$' + formatoNumero(data.gastos_variables));
-                $('#lblBrutaMenosFijos').text('$' + formatoNumero(data.resultado_bruta_menos_fijos));
+                $('#lblTotalGastos').text('-$' + formatoNumero(totalGastos));
+                $('#lblGastosFijos').text('-$' + formatoNumero(gastosFijos));
+                $('#lblGastosVariables').text('-$' + formatoNumero(gastosVariables));
                 $('#lblFormulaNeta').text('$' + formatoNumero(neta));
 
                 // Colores para ganancia/pérdida
@@ -1209,14 +1181,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     $('#iconNeta').removeClass('ti-trending-down').addClass('ti-trending-up');
                 }
 
-                // 2. Llenar Comisiones AMIRI (Waterfall a Utilidades)
                 let totalRetencion = parseFloat(data.comisiones_amiri) + parseFloat(data.comisiones_promotores);
-                $('#statComisionesAmiri').text('$' + formatoNumero(data.comisiones_amiri));
-                $('#lblCardComisionAmiri').text('$' + formatoNumero(data.comisiones_amiri));
-                $('#lblCardGananciaDivisas').text('$' + formatoNumero(data.ganancia_divisas_total));
-                $('#lblCardGastos').text('-$' + formatoNumero(data.gastos_total));
-                $('#lblCardUtilidades').text('$' + formatoNumero(data.ganancia_neta));
-                $('#lblUtilidadesAcumuladas').text('$' + formatoNumero(data.utilidades_acumuladas));
 
                 // 3. Llenar Ganancia Divisas (USDT vs USD)
                 let usd = parseFloat(data.ganancia_usd) || 0;
@@ -1958,6 +1923,13 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         }
 
 
+
+        // Toggle detalle de gastos
+
+        $(document).on('click', '#gastosToggle', function() {
+            $('#gastosDetalle').slideToggle(200);
+            $('#gastosChevron').toggleClass('ti-chevron-down ti-chevron-up');
+        });
 
         // Evento del botón filtrar
 

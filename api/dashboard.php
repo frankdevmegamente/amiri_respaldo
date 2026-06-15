@@ -12,14 +12,24 @@ require_once __DIR__ . '/../src/config/db.php';
 
  */
 
-function generarPDFComisionesAmiri($pdo, $totalComisiones, $totalGastos, $remanente, $graficaData, $params, $filtroFecha, $cuentaAmiriId) {
+function generarPDFComisionesAmiri($pdo, $totalComisiones, $totalesExtra, $graficaData, $params, $filtroFecha, $cuentaAmiriId) {
+
+    $gananciaBruta = $totalesExtra['ganancia_bruta'];
+    $gananciaDivisas = $totalesExtra['ganancia_divisas'];
+    $gananciaUSD = $totalesExtra['ganancia_usd'];
+    $gananciaUSDT = $totalesExtra['ganancia_usdt'];
+    $totalGastos = $totalesExtra['gastos_fijos'] + $totalesExtra['gastos_variables'];
+    $gastosFijos = $totalesExtra['gastos_fijos'];
+    $gastosVariables = $totalesExtra['gastos_variables'];
+    $utilidadNeta = $totalesExtra['utilidad_neta'];
+    $utilidadesAcumuladas = $totalesExtra['utilidades_acumuladas'];
 
     // Eliminar el parámetro de cuenta porque ya no es necesario
     if (isset($params[':cuentaId'])) {
         unset($params[':cuentaId']);
     }
 
-    // Obtener detalle de comisiones SOLO de AMIRI (Sincronizado con Reportes)
+    // Obtener detalle de comisiones SOLO de AMIRI
     $sqlDetalle = "SELECT fm.fecha, 'Comisión Amiri' as descripcion, 'Venta de Efectivo' as servicio, fm.comision_amiri as monto, 
                    cl.nombre as cliente
                    FROM deudas_clientes fm
@@ -28,250 +38,156 @@ function generarPDFComisionesAmiri($pdo, $totalComisiones, $totalGastos, $remane
     
     $sqlDetalle .= $filtroFecha . " ORDER BY fm.fecha DESC";
 
-    
-
     $stmt = $pdo->prepare($sqlDetalle);
-
     $stmt->execute($params);
-
     $comisiones = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    
-
     // Determinar período para el título
-
     $periodo = 'Todo el Historial';
-
     if (isset($_GET['mes']) && isset($_GET['anio'])) {
-
         $meses = ['01'=>'Enero', '02'=>'Febrero', '03'=>'Marzo', '04'=>'Abril', '05'=>'Mayo', '06'=>'Junio',
-
                   '07'=>'Julio', '08'=>'Agosto', '09'=>'Septiembre', '10'=>'Octubre', '11'=>'Noviembre', '12'=>'Diciembre'];
-
         $periodo = $meses[$_GET['mes']] . ' ' . $_GET['anio'];
-
     } elseif (isset($_GET['anio'])) {
-
         $periodo = 'Año ' . $_GET['anio'];
-
     } elseif (isset($_GET['fecha_desde']) && isset($_GET['fecha_hasta'])) {
-
         $periodo = $_GET['fecha_desde'] . ' al ' . $_GET['fecha_hasta'];
-
     }
 
-    
+    $fmt = function($n) { return '$' . number_format($n, 2); };
+    $diff = $utilidadesAcumuladas - $utilidadNeta;
 
     // Generar HTML para el PDF
-
     header('Content-Type: text/html; charset=UTF-8');
-
     ?>
-
     <!DOCTYPE html>
-
     <html>
-
     <head>
-
         <meta charset="UTF-8">
-
-        <title>Comisiones AMIRI - <?= $periodo ?></title>
-
+        <title>Reporte Financiero - <?= $periodo ?></title>
         <style>
-
-            body { font-family: Arial, sans-serif; margin: 20px; }
-
-            h1 { color: #333; border-bottom: 3px solid #5D87FF; padding-bottom: 10px; }
-
-            h2 { color: #666; margin-top: 30px; }
-
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-
-            th { background-color: #5D87FF; color: white; padding: 10px; text-align: left; }
-
-            td { padding: 8px; border-bottom: 1px solid #ddd; }
-
+            body { font-family: Arial, sans-serif; font-size: 11px; color: #333; margin: 20px; }
+            .header { background: #2c3e50; color: white; padding: 18px; margin-bottom: 18px; text-align: center; }
+            .header h1 { margin: 0; font-size: 20px; }
+            .header p { margin: 4px 0 0; color: #bdc3c7; font-size: 12px; }
+            .section { background: #fff; border: 1px solid #dee2e6; padding: 14px; margin-bottom: 12px; }
+            .s-title { font-size: 13px; font-weight: bold; padding-bottom: 7px; border-bottom: 2px solid; margin-bottom: 8px; }
+            .s-title.g { color: #28a745; border-color: #28a745; }
+            .s-title.r { color: #dc3545; border-color: #dc3545; }
+            .s-title.b { color: #007bff; border-color: #007bff; }
+            .s-title.p { color: #6f42c1; border-color: #6f42c1; }
+            table.info { width: 100%; border-collapse: collapse; }
+            table.info td { padding: 4px 6px; }
+            .lbl { color: #666; }
+            .val { font-weight: 600; }
+            .val.g { color: #28a745; }
+            .val.r { color: #dc3545; }
+            .val.b { color: #007bff; }
+            .val.p { color: #6f42c1; }
+            .val.d { color: #333; }
+            table.detail { width: 100%; border-collapse: collapse; margin-top: 5px; }
+            table.detail th { background: #5D87FF; color: white; padding: 8px; text-align: left; }
+            table.detail td { padding: 6px 8px; border-bottom: 1px solid #eee; }
             tr:nth-child(even) { background-color: #f9f9f9; }
-
-            .resumen { background-color: #f0f8ff; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
-
-            .resumen div { margin: 5px 0; font-size: 16px; }
-
-            .comision { color: #28a745; font-weight: bold; }
-
-            .total { font-size: 18px; font-weight: bold; }
-
-            .logo { text-align: center; margin-bottom: 20px; }
-
-            .logo h1 { color: #5D87FF; font-size: 2.5rem; margin: 0; }
-
-            @media print {
-
-                body { margin: 0; }
-
-                button { display: none; }
-
-            }
-
+            .footer { text-align: center; color: #999; font-size: 9px; margin-top: 18px; padding-top: 8px; border-top: 1px solid #eee; }
+            @media print { body { margin: 0; } }
         </style>
-
     </head>
-
     <body>
-
-        <div class="logo">
-
-            <h1>🔷 AMIRI</h1>
-
-            <p style="color: #666; margin-top: 0;">Sistema de Gestión de Comisiones</p>
-
+        <div class="header">
+            <h1>Reporte Financiero AMIRI</h1>
+            <p>Período: <?= htmlspecialchars($periodo) ?> | Generado: <?= date('d/m/Y H:i') ?></p>
         </div>
 
-        
-
-        <h1>Reporte de Comisiones AMIRI</h1>
-
-        <div class="resumen">
-
-            <div><strong>Período:</strong> <?= $periodo ?></div>
-
-            <div><strong>Fecha de Generación:</strong> <?= date('d/m/Y H:i') ?></div>
-
-        </div>
-
-        
-
-        <div class="resumen">
-
-            <div class="comision"><strong>Comisiones Generadas:</strong> $<?= number_format($totalComisiones, 2) ?></div>
-
-            <div style="color: #dc3545;"><strong>Gastos Generados:</strong> $<?= number_format($totalGastos, 2) ?></div>
-
-            <div class="total" style="color: #0dcaf0;"><strong>Remanente:</strong> $<?= number_format($remanente, 2) ?></div>
-
-        </div>
-
-        
-
-        <h2>Resumen por Fecha</h2>
-
-        <table>
-
-            <thead>
-
-                <tr>
-
-                    <th>Fecha</th>
-
-                    <th style="text-align: right;">Total del Día</th>
-
-                </tr>
-
-            </thead>
-
-            <tbody>
-
-                <?php foreach ($graficaData as $row): ?>
-
-                <tr>
-
-                    <td><?= htmlspecialchars($row['fecha']) ?></td>
-
-                    <td style="text-align: right;" class="comision">$<?= number_format($row['total'], 2) ?></td>
-
-                </tr>
-
-                <?php endforeach; ?>
-
-            </tbody>
-
+        <table style="width:100%;border-collapse:collapse;margin-bottom:12px;" cellpadding="0" cellspacing="0">
+            <tr>
+                <td style="width:25%;padding:6px;border:1px solid #dee2e6;border-left:4px solid #28a745;text-align:center;">
+                    <div style="font-size:10px;color:#28a745;font-weight:600;">Ganancia Bruta</div>
+                    <div style="font-size:16px;font-weight:bold;color:#28a745;margin-top:3px;"><?= $fmt($gananciaBruta) ?></div>
+                </td>
+                <td style="width:25%;padding:6px;border:1px solid #dee2e6;border-left:4px solid #dc3545;text-align:center;">
+                    <div style="font-size:10px;color:#dc3545;font-weight:600;">Gastos Totales</div>
+                    <div style="font-size:16px;font-weight:bold;color:#dc3545;margin-top:3px;"><?= $fmt($totalGastos) ?></div>
+                </td>
+                <td style="width:25%;padding:6px;border:1px solid #dee2e6;border-left:4px solid #007bff;text-align:center;">
+                    <div style="font-size:10px;color:#007bff;font-weight:600;">Utilidad del Mes</div>
+                    <div style="font-size:16px;font-weight:bold;color:#007bff;margin-top:3px;"><?= $fmt($utilidadNeta) ?></div>
+                </td>
+                <td style="width:25%;padding:6px;border:1px solid #dee2e6;border-left:4px solid #6f42c1;text-align:center;">
+                    <div style="font-size:10px;color:#6f42c1;font-weight:600;">Flujo Acumulado</div>
+                    <div style="font-size:16px;font-weight:bold;color:#6f42c1;margin-top:3px;"><?= $fmt($utilidadesAcumuladas) ?></div>
+                </td>
+            </tr>
         </table>
 
-        
+        <div class="section">
+            <div class="s-title g">(+) Ingresos</div>
+            <table class="info">
+                <tr><td class="lbl">Comisiones AMIRI</td><td align="right" class="val g"><?= $fmt($totalComisiones) ?></td></tr>
+                <tr><td class="lbl">Ganancia Divisas</td><td align="right" class="val g"><?= $fmt($gananciaDivisas) ?></td></tr>
+                <tr><td class="lbl" style="padding-left:15px;">&nbsp;&nbsp;&nbsp;• USD (Físico)</td><td align="right" class="val" style="color:#555;"><?= $fmt($gananciaUSD) ?></td></tr>
+                <tr><td class="lbl" style="padding-left:15px;">&nbsp;&nbsp;&nbsp;• USDT (Tether)</td><td align="right" class="val" style="color:#555;"><?= $fmt($gananciaUSDT) ?></td></tr>
+                <tr><td class="lbl" style="font-weight:bold;padding-top:6px;border-top:2px solid #333;">Ganancia Bruta</td><td align="right" class="val g" style="font-weight:bold;padding-top:6px;border-top:2px solid #333;"><?= $fmt($gananciaBruta) ?></td></tr>
+            </table>
+        </div>
 
-        <h2>Detalle de Comisiones</h2>
+        <div class="section">
+            <div class="s-title r">(-) Gastos</div>
+            <table class="info">
+                <tr><td class="lbl">Gastos Fijos</td><td align="right" class="val r"><?= $fmt($gastosFijos) ?></td></tr>
+                <tr><td class="lbl">Gastos Variables</td><td align="right" class="val r"><?= $fmt($gastosVariables) ?></td></tr>
+                <tr><td class="lbl" style="font-weight:bold;padding-top:6px;border-top:2px solid #333;">Gastos Totales</td><td align="right" class="val r" style="font-weight:bold;padding-top:6px;border-top:2px solid #333;"><?= $fmt($totalGastos) ?></td></tr>
+            </table>
+        </div>
 
-        <table>
+        <div class="section">
+            <div class="s-title b">(=) Resultado del Período</div>
+            <table class="info">
+                <tr><td class="lbl" style="font-size:14px;font-weight:bold;">Utilidad del Mes</td><td align="right" class="val b" style="font-size:15px;font-weight:bold;"><?= $fmt($utilidadNeta) ?></td></tr>
+            </table>
+        </div>
 
+        <div class="section">
+            <div class="s-title p">Histórico</div>
+            <table class="info">
+                <tr><td class="lbl">Utilidades Acumuladas (Flujo)</td><td align="right" class="val d"><?= $fmt($utilidadesAcumuladas) ?></td></tr>
+                <tr><td class="lbl" style="border-bottom:1px dashed #ddd;padding-bottom:6px;">Diferencia (meses anteriores)</td><td align="right" class="val d" style="border-bottom:1px dashed #ddd;padding-bottom:6px;"><?= $fmt($diff) ?></td></tr>
+            </table>
+        </div>
+
+        <h2 style="font-size:13px;font-weight:bold;color:#333;margin-top:20px;">Detalle de Comisiones</h2>
+        <table class="detail">
             <thead>
-
                 <tr>
-
                     <th>Fecha</th>
-
                     <th>Servicio</th>
-
                     <th>Cliente</th>
-
-                    <th>Descripción</th>
-
-                    <th style="text-align: right;">Monto</th>
-
+                    <th style="text-align:right;">Monto</th>
                 </tr>
-
             </thead>
-
             <tbody>
-
                 <?php foreach ($comisiones as $com): ?>
-
                 <tr>
-
                     <td><?= htmlspecialchars($com['fecha']) ?></td>
-
-                    <td><strong><?= htmlspecialchars($com['servicio'] ?? 'N/A') ?></strong></td>
-
+                    <td><?= htmlspecialchars($com['servicio'] ?? 'N/A') ?></td>
                     <td><?= htmlspecialchars($com['cliente'] ?? '-') ?></td>
-
-                    <td><small><?= htmlspecialchars($com['descripcion']) ?></small></td>
-
-                    <td style="text-align: right;" class="comision">$<?= number_format($com['monto'], 2) ?></td>
-
+                    <td style="text-align:right;font-weight:600;color:#28a745;"><?= $fmt($com['monto']) ?></td>
                 </tr>
-
                 <?php endforeach; ?>
-
-                <tr style="background-color: #e3f2fd; font-weight: bold;">
-
-                    <td colspan="4" style="text-align: right;">TOTAL:</td>
-
-                    <td style="text-align: right;" class="comision">$<?= number_format($totalComisiones, 2) ?></td>
-
+                <tr style="background:#e3f2fd;font-weight:bold;">
+                    <td colspan="3" style="text-align:right;padding:8px;">TOTAL:</td>
+                    <td style="text-align:right;padding:8px;color:#28a745;"><?= $fmt($totalComisiones) ?></td>
                 </tr>
-
             </tbody>
-
         </table>
 
-        
+        <div class="footer">AMIRI - Sistema de Gestión | Generado el <?= date('d/m/Y H:i:s') ?></div>
 
-        <div style="margin-top: 30px; text-align: center; color: #999;">
-
-            <small>AMIRI - Sistema de Gestión de Comisiones</small>
-
-        </div>
-
-        
-
-        <script>
-
-            window.onload = function() {
-
-                window.print();
-
-            };
-
-        </script>
-
+        <script>window.onload = function() { window.print(); };</script>
     </body>
-
     </html>
-
     <?php
-
     exit;
-
 }
 
 
@@ -358,6 +274,18 @@ try {
         $stmt->execute($paramsComisiones);
         $totalComisiones = (float)$stmt->fetchColumn();
 
+        // Ganancia Divisas (USD + USDT) para sumar al total (Sync con Reportes)
+        $filtroFechaMov = str_replace('fm.fecha', 'fecha', $filtroFecha);
+        $sqlUSD = "SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE servicio_id = 2 AND tipo = 'comision' AND cuenta_destino_id = 1 AND activo = 1" . $filtroFechaMov;
+        $sqlUSDT = "SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE servicio_id = 3 AND tipo = 'comision' AND cuenta_destino_id = 1 AND activo = 1" . $filtroFechaMov;
+        $stmtUSD = $pdo->prepare($sqlUSD);
+        $stmtUSD->execute($paramsComisiones);
+        $gananciaUSD = (float)$stmtUSD->fetchColumn();
+        $stmtUSDT = $pdo->prepare($sqlUSDT);
+        $stmtUSDT->execute($paramsComisiones);
+        $gananciaUSDT = (float)$stmtUSDT->fetchColumn();
+        $totalGananciaDivisas = $gananciaUSD + $gananciaUSDT;
+
         // Datos para la gráfica (agrupados por fecha) SOLO de AMIRI (Sincronizado con Reportes)
         $sqlGrafica = "SELECT DATE(fm.fecha) as fecha, SUM(comision_amiri) as total
                        FROM deudas_clientes fm
@@ -388,34 +316,47 @@ try {
 
 
 
-        // Calcular total de gastos y su desglose (Fijos / Variables)
+        // Calcular total de gastos y su desglose (Fijos / Variables) - sincronizado con Reportes
+        $filtroFechaGastos = str_replace('fm.fecha', 'fecha', $filtroFecha);
         $sqlGastos = "
-            SELECT
-                COALESCE(SUM(g.monto), 0) as total,
-                COALESCE(SUM(CASE WHEN g.clasificacion = 'fijo' THEN g.monto ELSE 0 END), 0) as fijos,
-                COALESCE(SUM(CASE WHEN g.clasificacion = 'variable' THEN g.monto ELSE 0 END), 0) as variables
-            FROM movimientos fm
-            LEFT JOIN gastos g ON fm.gasto_id = g.id
-            WHERE fm.tipo = 'salida' AND fm.activo = 1
-            AND (fm.estado = 'activo' OR fm.estado IS NULL) AND (g.id IS NULL OR g.activo = 1)
-            AND fm.cuenta_origen_id = :cuentaId";
+            SELECT 
+                COALESCE(SUM(monto), 0) as total, 
+                COALESCE(SUM(CASE WHEN clasificacion = 'fijo' THEN monto ELSE 0 END), 0) as fijos, 
+                COALESCE(SUM(CASE WHEN clasificacion = 'variable' THEN monto ELSE 0 END), 0) as variables
+            FROM gastos
+            WHERE activo = 1";
 
-        $sqlGastos .= $filtroFecha;
+        $sqlGastos .= $filtroFechaGastos;
 
         $stmtGastos = $pdo->prepare($sqlGastos);
-        $stmtGastos->execute($params);
+        $stmtGastos->execute($paramsComisiones);
         $gastosRow = $stmtGastos->fetch(PDO::FETCH_ASSOC);
 
         $totalGastos = (float)$gastosRow['total'];
         $gastosFijos = (float)$gastosRow['fijos'];
         $gastosVariables = (float)$gastosRow['variables'];
 
-        // Calcular remanente (comisiones - gastos)
-        $remanente = $totalComisiones - $totalGastos;
+        // Calcular remanente (comisiones + divisas - gastos)
+        $remanente = ($totalComisiones + $totalGananciaDivisas) - $totalGastos;
+
+        // Utilidades acumuladas históricas (cuenta Capital)
+        $stmtUtil = $pdo->query("SELECT COALESCE(SUM(saldo_actual), 0) as total FROM cuentas WHERE tipo_cuenta = 3 AND activo = 1");
+        $utilidadesAcumuladas = (float)$stmtUtil->fetchColumn();
 
         // GENERAR PDF
         if (isset($_GET['pdf'])) {
-            generarPDFComisionesAmiri($pdo, $totalComisiones, $totalGastos, $remanente, $graficaData, $params, $filtroFecha, $cuentaAmiriId);
+            $totalesExtra = [
+                'ganancia_bruta' => $totalComisiones + $totalGananciaDivisas,
+                'ganancia_divisas' => $totalGananciaDivisas,
+                'ganancia_usd' => $gananciaUSD,
+                'ganancia_usdt' => $gananciaUSDT,
+                'gastos_fijos' => $gastosFijos,
+                'gastos_variables' => $gastosVariables,
+                'utilidad_neta' => $remanente,
+                'utilidades_acumuladas' => $utilidadesAcumuladas,
+                'comisiones_promotores' => 0,
+            ];
+            generarPDFComisionesAmiri($pdo, $totalComisiones, $totalesExtra, $graficaData, $params, $filtroFecha, $cuentaAmiriId);
             exit;
         }
 
@@ -425,8 +366,16 @@ try {
             'gastos_fijos' => $gastosFijos,
             'gastos_variables' => $gastosVariables,
             'remanente' => $remanente,
+            'utilidades_acumuladas' => $utilidadesAcumuladas,
             'grafica_fechas' => $grafica_fechas,
-            'grafica_montos' => $grafica_montos
+            'grafica_montos' => $grafica_montos,
+            'total_ganancia_divisas' => $totalGananciaDivisas,
+            '_explicacion' => [
+                'remanente' => 'Utilidad neta del período. Fórmula: (Comisiones AMIRI + Ganancia Divisas) - Gastos Totales. La diferencia con "Utilidades acum. (flujo)" en reportes es el saldo arrastrado de meses anteriores.',
+                'total_comisiones' => 'Suma de comision_amiri en deudas_clientes activas del período.',
+                'total_gastos' => 'Suma de gastos operativos (fijos + variables) registrados en el período.',
+                'total_ganancia_divisas' => 'Utilidad FIFO generada por compra/venta de USD y USDT.',
+            ]
         ]);
         exit;
 

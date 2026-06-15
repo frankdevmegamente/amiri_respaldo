@@ -643,6 +643,7 @@ try {
                         title: 'Fecha',
                         render: function(data, type, row) {
                             if (!data) return 'N/A';
+                            if (type === 'sort' || type === 'type') return data;
                             
                             // Fecha de la operación principal (sin la zona horaria que resta un día)
                             const soloFecha = data.split(' ')[0]; 
@@ -709,7 +710,7 @@ try {
 
                 order: [[0, 'desc']],
 
-                language: { url: "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" }
+                language: { url: "https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json" }
 
             });
 

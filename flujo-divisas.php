@@ -1134,7 +1134,7 @@ $serviciosDivisas = [
 
                             let monto = parseFloat(row.monto_principal);
 
-                            let tc = parseFloat(row.tipo_cambio || 0);
+                            let tc = parseFloat(row.tipo_cambio || row.paridad || 0);
 
                             let moneda = row.moneda;
 
@@ -1258,7 +1258,7 @@ $serviciosDivisas = [
 
                     let monto = parseFloat(row.monto_principal);
 
-                    let tc = parseFloat(row.tipo_cambio || 0);
+                    let tc = parseFloat(row.tipo_cambio || row.paridad || 0);
 
                     let convertido = convertir && tc > 0 ? (monto * tc) : monto;
 

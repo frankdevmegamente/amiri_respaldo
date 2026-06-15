@@ -238,7 +238,7 @@ try {
         SELECT 
             MIN(fm.id) as id,
             fm.grupo_id,
-            fm.fecha,
+            MAX(fm.fecha) as fecha,
             MAX(fm.creado_en) as creado_en,
             MAX(fm.corregido_en) as corregido_en,
             MAX(fm.estado) as estado,
@@ -264,7 +264,7 @@ try {
 
             -- Suma total para pagos/cobros múltiples
             CASE 
-                WHEN COUNT(*) > 1 AND MAX(fm.servicio_id) IN (14, 17) THEN SUM(fm.monto)
+                WHEN COUNT(*) > 1 AND MAX(fm.servicio_id) IN (13, 14, 17) THEN SUM(fm.monto)
                 ELSE GREATEST(
                     MAX(CASE WHEN fm.tipo = 'entrada' THEN fm.monto ELSE 0 END),
                     MAX(CASE WHEN fm.tipo = 'salida' THEN fm.monto ELSE 0 END),
@@ -282,11 +282,15 @@ try {
 
             MAX(fm.paridad) as paridad,
 
-            -- DESCRIPCIÓN INTELIGENTE CON NOMBRES
+            -- DESCRIPCIÃ“N INTELIGENTE CON NOMBRES
             CASE 
                 -- Si es pago múltiple a prestamistas (Servicio 14)
                 WHEN COUNT(*) > 1 AND MAX(fm.servicio_id) = 14 THEN 
                     CONCAT('Pago múltiple (', COUNT(*), '): ', GROUP_CONCAT(DISTINCT pres.nombre SEPARATOR ', '))
+                
+                -- Si es pago múltiple a clientes (Servicio 13)
+                WHEN COUNT(*) > 1 AND MAX(fm.servicio_id) = 13 THEN 
+                    CONCAT('Pago múltiple (', COUNT(*), '): ', GROUP_CONCAT(DISTINCT cl.nombre SEPARATOR ', '))
                 
                 -- Si es cobro múltiple de préstamos otorgados (Servicio 17)
                 WHEN COUNT(*) > 1 AND MAX(fm.servicio_id) = 17 THEN 
@@ -302,19 +306,17 @@ try {
         LEFT JOIN clientes cl ON fm.cliente_id = cl.id
         LEFT JOIN proveedores p ON fm.proveedor_id = p.id
         LEFT JOIN promotores pr ON fm.promotor_id = pr.id
-        LEFT JOIN prestamistas pres ON fm.prestamista_id = pres.id -- UNIÓN VITAL
+        LEFT JOIN prestamistas pres ON fm.prestamista_id = pres.id -- UNIÃ“N VITAL
         WHERE $whereClause
-        GROUP BY fm.grupo_id, fm.fecha, s.nombre, fm.moneda
+        GROUP BY fm.grupo_id, s.nombre, fm.moneda
     ";
 
     
 
-    // Si se ordena por fecha, ordenar por creado_en para tener el orden cronológico exacto
-
-    // Ordenar por la fecha de operación seleccionada, y usar la fecha de captura como desempate
     if ($orderColumn === 'fecha') {
-        $orderColumn = "fecha $orderDir, creado_en";
-        $orderDir = "DESC";
+        $orderClause = "fecha $orderDir, creado_en $orderDir";
+    } else {
+        $orderClause = "$orderColumn $orderDir";
     }
 
     
@@ -325,7 +327,7 @@ try {
 
         SELECT * FROM ($subquery) as grouped
 
-        ORDER BY $orderColumn $orderDir
+        ORDER BY $orderClause
 
         LIMIT :start, :length
 
@@ -398,6 +400,9 @@ try {
     jsonError($e->getMessage(), 500);
 
 }
+
+
+
 
 
 

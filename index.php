@@ -248,8 +248,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 <div class="col-md-4">
                   <div class="card shadow-sm border-start border-info border-4 h-100">
                     <div class="card-body">
-                      <h6 class="text-muted">Remanente</h6>
+                      <h6 class="text-muted">Remanente <i class="ti ti-info-circle text-muted tooltip-icon" data-explica="remanente" style="cursor:help;font-size:13px;"></i></h6>
                       <h3 class="text-info" id="remanenteAmiri">$0.00</h3>
+                      <small class="text-muted fw-bold d-block mt-1">
+                          Remanente: <span id="remanenteFlujo" class="text-info">$0.00</span> |
+                          Saldo ant.: <span id="remanenteDiff" class="text-warning">$0.00</span>
+                      </small>
                     </div>
                   </div>
                 </div>
@@ -553,14 +557,29 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         }
 
         // --- ¡Aquí es el lugar correcto, cuando la API responde con éxito! ---
-        $('#comisionesAmiriTotal').text(formatoMoneda(data.total_comisiones));
+        $('#comisionesAmiriTotal').text(formatoMoneda(data.total_comisiones + data.total_ganancia_divisas));
         $('#gastosGeneradosAmiri').text(formatoMoneda(data.total_gastos));
         
         // Alimentamos los span con la nueva información de Fijos y Variables
         $('#gastosFijosAmiri').text(formatoMoneda(data.gastos_fijos));
         $('#gastosVarAmiri').text(formatoMoneda(data.gastos_variables));
 
-        $('#remanenteAmiri').text(formatoMoneda(data.remanente));
+        $('#remanenteAmiri').text(formatoMoneda(data.utilidades_acumuladas));
+        $('#remanenteFlujo').text(formatoMoneda(data.remanente));
+        $('#remanenteDiff').text(formatoMoneda(data.utilidades_acumuladas - data.remanente));
+
+        // Inicializar tooltips con explicaciones
+        if (data._explicacion) {
+            $('.tooltip-icon').each(function() {
+                const key = $(this).data('explica');
+                const texto = data._explicacion[key];
+                if (texto) {
+                    $(this).attr('title', texto);
+                }
+            });
+            $('.tooltip-icon').tooltip('dispose');
+            $('[title]').tooltip({ placement: 'top', trigger: 'hover' });
+        }
 
         // Renderizar gráfica
         renderComisionesAmiriChart(data.grafica_fechas || [], data.grafica_montos || []);

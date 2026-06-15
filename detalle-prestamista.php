@@ -260,7 +260,7 @@ try {
 
                     <div class="row mb-4">
                         <!-- Información del Prestamista -->
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="card shadow-sm border-0 rounded-4 h-100" style="position: relative; overflow: hidden;">
                                 
                                 <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #5D87FF; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
@@ -324,8 +324,28 @@ try {
                             </div>
                         </div>
 
+                        <!-- Resumen de Saldos -->
+                        <div class="col-md-4">
+                            <div class="card shadow-sm border-0 rounded-4 h-100">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                                        <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            <i class="ti ti-report-money fs-5"></i>
+                                        </div>
+                                        <h5 class="card-title fw-semibold mb-0">Resumen de Saldos</h5>
+                                    </div>
+                                    <div id="resumenSaldos">
+                                        <div class="text-center py-3">
+                                            <div class="spinner-border spinner-border-sm text-warning" role="status"></div>
+                                            <small class="text-muted ms-2">Cargando...</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Formulario Nuevo Préstamo -->
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="card shadow-sm border-0 rounded-4 h-100">
                                 <div class="card-body p-4">
                                     <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
@@ -402,6 +422,7 @@ try {
                                                     <th>Descripción</th>
                                                     <th>Estado</th>
                                                     <th>Pagado</th>
+                                                    <th>Concepto Pago</th>
                                                     <th>Fecha Pago</th>
                                                     <th>Acciones</th>
                                                 </tr>
@@ -591,7 +612,19 @@ try {
 
                             </div>
 
+                            <div class="row mb-3">
 
+                                <div class="col-md-12">
+
+                                    <label class="form-label">Concepto del Pago</label>
+
+                                    <input type="text" class="form-control" id="conceptoPago" name="concepto_pago" placeholder="Ej: Pago mensual, Liquidación, etc.">
+
+                                    <small class="text-muted">Descripción opcional que aparecerá en el movimiento</small>
+
+                                </div>
+
+                            </div>
 
                             <div class="alert alert-info" id="resumenPago" style="display: none;">
 
@@ -781,18 +814,14 @@ try {
                         title: 'Fecha',
                         render: function(data, type, row) {
                             if (!data) return 'N/A';
+                            if (type === 'sort' || type === 'type') return data;
                             
-                            // 1. EXTRAEMOS LA FECHA EXACTA EN TEXTO (Ignorando las zonas horarias)
-                            // Si data es "2026-03-31 15:30:00", lo cortamos a "2026-03-31"
                             const soloFecha = data.split(' ')[0]; 
-                            // Lo separamos por guiones [2026, 03, 31]
                             const partes = soloFecha.split('-'); 
-                            // Lo armamos al estilo latino: DD/MM/YYYY
                             const fechaOperacion = `${partes[2]}/${partes[1]}/${partes[0]}`; 
                             
                             let infoExtra = '';
                             
-                            // 2. LA FECHA DE CAPTURA (Esa sí dejamos que use tu función normal)
                             if (row.creado_en) {
                                 let captura = typeof formatearFechaHora === 'function' ? formatearFechaHora(row.creado_en) : row.creado_en;
                                 infoExtra = `<br><small class="text-muted" style="font-size: 0.7rem;"><i class="ti ti-device-floppy"></i> Capturado: ${captura}</small>`;
@@ -830,17 +859,26 @@ try {
                         render: d => formatoMoneda(d)
                     },
                     {
+                        data: 'ultimo_concepto_pago',
+                        title: 'Concepto Pago',
+                        render: function(data, type, row) {
+                            if (!data || data === '') return '<span class="text-muted">—</span>';
+                            let estado = row.estado || '';
+                            let badge = estado === 'pagado' ? 'success' : estado === 'parcial' ? 'warning' : 'secondary';
+                            return `<span class="badge bg-${badge} bg-opacity-10 text-${badge} border-0" style="font-size: 0.75rem;">${data}</span>`;
+                        }
+                    },
+                    {
                         data: 'fecha_pago',
                         title: 'Fecha Pago',
                         render: function(data, type, row) {
                             if (!data || data === '0000-00-00 00:00:00' || data === '0000-00-00') return '<span class="text-muted">N/A</span>';
+                            if (type === 'sort' || type === 'type') return data;
                             
-                            // 1. Extraemos la fecha exacta ignorando zonas horarias
                             const soloFecha = data.split(' ')[0]; 
                             const partes = soloFecha.split('-'); 
                             const fechaOperacion = `${partes[2]}/${partes[1]}/${partes[0]}`; 
                             
-                            // 2. La fecha de captura exacta (Usamos el mismo 'data' porque ahí guardamos la hora)
                             let captura = typeof formatearFechaHora === 'function' ? formatearFechaHora(data) : data;
                             let infoExtra = `<br><small class="text-muted" style="font-size: 0.7rem;"><i class="ti ti-device-floppy"></i> Capturado: ${captura}</small>`;
                             
@@ -859,14 +897,60 @@ try {
                         }
                     }
                 ],
-                order: [],
+                order: [[1, 'desc']],
                 // Agregar el idioma español
                 language: {
                     url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
                 }
             });
 
-            
+            /* ============================================================
+               CARGA DE SALDOS / RESUMEN
+            ============================================================ */
+            function cargarResumenSaldos() {
+                $.get('api/prestamos-prestamistas.php?resumen=1&prestamista_id=<?= $prestamista_id ?>', function(data) {
+                    const totalPrestado = parseFloat(data.total_prestado) || 0;
+                    const totalPagado = parseFloat(data.total_pagado) || 0;
+                    const saldoPendiente = parseFloat(data.saldo_pendiente) || 0;
+
+                    const pct = totalPrestado > 0 ? ((totalPagado / totalPrestado) * 100).toFixed(1) : 0;
+
+                    $('#resumenSaldos').html(`
+                        <div class="d-flex align-items-center justify-content-between mb-3 p-3 bg-light rounded">
+                            <div>
+                                <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Total Prestado</p>
+                                <h4 class="fw-bold mb-0 text-primary mt-1">${formatoMoneda(totalPrestado)}</h4>
+                            </div>
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="ti ti-arrow-up-right text-primary fs-5"></i>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between mb-3 p-3 bg-light rounded">
+                            <div>
+                                <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Total Pagado</p>
+                                <h4 class="fw-bold mb-0 text-success mt-1">${formatoMoneda(totalPagado)}</h4>
+                            </div>
+                            <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                <i class="ti ti-arrow-down-left text-success fs-5"></i>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center justify-content-between p-3 bg-warning bg-opacity-10 rounded border border-warning border-opacity-25">
+                            <div>
+                                <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Saldo Pendiente</p>
+                                <h3 class="fw-bold mb-0 text-warning mt-1">${formatoMoneda(saldoPendiente)}</h3>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-warning bg-opacity-20 text-warning">${pct}% pagado</span>
+                            </div>
+                        </div>
+                    `);
+                }).fail(function() {
+                    $('#resumenSaldos').html('<div class="alert alert-danger mb-0">Error al cargar resumen</div>');
+                });
+            }
+
+            cargarResumenSaldos();
+
             /* ============================================================
                LÓGICA DE PAGO MÚLTIPLE
             ============================================================ */
@@ -1264,9 +1348,7 @@ $('#montoPagarHidden').val("");
 
             $(document).on('click', '#btnGuardarEdicion', function() {
                 const cuentaPagoId = $('#cuentaPagoSelect').val();
-                const fechaElegida = $('#editarFechaPago').val();
-                const horaActual = new Date().toTimeString().split(' ')[0];
-                const fechaPagoCompletada = fechaElegida ? (fechaElegida + ' ' + horaActual) : '';
+                const fechaPagoCompletada = $('#editarFechaPago').val();
 
                 if (!cuentaPagoId) return alert("Selecciona una cuenta de pago.");
 
@@ -1303,11 +1385,14 @@ $('#montoPagarHidden').val("");
                     data: JSON.stringify({
                         pagos: arrayPagos, // Enviamos el arreglo con las instrucciones exactas
                         cuenta_pago_id: cuentaPagoId,
-                        fecha_pago: fechaPagoCompletada
+                        fecha_pago: fechaPagoCompletada,
+                        descripcion: $('#conceptoPago').val()
                     }),
                     success: function(response) {
                         if (response.success) {
                             $('#modalPagarPrestamo').modal('hide');
+                            tablaPrestamos.ajax.reload();
+                            cargarResumenSaldos();
                             showToast("Pago registrado correctamente. Redirigiendo a Flujo...", "success");
                             setTimeout(() => { window.location.href = 'flujo.php'; }, 1500);
                         }
@@ -1389,10 +1474,7 @@ $('#montoPagarHidden').val("");
 
                 e.preventDefault();
 
-                // AQUÍ LE AGREGAMOS LA HORA AL NUEVO PRÉSTAMO
                 const fechaElegida = $('input[name="fecha"]').val();
-                const horaActual = new Date().toTimeString().split(' ')[0]; // Genera HH:MM:SS
-                const fechaConHora = fechaElegida + ' ' + horaActual;
 
                 $.post(
 
@@ -1402,7 +1484,7 @@ $('#montoPagarHidden').val("");
 
                         monto: parseMoneda($('#montoInput').val()),
 
-                        fecha: fechaConHora,
+                        fecha: fechaElegida,
 
                         cuenta_id: $('select[name="cuenta_id"]').val(),
 
@@ -1421,6 +1503,8 @@ $('#montoPagarHidden').val("");
                             $('#montoFormateadoNuevo').text(''); // Limpiar formato visual
 
                             tablaPrestamos.ajax.reload();
+
+                            cargarResumenSaldos();
 
                             showToast("Préstamo agregado", "success");
 
@@ -1467,6 +1551,8 @@ $('#montoPagarHidden').val("");
                     success() {
 
                         tablaPrestamos.ajax.reload();
+
+                        cargarResumenSaldos();
 
                         showToast("Préstamo eliminado", "success");
 

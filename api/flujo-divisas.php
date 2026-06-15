@@ -307,6 +307,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         actualizarSaldoCuenta($pdo, $cuenta_proveedor_id, $cantidad, 'entrada', $mov_adeudo_id, "Adeudo proveedor: $cantidad $moneda");
 
+                        // Actualizar valor_mxn con el equivalente en MXN del adeudo
+                        $valor_mxn_adeudo = round($cantidad * $tipo_cambio, 2);
+                        $pdo->prepare("UPDATE cuentas SET valor_mxn = COALESCE(valor_mxn, 0) + ? WHERE id = ?")
+                            ->execute([$valor_mxn_adeudo, $cuenta_proveedor_id]);
+
                 }
 
             } else {

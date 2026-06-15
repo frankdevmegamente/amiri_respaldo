@@ -13,19 +13,26 @@ $pdo = getPDO();
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $prestamista_id = isset($_GET['prestamista_id']) ? (int)$_GET['prestamista_id'] : 0;
     $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+    $resumen = isset($_GET['resumen']) ? (int)$_GET['resumen'] : 0;
     
     try {
-        if ($id > 0) {
-            $stmt = $pdo->prepare("SELECT * FROM deudas_empresa WHERE id = ? AND activo = 1");
+        if ($resumen && $prestamista_id > 0) {
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total_prestado, COALESCE(SUM(monto_pagado), 0) as total_pagado FROM deudas_empresa WHERE prestamista_id = ? AND activo = 1");
+            $stmt->execute([$prestamista_id]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $row['saldo_pendiente'] = round((float)$row['total_prestado'] - (float)$row['total_pagado'], 2);
+            echo json_encode($row);
+        } elseif ($id > 0) {
+            $stmt = $pdo->prepare("SELECT *, (SELECT m.descripcion FROM movimientos m WHERE m.referencia_id = deudas_empresa.id AND m.servicio_id = 14 AND m.tipo = 'salida' AND m.estado = 'activo' ORDER BY m.id DESC LIMIT 1) as ultimo_concepto_pago FROM deudas_empresa WHERE id = ? AND activo = 1");
             $stmt->execute([$id]);
             $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
             echo json_encode($prestamo ?: ['error' => 'No encontrado']);
         } elseif ($prestamista_id > 0) {
-            $stmt = $pdo->prepare("SELECT * FROM deudas_empresa WHERE prestamista_id = ? AND activo = 1 ORDER BY estado = 'pagado', fecha DESC, id DESC");
+            $stmt = $pdo->prepare("SELECT *, (SELECT m.descripcion FROM movimientos m WHERE m.referencia_id = deudas_empresa.id AND m.servicio_id = 14 AND m.tipo = 'salida' AND m.estado = 'activo' ORDER BY m.id DESC LIMIT 1) as ultimo_concepto_pago FROM deudas_empresa WHERE prestamista_id = ? AND activo = 1 ORDER BY fecha DESC, id DESC");
             $stmt->execute([$prestamista_id]);
             echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         } else {
-            $stmt = $pdo->query("SELECT * FROM deudas_empresa WHERE activo = 1 ORDER BY estado = 'pagado', fecha DESC, id DESC");
+            $stmt = $pdo->query("SELECT *, (SELECT m.descripcion FROM movimientos m WHERE m.referencia_id = deudas_empresa.id AND m.servicio_id = 14 AND m.tipo = 'salida' AND m.estado = 'activo' ORDER BY m.id DESC LIMIT 1) as ultimo_concepto_pago FROM deudas_empresa WHERE activo = 1 ORDER BY fecha DESC, id DESC");
             echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         }
     } catch (Exception $e) {
@@ -84,6 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $pagos = $input['pagos'] ?? []; 
     $cuenta_id = $input['cuenta_pago_id'] ?? null;
     $fecha_pago = $input['fecha_pago'] ?? date('Y-m-d H:i:s');
+    $concepto = trim($input['descripcion'] ?? '');
 
     if (empty($pagos) || !$cuenta_id) {
         http_response_code(400); echo json_encode(['error' => 'Datos inválidos']); exit;
@@ -145,12 +153,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
                 ->execute([$nuevo_pagado, $estado, $fecha_pago, $p['id']]);
             
             // Registrar movimiento de salida (pago al prestamista)
+            $descMov = $concepto ?: "Abono a préstamo #{$p['id']}";
             $stmtMov = $pdo->prepare("INSERT INTO movimientos (grupo_id, fecha, tipo, monto, moneda, descripcion, cuenta_origen_id, prestamista_id, usuario_id, servicio_id, referencia_id, activo) VALUES (?, ?, 'salida', ?, 'MXN', ?, ?, ?, ?, 14, ?, 1)");
-            $stmtMov->execute([$g_id, $fecha_pago, $p['abono'], "Abono manual a préstamo #{$p['id']}", $cuenta_id, $p['prestamista_id'], $_SESSION['usuario_id'], $p['id']]);
+            $stmtMov->execute([$g_id, $fecha_pago, $p['abono'], $descMov, $cuenta_id, $p['prestamista_id'], $_SESSION['usuario_id'], $p['id']]);
             $movimiento_id = $pdo->lastInsertId();
             
             // Restar saldo de cuenta origen con registro en historial_saldos
-            actualizarSaldoCuenta($pdo, $cuenta_id, $p['abono'], 'salida', $movimiento_id, "Abono manual a préstamo #{$p['id']}");
+            actualizarSaldoCuenta($pdo, $cuenta_id, $p['abono'], 'salida', $movimiento_id, $descMov);
         }
         
         $pdo->commit();
@@ -215,7 +224,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
         if ($id > 0) {
             // Busca un solo préstamo para llenar el modal de pago individual
-            $stmt = $pdo->prepare("SELECT * FROM deudas_empresa WHERE id = ? AND activo = 1");
+            $stmt = $pdo->prepare("SELECT *, (SELECT m.descripcion FROM movimientos m WHERE m.referencia_id = deudas_empresa.id AND m.servicio_id = 14 AND m.tipo = 'salida' AND m.estado = 'activo' ORDER BY m.id DESC LIMIT 1) as ultimo_concepto_pago FROM deudas_empresa WHERE id = ? AND activo = 1");
             $stmt->execute([$id]);
             $prestamo = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -227,12 +236,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             }
         } elseif ($prestamista_id > 0) {
             // Busca las deudas específicas del prestamista para la tabla
-            $stmt = $pdo->prepare("SELECT * FROM deudas_empresa WHERE prestamista_id = ? AND activo = 1 ORDER BY estado = 'pagado', fecha DESC, id DESC");
+            $stmt = $pdo->prepare("SELECT *, (SELECT m.descripcion FROM movimientos m WHERE m.referencia_id = deudas_empresa.id AND m.servicio_id = 14 AND m.tipo = 'salida' AND m.estado = 'activo' ORDER BY m.id DESC LIMIT 1) as ultimo_concepto_pago FROM deudas_empresa WHERE prestamista_id = ? AND activo = 1 ORDER BY fecha DESC, id DESC");
             $stmt->execute([$prestamista_id]);
             echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         } else {
             // Muestra todas las deudas activas
-            $stmt = $pdo->query("SELECT * FROM deudas_empresa WHERE activo = 1 ORDER BY estado = 'pagado', fecha DESC, id DESC");
+            $stmt = $pdo->query("SELECT *, (SELECT m.descripcion FROM movimientos m WHERE m.referencia_id = deudas_empresa.id AND m.servicio_id = 14 AND m.tipo = 'salida' AND m.estado = 'activo' ORDER BY m.id DESC LIMIT 1) as ultimo_concepto_pago FROM deudas_empresa WHERE activo = 1 ORDER BY fecha DESC, id DESC");
             echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         }
     } catch (Exception $e) {

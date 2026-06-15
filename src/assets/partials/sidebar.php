@@ -1,4 +1,4 @@
-<!-- src/html/partials/sidebar.php -->
+﻿<!-- src/html/partials/sidebar.php -->
 
 <?php
 
@@ -245,11 +245,40 @@ if (!isset($pagina_actual)) {
         </ul>
 </li>
 
-          <li class="sidebar-item <?= in_array($pagina_actual, ['reportes.php']) ? 'active' : '' ?>">
-
-            <a class="sidebar-link" href="reportes.php" aria-expanded="false">
-
-              <i class="ti ti-chart-bar"></i>
+<li class="sidebar-item">
+    <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+        <span>
+            <i class="ti ti-chart-bar"></i>
+        </span>
+        <span class="hide-menu">Reportes</span>
+    </a>
+    <ul aria-expanded="false" class="collapse first-level">
+        <li class="sidebar-item <?= in_array($pagina_actual, ['reportes.php']) ? 'active' : '' ?>">
+            <a href="reportes.php" class="sidebar-link">
+                <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle fs-2"></i>
+                </div>
+                <span class="hide-menu">Reportes Totales</span>
+            </a>
+        </li>
+        <li class="sidebar-item <?= in_array($pagina_actual, ['reportes-utilidades.php']) ? 'active' : '' ?>">
+            <a href="reportes-utilidades.php" class="sidebar-link">
+                <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle fs-2"></i>
+                </div>
+                <span class="hide-menu">Utilidades</span>
+            </a>
+        </li>
+        <li class="sidebar-item <?= in_array($pagina_actual, ['reportes-servicios.php']) ? 'active' : '' ?>">
+            <a href="reportes-servicios.php" class="sidebar-link">
+                <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle fs-2"></i>
+                </div>
+                <span class="hide-menu">Servicios</span>
+            </a>
+        </li>
+    </ul>
+</li>
 
               <span class="hide-menu">Reportes</span>
 
