@@ -324,6 +324,16 @@ function cargarResumen() {
             }
             $('#cardsResumen').html(html);
             $('#rangoFechas').html('<i class="ti ti-calendar me-1"></i>' + $('#selectPeriodo option:selected').text());
+            // Auto-seleccionar la primera card si no hay selección activa
+            if (!selectedServicioId) {
+                var firstCard = $('.metric-card-serv[data-servicio-id]').first();
+                if (firstCard.length) {
+                    firstCard.trigger('click');
+                } else {
+                    cargarTablaMovimientos();
+                    cargarGraficaServicio(null, 'Todos los servicios');
+                }
+            }
         })
         .fail(function() {
             mostrarError('Error al cargar el resumen');
@@ -598,16 +608,14 @@ $('#btnFiltrar').on('click', function() {
     selectedServicioId = null;
     selectedServicioNombre = '';
     $('.metric-card-serv[data-servicio-id]').removeClass('active');
-    cargarResumen(); cargarTablaMovimientos();
-    cargarGraficaServicio(null, 'Todos los servicios');
+    cargarResumen();
 });
 
 $(document).ready(function() {
     $('#fechaInicio').val(new Date().toISOString().slice(0, 8) + '01');
     $('#fechaFin').val(new Date().toISOString().slice(0, 10));
     $('body').append('<div id="loadingOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);z-index:9998;"><div class="position-absolute top-50 start-50 translate-middle"><div class="spinner-border text-light" role="status"><span class="visually-hidden">Cargando...</span></div></div></div>');
-    cargarResumen(); cargarTablaMovimientos();
-    cargarGraficaServicio(null, 'Todos los servicios');
+    cargarResumen();
 });
 </script>
 </body>
