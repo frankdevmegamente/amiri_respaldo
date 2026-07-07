@@ -425,7 +425,7 @@ $metricas = obtenerMetricas($pdo);
 
         body[data-bs-theme="dark"] .nav-tabs .nav-link.active {
             color: #ffffff !important;
-            border-bottom-color: #5d87ff !important;
+            border-bottom-color: #6c5ce7 !important;
         }
 
         body[data-bs-theme="dark"] .bg-light {
@@ -706,6 +706,9 @@ $metricas = obtenerMetricas($pdo);
                                     <button class="btn btn-outline-warning" onclick="if(confirm('¿Limpiar logs y backups antiguos?')) window.location.href='scripts/cleanup.php'">
                                         <i class="ti ti-trash"></i> Limpiar archivos antiguos
                                     </button>
+                                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalResetDatos">
+                                        <i class="ti ti-refresh"></i> Reset de Datos
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -718,6 +721,94 @@ $metricas = obtenerMetricas($pdo);
     </div>
 
 
+
+    <!-- Modal Reset de Datos -->
+    <div class="modal fade" id="modalResetDatos" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold"><i class="ti ti-alert-triangle text-danger me-2"></i>Reset de Datos Financieros</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger d-flex align-items-center" role="alert">
+                        <i class="ti ti-info-circle fs-5 me-2"></i>
+                        <div><strong>Esta acci&oacute;n es irreversible.</strong> Se eliminar&aacute;n todos los datos financieros.</div>
+                    </div>
+                    <p class="mb-2"><strong>Se resetear&aacute;:</strong></p>
+                    <ul class="list-unstyled mb-3">
+                        <li><i class="ti ti-x text-danger me-1"></i> Movimientos / transacciones</li>
+                        <li><i class="ti ti-x text-danger me-1"></i> Saldos de cuentas (se pondr&aacute;n en $0)</li>
+                        <li><i class="ti ti-x text-danger me-1"></i> Inventario de monedas / FIFO</li>
+                        <li><i class="ti ti-x text-danger me-1"></i> Deudas (clientes y empresa)</li>
+                        <li><i class="ti ti-x text-danger me-1"></i> Pr&eacute;stamos otorgados</li>
+                        <li><i class="ti ti-x text-danger me-1"></i> Gastos, pagos a promotores</li>
+                        <li><i class="ti ti-x text-danger me-1"></i> Cierres mensuales y retiros de capital</li>
+                    </ul>
+                    <p class="mb-2"><strong>Se conservar&aacute;:</strong></p>
+                    <ul class="list-unstyled mb-3">
+                        <li><i class="ti ti-check text-success me-1"></i> Usuarios</li>
+                        <li><i class="ti ti-check text-success me-1"></i> Clientes, promotores, proveedores, prestamistas</li>
+                        <li><i class="ti ti-check text-success me-1"></i> Cuentas (con saldo en $0)</li>
+                        <li><i class="ti ti-check text-success me-1"></i> Cat&aacute;logos (servicios, categor&iacute;as, tipos de cuenta)</li>
+                    </ul>
+                    <div class="mb-0">
+                        <label class="form-label">Escribe <strong>RESET</strong> para confirmar:</label>
+                        <input type="text" id="confirmResetInput" class="form-control" placeholder="RESET" autocomplete="off">
+                    </div>
+                    <div id="resetStatus" class="mt-3" style="display:none;"></div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="btnResetDatos" class="btn btn-danger" disabled>
+                        <i class="ti ti-refresh me-1"></i>Resetear Datos
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const input = document.getElementById('confirmResetInput');
+        const btn = document.getElementById('btnResetDatos');
+        const status = document.getElementById('resetStatus');
+
+        input.addEventListener('input', function() {
+            btn.disabled = this.value.trim() !== 'RESET';
+        });
+
+        btn.addEventListener('click', function() {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Reseteando...';
+            status.style.display = 'none';
+
+            fetch('api/reset-datos.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    status.className = 'mt-3 alert alert-success';
+                    status.innerHTML = '<i class="ti ti-check-circle me-1"></i> ' + data.message;
+                    status.style.display = 'block';
+                    btn.innerHTML = '<i class="ti ti-refresh me-1"></i>Resetear Datos';
+                    setTimeout(function() { location.reload(); }, 2000);
+                } else {
+                    throw new Error(data.error || 'Error desconocido');
+                }
+            })
+            .catch(function(err) {
+                status.className = 'mt-3 alert alert-danger';
+                status.innerHTML = '<i class="ti ti-x-circle me-1"></i> ' + err.message;
+                status.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ti ti-refresh me-1"></i>Resetear Datos';
+            });
+        });
+    });
+    </script>
 
     <script src="src/assets/libs/jquery/dist/jquery.min.js"></script>
 

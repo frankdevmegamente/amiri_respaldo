@@ -292,6 +292,10 @@ try {
 
     <style>
 
+        .verify-header { position: relative; overflow: hidden; }
+        .verify-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(255,255,255,0.08); pointer-events: none; }
+        .verify-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(255,255,255,0.06); pointer-events: none; }
+
         .otp-input {
 
             width: 100%;
@@ -314,170 +318,62 @@ try {
 
         }
 
-
-
         .otp-input:focus {
 
-            border-color: #004aad;
+            border-color: #6c5ce7;
 
-            box-shadow: 0 0 0 0.2rem rgba(0, 74, 173, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.25);
 
             outline: none;
 
         }
 
-
-
-        .otp-input::placeholder {
-
-            letter-spacing: 0;
-
-        }
-
-
-
-        [data-bs-theme="dark"] .otp-input {
-
-            background-color: #2a2a2a;
-
-            border-color: #444;
-
-            color: #fff;
-
-        }
-
-
-
-        [data-bs-theme="dark"] .otp-input:focus {
-
-            border-color: #004aad;
-
-            background-color: #333;
-
-        }
-
-
+        .otp-input::placeholder { letter-spacing: 0; }
 
         .authenticator-icon {
 
-            width: 80px;
+            width: 80px; height: 80px;
 
-            height: 80px;
-
-            background: linear-gradient(135deg, #004aad 0%, #004aad 100%);
+            background: linear-gradient(135deg, #6c5ce7 0%, #6c5ce7 100%);
 
             border-radius: 50%;
 
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
 
             margin: 0 auto;
 
-            box-shadow: 0 4px 15px rgba(0, 74, 173, 0.3);
+            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
 
         }
 
+        .authenticator-icon i { font-size: 40px; color: white; }
 
+        .code-input-wrapper { margin: 20px 0; }
 
-        .authenticator-icon i {
+        .backup-code-hint { font-size: 0.85rem; color: #6c757d; margin-top: 10px; }
 
-            font-size: 40px;
+        .trust-device-section { border-top: 1px solid #dee2e6; margin-top: 20px; padding-top: 20px; }
 
-            color: white;
+        .device-info { font-size: 0.85rem; color: #6c757d; margin-top: 5px; }
 
+        .timer { font-size: 0.9rem; color: #6c757d; text-align: center; margin-top: 15px; }
+
+        [data-bs-theme="dark"] .otp-input {
+            background-color: #2a2a2a; border-color: #444; color: #fff;
         }
-
-
-
-        .code-input-wrapper {
-
-            margin: 20px 0;
-
+        [data-bs-theme="dark"] .otp-input:focus {
+            border-color: #6c5ce7; background-color: #333;
         }
-
-
-
-        .backup-code-hint {
-
-            font-size: 0.85rem;
-
-            color: #6c757d;
-
-            margin-top: 10px;
-
-        }
-
-
-
-        [data-bs-theme="dark"] .backup-code-hint {
-
-            color: #999;
-
-        }
-
-
-
-        .trust-device-section {
-
-            border-top: 1px solid #dee2e6;
-
-            margin-top: 20px;
-
-            padding-top: 20px;
-
-        }
-
-
-
-        [data-bs-theme="dark"] .trust-device-section {
-
-            border-top-color: #444;
-
-        }
-
-
-
-        .device-info {
-
-            font-size: 0.85rem;
-
-            color: #6c757d;
-
-            margin-top: 5px;
-
-        }
-
-
-
-        [data-bs-theme="dark"] .device-info {
-
-            color: #999;
-
-        }
-
-
-
-        .timer {
-
-            font-size: 0.9rem;
-
-            color: #6c757d;
-
-            text-align: center;
-
-            margin-top: 15px;
-
-        }
-
-
-
-        [data-bs-theme="dark"] .timer {
-
-            color: #999;
-
+        [data-bs-theme="dark"] .backup-code-hint { color: #999; }
+        [data-bs-theme="dark"] .trust-device-section { border-top-color: #444; }
+        [data-bs-theme="dark"] .device-info { color: #999; }
+        [data-bs-theme="dark"] .timer { color: #999; }
+        [data-bs-theme="dark"] .form-label { color: #e9ecef !important; }
+        [data-bs-theme="dark"] .text-muted { color: #8c9ea8 !important; }
+        [data-bs-theme="dark"] .form-check-label { color: #e9ecef !important; }
+        [data-bs-theme="dark"] .card {
+            background: rgba(30, 30, 30, 0.95) !important;
+            color: #fff;
         }
 
     </style>
@@ -522,9 +418,12 @@ try {
 
                             <!-- Header -->
 
-                            <div class="card-header text-center py-3"
+                            <div class="card-header text-center py-3 verify-header"
 
-                                style="background: linear-gradient(135deg, #004aad 0%, #004aad 100%); border: none;">
+                                style="background: linear-gradient(135deg, #6c5ce7 0%, #6c5ce7 100%); border: none;">
+
+                                <div class="bg-pattern"></div>
+                                <div class="bg-pattern-2"></div>
 
                                 <h6 class="text-white fw-bold mb-0" style="letter-spacing: 1px; font-size: 0.9rem;">
 
@@ -666,11 +565,11 @@ try {
 
                                         <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold"
 
-                                            style="background: linear-gradient(135deg, #004aad 0%, #004aad 100%); border: none; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 74, 173, 0.4); font-size: 0.95rem;"
+                                            style="background: linear-gradient(135deg, #6c5ce7 0%, #6c5ce7 100%); border: none; border-radius: 10px; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4); font-size: 0.95rem;"
 
-                                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0, 74, 173, 0.5)'"
+                                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(108, 92, 231, 0.5)'"
 
-                                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0, 74, 173, 0.4)'">
+                                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(108, 92, 231, 0.4)'">
 
                                             <i class="ti ti-check"></i> Verificar Código
 
@@ -774,60 +673,23 @@ try {
 
         const html = document.documentElement;
 
-
-
         const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-
         if (savedDarkMode) {
-
             html.setAttribute('data-bs-theme', 'dark');
-
             themeIcon.className = 'ti ti-sun';
-
-            const card = document.querySelector('.card');
-
-            card.style.background = 'rgba(30, 30, 30, 0.95)';
-
-            card.style.color = '#fff';
-
         }
 
-
-
         themeToggle.addEventListener('click', function() {
-
             const currentTheme = html.getAttribute('data-bs-theme');
-
-            const card = document.querySelector('.card');
-
-
-
             if (currentTheme === 'dark') {
-
                 html.setAttribute('data-bs-theme', 'light');
-
                 themeIcon.className = 'ti ti-moon';
-
                 localStorage.setItem('darkMode', 'false');
-
-                card.style.background = 'rgba(255, 255, 255, 0.95)';
-
-                card.style.color = '';
-
             } else {
-
                 html.setAttribute('data-bs-theme', 'dark');
-
                 themeIcon.className = 'ti ti-sun';
-
                 localStorage.setItem('darkMode', 'true');
-
-                card.style.background = 'rgba(30, 30, 30, 0.95)';
-
-                card.style.color = '#fff';
-
             }
-
         });
 
     </script>

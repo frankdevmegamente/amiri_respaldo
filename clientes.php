@@ -156,6 +156,29 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 [data-bs-theme="dark"] .form-control::placeholder {
     color: #8c9ea8;
 }
+
+/* ─── Page Header ─────────────────────────────── */
+.clientes-header { position: relative; overflow: hidden; border-radius: 16px !important; }
+.clientes-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(93, 135, 255, 0.08); pointer-events: none; }
+.clientes-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(19, 222, 185, 0.06); pointer-events: none; }
+.clientes-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
+.clientes-header .sub-badge { font-size: 1rem; color: #8c9ea8; }
+
+/* ─── Metric Cards ────────────────────────────── */
+.metric-card { position: relative; border-radius: 12px !important; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.metric-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important; }
+.metric-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 12px 12px 0 0; }
+.metric-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #8c9ea8; }
+.metric-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+.metric-value { font-size: 1.75rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.25rem; }
+.metric-footer { font-size: 0.8rem; color: #8c9ea8; }
+
+[data-bs-theme="dark"] .clientes-header .sub-badge { color: #8c9ea8 !important; }
+[data-bs-theme="dark"] .bg-primary.bg-opacity-10 { background-color: rgba(93,135,255,0.12) !important; }
+[data-bs-theme="dark"] .bg-success.bg-opacity-10 { background-color: rgba(19,222,185,0.12) !important; }
+[data-bs-theme="dark"] .bg-warning.bg-opacity-10 { background-color: rgba(255,174,31,0.12) !important; }
+[data-bs-theme="dark"] .bg-info.bg-opacity-10 { background-color: rgba(83,155,255,0.12) !important; }
+[data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
 </style>
 
 
@@ -175,11 +198,99 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             <div class="body-wrapper-inner">
                 <div class="container-fluid px-4" style="max-width: 100%;">
 
-                    <div class="d-flex align-items-center mb-3 mt-2">
-                        <h3 class="mb-0"><i class="ti ti-users"></i> Clientes</h3>
-                        <button class="btn btn-primary ms-auto" data-bs-toggle="modal" data-bs-target="#modalCliente">
-                            + Nuevo Cliente
-                        </button>
+                    <!-- ════════════════════════════════════
+                         PAGE HEADER
+                         ════════════════════════════════════ -->
+                    <div class="card clientes-header shadow-sm border-0 rounded-4 mb-4">
+                        <div class="bg-pattern"></div>
+                        <div class="bg-pattern-2"></div>
+                        <div class="card-body p-4">
+                            <div class="row align-items-center g-3">
+                                <div class="col-md">
+                                    <div class="d-flex align-items-center gap-3 mb-1">
+                                        <div class="d-flex align-items-center justify-content-center rounded-3"
+                                             style="width:48px;height:48px;background:rgba(93,135,255,0.12);">
+                                            <i class="ti ti-users text-primary" style="font-size:1.6rem;"></i>
+                                        </div>
+                                        <div>
+                                            <h2 class="mb-0">Clientes</h2>
+                                            <span class="sub-badge"><i class="ti ti-circle"></i> Gestión de clientes y retenciones</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-auto">
+                                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCliente">
+                                        <i class="ti ti-plus"></i> Nuevo Cliente
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ════════════════════════════════════
+                         KPI METRIC CARDS
+                         ════════════════════════════════════ -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card metric-card border-0 shadow-sm h-100">
+                                <div class="metric-accent bg-primary"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Total Clientes</span>
+                                        <div class="metric-icon bg-primary bg-opacity-10 text-primary">
+                                            <i class="ti ti-users"></i>
+                                        </div>
+                                    </div>
+                                    <div class="metric-value text-primary" id="kpiTotal">0</div>
+                                    <div class="metric-footer">Registrados</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card metric-card border-0 shadow-sm h-100">
+                                <div class="metric-accent bg-success"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Activos</span>
+                                        <div class="metric-icon bg-success bg-opacity-10 text-success">
+                                            <i class="ti ti-user-check"></i>
+                                        </div>
+                                    </div>
+                                    <div class="metric-value text-success" id="kpiActivos">0</div>
+                                    <div class="metric-footer">En operación</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card metric-card border-0 shadow-sm h-100">
+                                <div class="metric-accent bg-warning"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Operan MXN</span>
+                                        <div class="metric-icon bg-warning bg-opacity-10 text-warning">
+                                            <i class="ti ti-currency-peso"></i>
+                                        </div>
+                                    </div>
+                                    <div class="metric-value text-warning" id="kpiMxn">0</div>
+                                    <div class="metric-footer">Pesos mexicanos</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card metric-card border-0 shadow-sm h-100">
+                                <div class="metric-accent bg-info"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Operan Divisas</span>
+                                        <div class="metric-icon bg-info bg-opacity-10 text-info">
+                                            <i class="ti ti-currency-dollar"></i>
+                                        </div>
+                                    </div>
+                                    <div class="metric-value text-info" id="kpiDivisas">0</div>
+                                    <div class="metric-footer">USD / USDT</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="card">
@@ -731,6 +842,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     $('#formCliente')[0].reset();
                     $('#id').val('');
                     tabla.ajax.reload();
+                    cargarResumen();
                     showToast('Cliente guardado', 'success');
                 },
                 error: function(xhr) {
@@ -751,6 +863,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                     $('#formCliente')[0].reset();
                                     $('#id').val('');
                                     tabla.ajax.reload();
+                                    cargarResumen();
                                     showToast('Cliente restaurado correctamente', 'success');
                                 },
                                 error: function(xhr2) {
@@ -872,6 +985,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 success: () => {
 
                     tabla.ajax.reload();
+                    cargarResumen();
 
                     showToast('Cliente eliminado', 'success');
 
@@ -891,6 +1005,21 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         });
 
+        // ─── Resumen (KPI Cards) ─────────────────────
+        function cargarResumen() {
+            $.get('api/clientes.php?resumen=1', function(data) {
+                $('#kpiTotal').text(data.total);
+                $('#kpiActivos').text(data.activos);
+                $('#kpiMxn').text(data.opera_mxn);
+                $('#kpiDivisas').text(data.opera_divisas);
+            }).fail(function() {
+                $('#kpiTotal').text('Error');
+            });
+        }
+
+        $(document).ready(function() {
+            cargarResumen();
+        });
     </script>
 
 </body>

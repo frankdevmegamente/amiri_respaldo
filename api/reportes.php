@@ -432,6 +432,48 @@ try {
             echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
             break;
             
+        // ==================== CAPITAL AMIRI ====================
+        case 'capital_amiri':
+            // Último corte
+            $stmt = $pdo->query("SELECT * FROM cierres_mensuales ORDER BY mes DESC LIMIT 1");
+            $ultimoCorte = $stmt->fetch(PDO::FETCH_ASSOC);
+            $capitalCerrado = $ultimoCorte ? (float)$ultimoCorte['capital_acumulado'] : 0;
+
+            // Utilidad del mes actual
+            $mesActual = $_SESSION['mes_activo'] ?? date('Y-m');
+            $fInicio = $mesActual . '-01';
+            $fFin = date('Y-m-t', strtotime($fInicio));
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_amiri), 0) FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1");
+            $stmt->execute([$fInicio, $fFin]);
+            $comisiones = (float)$stmt->fetchColumn();
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
+            $stmt->execute([$fInicio, $fFin]);
+            $divisas = (float)$stmt->fetchColumn();
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) FROM gastos WHERE fecha BETWEEN ? AND ? AND activo = 1");
+            $stmt->execute([$fInicio, $fFin]);
+            $totalGastos = (float)$stmt->fetchColumn();
+            $utilidadMes = $comisiones + $divisas - $totalGastos;
+
+            // Total retiros
+            $stmt = $pdo->query("SELECT COALESCE(SUM(monto), 0) FROM retiros_capital");
+            $totalRetiros = (float)$stmt->fetchColumn();
+
+            // Utilidades acumuladas
+            $stmt = $pdo->query("SELECT COALESCE(SUM(saldo_actual), 0) as total FROM cuentas WHERE tipo_cuenta = 7 AND activo = 1");
+            $utilidadesAcumuladas = (float)$stmt->fetchColumn();
+
+            $capitalActual = $capitalCerrado + $utilidadMes - $totalRetiros;
+
+            echo json_encode([
+                'capital_actual' => $capitalActual,
+                'capital_cerrado' => $capitalCerrado,
+                'utilidades_acumuladas' => $utilidadesAcumuladas,
+                'utilidad_mes' => $utilidadMes,
+                'total_retiros' => $totalRetiros,
+                'ultimo_corte' => $ultimoCorte ? $ultimoCorte['mes'] : null,
+            ]);
+            break;
+
         default:
             echo json_encode(['error' => 'Tipo de reporte no válido']);
     }

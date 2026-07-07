@@ -119,6 +119,9 @@ try {
 
     $pdo->beginTransaction();
 
+    validarMesNoCerrado($pdo, $fecha);
+    validarMesNoMayorQueSesion($fecha);
+
     // Generar un ID único para agrupar todos los movimientos de esta operación
 
     $grupo_id = round(microtime(true) * 1000); // timestamp en milisegundos
@@ -232,6 +235,91 @@ try {
             'Venta de efectivo - Pendiente de pago'
 
         ]);
+
+    } else if ($servicio === 'Compra de Efectivo') {
+
+        if (!$cuenta_cliente_id) {
+            throw new Exception('El cliente no tiene cuenta/caja asociada');
+        }
+        if (!$cuenta_id) {
+            throw new Exception('Debe seleccionar una cuenta/caja para recibir el efectivo');
+        }
+
+        $porcentaje_amiri = floatval($data['porcentaje_amiri'] ?? 0);
+        $porcentaje_promotor = floatval($data['porcentaje_promotor'] ?? 0);
+
+        $comAmiri = round($monto * ($porcentaje_amiri / 100), 2);
+        $comPromotor = round($monto * ($porcentaje_promotor / 100), 2);
+        $montoAlCliente = round($monto - $comAmiri - $comPromotor, 2);
+
+        if ($montoAlCliente <= 0) {
+            throw new Exception('El monto al cliente debe ser mayor a $0. Las comisiones suman ' . ($porcentaje_amiri + $porcentaje_promotor) . '%');
+        }
+
+        $tipo_pago = $data['tipo_pago'] ?? 'credito';
+        $cuenta_pago_id = $data['cuenta_pago_id'] ?? null;
+
+        // 1) ENTRADA to the selected cuenta (caja/banco) — full monto recibido del cliente
+        $stmtMovimiento->execute([
+            $grupo_id, $fecha, $servicio_id, 'entrada', 'MXN', $monto,
+            null, $cuenta_id, $cliente_id, null, null, null, null, 1, 'Ingreso por ' . $servicio
+        ]);
+        $mov_id1 = $pdo->lastInsertId();
+        actualizarSaldoCuenta($pdo, $cuenta_id, $monto, 'entrada', $mov_id1, 'Ingreso por ' . $servicio);
+
+        // 2) COMISION from Utilidades (gasto)
+        if ($comAmiri > 0) {
+            $stmtMovimiento->execute([
+                $grupo_id, $fecha, $servicio_id, 'comision', 'MXN', $comAmiri,
+                1, null, null, null, null, null, null, 1, 'Comisión Amiri - ' . $servicio
+            ]);
+            $mov_id2 = $pdo->lastInsertId();
+            actualizarSaldoCuenta($pdo, 1, $comAmiri, 'salida', $mov_id2, 'Comisión Amiri - ' . $servicio);
+        }
+
+        // 3) COMISION from Promotor (gasto)
+        if ($comPromotor > 0 && $cuenta_promotor_id) {
+            $stmtMovimiento->execute([
+                $grupo_id, $fecha, $servicio_id, 'comision', 'MXN', $comPromotor,
+                $cuenta_promotor_id, null, null, $promotor_id, null, null, null, 1, 'Comisión Promotor - ' . $servicio
+            ]);
+            $mov_id3 = $pdo->lastInsertId();
+            actualizarSaldoCuenta($pdo, $cuenta_promotor_id, $comPromotor, 'salida', $mov_id3, 'Comisión Promotor - ' . $servicio);
+        }
+
+        // 4) SALIDA to cliente (contado) o deuda (credito)
+        if ($tipo_pago === 'contado') {
+            if (!$cuenta_pago_id) {
+                throw new Exception('Debe seleccionar una cuenta para realizar el pago');
+            }
+            // Validar saldo
+            $stmtSaldo = $pdo->prepare("SELECT saldo_actual FROM cuentas WHERE id = ?");
+            $stmtSaldo->execute([$cuenta_pago_id]);
+            $saldoPago = (float)$stmtSaldo->fetchColumn();
+            if ($montoAlCliente > $saldoPago + 0.001) {
+                throw new Exception('Saldo insuficiente en la cuenta de pago. Disponible: $' . number_format($saldoPago, 2));
+            }
+            $stmtMovimiento->execute([
+                $grupo_id, $fecha, $servicio_id, 'salida', 'MXN', $montoAlCliente,
+                $cuenta_pago_id, null, $cliente_id, null, null, null, null, 1, 'Pago por ' . $servicio
+            ]);
+            $mov_id4 = $pdo->lastInsertId();
+            actualizarSaldoCuenta($pdo, $cuenta_pago_id, $montoAlCliente, 'salida', $mov_id4, 'Pago por ' . $servicio);
+        } else {
+            // Crédito: registrar deuda de AMIRI hacia el cliente
+            $stmtDeuda = $pdo->prepare("INSERT INTO deudas_clientes (cliente_id, cuenta_cliente_id, movimiento_venta_id, monto_total, comision_amiri, comision_promotor, monto_neto_cliente, fecha, descripcion, estado, activo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendiente', 1)");
+            $stmtDeuda->execute([
+                $cliente_id,
+                $cuenta_cliente_id,
+                $grupo_id,
+                $monto,
+                $comAmiri,
+                $comPromotor,
+                $montoAlCliente,
+                $fecha,
+                'Compra de efectivo - Pendiente de pago al cliente'
+            ]);
+        }
 
     } else if ($servicio === 'Cambio de Flujo') {
 

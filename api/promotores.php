@@ -34,6 +34,25 @@ $pdo = getPDO();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
+    if (isset($_GET['resumen'])) {
+        $stmt = $pdo->query("
+            SELECT
+                COUNT(*) AS total,
+                SUM(p.activo = 1) AS activos,
+                SUM(p.activo = 0) AS inactivos,
+                COALESCE(SUM(c.saldo_actual), 0) AS saldo_comisiones
+            FROM promotores p
+            LEFT JOIN cuentas c ON p.cuenta_id = c.id
+        ");
+        $r = $stmt->fetch(PDO::FETCH_ASSOC);
+        $r['total'] = (int)$r['total'];
+        $r['activos'] = (int)$r['activos'];
+        $r['inactivos'] = (int)$r['inactivos'];
+        $r['saldo_comisiones'] = (float)$r['saldo_comisiones'];
+        echo json_encode($r);
+        exit;
+    }
+
     if (isset($_GET['id'])) {
 
         $stmt = $pdo->prepare("

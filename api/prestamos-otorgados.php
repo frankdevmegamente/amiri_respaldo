@@ -18,6 +18,16 @@ $pdo->exec("INSERT IGNORE INTO servicios (id, nombre, descripcion, tipo_movimien
 // ==========================================
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
+        if (isset($_GET['resumen'])) {
+            $stmt = $pdo->query("SELECT COUNT(DISTINCT persona_nombre) AS deudores, COALESCE(SUM(monto_total), 0) AS total_prestado, COALESCE(SUM(monto_pagado), 0) AS total_cobrado, COALESCE(SUM(monto_total - monto_pagado), 0) AS total_pendiente FROM prestamos_otorgados WHERE activo = 1");
+            $r = $stmt->fetch(PDO::FETCH_ASSOC);
+            $r['deudores'] = (int)$r['deudores'];
+            $r['total_prestado'] = (float)$r['total_prestado'];
+            $r['total_cobrado'] = (float)$r['total_cobrado'];
+            $r['total_pendiente'] = (float)$r['total_pendiente'];
+            echo json_encode($r);
+            exit;
+        }
         if (isset($_GET['agrupado'])) {
             $stmt = $pdo->query("SELECT persona_nombre, COUNT(*) as total_prestamos, SUM(monto_total) as total_prestado, SUM(monto_pagado) as total_cobrado, SUM(monto_total - monto_pagado) as total_pendiente, GROUP_CONCAT(id) as ids FROM prestamos_otorgados WHERE activo = 1 GROUP BY persona_nombre ORDER BY total_pendiente DESC");
             echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
@@ -47,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $persona_nombre = trim($_POST['persona_nombre']);
         
         $fecha_input = $_POST['fecha_prestamo'] ?? date('Y-m-d');
+        validarMesNoCerrado($pdo, $fecha_input);
         $fecha = (strlen($fecha_input) === 10) ? $fecha_input . ' ' . date('H:i:s') : $fecha_input;
         
         $s = $pdo->prepare("SELECT saldo_actual FROM cuentas WHERE id = ? FOR UPDATE"); 
@@ -101,6 +112,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     
     $fecha_input = $input['fecha_pago'] ?? date('Y-m-d');
     $fecha_pago = (strlen($fecha_input) === 10) ? $fecha_input . ' ' . date('H:i:s') : $fecha_input;
+
+    try {
+        validarMesNoCerrado($pdo, $fecha_input);
+    } catch (Exception $e) {
+        http_response_code(400);
+        echo json_encode(['error' => $e->getMessage()]);
+        exit;
+    }
 
     if (empty($pagos) || !$cuenta_destino_id) {
         http_response_code(400); 

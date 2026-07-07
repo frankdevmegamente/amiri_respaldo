@@ -1112,9 +1112,9 @@ class TwoFactorService {
 
                     two_fa_created_at,
 
-                    (SELECT COUNT(*) FROM trusted_devices WHERE usuario_id = ? AND expires_at > NOW()) as active_devices,
+                    two_fa_backup_codes,
 
-                    (SELECT COUNT(*) FROM two_fa_backup_codes WHERE JSON_EXTRACT(two_fa_backup_codes, '$.*.used') = false) as backup_codes_available
+                    (SELECT COUNT(*) FROM trusted_devices WHERE usuario_id = ? AND expires_at > NOW()) as active_devices
 
                 FROM usuarios 
 
@@ -1126,7 +1126,31 @@ class TwoFactorService {
 
             $stmt->execute([$usuarioId, $usuarioId]);
 
-            return $stmt->fetch();
+            $row = $stmt->fetch();
+
+            if ($row) {
+
+                $backupCodes = json_decode($row['two_fa_backup_codes'], true);
+
+                $available = 0;
+
+                if (is_array($backupCodes)) {
+
+                    foreach ($backupCodes as $bc) {
+
+                        if (!($bc['used'] ?? false)) $available++;
+
+                    }
+
+                }
+
+                $row['backup_codes_available'] = $available;
+
+                unset($row['two_fa_backup_codes']);
+
+            }
+
+            return $row;
 
         } catch (Exception $e) {
 

@@ -1,5 +1,3 @@
-
-
 <?php
 
 // src/assets/config/mail.php
@@ -8,21 +6,28 @@
 
 return [
 
-    'host' => 'smtp.gmail.com',
+    'host' => 'mail.amiri-app.site',
 
-    'port' => 587,
+    'port' => 465,
 
     'smtp_auth' => true,
 
-    'username' => 'jorge@albardi.mx',       // ← Cambia esto
+    'username' => 'admin@amiri-app.site',
 
-    'password' => 'rjmgiiefddeiusrl',
+    'password' => 'M9T=DS}+J;tYCP^3',
 
-    'encryption' => 'tls',
+    'encryption' => 'ssl',
 
-    'from_email' => 'no-reply@amiri.com',
+    'from_email' => 'admin@amiri-app.site',
 
-    'from_name' => 'Amiri App'
+    'from_name' => 'Amiri App',
+
+    'smtp_options' => [
+        'ssl' => [
+            'verify_peer' => false,
+            'verify_peer_name' => false,
+            'allow_self_signed' => true
+        ]
+    ]
 
 ];
-

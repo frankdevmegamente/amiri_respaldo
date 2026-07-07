@@ -733,6 +733,9 @@ class MovimientoCorreccionService {
             // Servicio 1 — Venta de Efectivo
             $this->pdo->prepare("UPDATE deudas_clientes SET activo = 0 WHERE movimiento_venta_id = ? AND activo = 1")->execute([$grupo_id]);
 
+            // Servicio 20 — Compra de Efectivo
+            $this->pdo->prepare("UPDATE deudas_clientes SET activo = 0 WHERE movimiento_venta_id = ? AND activo = 1")->execute([$grupo_id]);
+
             // Servicio 10 — Préstamo de Prestamista
             foreach ($movimientos as $mov) {
                 if ((int)$mov['servicio_id'] === 10) {
@@ -862,6 +865,22 @@ class MovimientoCorreccionService {
                             WHERE persona_nombre = ? AND estado != 'pendiente' AND monto_pagado >= ?
                             ORDER BY id DESC LIMIT 1
                         ")->execute([$montoPago, $montoPago, $nombre_limpio, $montoPago]);
+                    }
+                }
+            }
+
+            // Servicio 18 — Retiro de Capital (también captura retiros legacy con servicio=12)
+            foreach ($movimientos as $mov) {
+                $esRetiro = (int)$mov['servicio_id'] === 18 ||
+                    ((int)$mov['servicio_id'] === 12 && strpos($mov['descripcion'] ?? '', 'Retiro de capital:') === 0);
+                if ($esRetiro) {
+                    $retiroId = !empty($mov['referencia_id']) && $mov['referencia_tipo'] === 'retiro_capital'
+                        ? (int)$mov['referencia_id']
+                        : null;
+                    if ($retiroId) {
+                        $this->pdo->prepare("DELETE FROM retiros_capital WHERE id = ?")->execute([$retiroId]);
+                    } else {
+                        $this->pdo->prepare("DELETE FROM retiros_capital WHERE monto = ? AND fecha = ? ORDER BY id DESC LIMIT 1")->execute([abs($mov['monto']), $mov['fecha']]);
                     }
                 }
             }

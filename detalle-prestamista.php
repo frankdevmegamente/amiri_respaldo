@@ -207,7 +207,7 @@ try {
 
         body[data-bs-theme="dark"] .nav-tabs .nav-link.active {
             color: #ffffff !important;
-            border-bottom-color: #5d87ff !important;
+            border-bottom-color: #6c5ce7 !important;
         }
 
         body[data-bs-theme="dark"] .bg-light {
@@ -449,11 +449,8 @@ try {
                 <div class="modal-content">
 
                     <div class="modal-header">
-
-                        <h5 class="modal-title">Pagar Préstamo</h5>
-
+                        <h5 class="modal-title">Registrar Pago a Prestamista</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-
                     </div>
 
                     <form id="formEditarPrestamo" method="POST" action="">
@@ -466,9 +463,26 @@ try {
 
                         
                         <div class="modal-body">
+    <div class="alert alert-info py-2" id="resumenPrestamista" style="display: none;">
+        <small>Pagando a: <strong id="nombrePrestamistaPago"></strong></small>
+    </div>
+
+    <div class="alert alert-warning py-2 text-center" id="alertaDeudaTotalPrestamista" style="display: none;">
+        <small>Deuda Total: <strong id="deudaTotalPrestamista">$0.00</strong></small>
+    </div>
+
     <div id="contenedorPagosMultiples" class="mb-3 p-3 bg-light border rounded" style="display: none;"></div>
 
-                            <div class="row mb-2">
+                    <div class="mb-3" id="grupoMontoGlobal" style="display: none;">
+                        <label class="form-label fw-bold text-success">¿Cuánto dinero vas a pagar?</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="text" step="0.01" id="monto_a_pagar_input_multi" class="form-control form-control-lg text-success fw-bold">
+                        </div>
+                        <small class="text-muted">Se distribuirá automáticamente entre los préstamos seleccionados.</small>
+                    </div>
+
+                    <div class="row mb-2">
 
                                 <div class="col-md-6">
 
@@ -530,7 +544,7 @@ try {
 
                                 <div class="col-md-12">
 
-                                    <label class="form-label">Cuenta de Pago *</label>
+                                    <label class="form-label">Caja de Origen</label>
 
                                     <select class="form-select" id="cuentaPagoSelect" name="cuenta_pago_id" required>
 
@@ -572,23 +586,16 @@ try {
 
                                 <div class="col-md-6">
 
-                                    <label class="form-label">
-
-                                        Monto a Pagar *
-
+                                    <label class="form-label fw-bold text-success">
+                                        ¿Cuánto dinero vas a pagar?
                                         <span id="montoFormateadoPago" class="text-success fw-bold ms-2"></span>
-
                                     </label>
-
                                     <div class="input-group">
-
                                         <span class="input-group-text">$</span>
-
-                                        <input type="text" class="form-control" id="montoPagarFormatted" name="monto_a_pagar_formatted" placeholder="0.00" required>
-
+                                        <input type="text" class="form-control form-control-lg text-success fw-bold" id="montoPagarFormatted" name="monto_a_pagar_formatted" placeholder="0.00" required>
                                         <input type="hidden" name="monto_a_pagar" id="montoPagarHidden" required>
-
                                     </div>
+                                    <small class="text-muted">Se distribuirá automáticamente entre los préstamos pendientes.</small>
 
                                     <div class="mt-2">
 
@@ -642,7 +649,7 @@ try {
 
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
 
-                            <button type="button" class="btn btn-primary" id="btnGuardarEdicion">Guardar Pago</button>
+                            <button type="button" class="btn btn-success" id="btnGuardarEdicion">Confirmar Salida de Efectivo</button>
 
                         </div>
 
@@ -977,42 +984,42 @@ try {
 
             $('#btnPagarSeleccionados').click(function() {
                 let ids = [];
-                let htmlPagos = '<h6 class="mb-3 text-primary"><i class="ti ti-list-check"></i> Especifica cuánto abonar a cada préstamo:</h6>';
-                
+                let htmlPagos = '<h6 class="mb-3 text-primary"><i class="ti ti-list-check"></i> Préstamos seleccionados:</h6>';
+
                 $('.check-prestamo:checked').each(function() {
                     let id = $(this).data('id');
                     let pendiente = parseFloat($(this).data('pendiente'));
                     ids.push(id);
 
-                    // Cambiamos 'mb-2' por 'my-2' para que no choque con la función de ocultar
                     htmlPagos += `
-                        <div class="row align-items-center my-2 pago-item" data-id="${id}" data-pendiente="${pendiente}">
-                            <div class="col-sm-6">
-                                <span class="fw-bold text-body">Préstamo #${id}</span><br>
-                                <small class="text-danger">Pendiente: ${formatoMoneda(pendiente)}</small>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="input-group input-group-sm">
-                                    <span class="input-group-text bg-success text-white border-success">$</span>
-                                    <input type="text" step="0.01" class="form-control border-success input-abono-multiple fw-bold" value="${pendiente.toFixed(2)}" max="${pendiente.toFixed(2)}">
-                                </div>
-                            </div>
+                        <div class="d-flex justify-content-between align-items-center py-1 px-2 bg-white border rounded mb-1 pago-item" data-id="${id}" data-pendiente="${pendiente}">
+                            <span class="fw-bold">Préstamo #${id}</span>
+                            <span class="text-danger fw-bold">${formatoMoneda(pendiente)}</span>
                         </div>
                     `;
                 });
 
                 $('#contenedorPagosMultiples').html(htmlPagos).fadeIn();
 
-                // OCULTAMOS CON CUIDADO SOLO LAS FILAS VIEJAS
                 $('#montoTotalDisplay').closest('.row').hide();
                 $('#estadoActualDisplay').closest('.row').hide();
                 $('#descripcionDisplay').closest('.row').hide();
-                $('#montoPagarFormatted').closest('.row.mb-3').hide(); 
-                
+                $('#montoPagarFormatted').closest('.row.mb-3').hide();
+                $('#grupoMontoGlobal').show();
+
                 $('#cuentaPagoSelect').val('');
                 $('#btnLiquidarDeudaPrestamista').hide();
                 $('#resumenPago').hide();
                 $('#editarFechaPago').val("<?= date('Y-m-d') ?>");
+
+                var seleccionados = $('.check-prestamo:checked');
+                var count = seleccionados.length;
+                var totalPendiente = 0;
+                seleccionados.each(function() { totalPendiente += parseFloat($(this).data('pendiente')); });
+                $('#resumenPrestamista').show().find('#nombrePrestamistaPago').text('Pago múltiple (' + count + ' préstamos)');
+                $('#alertaDeudaTotalPrestamista').show();
+                $('#deudaTotalPrestamista').text('$' + totalPendiente.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
+                $('#monto_a_pagar_input_multi').val(totalPendiente.toFixed(2));
 
                 $('#formEditarPrestamo').data('modo', 'masivo').data('ids', ids);
                 $('#modalPagarPrestamo').modal('show');
@@ -1029,8 +1036,8 @@ try {
 
             $('#tablaPrestamos').on('click', '.pagar', function() {
                 $('#contenedorPagosMultiples').hide().empty();
+                $('#grupoMontoGlobal').hide();
                 
-                // VOLVEMOS A MOSTRAR LAS FILAS VIEJAS CON CUIDADO
                 $('#montoTotalDisplay').closest('.row').show();
                 $('#estadoActualDisplay').closest('.row').show();
                 $('#descripcionDisplay').closest('.row').show();
@@ -1099,12 +1106,12 @@ $('#montoPagarHidden').val("");
 
 
 
-                    // Mostrar resumen actualizado con monto adicional 0 (porque aún no hay pago nuevo)
-
-                    actualizarResumenPago(data.monto, data.monto_pagado, 0);
-
-
-
+                    // Mostrar resumen y deuda total
+                    var prestamistaNombre = "<?= htmlspecialchars($prestamista['nombre']) ?>";
+                    $('#resumenPrestamista').show().find('#nombrePrestamistaPago').text(prestamistaNombre);
+                    $('#alertaDeudaTotalPrestamista').show();
+                    $('#deudaTotalPrestamista').text('$' + pendiente.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
+                    $('#formEditarPrestamo').data('nombre', prestamistaNombre);
                     $('#resumenPago').show();
                     
                     // Si la fecha de pago ya existe usamos esa, si no, la de hoy
@@ -1338,6 +1345,13 @@ $('#montoPagarHidden').val("");
 
 
 
+            // Resetear modal al cerrarse
+            $('#modalPagarPrestamo').on('hidden.bs.modal', function() {
+                $('#resumenPrestamista').hide();
+                $('#alertaDeudaTotalPrestamista').hide();
+                $('#grupoMontoGlobal').hide();
+            });
+
             /* ============================================================
 
                GUARDAR PAGO
@@ -1348,7 +1362,7 @@ $('#montoPagarHidden').val("");
 
             $(document).on('click', '#btnGuardarEdicion', function() {
                 const cuentaPagoId = $('#cuentaPagoSelect').val();
-                const fechaPagoCompletada = $('#editarFechaPago').val();
+                const fechaPagoCompletada = $('#editarFechaPago').val() + ' ' + new Date().toTimeString().split(' ')[0];
 
                 if (!cuentaPagoId) return alert("Selecciona una cuenta de pago.");
 
@@ -1356,16 +1370,19 @@ $('#montoPagarHidden').val("");
                 let arrayPagos = []; // Aquí guardaremos la lista exacta de qué pagar
 
                 if (modoPago === 'masivo') {
-                    // Recolectamos lo que el usuario escribió en cada casillita
+                    let montoTotal = parseFloat($('#monto_a_pagar_input_multi').val()) || 0;
+                    if (montoTotal <= 0) return alert("Ingresa un monto válido.");
+                    let restante = montoTotal;
                     $('.pago-item').each(function() {
                         let id = $(this).data('id');
-                        let abono = parseFloat($(this).find('.input-abono-multiple').val()) || 0;
-                        if (abono > 0) {
+                        let pendiente = parseFloat($(this).data('pendiente')) || 0;
+                        let abono = Math.min(pendiente, restante);
+                        if (abono > 0.01) {
                             arrayPagos.push({ id: id, abono: abono });
+                            restante -= abono;
                         }
                     });
-
-                    if (arrayPagos.length === 0) return alert("Ingresa al menos un monto mayor a $0.00.");
+                    if (arrayPagos.length === 0) return alert("No se pudo distribuir el monto entre los préstamos seleccionados.");
                 } else {
                     // Pago individual normal
                     const id = $('#editarId').val();
@@ -1391,10 +1408,8 @@ $('#montoPagarHidden').val("");
                     success: function(response) {
                         if (response.success) {
                             $('#modalPagarPrestamo').modal('hide');
-                            tablaPrestamos.ajax.reload();
-                            cargarResumenSaldos();
-                            showToast("Pago registrado correctamente. Redirigiendo a Flujo...", "success");
-                            setTimeout(() => { window.location.href = 'flujo.php'; }, 1500);
+                            showToast("Pago registrado correctamente", "success");
+                            location.reload();
                         }
                     },
                     error: function(xhr) {
@@ -1416,19 +1431,6 @@ $('#montoPagarHidden').val("");
 
             ============================================================ */
 
-/* ============================================================
-               CANDADO VISUAL: EVITAR SOBREPAGOS EN ABONOS MÚLTIPLES
-            ============================================================ */
-            $(document).on('input', '.input-abono-multiple', function() {
-                let max = parseFloat($(this).attr('max')) || 0;
-                let val = parseFloat($(this).val()) || 0;
-                
-                // Si el usuario escribe más de lo que debe, lo topamos al máximo
-                if (val > max) {
-                    $(this).val(max.toFixed(2));
-                    showToast("No puedes abonar más del saldo pendiente", "warning");
-                }
-            });
 
             // Formatear monto en tiempo real para nuevo préstamo
 

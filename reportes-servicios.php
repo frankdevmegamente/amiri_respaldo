@@ -23,14 +23,49 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <style>
         .body-wrapper { padding-top: 100px !important; }
         .body-wrapper-inner, .body-wrapper .container-fluid { padding-top: 15px !important; margin-top: 0 !important; }
-        .nav-pills .nav-link { border-radius: 8px; padding: 10px 20px; }
-        .nav-pills .nav-link.active { background: linear-gradient(135deg, #5D87FF, #49BEFF); }
-        .chart-container { position: relative; height: 300px; }
-        .chart-container-clickable { cursor: pointer; }
+
+        /* ─── Page Header ─── */
+        .servicios-header { position:relative; overflow:hidden; border-radius:16px !important; }
+        .servicios-header .bg-pattern { position:absolute; top:-50%; right:-10%; width:400px; height:400px; border-radius:50%; background:rgba(108,92,231,0.08); pointer-events:none; }
+        .servicios-header .bg-pattern-2 { position:absolute; bottom:-30%; left:20%; width:250px; height:250px; border-radius:50%; background:rgba(19,222,185,0.06); pointer-events:none; }
+        .servicios-header h2 { font-size:1.75rem; font-weight:700; margin-bottom:0.25rem; }
+        .servicios-header .subtitle { font-size:0.85rem; color:#8c9ea8; }
+
+        /* ─── Metric Cards ─── */
+        .metric-card { border-radius:12px; overflow:hidden; transition:all 0.2s ease; position:relative; cursor:pointer; }
+        .metric-card:hover { transform:translateY(-3px); box-shadow:0 8px 25px rgba(0,0,0,0.08) !important; }
+        .metric-card .metric-accent { position:absolute; top:0; left:0; right:0; height:3px; }
+        .metric-card .card-body { padding:1rem 1.1rem; }
+        .metric-card .metric-label { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.3px; color:#8c9ea8; font-weight:600; }
+        .metric-card .metric-icon { width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:8px; font-size:14px; flex-shrink:0; }
+        .metric-card .metric-value { font-size:1.25rem; font-weight:700; color:#2A3547; line-height:1.2; margin-top:2px; }
+        .metric-card .metric-footer { font-size:0.68rem; color:#8c9ea8; margin-top:6px; }
+        .metric-card.selected { outline:2px solid #6c5ce7; outline-offset:-2px; box-shadow:0 4px 16px rgba(108,92,231,0.2)!important; }
+        .metric-card.selected .metric-accent { height:4px; }
+
+        /* ─── Chart / Table Cards ─── */
+        .section-card { border-radius:14px; overflow:hidden; }
+        .section-card .card-header { padding:1rem 1.25rem; background:transparent; border-bottom-color:rgba(0,0,0,0.04); }
+        .section-card .card-header h6 { font-size:0.85rem; font-weight:600; }
+        .chart-container { position:relative; height:300px; }
+        .chart-container-clickable { cursor:pointer; }
+
+        /* ─── Dark Mode ─── */
+        body[data-bs-theme="dark"] .metric-card .metric-value { color:#e8ecf0; }
+        body[data-bs-theme="dark"] .metric-card { background:#1e293b !important; }
+        body[data-bs-theme="dark"] .metric-card .metric-label { color:#8c9ea8; }
+        body[data-bs-theme="dark"] .metric-card .metric-footer { color:#6b7a90; }
+        body[data-bs-theme="dark"] .section-card { background:#1e293b !important; }
+        body[data-bs-theme="dark"] .section-card .card-header { border-bottom-color:rgba(255,255,255,0.04); }
+        body[data-bs-theme="dark"] .servicios-header .subtitle { color:#8c9ea8; }
+
         body[data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro { display: none !important; }
         body[data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro { display: block !important; }
+
+        .animating { animation:fadeInUp 0.4s ease forwards; opacity:0; }
+        @keyframes fadeInUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
     </style>
 </head>
 <body>
@@ -41,132 +76,67 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <div class="body-wrapper">
         <div class="body-wrapper-inner">
             <div class="container-fluid px-4" style="max-width: 100%;">
-                <!-- Header -->
-                <div class="row mb-4 page-header">
-                    <div class="col-12">
-                        <div class="card shadow-sm border-0 rounded-4" style="position:relative;overflow:hidden;">
-                            <div style="position:absolute;top:-60px;right:-60px;width:180px;height:180px;background:#5D87FF;opacity:0.08;border-radius:50%;z-index:0;pointer-events:none;"></div>
-                            <div style="position:absolute;bottom:-40px;left:-40px;width:120px;height:120px;background:#13deb9;opacity:0.08;border-radius:50%;z-index:0;pointer-events:none;"></div>
-                            <div class="card-body p-4" style="position:relative;z-index:1;">
-                                <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
-                                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;">
-                                        <i class="ti ti-clipboard-list fs-5"></i>
+                <!-- ═══ PAGE HEADER ═══ -->
+                <div class="card servicios-header shadow-sm border-0 rounded-4 mb-4">
+                    <div class="bg-pattern"></div>
+                    <div class="bg-pattern-2"></div>
+                    <div class="card-body p-4">
+                        <div class="row align-items-center g-3">
+                            <div class="col-md">
+                                <div class="d-flex align-items-center gap-3 mb-1">
+                                    <div class="d-flex align-items-center justify-content-center rounded-3"
+                                         style="width:48px;height:48px;background:rgba(108,92,231,0.12);">
+                                        <i class="ti ti-clipboard-list text-primary" style="font-size:1.6rem;"></i>
                                     </div>
-                                    <h5 class="card-title fw-semibold mb-0">Reporte de Servicios</h5>
+                                    <div>
+                                        <h2 class="mb-0">Reporte de Servicios</h2>
+                                        <span class="subtitle"><i class="ti ti-circle-filled" style="font-size:6px;vertical-align:middle;margin-right:4px;"></i>Monitoreo detallado de operaciones por servicio</span>
+                                    </div>
                                 </div>
-                                <p class="text-muted mb-0">Monitoreo detallado de retiros de efectivo y operaciones por servicio</p>
                             </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Filtros -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="card filter-card shadow-sm">
-                            <div class="card-body py-3">
-                                <div class="row align-items-end g-3">
-                                    <div class="col-md-2">
-                                        <label class="form-label fw-semibold">Período</label>
-                                        <select class="form-select" id="selectPeriodo">
+                            <div class="col-md-auto">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="input-group input-group-sm" style="width:auto;">
+                                        <span class="input-group-text bg-transparent"><i class="ti ti-calendar"></i></span>
+                                        <select class="form-select form-select-sm" id="selectPeriodo" style="min-width:140px;">
                                             <option value="mes" selected>Este Mes</option>
                                             <option value="mes_pasado">Mes Pasado</option>
                                             <option value="anio">Este Año</option>
                                             <option value="rango">Fecha Personalizada</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-2" id="fechaInicioGroup" style="display:none;">
-                                        <label class="form-label fw-semibold">Desde</label>
-                                        <input type="date" class="form-control" id="fechaInicio">
+                                    <div id="fechaInicioGroup" style="display:none;">
+                                        <input type="date" class="form-control form-control-sm" id="fechaInicio" style="width:140px;">
                                     </div>
-                                    <div class="col-md-2" id="fechaFinGroup" style="display:none;">
-                                        <label class="form-label fw-semibold">Hasta</label>
-                                        <input type="date" class="form-control" id="fechaFin">
+                                    <div id="fechaFinGroup" style="display:none;">
+                                        <input type="date" class="form-control form-control-sm" id="fechaFin" style="width:140px;">
                                     </div>
-                                    <div class="col-md-2">
-                                        <button class="btn btn-primary w-100" id="btnFiltrar">
-                                            <i class="ti ti-filter"></i> Aplicar
-                                        </button>
-                                    </div>
-                                    <div class="col-md-4 text-end">
-                                        <span class="filter-badge-periodo" id="rangoFechas"><i class="ti ti-calendar"></i> Este Mes</span>
-                                    </div>
+                                    <button class="btn btn-primary btn-sm" id="btnFiltrar">
+                                        <i class="ti ti-filter"></i> Aplicar
+                                    </button>
+                                    <span class="filter-badge-periodo small text-muted" id="rangoFechas"><i class="ti ti-calendar"></i> Este Mes</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- Tarjetas de Resumen -->
-                <div class="row mb-4" id="cardsResumen"></div>
-                <!-- Gráfica de Operaciones por Día -->
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="card shadow-sm">
-                            <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-                                <h6 class="fw-semibold mb-0"><i class="ti ti-chart-bar text-warning me-2"></i>Operaciones por Día</h6>
-                                <select class="form-select form-select-sm w-auto" id="selectServicioGrafica" style="max-width:250px;">
-                                    <option value="">Cargando servicios...</option>
-                                </select>
-                            </div>
-                            <div class="card-body">
-                                <p class="text-muted small mb-3">Haz clic en una barra para ver el detalle de las operaciones de ese día</p>
-                                <div class="chart-container chart-container-clickable">
-                                    <canvas id="chartServicioDiario"></canvas>
-                                </div>
-                            </div>
+                <!-- ═══ KPI CARDS ═══ -->
+                <div class="row g-3 mb-4" id="cardsResumen"></div>
+
+                <!-- ═══ CHART ═══ -->
+                <div class="card section-card shadow-sm border-0 mb-4">
+                    <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <h6 class="mb-0"><i class="ti ti-chart-bar text-warning me-2"></i>Operaciones por Día</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-3"><i class="ti ti-click me-1"></i>Haz clic en una barra para ver el detalle de operaciones de ese día</p>
+                        <div class="chart-container chart-container-clickable">
+                            <canvas id="chartServicioDiario"></canvas>
                         </div>
                     </div>
                 </div>
-                <!-- Todos los Movimientos -->
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card shadow-sm">
-                            <div class="card-header bg-transparent">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="fw-semibold mb-0"><i class="ti ti-list me-2"></i>Todos los Movimientos</h6>
-		<div class="d-flex gap-2 align-items-center">
-									<select class="form-select form-select-sm w-auto" id="selectTipoOperacion">
-										<option value="todos">Todos</option>
-										<option value="retiros">Retiros</option>
-										<option value="depositos">Depósitos</option>
-										<option value="transferencias">Transferencias</option>
-									</select>
-									<div class="dropdown">
-										<button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-											<i class="ti ti-download"></i> Exportar
-										</button>
-										<ul class="dropdown-menu dropdown-menu-end">
-											<li><a class="dropdown-item" href="#" onclick="exportarReporte('excel')"><i class="ti ti-file-spreadsheet text-success"></i> Excel</a></li>
-											<li><a class="dropdown-item" href="#" onclick="exportarReporte('csv')"><i class="ti ti-file-text text-info"></i> CSV</a></li>
-											<li><a class="dropdown-item" href="#" onclick="exportarReporte('pdf')"><i class="ti ti-file-text text-danger"></i> PDF</a></li>
-										</ul>
-									</div>
-								</div>
-                                </div>
-                            </div>
-                            <div class="card-body p-4">
-                                <div class="table-responsive">
-                                    <table class="table table-hover table-reportes" id="tablaMovimientos">
-                                        <thead>
-                                            <tr>
-                                                <th data-priority="1" class="no-capitalize" style="width:36px;">#</th>
-                                                <th data-priority="1">Fecha</th>
-                                                <th data-priority="1">Servicio</th>
-                                                <th data-priority="2">Tipo</th>
-                                                <th data-priority="3">Moneda</th>
-                                                <th data-priority="1" class="text-end">Monto</th>
-                                                <th data-priority="4">Cliente</th>
-                                                <th data-priority="4">Promotor</th>
-                                                <th data-priority="4">Proveedor</th>
-                                                <th data-priority="5">Descripción</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="bodyMovimientos"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
+
             </div>
         </div>
     </div>
@@ -183,24 +153,63 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead>
-                            <tr>
-                                <th>Hora</th>
-                                <th>Entidad</th>
-                                <th>Tipo</th>
+                            <tr id="theadDetalleDiaRow">
+                                <th>#</th>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
                                 <th class="text-end">Monto</th>
-                                <th>Descripción</th>
+                                <th>Moneda</th>
+                                <th class="text-center">Acción</th>
                             </tr>
                         </thead>
                         <tbody id="bodyDetalleDia"></tbody>
                         <tfoot class="table-light fw-bold">
-                            <tr>
+                            <tr id="tfootDetalleDiaRow">
                                 <td colspan="3">TOTAL</td>
                                 <td class="text-end" id="totalDetalleDia">$0.00</td>
+                                <td></td>
                                 <td></td>
                             </tr>
                         </tfoot>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Detalle de Operación (desglose contable) -->
+<div class="modal fade modal-premium" id="modalDetalleOperacion" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="ti ti-file-description me-2"></i><span id="modalDetalleOperacionLabel">Detalle de Operación</span></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div id="detalleOperacionSummary" style="display:none;"></div>
+                <div class="table-responsive mt-2">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                <th>Tipo</th>
+                                <th class="text-end">Monto</th>
+                                <th>Descripción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyDetalleOperacion"></tbody>
+                        <tfoot class="table-light fw-bold">
+                            <tr>
+                                <td colspan="2">TOTAL</td>
+                                <td class="text-end" id="totalDetalleOperacion">$0.00</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>
@@ -218,7 +227,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 <script src="src/assets/js/pantalla-completa.js"></script>
 <script>
 let chartServicioDiario = null;
-let dtMovimientos = null;
+let selectedServicioId = null;
+let selectedServicioNombre = '';
 
 function formatoNumero(num) {
     num = parseFloat(num || 0);
@@ -286,12 +296,19 @@ const resumenCardStyles = [
     { icon: 'ti ti-businessplan', color: 'success' },
 ];
 
-function crearTarjetaResumen(nombre, total, cantidad, icon, color, delay) {
+function crearTarjetaResumen(nombre, total, cantidad, icon, color, delay, servicioId, subtitulo, totalMxn) {
     var iconClass = icon || 'ti ti-cash';
     var colorClass = color || 'primary';
     var delayStyle = delay !== undefined ? ' style="animation-delay:' + delay + 's;"' : '';
+    var sid = servicioId || 0;
+    var subHtml = subtitulo ? '<div class="metric-subtitle text-muted small">' + subtitulo + '</div>' : '';
+    var montoHtml = '$' + formatoNumero(total);
+    if (totalMxn !== undefined && totalMxn !== null) {
+        montoHtml += '<br><small class="text-muted fw-normal">$' + formatoNumero(totalMxn) + ' MXN</small>';
+    }
     return '<div class="col-xl-3 col-lg-4 col-md-6 mb-3">' +
-        '<div class="card card-stat metric-card border-0 shadow-sm h-100 animating"' + delayStyle + '>' +
+        '<div class="card card-stat metric-card border-0 shadow-sm h-100 animating"' + delayStyle +
+        ' data-servicio-id="' + sid + '" onclick="seleccionarServicio(' + sid + ',\'' + nombre.replace(/'/g, "\\'") + '\')">' +
         '<div class="metric-accent bg-' + colorClass + '"></div>' +
         '<div class="card-body p-3">' +
         '<div class="d-flex justify-content-between align-items-start mb-2">' +
@@ -300,7 +317,8 @@ function crearTarjetaResumen(nombre, total, cantidad, icon, color, delay) {
         '<i class="' + iconClass + '"></i>' +
         '</div>' +
         '</div>' +
-        '<div class="metric-value">$' + formatoNumero(total) + '</div>' +
+        subHtml +
+        '<div class="metric-value">' + montoHtml + '</div>' +
         '<div class="metric-footer">' +
         '<i class="ti ti-repeat"></i> <strong>' + (cantidad || 0) + '</strong> operaciones' +
         '</div>' +
@@ -315,21 +333,29 @@ function cargarResumen() {
         .done(function(data) {
             var html = '';
             var idx = 0;
-            // Tarjeta de depositado (viene de deudas_clientes)
-            if (data.depositado) {
-                html += crearTarjetaResumen('Total Depositado', data.depositado.total, data.depositado.cantidad, 'ti ti-cash', 'success', idx * 0.05);
-                idx++;
-            }
             // Tarjetas por cada servicio
             if (data.servicios && data.servicios.length > 0) {
                 data.servicios.forEach(function(s, i) {
-                    var style = resumenCardStyles[(i + 1) % resumenCardStyles.length];
-                    html += crearTarjetaResumen(s.servicio, s.total, s.cantidad, style.icon, style.color, idx * 0.05);
+                    if (s.id == 1) {
+                        html += crearTarjetaResumen(s.servicio, s.total, s.cantidad, 'ti ti-building-store', 'primary', idx * 0.05, s.id, 'Total de venta en efectivo (antes de comisiones)');
+                        idx++;
+                        return;
+                    }
+                    var style = resumenCardStyles[idx % resumenCardStyles.length];
+                    var esDivisaVenta = (s.id == 2 || s.id == 3);
+                    html += crearTarjetaResumen(s.servicio, s.total, s.cantidad, style.icon, style.color, idx * 0.05, s.id, null, esDivisaVenta ? s.total_mxn : null);
                     idx++;
                 });
             }
             $('#cardsResumen').html(html);
             $('#rangoFechas').html('<i class="ti ti-calendar"></i> ' + $('#selectPeriodo option:selected').text());
+            // Re-aplicar selección previa después de refrescar las cards
+            if (selectedServicioId) {
+                $('.metric-card').removeClass('selected');
+                $('.metric-card[data-servicio-id="' + selectedServicioId + '"]').addClass('selected');
+            } else {
+                seleccionarServicio(1, 'Venta de Efectivo');
+            }
         })
         .fail(function() {
             mostrarError('Error al cargar el resumen');
@@ -337,25 +363,22 @@ function cargarResumen() {
         .always(function() { mostrarCarga(false); });
 }
 
-function cargarListaServicios() {
-    $.getJSON('api/reportes-servicios.php?tipo=lista_servicios')
-        .done(function(data) {
-            let html = '<option value="">-- Seleccionar servicio --</option>';
-            data.forEach(function(s) {
-                html += `<option value="${s.id}">${s.servicio}</option>`;
-            });
-            $('#selectServicioGrafica').html(html);
-            $('#selectServicioGrafica').val('7');
-            // Dispara el evento change para cargar la gráfica inicial
-            $('#selectServicioGrafica').trigger('change');
-        })
-        .fail(function() {
-            $('#selectServicioGrafica').html('<option value="">Error al cargar servicios</option>');
-        });
+function seleccionarServicio(id, nombre) {
+    selectedServicioId = id;
+    selectedServicioNombre = nombre || '';
+    // Quitar .selected de todas las cards y ponerla en la clickeada
+    $('.metric-card').removeClass('selected');
+    $('.metric-card[data-servicio-id="' + id + '"]').addClass('selected');
+    // Si es 0 (Total Depositado), no filtrar
+    if (id === 0) {
+        selectedServicioId = null;
+        selectedServicioNombre = '';
+    }
+    cargarGraficaServicio();
 }
 
 function cargarGraficaServicio() {
-    const servicioId = $('#selectServicioGrafica').val();
+    const servicioId = selectedServicioId;
     if (!servicioId) {
         if (chartServicioDiario) { chartServicioDiario.destroy(); chartServicioDiario = null; }
         return;
@@ -391,7 +414,7 @@ function cargarGraficaServicio() {
                         label: 'Monto',
                         data: valores,
                         backgroundColor: gradient,
-                        borderColor: 'rgba(93,135,255,0.5)',
+                        borderColor: 'rgba(108,92,231,0.5)',
                         borderWidth: 1,
                         borderRadius: { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 },
                         borderSkipped: false
@@ -461,116 +484,169 @@ function cargarGraficaServicio() {
 }
 
 function abrirDetalleDia(dia) {
-    const servicioId = $('#selectServicioGrafica').val();
-    const nombreServicio = $('#selectServicioGrafica option:selected').text();
+    const servicioId = selectedServicioId;
+    const nombreServicio = selectedServicioNombre;
     if (!servicioId) return;
 
     mostrarCarga(true);
     $('#modalServicioTitulo').text(nombreServicio);
     $('#modalDiaTitulo').text(dia);
-    $.getJSON(`api/reportes-servicios.php?tipo=detalle_dia&servicio_id=${servicioId}&dia=${dia}&${getParams()}`)
+
+    // Obtener mes/año del período seleccionado (misma lógica que getParams)
+    const periodo = $('#selectPeriodo').val();
+    let anio, mes;
+    if (periodo === 'mes_pasado') {
+        const d = new Date();
+        d.setMonth(d.getMonth() - 1);
+        anio = d.getFullYear();
+        mes = String(d.getMonth() + 1).padStart(2, '0');
+    } else if (periodo === 'rango') {
+        const fi = $('#fechaInicio').val();
+        if (fi) {
+            const p = fi.split('-');
+            anio = p[0]; mes = p[1];
+        } else {
+            const d = new Date();
+            anio = d.getFullYear();
+            mes = String(d.getMonth() + 1).padStart(2, '0');
+        }
+    } else {
+        const d = new Date();
+        anio = d.getFullYear();
+        mes = String(d.getMonth() + 1).padStart(2, '0');
+    }
+    const diaStr = String(dia).padStart(2, '0');
+    const fecha = `${anio}-${mes}-${diaStr}`;
+
+    $.getJSON(`api/reportes-servicios.php?tipo=operaciones&servicio_id=${servicioId}&periodo=rango&fecha_inicio=${fecha}&fecha_fin=${fecha}`)
         .done(function(data) {
+            const tieneBotonDetalle = [1, 2, 3, 5, 6].indexOf(servicioId) !== -1;
+
+            // ─── Dynamic headers ───
+            if (tieneBotonDetalle) {
+                $('#theadDetalleDiaRow').html(
+                    '<th>#</th><th>Fecha</th><th>Cliente</th><th class="text-end">Monto</th><th>Moneda</th><th class="text-center">Acción</th>'
+                );
+            } else {
+                $('#theadDetalleDiaRow').html(
+                    '<th>#</th><th>Fecha</th><th>Tipo</th><th>Origen / Destino</th><th class="text-end">Monto</th><th>Moneda</th>'
+                );
+            }
+
             let html = '';
             let total = 0;
-            data.forEach(function(r) {
-                const monto = parseFloat(r.monto) || 0;
-                total += monto;
-                var entidad = r.beneficiario
-                    ? '<span class="badge bg-secondary bg-opacity-10 text-secondary border-0">Beneficiario</span> ' + r.beneficiario
-                    : (r.prestamista && r.prestamista !== '-'
-                        ? '<span class="badge bg-purple bg-opacity-10 text-purple border-0" style="background:rgba(108,92,231,0.1)!important;color:#6c5ce7!important;">Prestamista</span> ' + r.prestamista
-                        : (r.proveedor && r.proveedor !== '-'
-                            ? '<span class="badge bg-warning bg-opacity-10 text-warning border-0">Proveedor</span> ' + r.proveedor
-                            : (r.promotor && r.promotor !== '-'
-                                ? '<span class="badge bg-info bg-opacity-10 text-info border-0">Promotor</span> ' + r.promotor
-                                : (r.cliente && r.cliente !== '-'
-                                    ? '<span class="badge bg-primary bg-opacity-10 text-primary border-0">Cliente</span> ' + r.cliente
-                                    : (r.referencia_tipo
-                                        ? '<span class="badge bg-secondary bg-opacity-10 text-secondary border-0">Tipo</span> ' + r.referencia_tipo.replace(/_/g, ' ')
-                                        : '<span class="text-muted">-</span>')))));
-                var badgeTipo = r.tipo === 'entrada'
-                    ? 'bg-success bg-opacity-10 text-success border-0'
-                    : (r.tipo === 'salida'
-                        ? 'bg-danger bg-opacity-10 text-danger border-0'
-                        : 'bg-info bg-opacity-10 text-info border-0');
-                html += '<tr>' +
-                    '<td>' + formatearFechaHora(r.creado_en) + '</td>' +
-                    '<td>' + entidad + '</td>' +
-                    '<td><span class="badge ' + badgeTipo + '">' + r.tipo + '</span></td>' +
-                    '<td class="text-end text-amount ' + (monto >= 0 ? 'positivo' : 'negativo') + '">$' + formatoNumero(monto) + '</td>' +
-                    '<td class="desc-cell" title="' + (r.descripcion || '') + '">' + (r.descripcion || '-') + '</td>' +
-                    '</tr>';
-            });
-            $('#bodyDetalleDia').html(html || '<tr><td colspan="5" class="text-center">No hay registros este d&iacute;a</td></tr>');
-            $('#totalDetalleDia').text('$' + formatoNumero(total));
-            $('#modalDetalleDia').modal('show');
-        })
-        .fail(function() {
-            mostrarError('Error al cargar detalle');
-        })
-        .always(function() { mostrarCarga(false); });
-}
-
-function cargarTablaMovimientos() {
-    const tipoOperacion = $('#selectTipoOperacion').val();
-    mostrarCarga(true);
-    $.getJSON(`api/reportes-servicios.php?tipo=todos_movimientos&tipo_operacion=${tipoOperacion}&${getParams()}`)
-        .done(function(data) {
-            if (dtMovimientos) { dtMovimientos.destroy(); dtMovimientos = null; }
-            let html = '';
             data.forEach(function(r, idx) {
-                const monto = parseFloat(r.monto) || 0;
+                const monto = parseFloat(r.monto_total || r.monto) || 0;
+                total += monto;
                 const moneda = r.moneda || 'MXN';
-                const signoClase = r.tipo === 'entrada' || r.tipo === 'deposito' ? 'positivo' : 'negativo';
-                const signo = signoClase === 'negativo' ? '-' : '';
-                var badgeTipo = r.tipo === 'entrada'
-                    ? 'bg-success bg-opacity-10 text-success border-0'
-                    : (r.tipo === 'salida'
-                        ? 'bg-danger bg-opacity-10 text-danger border-0'
-                        : 'bg-info bg-opacity-10 text-info border-0');
+                const opId = r.id;
                 var badgeMoneda = moneda === 'MXN'
                     ? 'bg-success bg-opacity-10 text-success border-0'
                     : (moneda === 'USD'
                         ? 'bg-primary bg-opacity-10 text-primary border-0'
                         : 'bg-info bg-opacity-10 text-info border-0');
-                html += '<tr>' +
-                    '<td><span class="row-num">' + (idx + 1) + '</span></td>' +
-                    '<td>' + formatearFechaHora(r.creado_en) + '</td>' +
-                    '<td><span class="badge bg-primary bg-opacity-10 text-primary border-0">' + (r.servicio || '-') + '</span></td>' +
-                    '<td><span class="badge ' + badgeTipo + '">' + r.tipo + '</span></td>' +
-                    '<td><span class="badge ' + badgeMoneda + '">' + moneda + '</span></td>' +
-                    '<td class="text-end text-amount ' + signoClase + '">' + signo + formatoMoneda(monto, moneda) + '</td>' +
-                    '<td>' + (r.cliente || '-') + '</td>' +
-                    '<td>' + (r.promotor || '-') + '</td>' +
-                    '<td>' + (r.proveedor || '-') + '</td>' +
-                    '<td class="desc-cell" title="' + (r.descripcion || '') + '">' + (r.descripcion || '-') + '</td>' +
-                    '</tr>';
+
+                if (tieneBotonDetalle) {
+                    html += '<tr>' +
+                        '<td>' + (idx + 1) + '</td>' +
+                        '<td>' + (r.fecha || '-') + '</td>' +
+                        '<td>' + (r.cliente || '-') + '</td>' +
+                        '<td class="text-end text-amount positivo">' + formatoMoneda(monto, moneda) + '</td>' +
+                        '<td><span class="badge ' + badgeMoneda + '">' + moneda + '</span></td>' +
+                        '<td class="text-center"><button class="btn btn-sm btn-outline-primary" onclick="abrirDetalleOperacion(' + servicioId + ', ' + opId + ')"><i class="ti ti-eye"></i></button></td>' +
+                        '</tr>';
+                } else {
+                    var badgeTipo = r.tipo === 'entrada'
+                        ? 'bg-success bg-opacity-10 text-success border-0'
+                        : (r.tipo === 'salida'
+                            ? 'bg-danger bg-opacity-10 text-danger border-0'
+                            : (r.tipo === 'traspaso'
+                                ? 'bg-info bg-opacity-10 text-info border-0'
+                                : 'bg-secondary bg-opacity-10 text-secondary border-0'));
+                    var entidad = '';
+                    if (r.tipo === 'traspaso') {
+                        if (r.cuenta_origen && r.cuenta_origen !== '-') entidad += 'Salió de: ' + r.cuenta_origen;
+                        if (r.cuenta_destino && r.cuenta_destino !== '-') entidad += (entidad ? '<br>' : '') + 'Entró a: ' + r.cuenta_destino;
+                        if (!entidad) entidad = r.descripcion && r.descripcion !== '-' ? r.descripcion : '-';
+                    } else {
+                        entidad = r.cliente && r.cliente !== '-' ? r.cliente
+                            : (r.promotor && r.promotor !== '-' ? r.promotor
+                                : (r.proveedor && r.proveedor !== '-' ? r.proveedor
+                                    : (r.descripcion && r.descripcion !== '-' ? r.descripcion : '-')));
+                    }
+                    var signoClase = monto >= 0 ? 'positivo' : 'negativo';
+                    var signo = monto < 0 ? '-' : '';
+                    html += '<tr>' +
+                        '<td>' + (idx + 1) + '</td>' +
+                        '<td>' + (r.fecha || '-') + '</td>' +
+                        '<td><span class="badge ' + badgeTipo + '">' + (r.tipo || '-') + '</span></td>' +
+                        '<td>' + entidad + '</td>' +
+                        '<td class="text-end text-amount ' + signoClase + '">' + signo + formatoMoneda(Math.abs(monto), moneda) + '</td>' +
+                        '<td><span class="badge ' + badgeMoneda + '">' + moneda + '</span></td>' +
+                        '</tr>';
+                }
             });
-            $('#bodyMovimientos').html(html || '<tr><td colspan="10" class="text-center">No hay movimientos</td></tr>');
-            dtMovimientos = $('#tablaMovimientos').DataTable({
-                responsive: true,
-                language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
-                pageLength: 25,
-                order: [[1, 'desc']],
-                columnDefs: [
-                    { responsivePriority: 1, targets: [0, 1, 2, 5] },
-                    { responsivePriority: 2, targets: [3] },
-                    { responsivePriority: 3, targets: [4] },
-                    { responsivePriority: 4, targets: [6, 7, 8] },
-                    { responsivePriority: 5, targets: [9] },
-                    { orderable: false, targets: [0] }
-                ]
-            });
+
+            // ─── Dynamic footer (oculto) ───
+            $('#tfootDetalleDiaRow').html('');
+
+            if (!html) {
+                var colspan = 6;
+                $('#bodyDetalleDia').html('<tr><td colspan="' + colspan + '" class="text-center text-muted py-3">No hay operaciones este d&iacute;a</td></tr>');
+            } else {
+                $('#bodyDetalleDia').html(html);
+            }
+            $('#modalDetalleDia').modal('show');
         })
         .fail(function() {
-            mostrarError('Error al cargar movimientos');
+            mostrarError('Error al cargar operaciones del día');
         })
         .always(function() { mostrarCarga(false); });
 }
 
-function exportarReporte(formato) {
-    window.location.href = 'api/exportar-reporte.php?reporte=servicios&formato=' + formato + '&' + getParams();
+function abrirDetalleOperacion(servicioId, operacionId) {
+    // Cerrar modal del día primero para evitar conflicto de backdrops
+    $('#modalDetalleDia').one('hidden.bs.modal', function() {
+        const nombreServicio = selectedServicioNombre || '';
+        $('#modalDetalleOperacionLabel').text('Detalle - ' + nombreServicio);
+        mostrarCarga(true);
+        $.getJSON(`api/reportes-servicios.php?tipo=detalle_operacion&servicio_id=${servicioId}&operacion_id=${operacionId}`)
+            .done(function(data) {
+                $('#detalleOperacionSummary').html('');
+
+                // ─── Movimientos table ───
+                var movs = data.movimientos || data;
+                var html = '';
+                var total = 0;
+                (movs).forEach(function(r) {
+                    const monto = parseFloat(r.monto) || 0;
+                    total += monto;
+                    var badgeTipo = r.tipo === 'entrada'
+                        ? 'bg-success bg-opacity-10 text-success border-0'
+                        : (r.tipo === 'salida'
+                            ? 'bg-danger bg-opacity-10 text-danger border-0'
+                            : (r.tipo === 'comision'
+                                ? 'bg-warning bg-opacity-10 text-warning border-0'
+                                : 'bg-info bg-opacity-10 text-info border-0'));
+                    html += '<tr>' +
+                        '<td>' + formatearFechaHora(r.creado_en) + '</td>' +
+                        '<td><span class="badge ' + badgeTipo + '">' + r.tipo + '</span></td>' +
+                        '<td class="text-end text-amount ' + (monto >= 0 ? 'positivo' : 'negativo') + '">$' + formatoNumero(monto) + '</td>' +
+                        '<td>' + (r.descripcion || '-') + '</td>' +
+                        '</tr>';
+                });
+                $('#bodyDetalleOperacion').html(html || '<tr><td colspan="4" class="text-center">Sin detalle disponible</td></tr>');
+                $('#totalDetalleOperacion').parent().hide();
+                $('#modalDetalleOperacion').modal('show');
+            })
+            .fail(function() {
+                mostrarError('Error al cargar detalle de operación');
+            })
+            .always(function() { mostrarCarga(false); });
+    }).modal('hide');
 }
+
+
 
 function mostrarError(msg) {
     var toast = '<div class="alert alert-danger alert-dismissible fade show position-fixed top-0 end-0 m-3" style="z-index:9998;" role="alert">' +
@@ -584,23 +660,37 @@ function mostrarError(msg) {
 $('#selectPeriodo').on('change', function() {
     if ($(this).val() === 'rango') { $('#fechaInicioGroup, #fechaFinGroup').show(); }
     else { $('#fechaInicioGroup, #fechaFinGroup').hide(); }
+    cargarResumen();
+    if (selectedServicioId) { cargarGraficaServicio(); }
 });
 
-$('#selectServicioGrafica').on('change', function() {
-    cargarGraficaServicio();
+$('#fechaInicio, #fechaFin').on('change', function() {
+    if ($('#selectPeriodo').val() === 'rango') {
+        cargarResumen();
+        if (selectedServicioId) { cargarGraficaServicio(); }
+    }
 });
-
-$('#selectTipoOperacion').on('change', function() { cargarTablaMovimientos(); });
 
 $('#btnFiltrar').on('click', function() {
-    cargarResumen(); cargarGraficaServicio(); cargarTablaMovimientos();
+    selectedServicioId = null;
+    selectedServicioNombre = '';
+    $('.metric-card').removeClass('selected');
+    if (chartServicioDiario) { chartServicioDiario.destroy(); chartServicioDiario = null; }
+    cargarResumen();
+});
+
+// Interceptor global de 401: si la API responde no autorizado, redirigir al login
+$(document).ajaxError(function(event, jqxhr) {
+    if (jqxhr.status === 401) {
+        window.location.href = 'login.php';
+    }
 });
 
 $(document).ready(function() {
     $('#fechaInicio').val(new Date().toISOString().slice(0, 8) + '01');
     $('#fechaFin').val(new Date().toISOString().slice(0, 10));
     $('body').append('<div id="loadingOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);z-index:9998;"><div class="position-absolute top-50 start-50 translate-middle"><div class="spinner-border text-light" role="status"><span class="visually-hidden">Cargando...</span></div></div></div>');
-    cargarResumen(); cargarListaServicios(); cargarTablaMovimientos();
+    cargarResumen();
 });
 </script>
 </body>

@@ -56,6 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Datos insuficientes para crear el préstamo");
         }
 
+        validarMesNoCerrado($pdo, $fecha);
+
         $pdo->beginTransaction();
         
         $pdo->prepare("INSERT INTO deudas_empresa (prestamista_id, cuenta_id, monto, fecha, descripcion, estado, monto_pagado, activo) VALUES (?,?,?,?,?,'pendiente',0,1)")
@@ -95,6 +97,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
 
     if (empty($pagos) || !$cuenta_id) {
         http_response_code(400); echo json_encode(['error' => 'Datos inválidos']); exit;
+    }
+
+    try {
+        validarMesNoCerrado($pdo, $fecha_pago);
+    } catch (Exception $e) {
+        http_response_code(400);
+        echo json_encode(['error' => $e->getMessage()]);
+        exit;
     }
 
     $pdo->beginTransaction();

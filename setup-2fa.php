@@ -252,6 +252,32 @@ try {
 
             $twoFAEnabled = true;
 
+
+
+        } elseif ($action === 'revoke_device') {
+
+            $deviceId = $_POST['device_id'] ?? null;
+
+            if ($deviceId) {
+
+                $twoFAService->revokeTrustedDevice($usuarioId, $deviceId);
+
+                Logger::audit('trusted_device_revoked', $usuarioId, [
+
+                    'device_id' => $deviceId,
+
+                    'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+
+                ]);
+
+                $success = 'Dispositivo revocado correctamente.';
+
+            } else {
+
+                $error = 'ID de dispositivo no válido.';
+
+            }
+
         }
 
     }
@@ -385,7 +411,7 @@ try {
 
             background: #e9ecef;
 
-            border-color: #004aad;
+            border-color: #6c5ce7;
 
         }
 
@@ -407,7 +433,7 @@ try {
 
             background: #3a3a3a;
 
-            border-color: #004aad;
+            border-color: #6c5ce7;
 
         }
 
@@ -429,7 +455,7 @@ try {
 
             background: #f8f9fa;
 
-            border-left: 4px solid #004aad;
+            border-left: 4px solid #6c5ce7;
 
             padding: 15px;
 
@@ -451,7 +477,7 @@ try {
 
             background: #333;
 
-            border-left-color: #004aad;
+            border-left-color: #6c5ce7;
 
         }
 
@@ -461,7 +487,7 @@ try {
 
             display: inline-block;
 
-            background: linear-gradient(135deg, #004aad 0%, #004aad 100%);
+            background: linear-gradient(135deg, #6c5ce7 0%, #6c5ce7 100%);
 
             color: white;
 
@@ -641,19 +667,11 @@ try {
 
                                                         <p class="text-muted mb-3">Tu cuenta está protegida con autenticación de dos factores</p>
 
-                                                        <form method="POST" class="d-inline" onsubmit="return confirm('¿Desactivar 2FA?');">
+                                                        <a href="setup-2fa.php?step=disable_confirm" class="btn btn-sm btn-outline-danger">
 
-                                                            <input type="hidden" name="action" value="disable_2fa_prompt" />
+                                                            <i class="ti ti-lock-open"></i> Desactivar
 
-                                                            <button type="button" class="btn btn-sm btn-outline-danger"
-
-                                                                onclick="document.querySelector('[data-step=disable_confirm]').click();">
-
-                                                                <i class="ti ti-lock-open"></i> Desactivar
-
-                                                            </button>
-
-                                                        </form>
+                                                        </a>
 
                                                     <?php else: ?>
 
@@ -919,23 +937,7 @@ try {
 
 
 
-                                    <script>
 
-                                        QRCode.toCanvas(document.getElementById('qrcode'),
-
-                                            '<?= htmlspecialchars($_SESSION['setup_uri']) ?>',
-
-                                            { width: 200, margin: 1 },
-
-                                            function(error) {
-
-                                                if (error) console.error(error);
-
-                                            }
-
-                                        );
-
-                                    </script>
 
 
 
@@ -1105,19 +1107,7 @@ try {
 
 
 
-                        <!-- Botón oculto para cambiar de paso -->
 
-                        <form method="POST" id="stepForm" style="display:none;">
-
-                            <input type="hidden" name="step" id="stepInput" />
-
-                        </form>
-
-                        <button data-step="disable_confirm" style="display:none;"
-
-                            onclick="document.getElementById('stepInput').value='disable_confirm'; document.getElementById('stepForm').submit();">
-
-                        </button>
 
                     </div>
 

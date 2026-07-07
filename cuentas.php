@@ -202,6 +202,29 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .dark-mode .tb-linea {
             border-top: 1px dashed #2c344c !important;
         }
+
+        /* ─── Page Header ─────────────────────────────── */
+        .cuentas-header { position: relative; overflow: hidden; border-radius: 16px !important; }
+        .cuentas-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(93, 135, 255, 0.08); pointer-events: none; }
+        .cuentas-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(19, 222, 185, 0.06); pointer-events: none; }
+        .cuentas-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .cuentas-header .sub-badge { font-size: 1rem; color: #8c9ea8; }
+
+        /* ─── Metric Cards ────────────────────────────── */
+        .metric-card { position: relative; border-radius: 12px !important; transition: transform 0.2s ease, box-shadow 0.2s ease; cursor: pointer; }
+        .metric-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important; }
+        .metric-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 12px 12px 0 0; }
+        .metric-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #8c9ea8; }
+        .metric-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+        .metric-value { font-size: 1.75rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.25rem; }
+        .metric-footer { font-size: 0.8rem; color: #8c9ea8; }
+
+        [data-bs-theme="dark"] .cuentas-header .sub-badge { color: #8c9ea8 !important; }
+        [data-bs-theme="dark"] .bg-primary.bg-opacity-10 { background-color: rgba(93,135,255,0.12) !important; }
+        [data-bs-theme="dark"] .bg-success.bg-opacity-10 { background-color: rgba(19,222,185,0.12) !important; }
+        [data-bs-theme="dark"] .bg-warning.bg-opacity-10 { background-color: rgba(255,174,31,0.12) !important; }
+        [data-bs-theme="dark"] .bg-info.bg-opacity-10 { background-color: rgba(83,155,255,0.12) !important; }
+        [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
     </style>
 
 </head>
@@ -225,20 +248,102 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
                 <div class="container-fluid px-4" style="max-width: 100%;">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="page-breadcrumb d-flex align-items-center mb-3 mt-2">
-                                <h3 class="mb-0"><i class="ti ti-wallet"></i> Cuentas</h3>
-                                <div class="ms-auto">
+                    <!-- ════════════════════════════════════
+                         PAGE HEADER
+                         ════════════════════════════════════ -->
+                    <div class="card cuentas-header shadow-sm border-0 rounded-4 mb-4">
+                        <div class="bg-pattern"></div>
+                        <div class="bg-pattern-2"></div>
+                        <div class="card-body p-4">
+                            <div class="row align-items-center g-3">
+                                <div class="col-md">
+                                    <div class="d-flex align-items-center gap-3 mb-1">
+                                        <div class="d-flex align-items-center justify-content-center rounded-3"
+                                             style="width:48px;height:48px;background:rgba(93,135,255,0.12);">
+                                            <i class="ti ti-wallet text-primary" style="font-size:1.6rem;"></i>
+                                        </div>
+                                        <div>
+                                            <h2 class="mb-0">Cuentas</h2>
+                                            <span class="sub-badge"><i class="ti ti-circle"></i> Administración de cuentas bancarias y cajas</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-auto">
                                     <div class="dropdown">
                                         <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown">
-                                            + Nueva Cuenta
+                                            <i class="ti ti-plus"></i> Nueva Cuenta
                                         </button>
                                         <ul class="dropdown-menu">
                                             <li><a class="dropdown-item" href="#" onclick="mostrarFormulario(1)">Cuenta Bancaria</a></li>
                                             <li><a class="dropdown-item" href="#" onclick="mostrarFormulario(2)">Caja</a></li>
                                         </ul>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ════════════════════════════════════
+                         KPI METRIC CARDS
+                         ════════════════════════════════════ -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card metric-card border-0 shadow-sm h-100" onclick="switchTab('bancaria')" title="Ver cuentas bancarias">
+                                <div class="metric-accent bg-primary"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Total Cuentas</span>
+                                        <div class="metric-icon bg-primary bg-opacity-10 text-primary">
+                                            <i class="ti ti-wallet"></i>
+                                        </div>
+                                    </div>
+                                    <div class="metric-value text-primary" id="kpiTotal">0</div>
+                                    <div class="metric-footer">Registradas</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card metric-card border-0 shadow-sm h-100" onclick="switchTab('bancaria')" title="Ver cuentas bancarias">
+                                <div class="metric-accent bg-success"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Bancarias</span>
+                                        <div class="metric-icon bg-success bg-opacity-10 text-success">
+                                            <i class="ti ti-building-bank"></i>
+                                        </div>
+                                    </div>
+                                    <div class="metric-value text-success" id="kpiBancarias">0</div>
+                                    <div class="metric-footer">Cuentas de banco</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card metric-card border-0 shadow-sm h-100" onclick="switchTab('caja')" title="Ver cajas internas">
+                                <div class="metric-accent bg-warning"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Cajas</span>
+                                        <div class="metric-icon bg-warning bg-opacity-10 text-warning">
+                                            <i class="ti ti-safe"></i>
+                                        </div>
+                                    </div>
+                                    <div class="metric-value text-warning" id="kpiCajas">0</div>
+                                    <div class="metric-footer">Cajas internas</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card metric-card border-0 shadow-sm h-100" onclick="switchTab('bancaria')" title="Ver cuentas activas">
+                                <div class="metric-accent bg-info"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Activas</span>
+                                        <div class="metric-icon bg-info bg-opacity-10 text-info">
+                                            <i class="ti ti-circle-check"></i>
+                                        </div>
+                                    </div>
+                                    <div class="metric-value text-info" id="kpiActivas">0</div>
+                                    <div class="metric-footer">En uso</div>
                                 </div>
                             </div>
                         </div>
@@ -623,8 +728,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                             $('#modalCuenta').modal('hide');
 
                             tablaBancarias.ajax.reload();
-
                             tablaCajas.ajax.reload();
+                            cargarResumen();
 
                             showToast('Cuenta guardada', 'success');
 
@@ -639,6 +744,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     });
 
                 });
+
+                cargarResumen();
 
             });
 
@@ -855,8 +962,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     success: () => {
 
                         tablaBancarias.ajax.reload();
-
                         tablaCajas.ajax.reload();
+                        cargarResumen();
 
                         showToast('Cuenta eliminada', 'success');
 
@@ -1043,6 +1150,31 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 });
             }
 
+        // ─── Resumen (KPI Cards) ─────────────────────
+        function cargarResumen() {
+            $.get('api/cuentas.php?resumen=1', function(data) {
+                $('#kpiTotal').text(data.total);
+                $('#kpiBancarias').text(data.bancarias);
+                $('#kpiCajas').text(data.cajas);
+                $('#kpiActivas').text(data.activas);
+
+                if (data.bancarias_lista && data.bancarias_lista.length)
+                    $('.col-xl-3.col-md-6').eq(1).find('.metric-card').attr('title', data.bancarias_lista.join('\n'));
+                if (data.cajas_lista && data.cajas_lista.length)
+                    $('.col-xl-3.col-md-6').eq(2).find('.metric-card').attr('title', data.cajas_lista.join('\n'));
+            }).fail(function() {
+                $('#kpiTotal').text('Error');
+            });
+        }
+
+        function switchTab(tab) {
+            var tabEl = document.getElementById(tab + '-tab');
+            if (tabEl) {
+                var bsTab = new bootstrap.Tab(tabEl);
+                bsTab.show();
+                tabEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
         </script>
 
 

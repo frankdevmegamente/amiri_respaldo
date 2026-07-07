@@ -64,7 +64,16 @@ $twoFAEnabled = $user2FA['two_fa_enabled'] ?? false;
 </head>
 
 <style>
-   body[data-bs-theme="dark"] .logo-modo-claro,
+        .body-wrapper {
+            padding-top: 100px !important;
+        }
+        
+        .body-wrapper-inner, 
+        .body-wrapper .container-fluid {
+            padding-top: 15px !important;
+            margin-top: 0 !important;
+        }
+     body[data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
         }
@@ -73,6 +82,57 @@ $twoFAEnabled = $user2FA['two_fa_enabled'] ?? false;
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }
+
+/* =========================================
+   🌙 MODO OSCURO PERFIL
+   ========================================= */
+
+[data-bs-theme="dark"] h3,
+[data-bs-theme="dark"] .page-breadcrumb h3 {
+    color: #e9ecef !important;
+}
+
+[data-bs-theme="dark"] .card {
+    background: #1a2234;
+    border-color: #2c344c;
+}
+
+[data-bs-theme="dark"] .form-label {
+    color: #e9ecef !important;
+}
+
+[data-bs-theme="dark"] .form-control {
+    background-color: #2a2a2a !important;
+    border-color: #444 !important;
+    color: #fff !important;
+}
+
+[data-bs-theme="dark"] .form-control:focus {
+    background-color: #333 !important;
+    border-color: #667eea !important;
+    color: #fff !important;
+}
+
+[data-bs-theme="dark"] .form-control::placeholder {
+    color: #999 !important;
+}
+
+[data-bs-theme="dark"] .text-muted {
+    color: #8c9ea8 !important;
+}
+
+[data-bs-theme="dark"] .bg-light {
+    background-color: #1e293b !important;
+}
+
+/* ─── Page Header ─────────────────────────────── */
+.perfil-header { position: relative; overflow: hidden; border-radius: 16px !important; }
+.perfil-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(93, 135, 255, 0.08); pointer-events: none; }
+.perfil-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(19, 222, 185, 0.06); pointer-events: none; }
+.perfil-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
+.perfil-header .sub-badge { font-size: 1rem; color: #8c9ea8; }
+
+[data-bs-theme="dark"] .perfil-header .sub-badge { color: #8c9ea8 !important; }
 </style>
 
 <body>
@@ -93,20 +153,30 @@ $twoFAEnabled = $user2FA['two_fa_enabled'] ?? false;
 
       <div class="body-wrapper-inner">
 
-        <div class="container-fluid">
+        <div class="container-fluid px-4" style="max-width: 100%;">
 
-          <div class="row">
-
-            <div class="col-12">
-
-              <div class="page-breadcrumb d-flex align-items-center mb-3">
-
-                <h3 class="mb-0"><i class="ti ti-user"></i> Editar Perfil</h3>
-
+          <!-- ════════════════════════════════════
+               PAGE HEADER
+               ════════════════════════════════════ -->
+          <div class="card perfil-header shadow-sm border-0 rounded-4 mb-4">
+              <div class="bg-pattern"></div>
+              <div class="bg-pattern-2"></div>
+              <div class="card-body p-4">
+                  <div class="row align-items-center g-3">
+                      <div class="col-md">
+                          <div class="d-flex align-items-center gap-3 mb-1">
+                              <div class="d-flex align-items-center justify-content-center rounded-3"
+                                   style="width:48px;height:48px;background:rgba(93,135,255,0.12);">
+                                  <i class="ti ti-user text-primary" style="font-size:1.6rem;"></i>
+                              </div>
+                              <div>
+                                  <h2 class="mb-0">Editar Perfil</h2>
+                                  <span class="sub-badge"><i class="ti ti-circle"></i> Configura tu información personal y seguridad</span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
               </div>
-
-            </div>
-
           </div>
 
 

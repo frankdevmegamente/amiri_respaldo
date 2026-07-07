@@ -69,7 +69,7 @@ try {
             // (los gastos nuevos solo descuentan de la cuenta seleccionada,
             //  los viejos ya tienen su contraparte en capital, no se duplican)
             $totalGastosSinCapital = 0;
-            $stmtGastos = $pdo->query("SELECT COALESCE(SUM(monto), 0) AS total FROM gastos g WHERE g.activo = 1 AND (SELECT COUNT(*) FROM movimientos WHERE gasto_id = g.id AND cuenta_origen_id = (SELECT id FROM cuentas WHERE tipo_cuenta = 3 AND activo = 1 LIMIT 1)) = 0");
+            $stmtGastos = $pdo->query("SELECT COALESCE(SUM(monto), 0) AS total FROM gastos g WHERE g.activo = 1 AND (SELECT COUNT(*) FROM movimientos WHERE gasto_id = g.id AND cuenta_origen_id IN (SELECT id FROM cuentas WHERE tipo_cuenta = 3 AND activo = 1)) = 0");
             $totalGastosSinCapital = (float)$stmtGastos->fetch(PDO::FETCH_ASSOC)['total'];
             $totalSaldos += $totalGastosSinCapital;
 
@@ -77,7 +77,7 @@ try {
 
             // NO incluir tipo 4 ni 5: esas cuentas se suman via deudas_clientes y promotores para evitar doble conteo
 
-            $stmtCap = $pdo->query("SELECT COALESCE(SUM(saldo_actual),0) AS total FROM cuentas WHERE activo=1 AND tipo_cuenta = 3");
+            $stmtCap = $pdo->query("SELECT COALESCE(SUM(saldo_actual),0) AS total FROM cuentas WHERE activo=1 AND tipo_cuenta IN (3, 7)");
 
             $totalCapital = (float)$stmtCap->fetch(PDO::FETCH_ASSOC)['total'];
 
@@ -132,17 +132,31 @@ try {
             $totalProveedores = (float)$stmtProv->fetch(PDO::FETCH_ASSOC)['total'];
 
             $totalObligaciones = $totalPrestamistas + $totalProveedores;
+
+            // RETIROS DE CAPITAL AMIRI (se restan porque redujeron capital sin afectar saldos)
+            $stmtRetiros = $pdo->query("SELECT COALESCE(SUM(monto), 0) AS total FROM retiros_capital");
+            $totalRetiros = (float)$stmtRetiros->fetch(PDO::FETCH_ASSOC)['total'];
             
             // Redondear para evitar basura de flotantes
             $totalSaldos = round($totalSaldos, 2);
             $totalCapital = round($totalCapital, 2);
             $totalObligaciones = round($totalObligaciones, 2);
+            $totalRetiros = round($totalRetiros, 2);
 
-            $diferencia = round($totalSaldos - $totalCapital - $totalObligaciones, 2);
+            $diferencia = round($totalSaldos - $totalCapital - $totalObligaciones - $totalRetiros, 2);
             
             // Construir explicación de la diferencia
             $explicacion = [];
             $componentes = [];
+            if ($totalRetiros > 0) {
+                $explicacion[] = [
+                    'tipo' => 'retiros_capital',
+                    'concepto' => 'Retiros de Capital Amiri',
+                    'monto' => $totalRetiros,
+                    'detalle' => 'Retiros registrados que redujeron capital sin afectar saldos'
+                ];
+                $componentes[] = 'Retiros: $' . number_format($totalRetiros, 2);
+            }
             if ($totalPrestamosOtorgados > 0) {
                 $stmtDet = $pdo->query("SELECT persona_nombre, (monto_total - monto_pagado) AS pendiente FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1 ORDER BY persona_nombre");
                 $detalles = [];
@@ -180,6 +194,8 @@ try {
                 'total_saldos'    => $totalSaldos,
 
                 'total_capital'   => $totalCapital,
+
+                'total_retiros'   => $totalRetiros,
 
                 'total_prestamos' => $totalObligaciones,
 
@@ -253,7 +269,7 @@ try {
 
                 FROM cuentas
 
-                WHERE activo = 1 AND tipo_cuenta = 3
+                WHERE activo = 1 AND tipo_cuenta IN (3, 7)
 
             ");
 
@@ -385,7 +401,7 @@ try {
             $totalSaldos += $totalPrestamosOtorgados;
 
             // Sumar gastos activos que NO descontaron de Comisiones AMIRI
-            $stmtGastos = $pdo->query("SELECT COALESCE(SUM(monto), 0) AS total FROM gastos g WHERE g.activo = 1 AND (SELECT COUNT(*) FROM movimientos WHERE gasto_id = g.id AND cuenta_origen_id = (SELECT id FROM cuentas WHERE tipo_cuenta = 3 AND activo = 1 LIMIT 1)) = 0");
+            $stmtGastos = $pdo->query("SELECT COALESCE(SUM(monto), 0) AS total FROM gastos g WHERE g.activo = 1 AND (SELECT COUNT(*) FROM movimientos WHERE gasto_id = g.id AND cuenta_origen_id IN (SELECT id FROM cuentas WHERE tipo_cuenta = 3 AND activo = 1)) = 0");
             $totalSaldos += (float)$stmtGastos->fetch(PDO::FETCH_ASSOC)['total'];
         }
 
@@ -399,7 +415,7 @@ try {
 
                 WHERE activo = 1
 
-                AND tipo_cuenta IN (3, 4, 5)
+                AND tipo_cuenta IN (3, 4, 5, 7)
 
                 AND id != 2" . $whereMoneda;
 
@@ -503,21 +519,38 @@ try {
             $totalPrestamosOtorgados = (float)$stmtPO->fetch(PDO::FETCH_ASSOC)['total'];
         }
 
+        // RETIROS DE CAPITAL AMIRI (solo MXN, se restan porque redujeron capital sin afectar saldos)
+        $totalRetiros = 0;
+        if ($moneda === 'MXN' || $moneda === 'TODAS') {
+            $stmtRetiros = $pdo->query("SELECT COALESCE(SUM(monto), 0) AS total FROM retiros_capital");
+            $totalRetiros = (float)$stmtRetiros->fetch(PDO::FETCH_ASSOC)['total'];
+        }
+
         $totalSaldos = round($totalSaldos, 2);
         $totalCapital = round($totalCapital, 2);
         $totalPrestamos = round($totalPrestamos, 2);
         $totalProveedoresAdeudos = round($totalProveedoresAdeudos, 2);
+        $totalRetiros = round($totalRetiros, 2);
 
         // 4. DIFERENCIA
         if ($moneda === 'USD' || $moneda === 'USDT') {
             $diferencia = round($totalSaldos + $totalCapital - $totalProveedoresAdeudos, 2);
         } else {
-            $diferencia = round($totalSaldos - ($totalCapital + $totalPrestamos), 2);
+            $diferencia = round($totalSaldos - ($totalCapital + $totalPrestamos + $totalRetiros), 2);
         }
 
         // Construir explicación
         $explicacion = [];
         $componentes = [];
+        if ($totalRetiros > 0) {
+            $explicacion[] = [
+                'tipo' => 'retiros_capital',
+                'concepto' => 'Retiros de Capital Amiri',
+                'monto' => $totalRetiros,
+                'detalle' => 'Retiros registrados que redujeron capital sin afectar saldos'
+            ];
+            $componentes[] = 'Retiros: $' . number_format($totalRetiros, 2);
+        }
         if ($totalPrestamosOtorgados > 0) {
             $stmtDet = $pdo->query("SELECT persona_nombre, (monto_total - monto_pagado) AS pendiente FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1 ORDER BY persona_nombre");
             $detalles = [];
@@ -555,6 +588,8 @@ try {
             'total_saldos' => $totalSaldos,
 
             'total_capital' => $totalCapital,
+
+            'total_retiros' => $totalRetiros,
 
             'total_prestamos' => $totalPrestamos,
 
@@ -862,7 +897,7 @@ try {
 
                 LEFT JOIN tipos_cuenta ct ON c.tipo_cuenta = ct.id
 
-                WHERE c.activo = 1 AND c.tipo_cuenta = 3
+                WHERE c.activo = 1 AND c.tipo_cuenta IN (3, 7)
 
                 ORDER BY c.nombre
 
@@ -1066,7 +1101,7 @@ try {
 
                 WHERE c.activo = 1
 
-                AND c.tipo_cuenta = 3
+                AND c.tipo_cuenta IN (3, 7)
 
                 ORDER BY c.nombre
 
@@ -1184,7 +1219,7 @@ try {
 
                 WHERE c.activo = 1
 
-                AND c.tipo_cuenta IN (3)" . $whereCapital . "
+                AND c.tipo_cuenta IN (3, 7)" . $whereCapital . "
 
                 ORDER BY c.nombre";
 
@@ -1322,19 +1357,19 @@ try {
 
             WHERE c.activo = 1
 
-            AND c.tipo_cuenta IN (3, 4, 5)
+            AND c.tipo_cuenta IN (3, 4, 5, 7)
 
             AND c.id != 2" . $whereMoneda . "
 
             ORDER BY 
 
-                CASE c.tipo_cuenta
+                CASE 
 
-                    WHEN 3 THEN 1
+                    WHEN c.tipo_cuenta = 3 THEN 1
 
-                    WHEN 5 THEN 2
+                    WHEN 5 THEN 3
 
-                    WHEN 4 THEN 3
+                    WHEN 4 THEN 4
 
                 END,
 

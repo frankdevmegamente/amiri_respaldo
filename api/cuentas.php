@@ -28,7 +28,30 @@ try {
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
+        if (isset($_GET['resumen'])) {
+            $stmt = $pdo->query("
+                SELECT
+                    COUNT(*) AS total,
+                    SUM(tipo_cuenta = 1) AS bancarias,
+                    SUM(tipo_cuenta = 2) AS cajas,
+                    SUM(activo = 1) AS activas
+                FROM cuentas
+            ");
+            $r = $stmt->fetch(PDO::FETCH_ASSOC);
+            $r['total'] = (int)$r['total'];
+            $r['bancarias'] = (int)$r['bancarias'];
+            $r['cajas'] = (int)$r['cajas'];
+            $r['activas'] = (int)$r['activas'];
 
+            $stmtNombres = $pdo->query("SELECT CONCAT(nombre, ' (', tipo_moneda, ')') AS label FROM cuentas WHERE tipo_cuenta = 1 AND activo = 1 ORDER BY nombre");
+            $r['bancarias_lista'] = $stmtNombres->fetchAll(PDO::FETCH_COLUMN);
+
+            $stmtNombres = $pdo->query("SELECT CONCAT(nombre, ' (', tipo_moneda, ')') AS label FROM cuentas WHERE tipo_cuenta = 2 AND activo = 1 ORDER BY nombre");
+            $r['cajas_lista'] = $stmtNombres->fetchAll(PDO::FETCH_COLUMN);
+
+            echo json_encode($r);
+            exit;
+        }
 
         // Obtener una cuenta específica por ID
 

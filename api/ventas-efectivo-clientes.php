@@ -178,6 +178,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         $fecha_pago = $fecha_pago_input;
     }
 
+    try {
+        validarMesNoCerrado($pdo, explode(' ', $fecha_pago)[0]);
+    } catch (Exception $e) {
+        http_response_code(400);
+        echo json_encode(['error' => $e->getMessage()]);
+        exit;
+    }
+
     $pdo->beginTransaction();
     try {
         // Obtener servicio 'Pago a Cliente' (id 13 esperado)

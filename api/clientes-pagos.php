@@ -60,6 +60,8 @@ if (!$cliente_id || !$cuenta_pago_id || $monto <= 0) {
 
 try {
 
+    validarMesNoCerrado($pdo, $fecha);
+
     // Caja del cliente
 
     $stmtCliente = $pdo->prepare("SELECT cuenta_id FROM clientes WHERE id = ?");

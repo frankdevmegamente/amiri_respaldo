@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           ]);
 
           // ✅ VALIDAR DISPOSITIVO CONFIABLE (24 HORAS)
-          $deviceToken = $_COOKIE['trusted_device_token'] ?? null;
+          $deviceToken = $_COOKIE['trusted_device'] ?? null;
           $isTrustedDevice = false;
           
           if ($deviceToken && $usuario['two_fa_enabled']) {
@@ -160,7 +160,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
   <style>
-    /* Dark Mode Styles */
+    /* ─── Page Header ─────────────────────────────── */
+    .login-header { position: relative; overflow: hidden; }
+    .login-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(255,255,255,0.08); pointer-events: none; }
+    .login-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(255,255,255,0.06); pointer-events: none; }
+
+    /* ─── Dark Mode ──────────────────────────────── */
     [data-bs-theme="dark"] .form-label,
     [data-bs-theme="dark"] .text-muted {
       color: #e0e0e0 !important;
@@ -174,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     [data-bs-theme="dark"] .form-control:focus {
       background-color: #333 !important;
-      border-color: #667eea !important;
+      border-color: #6c5ce7 !important;
       color: #fff !important;
     }
 
@@ -195,11 +200,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     [data-bs-theme="dark"] a {
-      color: #8b9bff !important;
+      color: #6c5ce7 !important;
     }
 
     [data-bs-theme="dark"] a:hover {
-      color: #a5b4ff !important;
+      color: #7aa2ff !important;
+    }
+
+    [data-bs-theme="dark"] .card {
+      background: rgba(30, 30, 30, 0.95) !important;
+      color: #fff;
     }
   </style>
 </head>
@@ -220,14 +230,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="col-md-6 col-lg-5 col-xxl-3">
             <div class="card mb-0 shadow-lg border-0" style="border-radius: 16px; overflow: hidden; backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.95);">
               <!-- Header con gradiente -->
-              <div class="card-header text-center py-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+              <div class="card-header text-center py-3 login-header" style="background: linear-gradient(135deg, #6c5ce7 0%, #6c5ce7 100%); border: none;">
+                <div class="bg-pattern"></div>
+                <div class="bg-pattern-2"></div>
                 <img src="src/assets/images/logos/logo.png" width="140" alt="Logo" class="mb-1" style="filter: brightness(0) invert(1);" />
                 <h6 class="text-white fw-bold mb-0" style="letter-spacing: 1px; font-size: 0.9rem;">SISTEMA AMIRI</h6>
               </div>
 
               <div class="card-body px-4 py-3">
                 <div class="text-center mb-3">
-                  <div class="d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+                  <div class="d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: linear-gradient(135deg, #6c5ce7 0%, #6c5ce7 100%); border-radius: 50%; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);">
                     <i class="ti ti-user" style="font-size: 24px; color: white;"></i>
                   </div>
                   <p class="mt-2 mb-0 text-muted fw-semibold" style="font-size: 0.9rem;">Ingresa tus credenciales</p>
@@ -263,12 +275,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                   </div>
 
-                  <button type="submit" class="btn btn-primary w-100 py-2 mb-2 fw-semibold" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 10px; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); transition: all 0.3s ease; font-size: 0.95rem;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(102, 126, 234, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.4)'">
+                  <button type="submit" class="btn btn-primary w-100 py-2 mb-2 fw-semibold" style="background: linear-gradient(135deg, #6c5ce7 0%, #6c5ce7 100%); border: none; border-radius: 10px; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4); transition: all 0.3s ease; font-size: 0.95rem;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(108, 92, 231, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(108, 92, 231, 0.4)'">
                     <i class="ti ti-login"></i> Iniciar Sesión
                   </button>
 
                   <div class="text-center mt-3">
-                    <a href="forgot-password.php" class="text-decoration-none fw-semibold" style="color: #667eea; transition: all 0.3s ease; font-size: 0.85rem;" onmouseover="this.style.color='#764ba2'" onmouseout="this.style.color='#667eea'">
+                    <a href="forgot-password.php" class="text-decoration-none fw-semibold" style="color: #6c5ce7; transition: all 0.3s ease; font-size: 0.85rem;" onmouseover="this.style.color='#003380'" onmouseout="this.style.color='#6c5ce7'">
                       <i class="ti ti-help-circle"></i> ¿Olvidaste tu contraseña?
                     </a>
                   </div>
@@ -283,7 +295,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <script src="src/assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="src/assets/libs/jquery/dist/jquery.min.js"></script>
   <script>
     document.getElementById('togglePassword').addEventListener('click', function() {
       const password = document.getElementById('password');
@@ -302,50 +313,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     const themeIcon = document.getElementById('theme-icon');
     const html = document.documentElement;
 
-    // Cargar tema guardado (sincronizado con sistema interno)
     const savedDarkMode = localStorage.getItem('darkMode') === 'true';
     if (savedDarkMode) {
       html.setAttribute('data-bs-theme', 'dark');
       themeIcon.className = 'ti ti-sun';
-      const card = document.querySelector('.card');
-      card.style.background = 'rgba(30, 30, 30, 0.95)';
-      card.style.color = '#fff';
-      // Aplicar estilos a los input-group-text
-      document.querySelectorAll('.input-group-text').forEach(el => {
-        el.style.backgroundColor = '#2a2a2a';
-        el.style.borderColor = '#444';
-        el.style.color = '#e0e0e0';
-      });
     }
 
     themeToggle.addEventListener('click', function() {
       const currentTheme = html.getAttribute('data-bs-theme');
-      const card = document.querySelector('.card');
-
       if (currentTheme === 'dark') {
         html.setAttribute('data-bs-theme', 'light');
         themeIcon.className = 'ti ti-moon';
         localStorage.setItem('darkMode', 'false');
-        card.style.background = 'rgba(255, 255, 255, 0.95)';
-        card.style.color = '';
-        // Restaurar estilos light
-        document.querySelectorAll('.input-group-text').forEach(el => {
-          el.style.backgroundColor = '';
-          el.style.borderColor = '';
-          el.style.color = '';
-        });
       } else {
         html.setAttribute('data-bs-theme', 'dark');
         themeIcon.className = 'ti ti-sun';
         localStorage.setItem('darkMode', 'true');
-        card.style.background = 'rgba(30, 30, 30, 0.95)';
-        card.style.color = '#fff';
-        // Aplicar estilos dark
-        document.querySelectorAll('.input-group-text').forEach(el => {
-          el.style.backgroundColor = '#2a2a2a';
-          el.style.borderColor = '#444';
-          el.style.color = '#e0e0e0';
-        });
       }
     });
   </script>

@@ -1,5 +1,10 @@
 /* src/assets/css/layout-custom.css */
 
+/* Ocultar scrollbar vertical del sidebar */
+.left-sidebar .scroll-sidebar .simplebar-track.simplebar-vertical {
+  visibility: hidden !important;
+}
+
 .theme-toggle-btn,
 .fullscreen-btn {
   background: none;
@@ -193,7 +198,7 @@ body.loading #main-wrapper {
 .dataTable tbody tr:hover,
 .table tbody tr:hover {
   background-color: rgba(93, 135, 255, 0.04) !important;
-  box-shadow: inset 4px 0 0 0 #5d87ff;
+  box-shadow: inset 4px 0 0 0 #6c5ce7;
 }
 
 /* ============================================
@@ -233,7 +238,7 @@ body.loading #main-wrapper {
 
 .dataTables_wrapper .dataTables_filter input:focus {
   outline: none;
-  border-color: #5d87ff;
+  border-color: #6c5ce7;
   box-shadow: 0 0 0 3px rgba(93, 135, 255, 0.1);
 }
 
@@ -244,7 +249,7 @@ body.loading #main-wrapper {
   margin: 0 2px !important;
 }
 .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-  background: #5d87ff !important;
+  background: #6c5ce7 !important;
   color: white !important;
   box-shadow: 0 4px 6px rgba(93, 135, 255, 0.25) !important;
 }
@@ -483,6 +488,16 @@ body.loading #main-wrapper {
 }
 [data-bs-theme="dark"] .metric-label {
   color: #8b92a8;
+}
+
+.metric-subtitle {
+  font-size: 0.68rem;
+  color: #8b92a8;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+[data-bs-theme="dark"] .metric-subtitle {
+  color: #6b7280;
 }
 
 .metric-value {

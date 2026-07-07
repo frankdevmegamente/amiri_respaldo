@@ -163,14 +163,14 @@ sort($bancos_unicos);
             align-items: center;
             margin-bottom: 25px;
             padding-bottom: 20px;
-            border-bottom: 2px solid #5d87ff;
+            border-bottom: 2px solid #6c5ce7;
         }
 
         .ticket-title {
             font-size: 17px; /* Le bajamos un puntito para que encaje mejor */
             font-weight: 700;
             letter-spacing: 1px;
-            color: #5d87ff;
+            color: #6c5ce7;
             text-transform: uppercase;
             white-space: normal; /* 🔥 ESTA ES LA CLAVE: Permite que respete el borde */
             text-align: right;
@@ -192,7 +192,7 @@ sort($bancos_unicos);
 
         .client-amount {
             background-color: rgba(93, 135, 255, 0.1);
-            color: #5d87ff;
+            color: #6c5ce7;
             padding: 8px 16px;
             border-radius: 6px;
             font-size: 16px;
@@ -355,7 +355,7 @@ sort($bancos_unicos);
 }
 
 [data-bs-theme="dark"] .select2-container--default .select2-results__option--highlighted[aria-selected] {
-    background-color: #5d87ff;
+    background-color: #6c5ce7;
     color: #ffffff;
 }
 
@@ -734,7 +734,7 @@ document.getElementById('formSubirExcel').addEventListener('submit', function(e)
             if (b.includes('cetes')) return '#104a3e'; // Verde oscuro CetesDirecto
             
             // 3. Color por defecto (Si de plano es uno que no está en la lista)
-            return '#5d87ff'; // Azul/Morado Amiri
+            return '#6c5ce7'; // Azul/Morado Amiri
         }
 
         $(document).ready(function() {

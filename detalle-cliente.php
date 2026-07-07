@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 require_once __DIR__ . '/src/config/session.php';
 
@@ -242,7 +242,7 @@ try {
 
         body[data-bs-theme="dark"] .nav-tabs .nav-link.active {
             color: #ffffff !important;
-            border-bottom-color: #5d87ff !important;
+            border-bottom-color: #6c5ce7 !important;
         }
 
         body[data-bs-theme="dark"] .bg-light {
@@ -410,7 +410,9 @@ try {
                                                             <th>Fecha</th>
                                                             <th>Total recibido</th>
                                                             <th>Comisión AMIRI</th>
+                                                            <th>%</th>
                                                             <th>Comisión Promotor</th>
+                                                            <th>%</th>
                                                             <th>Total a pagar</th>
                                                             <th>Estado</th>
                                                             <th>Pagado</th>
@@ -948,11 +950,55 @@ try {
 
                         data: null,
 
+                        className: 'text-center',
+
+                        render: function(data) {
+
+                            const total = parseFloat(data.monto_total) || 0;
+
+                            const com = parseFloat(data.comision_amiri) || 0;
+
+                            if (total <= 0 || com <= 0) return '<span class="text-muted">—</span>';
+
+                            const pct = (com / total) * 100;
+
+                            return `<span class="badge bg-primary bg-opacity-10 text-primary">${pct.toFixed(2)}%</span>`;
+
+                        }
+
+                    },
+
+                    {
+
+                        data: null,
+
                         render: function(data) {
 
                             const moneda = data.moneda || 'MXN';
 
                             return formatoMonedaDinamica(data.comision_promotor, moneda);
+
+                        }
+
+                    },
+
+                    {
+
+                        data: null,
+
+                        className: 'text-center',
+
+                        render: function(data) {
+
+                            const total = parseFloat(data.monto_total) || 0;
+
+                            const com = parseFloat(data.comision_promotor) || 0;
+
+                            if (total <= 0 || com <= 0) return '<span class="text-muted">—</span>';
+
+                            const pct = (com / total) * 100;
+
+                            return `<span class="badge bg-warning bg-opacity-10 text-warning">${pct.toFixed(2)}%</span>`;
 
                         }
 
@@ -1495,13 +1541,38 @@ try {
                         }
                     },
                     {
-                        data: 'moneda',
+                        data: null,
+                        className: 'text-center',
                         render: function(data) {
-                            const cls = data === 'USD' ? 'bg-success bg-opacity-10 text-success' : 'bg-info bg-opacity-10 text-info';
-                            return `<span class="badge ${cls}">${data}</span>`;
+                            const total = parseFloat(data.monto_total) || 0;
+                            const com = parseFloat(data.comision_amiri) || 0;
+                            if (total <= 0 || com <= 0) return '<span class="text-muted">—</span>';
+                            const pct = (com / total) * 100;
+                            const cls = pct >= 2 ? 'bg-success bg-opacity-10 text-success' : 'bg-info bg-opacity-10 text-info';
+                            return `<span class="badge ${cls}">${pct.toFixed(2)}%</span>`;
                         }
                     },
-
+                    
+                    {
+                        data: null,
+                        className: 'text-center',
+                        render: function(data) {
+                            const total = parseFloat(data.monto_total) || 0;
+                            const com = parseFloat(data.comision_amiri) || 0;
+                            if (total <= 0 || com <= 0) return '<span class="text-muted">—</span>';
+                            const pct = (com / total) * 100;
+                            const cls = pct >= 2 ? 'bg-success bg-opacity-10 text-success' : 'bg-info bg-opacity-10 text-info';
+                            return `<span class="badge ${cls}">${pct.toFixed(2)}%</span>`;
+                        }
+                    },
+                    
+                    {
+                        data: null,
+                        render: function(data) {
+                            const moneda = data.moneda || 'MXN';
+                            return formatoMonedaDinamica(data.comision_promotor, moneda);
+                        }
+                    },
                     {
 
                         data: 'cantidad',

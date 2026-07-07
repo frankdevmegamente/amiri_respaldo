@@ -458,11 +458,30 @@ try {
                         }
                     }
 
+                    // --- [CANDADO MES CERRADO] ---
+                    $stmtFechas = $pdo->prepare("SELECT DISTINCT DATE_FORMAT(fecha, '%Y-%m') as mes FROM movimientos WHERE grupo_id = ? AND estado = 'activo'");
+                    $stmtFechas->execute([$grupo_id]);
+                    $mesesAfectados = $stmtFechas->fetchAll(PDO::FETCH_COLUMN);
+                    foreach ($mesesAfectados as $mes) {
+                        $stmtC = $pdo->prepare("SELECT id FROM cierres_mensuales WHERE mes = ?");
+                        $stmtC->execute([$mes]);
+                        if ($stmtC->fetch()) {
+                            throw new Exception("No puedes anular movimientos del mes $mes porque ya está cerrado.");
+                        }
+                    }
+
                     // --- [EJECUCIÓN CENTRALIZADA] ---
                     // El Service ahora hará todo el trabajo matemático una sola vez.
                     $resultado = $service->anularPorGrupo($grupo_id, $motivo, $usuario_id);
                     
                     if (isset($resultado['success']) && $resultado['success']) {
+                        // Si el grupo anulado contenía un movimiento de inicialización (servicio_id=19),
+                        // limpiar los cierres_mensuales que creó la inicialización
+                        $stmtCheckInit = $pdo->prepare("SELECT COUNT(*) FROM movimientos WHERE grupo_id = ? AND servicio_id = 19");
+                        $stmtCheckInit->execute([$grupo_id]);
+                        if ($stmtCheckInit->fetchColumn() > 0) {
+                            $pdo->exec("DELETE FROM cierres_mensuales");
+                        }
                         echo json_encode($resultado);
                     } else {
                         http_response_code(400);
@@ -509,7 +528,19 @@ try {
 
                 }
 
-                
+                // Validar que el movimiento original no pertenezca a un mes cerrado
+
+                $stmtOrig = $pdo->prepare("SELECT fecha FROM movimientos WHERE id = ? AND activo = 1");
+
+                $stmtOrig->execute([$movimiento_id]);
+
+                $movOriginal = $stmtOrig->fetch(PDO::FETCH_ASSOC);
+
+                if ($movOriginal) {
+
+                    validarMesNoCerrado($pdo, explode(' ', $movOriginal['fecha'])[0]);
+
+                }
 
                 // Construir array de datos corregidos
 
@@ -526,6 +557,8 @@ try {
                 }
 
                 if (isset($_POST['fecha'])) {
+
+                    validarMesNoCerrado($pdo, $_POST['fecha']);
 
                     $datos_corregidos['fecha'] = $_POST['fecha'];
 

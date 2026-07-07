@@ -23,6 +23,102 @@ try {
 
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $mes = $_GET['mes'] ?? null;
+
+        // ─── Resumen ─────────────────────────────────────
+        if (isset($_GET['resumen'])) {
+            $where = 'g.activo = 1';
+            $params = [];
+            if ($mes) {
+                $where .= ' AND g.fecha LIKE ?';
+                $params[] = $mes . '-%';
+            }
+            $stmt = $pdo->prepare("
+                SELECT
+                    COUNT(*) AS total_gastos,
+                    COALESCE(SUM(g.monto), 0) AS total_monto,
+                    COALESCE(AVG(g.monto), 0) AS promedio_monto,
+                    COALESCE(MAX(g.monto), 0) AS max_monto
+                FROM gastos g
+                WHERE $where
+            ");
+            $stmt->execute($params);
+            $resumen = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($resumen['max_monto'] > 0) {
+                $w2 = 'g.activo = 1';
+                $p2 = [];
+                if ($mes) {
+                    $w2 .= ' AND g.fecha LIKE ?';
+                    $p2[] = $mes . '-%';
+                }
+                $stmt2 = $pdo->prepare("
+                    SELECT g.concepto, tg.nombre AS tipo
+                    FROM gastos g
+                    JOIN categorias_gasto tg ON g.categoria_id = tg.id
+                    WHERE $w2
+                    ORDER BY g.monto DESC
+                    LIMIT 1
+                ");
+                $stmt2->execute($p2);
+                $top = $stmt2->fetch(PDO::FETCH_ASSOC);
+                $resumen['max_concepto'] = $top ? ($top['concepto'] ?: $top['tipo']) : '—';
+            } else {
+                $resumen['max_concepto'] = '—';
+            }
+
+            $resumen['total_gastos'] = (int)$resumen['total_gastos'];
+            $resumen['total_monto'] = (float)$resumen['total_monto'];
+            $resumen['promedio_monto'] = (float)$resumen['promedio_monto'];
+            $resumen['max_monto'] = (float)$resumen['max_monto'];
+
+            echo json_encode($resumen);
+            exit;
+        }
+
+        // ─── Charts ──────────────────────────────────────
+        if (isset($_GET['chart'])) {
+            $where = 'g.activo = 1';
+            $params = [];
+            if ($mes) {
+                $where .= ' AND g.fecha LIKE ?';
+                $params[] = $mes . '-%';
+            }
+
+            $stmt = $pdo->prepare("
+                SELECT tg.nombre AS tipo, COALESCE(g.clasificacion, 'sin_definir') AS clasificacion, COALESCE(SUM(g.monto), 0) AS total
+                FROM gastos g
+                JOIN categorias_gasto tg ON g.categoria_id = tg.id
+                WHERE $where
+                GROUP BY tg.nombre, g.clasificacion
+                ORDER BY total DESC
+            ");
+            $stmt->execute($params);
+            $datos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $consolidado = [];
+            $order = [];
+            foreach ($datos as $d) {
+                $tipo = $d['tipo'];
+                if (!isset($consolidado[$tipo])) {
+                    $consolidado[$tipo] = ['tipo' => $tipo, 'total' => 0, 'clasificacion' => $d['clasificacion']];
+                    $order[] = $tipo;
+                }
+                $consolidado[$tipo]['total'] += (float)$d['total'];
+                if ($consolidado[$tipo]['clasificacion'] !== $d['clasificacion']) {
+                    $consolidado[$tipo]['clasificacion'] = 'mixto';
+                }
+            }
+
+            $resultado = [];
+            foreach ($order as $t) {
+                $resultado[] = $consolidado[$t];
+            }
+
+            echo json_encode($resultado);
+            exit;
+        }
+
         if (isset($_GET['id'])) {
             $stmt = $pdo->prepare("
                 SELECT g.*, c.nombre cuenta_nombre, tg.nombre tipo_gasto_nombre
@@ -34,14 +130,21 @@ try {
             $stmt->execute([$_GET['id']]);
             echo json_encode($stmt->fetch());
         } else {
-            $stmt = $pdo->query("
+            $where = 'g.activo = 1';
+            $params = [];
+            if ($mes) {
+                $where .= ' AND g.fecha LIKE ?';
+                $params[] = $mes . '-%';
+            }
+            $stmt = $pdo->prepare("
                 SELECT g.*, c.nombre cuenta_nombre, tg.nombre tipo_gasto_nombre
                 FROM gastos g
                 JOIN cuentas c ON g.cuenta_id = c.id
                 JOIN categorias_gasto tg ON g.categoria_id = tg.id
-                WHERE g.activo = 1
+                WHERE $where
                 ORDER BY g.fecha DESC, g.id DESC
             ");
+            $stmt->execute($params);
             echo json_encode($stmt->fetchAll());
         }
         exit;
@@ -55,7 +158,7 @@ try {
 
         $fecha = $_POST['fecha'] ?? date('Y-m-d');
 
-        
+        validarMesNoCerrado($pdo, $fecha);
 
         $stmt = $pdo->prepare("
             INSERT INTO gastos (fecha, cuenta_id, categoria_id, clasificacion, monto, concepto)

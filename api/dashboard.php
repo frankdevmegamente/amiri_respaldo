@@ -244,6 +244,9 @@ try {
 
             $params[':hasta'] = $_GET['fecha_hasta'];
 
+        } elseif (!empty($_SESSION['mes_activo'])) {
+            $filtroFecha = " AND DATE_FORMAT(fm.fecha, '%Y-%m') = :periodo";
+            $params[':periodo'] = $_SESSION['mes_activo'];
         }
 
 

@@ -141,7 +141,7 @@ body[data-bs-theme="dark"] .badge.bg-success.bg-opacity-10 {
 
 body[data-bs-theme="dark"] .badge.bg-info.bg-opacity-10 {
   background-color: rgba(93, 135, 255, 0.15) !important;
-  color: #5d87ff !important;
+  color: #6c5ce7 !important;
 }
 
 body[data-bs-theme="dark"] .badge.bg-primary.bg-opacity-10 {

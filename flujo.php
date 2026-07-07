@@ -30,9 +30,9 @@ $serviciosMXN = $pdo->query("
 
     SELECT id, nombre FROM servicios
 
-    WHERE activo = 1 AND id IN (1, 4, 7)
+    WHERE activo = 1 AND id IN (1, 4, 7, 20)
 
-    ORDER BY FIELD(id, 1, 4, 7)
+    ORDER BY FIELD(id, 1, 4, 7, 20)
 
 ")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -543,7 +543,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                             <label class="form-label">Fecha</label>
 
-                            <input type="date" class="form-control" name="fecha" value="<?= date('Y-m-d') ?>" required>
+                            <input type="date" class="form-control" name="fecha" value="<?= date('Y-m-d') ?>" max="<?= date('Y-m-t', strtotime($_SESSION['mes_activo'] ?? date('Y-m'))) ?>" required>
 
                         </div>
 
@@ -951,7 +951,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
         processing: true,
             serverSide: true,
 
-            ajax: { url: 'api/flujo-lista.php?servicios_ids=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17', dataSrc: 'data' },
+            ajax: { url: 'api/flujo-lista.php?servicios_ids=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19', dataSrc: 'data' },
 
             columns: [
                 {
@@ -1104,7 +1104,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
             // Recargar la tabla con la nueva vista
             let vistaActual = $(e.target).data('vista');
-            let nuevaUrl = 'api/flujo-lista.php?servicios_ids=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17&vista=' + vistaActual;
+            let nuevaUrl = 'api/flujo-lista.php?servicios_ids=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19&vista=' + vistaActual;
             table.ajax.url(nuevaUrl).load();
         });
 
@@ -1403,7 +1403,8 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                     $detalle.html(detalleHtml).show();
                 }
 
-                const desglose = ` | Saldos: $${formatMXN(data.total_saldos || 0)} − (Capital: $${formatMXN(data.total_capital || 0)} + Obligaciones: $${formatMXN(data.total_prestamos || 0)})`;
+                const retirosPart = data.total_retiros ? ` + Retiros: $${formatMXN(data.total_retiros)}` : '';
+                const desglose = ` | Saldos: $${formatMXN(data.total_saldos || 0)} − (Capital: $${formatMXN(data.total_capital || 0)}${retirosPart} + Obligaciones: $${formatMXN(data.total_prestamos || 0)})`;
                 $texto.append(`<br><small class="text-muted">${desglose}</small>`);
             });
 
@@ -1960,6 +1961,148 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
 
 
+                    case 'Compra de Efectivo':
+
+                        $('#clienteGroup').show();
+
+                        $('#cuentaGroup').show();
+
+                        cargarClientesMXN();
+
+                        $.getJSON('api/cuentas.php?tipo_moneda=MXN', function (data) {
+                            let html = '<option value="">-- Selecciona la cuenta --</option>';
+                            data.forEach(function (c) {
+                                let nombreCuenta = c.nombre;
+                                if (c.banco && c.banco.trim()) {
+                                    nombreCuenta += ' (' + c.banco + ')';
+                                }
+                                html += `<option value="${c.id}">${nombreCuenta} (MXN ${formatMXN(c.saldo_actual)})</option>`;
+                            });
+                            $('#cuentaSelect').html(html);
+                        });
+
+                        $campos.html(`
+
+                            <div class="mb-3">
+
+                                <label class="form-label">
+
+                                    Monto de la operaci&oacute;n
+
+                                    <span id="montoFormateado" class="text-success fw-bold ms-2"></span>
+
+                                </label>
+
+                                <input type="text" step="0.01" class="form-control input-monto" required>
+
+                            </div>
+
+                            <div class="row">
+
+                                <div class="col-md-6">
+
+                                    <div class="mb-3">
+
+                                        <label class="form-label">% Amiri</label>
+
+                                        <input type="text" step="0.01" class="form-control input-porc-amiri" value="0" required>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-6" id="campoPromotorPorcentaje">
+
+                                    <div class="mb-3">
+
+                                        <label class="form-label">% Promotor</label>
+
+                                        <input type="text" step="0.01" class="form-control input-porc-promotor" value="0" required>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label class="form-label">Retenci&oacute;n Total (%)</label>
+
+                                <div class="input-group">
+
+                                    <input type="text" step="0.01" class="form-control input-retencion-total" value="0" disabled readonly>
+
+                                    <span class="input-group-text bg-info text-white"><i class="ti ti-percentage"></i></span>
+
+                                </div>
+
+                                <small class="text-muted">Suma autom&aacute;tica de % Amiri + % Promotor</small>
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label class="form-label fw-bold">Tipo de Pago *</label>
+
+                                <div class="d-flex gap-2">
+
+                                    <button type="button" class="btn btn-outline-danger btn-tipo-pago active" data-tipo="credito">
+
+                                        <i class="ti ti-credit-card"></i> A Cr&eacute;dito
+
+                                    </button>
+
+                                    <button type="button" class="btn btn-outline-success btn-tipo-pago" data-tipo="contado">
+
+                                        <i class="ti ti-cash"></i> De Contado
+
+                                    </button>
+
+                                </div>
+
+                                <input type="hidden" class="input-tipo-pago" value="credito">
+
+                            </div>
+
+                            <div class="mb-3" id="grupoCuentaPagoContado" style="display:none;">
+
+                                <label class="form-label fw-bold text-success">Cuenta de Pago (Contado) *</label>
+
+                                <select class="form-select" id="cuentaPagoContadoSelect">
+
+                                    <option value="">-- Selecciona la cuenta --</option>
+
+                                </select>
+
+                                <div id="warningFondoInsuficiente" class="alert alert-warning py-1 px-2 mt-1 mb-0" style="display:none;font-size:0.875rem;"></div>
+
+                                <small class="text-success"><i class="ti ti-arrow-right"></i> Se descontar&aacute; el pago de esta cuenta inmediatamente</small>
+
+                            </div>
+
+                        `);
+
+                        $('#totalesGroup').show();
+
+                        // Manejar toggle contado/crédito
+                        $(document).off('click', '.btn-tipo-pago').on('click', '.btn-tipo-pago', function() {
+                            $('.btn-tipo-pago').removeClass('active');
+                            $(this).addClass('active');
+                            const tipo = $(this).data('tipo');
+                            $('.input-tipo-pago').val(tipo);
+                            if (tipo === 'contado') {
+                                $('#grupoCuentaPagoContado').show();
+                                cargarCuentasMXNPago();
+                            } else {
+                                $('#grupoCuentaPagoContado').hide();
+                            }
+                        });
+
+                        break;
+
+
+
                     case 'Cambio de Flujo':
 
                         $('#cuentaGroup').hide();
@@ -2185,17 +2328,17 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
 
 
-        // ─── Cálculo automático MXN (Venta de Efectivo) ──────────────────────
+        // ─── Cálculo automático MXN (Venta/Compra de Efectivo) ──────────────
 
         $(document).on('input', '.input-paridad, .input-monto, .input-porc-amiri, .input-porc-promotor', function () {
 
             let servicioNombre = $('#servicioSelect').val();
 
-            if (!['Venta de Efectivo', 'Cambio de Flujo', 'Retiro de Efectivo'].includes(servicioNombre)) return;
+            if (!['Venta de Efectivo', 'Compra de Efectivo', 'Cambio de Flujo', 'Retiro de Efectivo'].includes(servicioNombre)) return;
 
 
 
-            if (servicioNombre === 'Venta de Efectivo') {
+            if (servicioNombre === 'Venta de Efectivo' || servicioNombre === 'Compra de Efectivo') {
 
                 let pa = parseFloat($('.input-porc-amiri').val())    || 0;
 
@@ -2280,7 +2423,41 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                     <div class="alert alert-info mt-2 mb-0 py-2">
 
-                        <small><i class="ti ti-info-circle"></i> El cliente recibirá $${formatMXN(tot)} en efectivo.</small>
+                        <small><i class="ti ti-info-circle"></i> El cliente recibir&aacute; $${formatMXN(tot)} en efectivo.</small>
+
+                    </div>
+
+                `);
+
+            } else if (servicioNombre === 'Compra de Efectivo') {
+
+                let pa  = parseFloat($('.input-porc-amiri').val())    || 0;
+
+                let pp  = parseFloat($('.input-porc-promotor').val()) || 0;
+
+                let ca  = monto * (pa / 100);
+
+                let cp  = monto * (pp / 100);
+
+                let tot = monto - ca - cp;
+
+                $('#desgloseBody').html(`
+
+                    <table class="table table-sm mb-0">
+
+                        <tr><td><strong>💵 Monto de la operaci&oacute;n:</strong></td><td class="text-end"><strong>$${formatMXN(monto)}</strong></td></tr>
+
+                        <tr class="table-warning"><td><i class="ti ti-building-bank"></i> Comisi&oacute;n AMIRI (${pa}%):</td><td class="text-end">-$${formatMXN(ca)}</td></tr>
+
+                        <tr class="table-info"><td><i class="ti ti-user"></i> Comisi&oacute;n Promotor (${pp}%):</td><td class="text-end">-$${formatMXN(cp)}</td></tr>
+
+                        <tr class="table-success"><td><strong><i class="ti ti-cash"></i> AMIRI paga al Cliente:</strong></td><td class="text-end"><strong>$${formatMXN(tot)}</strong></td></tr>
+
+                    </table>
+
+                    <div class="alert alert-info mt-2 mb-0 py-2">
+
+                        <small><i class="ti ti-info-circle"></i> AMIRI recibe $${formatMXN(monto)} y paga $${formatMXN(tot)} al cliente. Comisiones se descuentan de Utilidades.</small>
 
                     </div>
 
@@ -3198,6 +3375,18 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                     payload.porcentaje_amiri    = parseFloat($('.input-porc-amiri').val())    || 0;
 
                     payload.porcentaje_promotor = parseFloat($('.input-porc-promotor').val()) || 0;
+
+                }
+
+                if (servicioNombre === 'Compra de Efectivo') {
+
+                    payload.porcentaje_amiri    = parseFloat($('.input-porc-amiri').val())    || 0;
+
+                    payload.porcentaje_promotor = parseFloat($('.input-porc-promotor').val()) || 0;
+
+                    payload.tipo_pago           = $('.input-tipo-pago').val() || 'credito';
+
+                    payload.cuenta_pago_id      = $('#cuentaPagoContadoSelect').val() || null;
 
                 }
 

@@ -536,7 +536,7 @@ $serviciosDivisas = [
 
                             <label class="form-label">Fecha</label>
 
-                            <input type="date" class="form-control" name="fecha" value="<?= date('Y-m-d') ?>" required>
+                            <input type="date" class="form-control" name="fecha" value="<?= date('Y-m-d') ?>" max="<?= date('Y-m-t', strtotime($_SESSION['mes_activo'] ?? date('Y-m'))) ?>" required>
 
                         </div>
 

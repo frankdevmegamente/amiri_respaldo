@@ -1,4 +1,4 @@
-# api/.htaccess
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} -f
+# api/.htaccess
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} -f
 RewriteRule ^(.*)$ $1 [QSA,L]

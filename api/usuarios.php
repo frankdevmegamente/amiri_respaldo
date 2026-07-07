@@ -22,6 +22,25 @@ $pdo = getPDO();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
+    if (isset($_GET['resumen'])) {
+        $stmt = $pdo->query("
+            SELECT
+                COUNT(*) AS total,
+                SUM(CASE WHEN rol = 'admin' THEN 1 ELSE 0 END) AS admins,
+                SUM(CASE WHEN rol = 'prestamista' THEN 1 ELSE 0 END) AS prestamistas,
+                SUM(CASE WHEN rol = 'usuario' THEN 1 ELSE 0 END) AS usuarios
+            FROM usuarios
+            WHERE activo = 1
+        ");
+        $r = $stmt->fetch(PDO::FETCH_ASSOC);
+        $r['total'] = (int)$r['total'];
+        $r['admins'] = (int)$r['admins'];
+        $r['prestamistas'] = (int)$r['prestamistas'];
+        $r['usuarios'] = (int)$r['usuarios'];
+        echo json_encode($r);
+        exit;
+    }
+
     if (isset($_GET['id'])) {
 
         $stmt = $pdo->prepare("SELECT id, nombre, email, rol, creado_en FROM usuarios WHERE id = ? AND activo = 1");

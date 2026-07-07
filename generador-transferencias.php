@@ -107,14 +107,14 @@ sort($bancos_unicos);
             align-items: center;
             margin-bottom: 25px;
             padding-bottom: 20px;
-            border-bottom: 2px solid #5d87ff;
+            border-bottom: 2px solid #6c5ce7;
         }
 
         .ticket-title {
             font-size: 18px;
             font-weight: 700;
             letter-spacing: 1.5px;
-            color: #5d87ff;
+            color: #6c5ce7;
             text-transform: uppercase;
             white-space: nowrap; 
         }
@@ -133,7 +133,7 @@ sort($bancos_unicos);
 
         .client-amount {
             background-color: rgba(93, 135, 255, 0.1);
-            color: #5d87ff;
+            color: #6c5ce7;
             padding: 8px 16px;
             border-radius: 6px;
             font-size: 16px;
@@ -251,7 +251,7 @@ sort($bancos_unicos);
 }
 
 [data-bs-theme="dark"] .select2-container--default .select2-results__option--highlighted[aria-selected] {
-    background-color: #5d87ff;
+    background-color: #6c5ce7;
     color: #ffffff;
 }
 
@@ -464,7 +464,7 @@ sort($bancos_unicos);
 
                                     <div class="ticket-row total-row" style="display: none;" id="contenedorTotal">
                                         <div>
-                                            <div class="text-muted-custom mb-1" style="color: #5d87ff;">TOTAL TRANSFERENCIAS</div>
+                                            <div class="text-muted-custom mb-1" style="color: #6c5ce7;">TOTAL TRANSFERENCIAS</div>
                                         </div>
                                         <div class="fs-large text-success-custom fw-bolder" id="outTotal" style="font-size: 26px;">$0.00 MXN</div>
                                     </div>
@@ -622,7 +622,7 @@ $('#formEditarCliente').on('submit', function(e) {
             if (b.includes('rappi') || b.includes('rappipay')) return '#ff4600';
             if (b.includes('bineo')) return '#ff0066';
             if (b.includes('cetes')) return '#104a3e';
-            return '#5d87ff';
+            return '#6c5ce7';
         }
 
         $(document).ready(function() {

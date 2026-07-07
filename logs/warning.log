@@ -11,3 +11,5 @@
 [2026-05-14 11:37:24] [WARNING] login_failed {"email":"admin@example.com","ip":"::1","attempts":1}
 [2026-05-14 11:37:26] [WARNING] login_failed {"email":"admin@example.com","ip":"::1","attempts":2}
 [2026-05-15 15:35:07] [WARNING] login_failed {"email":"admin@hyperion.com","ip":"::1","attempts":1}
+[2026-07-02 14:48:22] [WARNING] login_failed {"email":"admin@hyperion.com","ip":"192.168.200.62","attempts":1}
+[2026-07-02 14:48:25] [WARNING] login_failed {"email":"admin@example.com","ip":"192.168.200.62","attempts":1}

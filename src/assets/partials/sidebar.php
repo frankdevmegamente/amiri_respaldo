@@ -110,6 +110,18 @@ if (!isset($pagina_actual)) {
 
           </li>
 
+          <li class="sidebar-item <?= in_array($pagina_actual, ['capital-amiri.php']) ? 'active' : '' ?>">
+
+            <a class="sidebar-link" href="capital-amiri.php" aria-expanded="false">
+
+              <i class="ti ti-crown"></i>
+
+              <span class="hide-menu">Capital Amiri</span>
+
+            </a>
+
+          </li>
+
           <li class="sidebar-item <?= in_array($pagina_actual, ['clientes.php']) ? 'active' : '' ?>">
 
             <a class="sidebar-link" href="clientes.php" aria-expanded="false">
@@ -189,29 +201,10 @@ if (!isset($pagina_actual)) {
 
           </li>
 
-          <li class="sidebar-item <?= in_array($pagina_actual, ['importar-sql.php']) ? 'active' : '' ?>">
-
-            <a class="sidebar-link" href="importar-sql.php" aria-expanded="false">
-
-              <i class="ti ti-database-import"></i>
-
-              <span class="hide-menu">Importar SQL</span>
-
-            </a>
-
-          </li>
-
-       
-
-          
-
-         
-  
-        
         <li class="sidebar-item">
     <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
         <span>
-            <i class="ti ti-photo-star"></i> </span>
+            <i class="ti ti-tools"></i> </span>
         <span class="hide-menu">Generadores</span>
     </a>
     <ul aria-expanded="false" class="collapse first-level">
@@ -280,24 +273,6 @@ if (!isset($pagina_actual)) {
     </ul>
 </li>
 
-              <span class="hide-menu">Reportes</span>
-
-            </a>
-
-          </li>
-
-          <!-- <li class="sidebar-item <?= in_array($pagina_actual, ['servicios.php']) ? 'active' : '' ?>">
-
-            <a class="sidebar-link" href="servicios.php" aria-expanded="false">
-
-              <i class="ti ti-clipboard"></i>
-
-              <span class="hide-menu">Servicios</span>
-
-            </a>
-
-          </li> -->
-
           <li class="sidebar-item <?= in_array($pagina_actual, ['auditoria.php']) ? 'active' : '' ?>">
 
             <a class="sidebar-link" href="auditoria.php" aria-expanded="false">
@@ -317,6 +292,18 @@ if (!isset($pagina_actual)) {
               <i class="ti ti-activity"></i>
 
               <span class="hide-menu">Monitor</span>
+
+            </a>
+
+          </li>
+
+          <li class="sidebar-item <?= in_array($pagina_actual, ['fifo.php']) ? 'active' : '' ?>">
+
+            <a class="sidebar-link" href="fifo.php" aria-expanded="false">
+
+              <i class="ti ti-currency-tenge"></i>
+
+              <span class="hide-menu">FIFO</span>
 
             </a>
 

@@ -112,7 +112,7 @@ try {
 
         body[data-bs-theme="dark"] .nav-tabs .nav-link.active {
             color: #ffffff !important;
-            border-bottom-color: #5d87ff !important;
+            border-bottom-color: #6c5ce7 !important;
         }
 
         body[data-bs-theme="dark"] .bg-light {

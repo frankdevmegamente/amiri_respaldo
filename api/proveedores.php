@@ -20,7 +20,23 @@ $pdo = getPDO();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
-
+    if (isset($_GET['resumen'])) {
+        $stmt = $pdo->query("
+            SELECT
+                COUNT(*) AS total,
+                SUM(activo = 1) AS activos,
+                SUM(acepta_usd = 1) AS aceptan_usd,
+                SUM(acepta_usdt = 1) AS aceptan_usdt
+            FROM proveedores
+        ");
+        $r = $stmt->fetch(PDO::FETCH_ASSOC);
+        $r['total'] = (int)$r['total'];
+        $r['activos'] = (int)$r['activos'];
+        $r['aceptan_usd'] = (int)$r['aceptan_usd'];
+        $r['aceptan_usdt'] = (int)$r['aceptan_usdt'];
+        echo json_encode($r);
+        exit;
+    }
 
     if (isset($_GET['id'])) {
 

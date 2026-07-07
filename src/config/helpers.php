@@ -202,3 +202,32 @@ function restarSaldoCuenta($pdo, $cuenta_id, $monto, $movimiento_id = null, $des
     return actualizarSaldoCuenta($pdo, $cuenta_id, $monto, 'salida', $movimiento_id, $descripcion);
 
 }
+
+if (!function_exists('validarMesNoCerrado')) {
+
+    function validarMesNoCerrado($pdo, $fecha, $mensajeExtra = '') {
+        $mes = date('Y-m', strtotime($fecha));
+        $stmt = $pdo->prepare("SELECT id FROM cierres_mensuales WHERE mes = ?");
+        $stmt->execute([$mes]);
+        if ($stmt->fetch()) {
+            $msg = "No puedes registrar operaciones en el mes $mes porque ya está cerrado (ya se generó el corte mensual). Elige una fecha en un mes que aún no haya sido cerrado.";
+            if ($mensajeExtra) {
+                $msg .= ' ' . $mensajeExtra;
+            }
+            throw new Exception($msg);
+        }
+    }
+
+}
+
+if (!function_exists('validarMesNoMayorQueSesion')) {
+
+    function validarMesNoMayorQueSesion($fecha) {
+        $mesFecha = date('Y-m', strtotime($fecha));
+        $mesSesion = $_SESSION['mes_activo'] ?? date('Y-m');
+        if ($mesFecha > $mesSesion) {
+            throw new Exception("No puedes registrar operaciones en $mesFecha porque el sistema está en $mesSesion. Cambia al mes correspondiente en el encabezado.");
+        }
+    }
+
+}

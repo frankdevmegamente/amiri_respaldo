@@ -433,6 +433,28 @@ switch ($reporte) {
         $columnas = ['Concepto', 'Valor'];
         break;
 
+    case 'capital_amiri':
+        $titulo = 'Capital Amiri';
+
+        $stmt = $pdo->query("SELECT * FROM cierres_mensuales ORDER BY mes DESC LIMIT 1");
+        $ultimoCorte = $stmt->fetch(PDO::FETCH_ASSOC);
+        $capitalCerrado = $ultimoCorte ? (float)$ultimoCorte['capital_acumulado'] : 0;
+
+        $stmt = $pdo->query("SELECT COALESCE(SUM(saldo_actual), 0) as total FROM cuentas WHERE tipo_cuenta = 7 AND activo = 1");
+        $utilidadesAcumuladas = (float)$stmt->fetchColumn();
+
+        $stmt = $pdo->query("SELECT COALESCE(SUM(monto), 0) FROM retiros_capital");
+        $totalRetiros = (float)$stmt->fetchColumn();
+
+        $datos = [
+            ['concepto' => 'Capital Acumulado', 'valor' => '$' . number_format($utilidadesAcumuladas, 2)],
+            ['concepto' => 'Último Corte', 'valor' => $ultimoCorte ? $ultimoCorte['mes'] : 'Sin cortes'],
+            ['concepto' => 'Capital en Cortes', 'valor' => '$' . number_format($capitalCerrado, 2)],
+            ['concepto' => 'Total Retiros', 'valor' => '$' . number_format($totalRetiros, 2)],
+        ];
+        $columnas = ['Concepto', 'Valor'];
+        break;
+
 }
  
  

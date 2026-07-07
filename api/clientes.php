@@ -26,7 +26,23 @@ $clienteService = new ClienteService($pdo);
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
-
+    if (isset($_GET['resumen'])) {
+        $stmt = $pdo->query("
+            SELECT
+                COUNT(*) AS total,
+                SUM(activo = 1) AS activos,
+                SUM(activo = 1 AND opera_mxn = 1) AS opera_mxn,
+                SUM(activo = 1 AND (opera_usd = 1 OR opera_usdt = 1)) AS opera_divisas
+            FROM clientes
+        ");
+        $r = $stmt->fetch(PDO::FETCH_ASSOC);
+        $r['total'] = (int)$r['total'];
+        $r['activos'] = (int)$r['activos'];
+        $r['opera_mxn'] = (int)$r['opera_mxn'];
+        $r['opera_divisas'] = (int)$r['opera_divisas'];
+        echo json_encode($r);
+        exit;
+    }
 
     if (isset($_GET['id'])) {
 

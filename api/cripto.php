@@ -8,7 +8,9 @@ $assets = [
 
     'BTC' => ['ticker' => 'BTCUSDT', 'symbol' => 'bitcoin'],
 
-    'ETH' => ['ticker' => 'ETHUSDT', 'symbol' => 'ethereum']
+    'ETH' => ['ticker' => 'ETHUSDT', 'symbol' => 'ethereum'],
+
+    'USDT' => ['ticker' => null, 'symbol' => 'tether']
 
 ];
 

@@ -61,6 +61,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $fecha = $_POST['fecha'] ?? date('Y-m-d');
 
+        validarMesNoCerrado($pdo, $fecha);
+        validarMesNoMayorQueSesion($fecha);
+
         $servicio = $_POST['servicio'] ?? '';
 
         $cliente_id = !empty($_POST['cliente_id']) ? (int)$_POST['cliente_id'] : null;

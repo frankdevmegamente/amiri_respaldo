@@ -31,8 +31,9 @@ try {
         $paridad        = (float)($data['paridad']       ?? 0);  // TC compra promedio
 
         $moneda_pago    = strtoupper($data['moneda']     ?? 'USD'); // USD o USDT
-
         $fecha          = $data['fecha'] ?? date('Y-m-d');
+
+        validarMesNoCerrado($pdo, $fecha);
 
 
 

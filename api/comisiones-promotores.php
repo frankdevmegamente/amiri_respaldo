@@ -271,6 +271,8 @@ try {
         $cuenta_pago_id = (int) ($input['cuenta_pago_id'] ?? 0);
         $fecha_pago = !empty($input['fecha_pago']) ? $input['fecha_pago'] : date('Y-m-d H:i:s');
 
+        validarMesNoCerrado($pdo, explode(' ', $fecha_pago)[0]);
+
         if (!$promotor_id || $monto <= 0 || !$cuenta_pago_id) {
             http_response_code(400); echo json_encode(['error' => 'Datos incompletos para procesar el pago']); exit;
         }
@@ -341,5 +343,5 @@ try {
 
     http_response_code(405); echo json_encode(['error' => 'Método no permitido']);
 } catch (Exception $e) {
-    http_response_code(500); echo json_encode(['error' => 'Error interno']);
+    http_response_code(400); echo json_encode(['error' => $e->getMessage()]);
 }

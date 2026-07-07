@@ -49,12 +49,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .ticket-header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 30px; padding-bottom: 25px;
-            border-bottom: 3px solid #5d87ff;
+            border-bottom: 3px solid #6c5ce7;
         }
 
         .ticket-title {
             font-size: 18px; font-weight: 600; letter-spacing: 1px;
-            color: #5d87ff; text-transform: uppercase;
+            color: #6c5ce7; text-transform: uppercase;
         }
 
         /* Contenedor Híbrido: En escritorio actúa como lista vertical */
@@ -79,7 +79,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         }
 
         .fs-large { font-size: 26px; font-weight: 700; color: #1a1a1a; }
-        .text-primary-custom { color: #5d87ff; font-weight: 700; }
+        .text-primary-custom { color: #6c5ce7; font-weight: 700; }
         .text-success-custom { color: #36c76c; font-weight: 800; font-size: 34px; }
 
         .ticket-row.total-row {
@@ -108,7 +108,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] #ticketObservaciones { background: #252f43 !important; border-color: #2c344c !important; }
         [data-bs-theme="dark"] #outObservacionesTxt { color: #e9ecef !important; }
         [data-bs-theme="dark"] .btn-check:checked + .btn-outline-primary { color: #ffffff !important; }
-        [data-bs-theme="dark"] .btn-outline-primary { color: #799dfb; border-color: #5d87ff; }
+        [data-bs-theme="dark"] .btn-outline-primary { color: #799dfb; border-color: #6c5ce7; }
 
         body[data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
         body[data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
@@ -203,7 +203,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             }
 
             .ticket-row.total-row .text-muted-custom { 
-                color: #5d87ff !important; 
+                color: #6c5ce7 !important; 
                 font-size: 10px !important;
             }
             
@@ -390,7 +390,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                     </div>
 
                                     <div class="ticket-row total-row d-flex justify-content-between align-items-center" style="position: relative; z-index: 1;">
-                                        <div class="text-muted-custom" style="color: #5d87ff; margin-bottom: 0;" id="outTotalLabel">TOTAL A RECIBIR</div>
+                                        <div class="text-muted-custom" style="color: #6c5ce7; margin-bottom: 0;" id="outTotalLabel">TOTAL A RECIBIR</div>
                                         <div class="text-success-custom" id="outTotalTxt">$0.00 MXN</div>
                                     </div>
 

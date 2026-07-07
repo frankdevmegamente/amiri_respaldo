@@ -273,7 +273,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         body[data-bs-theme="dark"] .nav-tabs .nav-link.active {
             color: #ffffff !important;
-            border-bottom-color: #5d87ff !important;
+            border-bottom-color: #6c5ce7 !important;
         }
 
         body[data-bs-theme="dark"] .bg-light {
@@ -484,7 +484,34 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                             </div>
                         </div>
 
-
+                        <!-- Capital Amiri -->
+                        <div class="col-xl-4 col-md-6 mb-3">
+                            <div class="card card-stat border-0 shadow-sm h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="stat-icon bg-primary bg-opacity-10 text-primary me-3">
+                                            <i class="ti ti-crown"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <p class="text-muted mb-1 small">Capital Amiri</p>
+                                            <h4 class="mb-0 fw-bold" id="capitalAmiriTotal">$0.00</h4>
+                                        </div>
+                                    </div>
+                                    <div class="bg-light rounded p-2 small mt-2 border">
+                                        <div class="d-flex justify-content-between text-muted mb-1">
+                                            <span>Último Corte:</span> <span id="capitalAmiriCorte" class="fw-bold text-dark">-</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between text-muted mb-1">
+                                            <span>Retiros:</span> <span id="capitalAmiriRetiros" class="fw-bold text-dark">$0.00</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between fw-bold border-top pt-1">
+                                            <span>Capital Actual:</span> <span id="capitalAmiriActual" class="text-primary fw-bold">$0.00</span>
+                                        </div>
+                                    </div>
+                                    <a href="capital-amiri.php" class="stretched-link"></a>
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="col-xl-4 col-md-6 mb-3">
                             <div class="card card-stat border-0 shadow-sm h-100">
@@ -1225,6 +1252,15 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     $('.tooltip-icon').tooltip('dispose');
                     $('[title]').tooltip({ placement: 'top', trigger: 'hover' });
                 }
+            });
+            // Capital Amiri
+            $.getJSON('api/capital.php?tipo=resumen', function(cap) {
+                $('#capitalAmiriTotal').text('$' + formatoNumero(cap.utilidades_acumuladas));
+                $('#capitalAmiriCorte').text(cap.ultimo_corte || 'Sin cortes');
+                $('#capitalAmiriRetiros').text('$' + formatoNumero(cap.total_retiros));
+                $('#capitalAmiriActual').text('$' + formatoNumero(cap.capital_actual));
+            }).fail(function() {
+                $('#capitalAmiriTotal').text('$0.00');
             });
         }
 
