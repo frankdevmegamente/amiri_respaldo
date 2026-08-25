@@ -30,46 +30,6 @@ if (!function_exists('requireAuth')) {
 
 
 
-if (!function_exists('getPDO')) {
-
-    function getPDO() {
-
-        static $pdo = null;
-
-        if ($pdo === null) {
-
-            $requireEnv = __DIR__ . '/env.php';
-
-            if (file_exists($requireEnv)) {
-
-                require_once $requireEnv;
-
-            }
-
-            $host = $_ENV['DB_HOST'] ?? 'localhost';
-
-            $dbname = $_ENV['DB_NAME'] ?? 'guiaspar_amiri_db';
-
-            $user = $_ENV['DB_USER'] ?? 'root';
-
-            $pass = $_ENV['DB_PASS'] ?? 'TuContraseñaSegura';
-
-            $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $user, $pass, [
-
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-
-            ]);
-
-        }
-
-        return $pdo;
-
-    }
-
-}
-
 
 
 /**

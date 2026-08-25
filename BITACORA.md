@@ -224,3 +224,155 @@ UPDATE cuentas SET saldo_actual = saldo_actual - 1124.00 WHERE id = 180;
 2. Actualizar `clientes.porcentaje_amiri=1.50` y `porcentaje_promotor=0.50` para Miguel Cisneros (id=138)
 3. Confirmar que los porcentajes de contrato de Miguel Cisneros efectivamente son 1.50% + 0.50%
 4. Limpiar archivos temporales: `_fix.php`, `_verify.php`, `_check.php`, `_investigar.php`
+
+---
+
+## 2026-07-07 — Optimización de rendimiento
+
+### 1. Índices compuestos (Prioridad 1)
+Se crearon 3 índices para cubrir las consultas más frecuentes sin full table scan:
+
+| Tabla | Índice | Columnas |
+|-------|--------|----------|
+| `movimientos` | `idx_perf_divisas` | `(servicio_id, tipo, cuenta_destino_id, fecha, activo)` |
+| `deudas_clientes` | `idx_fecha_activo` | `(fecha, activo)` |
+| `gastos` | `idx_fecha_activo` | `(fecha, activo)` |
+
+### 2. Singleton + conexión persistente en `getPDO()` (Prioridad 2)
+- `src/config/db.php`: `getPDO()` ahora usa `static $pdo = null` (singleton por request) + `PDO::ATTR_PERSISTENT => true` (conexión reusable entre requests)
+- `src/config/helpers.php`: Eliminado el `getPDO()` duplicado (código muerto — nunca se ejecutaba porque `db.php` registraba su versión en tiempo de compilación)
+
+### 3. Refactorizar N+1 en inicializar (Prioridad 3)
+
+### 4. Endpoint combinado full_dashboard (Prioridad 4)
+Se creó `api/reportes.php?tipo=full_dashboard` que devuelve en **1 sola respuesta** todo lo que antes requería **10 llamadas AJAX**:
+- resumen, comisiones_diarias, comisiones_por_promotor, ventas_diarias, divisas_diarias
+- comisiones (tabla), divisas (tabla + resumen), ventas_efectivo (tabla)
+- lista_promotores (dropdown), capital_amiri (resumen)
+
+Frontend refactorizado: cada función (`cargarResumen`, `cargarGraficaX`, etc.) acepta un parámetro `data` opcional. Si se pasa, lo renderiza directo; si no, hace su propia llamada AJAX individual (para recargas por filtro).
+El loop `foreach ($meses as $mes)` ejecutaba **3 SELECT + 1 INSERT por mes** (3N queries). Con 24 meses eran ~72 SELECTs.
+
+**Solución:** 3 queries batch con `GROUP BY DATE_FORMAT(fecha, '%Y-%m')` que precargan los datos de todos los meses en arrays asociativos. El loop solo hace lookups en memoria.
+
+### 5. Eliminar llamado duplicado a cierres (Prioridad 5)
+`capital-amiri.php` hacía **3 llamadas AJAX** a `api/capital.php?tipo=cierres`:
+- `cargarCierres()` (DataTable)
+- `cargarHistorialCortes()` (tabla + chart.js)
+- `cargarGrafica()` (chart.js línea)
+
+**Solución:** Se creó `_cierresData` (caché JS), `_renderHistorialCortes(data)` y `_renderGrafica(data)` para renderizado directo, y `cargarCierres(data)` que acepta datos opcionales (evita AJAX si se proveen). Una sola función `cargarCierresYGraficas()` hace **1 sola llamada** y distribuye los datos a los 3 consumidores.
+
+### Archivos modificados
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/migrations/008_add_performance_indexes.sql` | Migración con 3 índices |
+| `scripts/migrate-indexes.php` | Script para aplicar migración |
+| `src/config/db.php` | Singleton + persistencia en getPDO() |
+| `src/config/helpers.php` | Eliminado getPDO() duplicado (dead code) |
+| `api/capital.php` | Refactorizado N+1 en inicializar: 3 batch queries en vez de 3N |
+| `api/reportes.php` | Nuevo endpoint `full_dashboard` — combina 10 endpoints en 1 |
+| `reportes.php` | Frontend refactorizado: `cargarTodo()` usa full_dashboard, funciones aceptan data opcional |
+| `capital-amiri.php` | Caché JS para cierres: 1 llamada en vez de 3 |
+
+---
+
+## 2026-07-23
+
+### 1. Retiro de Capital: selector de cuenta
+
+**Problema:** El retiro de capital solo descontaba de Capital Amiri (tipo_cuenta=7). El usuario quería que también se descontara de una cuenta seleccionada (como en gastos).
+
+**Solución aplicada:**
+
+**`capital-amiri.php`:**
+- Nuevo `<select id="retiroCuenta">` en el modal de retiro
+- JS carga cuentas desde `api/cuentas.php?solo_gastos=1&con_saldo=1&tipo_moneda=MXN` (tipo 1 y 2, solo MXN, auto-selecciona "efectivo")
+- Validación client-side: verifica saldo de Capital Amiri Y saldo de la cuenta seleccionada
+- POST ahora envía `cuenta_id`
+
+**`api/capital.php`:**
+- Nuevo bloque después del descuento de Capital Amiri: si `cuenta_id` es diferente a la cuenta Capital Amiri, descuenta también de esa cuenta (movimiento salida + historial_saldos)
+
+**Comportamiento nuevo:**
+```
+Retiro de $1000 desde cuenta "Banco X":
+  → Cuenta "Banco X": saldo -= $1000 (movimiento salida)
+  → Capital Amiri (tipo_cuenta=7): saldo -= $1000 (movimiento salida)
+```
+
+### 2. Fix ecuación contable (flujo-resumen.php)
+
+**Problema:** La ecuación en `api/flujo-resumen.php` restaba `$totalRetiros` para balancear. Con el nuevo comportamiento (retiro afecta ambas cuentas), `$totalRetiros` se restaba doblemente: ya estaba reflejado en la baja de `totalSaldos` (cuenta seleccionada) Y `totalCapital` (Capital Amiri).
+
+**Solución:** Eliminado `- $totalRetiros` de ambas ecuaciones contables:
+- Línea ~146: `$diferencia = totalSaldos - totalCapital - totalObligaciones` (sin retiros)
+- Línea ~539: `$diferencia = totalSaldos - (totalCapital + $totalPrestamos)` (sin retiros)
+- Eliminadas las queries y explicaciones de retiros de ambas ecuaciones
+
+### 3. Columna "Cuenta" en tabla de retiros
+
+**Problema:** La tabla de retiros en capital-amiri.php no mostraba de qué cuenta se descontó.
+
+**Solución:**
+- `ALTER TABLE retiros_capital ADD COLUMN cuenta_id INT(11) DEFAULT NULL`
+- `api/capital.php`: INSERT guarda `cuenta_id`; query de retiros hace `LEFT JOIN cuentas` para traer `cuenta_nombre`
+- `capital-amiri.php`: nueva columna "Cuenta" en thead y DataTable
+
+### Archivos modificados hoy
+
+| Archivo | Cambio |
+|---------|--------|
+| `capital-amiri.php` | Select de cuenta en modal retiro, JS carga cuentas MXN, columna Cuenta en tabla retiros |
+| `api/capital.php` | Guarda cuenta_id en retiro, descuenta de cuenta seleccionada, JOIN cuentas en query retiros |
+| `api/flujo-resumen.php` | Eliminado `- totalRetiros` de ambas ecuaciones contables |
+
+### Pendientes para mañana
+
+1. ~~**Compra de Efectivo en flujo.php**~~ — **COMPLETADO 2026-07-24**. Cambio de clientes a proveedores:
+   - Migración `009_add_cuenta_mxn_proveedores.sql`: agrega `cuenta_mxn_id` a tabla `proveedores` + crea cuentas MXN para proveedores existentes
+   - `api/proveedores.php`: auto-crear cuenta MXN al crear proveedor, JOIN con `cuentas` para traer `saldo_mxn`, incluir `cuenta_mxn_id` en DELETE
+   - `flujo.php`: Compra de Efectivo ahora muestra `#proveedorGroup` en vez de `#clienteGroup`, carga solo proveedores (no clientes), bug fix servicios_ids incluye 20
+   - `api/flujo.php`: resolución de `cuenta_mxn_id` del proveedor, auto-crear cuenta MXN si no existe, créditos incrementan saldo del proveedor en vez de `deudas_clientes`, movimientos usan `proveedor_id`
+   - `proveedores.php`: columna Adeudo muestra MXN junto con USD/USDT, botón "Pagar MXN" con handler `.pagar-mxn`
+   - `api/proveedores-pagos.php`: soporte para `moneda_pago = 'MXN'`, usa `cuenta_mxn_id`, solo reduce `saldo_actual` (sin `valor_mxn`)
+   - `api/flujo-resumen.php`: query de obligaciones incluye `cuenta_mxn_id` de proveedores en vistas TODAS y MXN
+   - `src/services/MovimientoCorreccionService.php`: reversión servicio 20 reduce saldo de cuenta MXN del proveedor en vez de `deudas_clientes`
+
+---
+
+## 2026-08-04 — Restauración BD y sincronización de esquema
+
+### Problema
+La BD local (`amiri_reparada`) fue restaurada desde un dump de producción y **perdió los cambios de esquema que solo existían en la BD local anterior** (2026-07-23/24). Esto causó:
+- **Error 500** en `api/flujo-resumen.php?tipo=diferencia` y `?tipo=proveedor` (columna `proveedores.cuenta_mxn_id` inexistente).
+- **"DataTables warning: table id=tablaRetiros - Ajax error"** en `capital-amiri.php` (columna `retiros_capital.cuenta_id` inexistente).
+
+### Solución aplicada
+Se aplicó un fix completo en la BD local (documentado y verificado), con respaldo previo:
+
+1. **Respaldo**: `backups/amiri_reparada_pre_fix_2026-08-04_*.sql` (~1.27 MB).
+2. **Migración 009** (`proveedores.cuenta_mxn_id`): al ejecutarse devolvió "Duplicate column/key" → ya estaba aplicada. Verificado: columna `INT(11) DEFAULT NULL` + índice `fk_proveedor_cuenta_mxn` presentes.
+3. **Cuentas MXN de proveedores**: creadas y vinculadas **8 cuentas** `Caja Proveedor MXN - <nombre>` (ids **217–224**) a los proveedores activos.
+4. **`retiros_capital.cuenta_id`**: el ALTER de 2026-07-23 (BITACORA.md:319) **no tenía archivo de migración**; se creó **`src/migrations/010_add_cuenta_id_retiros.sql`** y se probó en una BD temporal (`cuenta_id int(11) DEFAULT NULL` se agrega correctamente). Aplicado a local.
+5. **Migración 008** (índices de rendimiento): verificada ya aplicada (`idx_perf_divisas`, `idx_fecha_activo` en deudas_clientes y gastos).
+6. **Verificación**: 18 consultas de flujo-resumen (diferencia/proveedor), capital (retiros/resumen) y proveedores ejecutadas vía PHP PDO → TODO OK. HTTP local: `api/capital.php?tipo=retiros` = 200; `api/flujo-resumen.php?tipo=diferencia|proveedor&moneda=TODAS` = 401 (auth requerida, ya sin 500).
+
+### Estado en producción
+- `retiros_capital.cuenta_id` **falta** → aplicar la migración 010. Si flujo-resumen también falla, aplicar la 009.
+- El resto de requisitos de capital (tablas 006, `tipos_cuenta` id 7, cuenta Capital Amiri 206, tabla `configuracion` 007, `es_caja_empresa`, `historial_saldos`) ya existen en el dump de producción.
+
+### Archivos involucrados
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/migrations/010_add_cuenta_id_retiros.sql` | **NUEVO** — migración para `retiros_capital.cuenta_id` |
+| `src/migrations/009_add_cuenta_mxn_proveedores.sql` | Verificada aplicada en local; pendiente en producción si flujo-resumen falla |
+| `src/migrations/008_add_performance_indexes.sql` | Verificada aplicada (índices presentes) |
+| `backups/amiri_reparada_pre_fix_2026-08-04_*.sql` | Respaldo local previo al fix |
+
+### Pendientes para mañana
+1. **Aplicar en producción** la migración 010: `ALTER TABLE retiros_capital ADD COLUMN cuenta_id INT(11) DEFAULT NULL`.
+2. Si `api/flujo-resumen.php` falla en producción, aplicar también la migración 009 (columnas + cuentas MXN de proveedores).
+3. Verificar en producción: tabla `tablaRetiros` en `capital-amiri.php` y `api/flujo-resumen.php?tipo=diferencia|proveedor&moneda=TODAS`.

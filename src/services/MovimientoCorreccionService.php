@@ -733,8 +733,19 @@ class MovimientoCorreccionService {
             // Servicio 1 — Venta de Efectivo
             $this->pdo->prepare("UPDATE deudas_clientes SET activo = 0 WHERE movimiento_venta_id = ? AND activo = 1")->execute([$grupo_id]);
 
-            // Servicio 20 — Compra de Efectivo
-            $this->pdo->prepare("UPDATE deudas_clientes SET activo = 0 WHERE movimiento_venta_id = ? AND activo = 1")->execute([$grupo_id]);
+            // Servicio 20 — Compra de Efectivo (ahora con proveedores)
+            foreach ($movimientos as $mov) {
+                if ((int)$mov['servicio_id'] === 20 && !empty($mov['proveedor_id'])) {
+                    // Buscar la cuenta MXN del proveedor y reducir el adeudo
+                    $stmtProv = $this->pdo->prepare("SELECT cuenta_mxn_id FROM proveedores WHERE id = ?");
+                    $stmtProv->execute([$mov['proveedor_id']]);
+                    $cuentaMxnId = $stmtProv->fetchColumn();
+                    if ($cuentaMxnId && strtolower($mov['tipo']) === 'salida') {
+                        $this->pdo->exec("SET @hyperion_saldo_auth = 1");
+                        $this->pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?")->execute([abs($mov['monto']), $cuentaMxnId]);
+                    }
+                }
+            }
 
             // Servicio 10 — Préstamo de Prestamista
             foreach ($movimientos as $mov) {

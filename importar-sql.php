@@ -349,25 +349,26 @@ $scriptUrl = 'importar-sql.php';
         .val-summary .val-item { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 500; }
         .val-pass { background: #e8f5e9; color: #2e7d32; }
         .val-fail { background: #fbe9e7; color: #c62828; }
-        body[data-bs-theme="dark"] .card { background: #1f2535; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-        body[data-bs-theme="dark"] .stat-box { background: #232b3c; }
-        body[data-bs-theme="dark"] .stat-box .label { color: #9aa4c8; }
-        body[data-bs-theme="dark"] .table-result th { color: #9aa4c8; border-color: #2b3350; }
-        body[data-bs-theme="dark"] .table-result td { border-color: #2b3350; color: #c8cee8; }
-        body[data-bs-theme="dark"] .preview-wrap { border-color: #2b3350; }
-        body[data-bs-theme="dark"] .preview-wrap th { background: #232b3c; color: #e6ecff; border-color: #2b3350; }
-        body[data-bs-theme="dark"] .preview-wrap td { border-color: #2b3350; color: #c8cee8; }
-        body[data-bs-theme="dark"] .preview-loading .spinner { border-color: #2b3350; border-top-color: #5D87FF; }
-        body[data-bs-theme="dark"] .form-control, body[data-bs-theme="dark"] .form-select { background: #232b3c; color: #e6ecff; border-color: #2b3350; }
-        body[data-bs-theme="dark"] .form-control:focus { background: #1f2535; color: #e6ecff; border-color: #5D87FF; box-shadow: 0 0 0 0.2rem rgba(93,135,255,0.25); }
-        body[data-bs-theme="dark"] .form-label { color: #c8cee8; }
-        body[data-bs-theme="dark"] .val-pass { background: #1b3a1b; color: #81c784; }
-        body[data-bs-theme="dark"] .val-fail { background: #3a1b1b; color: #ef9a9a; }
-        body[data-bs-theme="dark"] .btn-close { filter: invert(1); }
-        body[data-bs-theme="dark"] .error-detail { border-left-color: #ef5350; }
-        body[data-bs-theme="dark"] .error-detail .field { color: #ef5350; }
+        [data-bs-theme="dark"] .card { background: #1f2535; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        [data-bs-theme="dark"] .stat-box { background: #232b3c; }
+        [data-bs-theme="dark"] .stat-box .label { color: #9aa4c8; }
+        [data-bs-theme="dark"] .table-result th { color: #9aa4c8; border-color: #2b3350; }
+        [data-bs-theme="dark"] .table-result td { border-color: #2b3350; color: #c8cee8; }
+        [data-bs-theme="dark"] .preview-wrap { border-color: #2b3350; }
+        [data-bs-theme="dark"] .preview-wrap th { background: #232b3c; color: #e6ecff; border-color: #2b3350; }
+        [data-bs-theme="dark"] .preview-wrap td { border-color: #2b3350; color: #c8cee8; }
+        [data-bs-theme="dark"] .preview-loading .spinner { border-color: #2b3350; border-top-color: #5D87FF; }
+        [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select { background: #232b3c; color: #e6ecff; border-color: #2b3350; }
+        [data-bs-theme="dark"] .form-control:focus { background: #1f2535; color: #e6ecff; border-color: #5D87FF; box-shadow: 0 0 0 0.2rem rgba(93,135,255,0.25); }
+        [data-bs-theme="dark"] .form-label { color: #c8cee8; }
+        [data-bs-theme="dark"] .val-pass { background: #1b3a1b; color: #81c784; }
+        [data-bs-theme="dark"] .val-fail { background: #3a1b1b; color: #ef9a9a; }
+        [data-bs-theme="dark"] .btn-close { filter: invert(1); }
+        [data-bs-theme="dark"] .error-detail { border-left-color: #ef5350; }
+        [data-bs-theme="dark"] .error-detail .field { color: #ef5350; }
         .file-size { font-size: 0.75rem; color: #6c757d; }
     </style>
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <body>
 <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"

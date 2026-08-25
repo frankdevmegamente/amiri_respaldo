@@ -111,32 +111,55 @@ $pdo = getPDO();
             background: rgba(108, 92, 231, 0.06);
         }
 
-        body[data-bs-theme="dark"] .table,
-        body[data-bs-theme="dark"] .table thead th,
-        body[data-bs-theme="dark"] .table tbody td,
-        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+        [data-bs-theme="dark"] .table,
+        [data-bs-theme="dark"] .table thead th,
+        [data-bs-theme="dark"] .table tbody td,
+        [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
             background-color: #1f2535 !important;
             color: #e6ecff !important;
             border-color: #2b3350 !important;
         }
-        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
+        [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
             background-color: #232b3c !important;
         }
-        body[data-bs-theme="dark"] .card,
-        body[data-bs-theme="dark"] .card-header,
-        body[data-bs-theme="dark"] .card-body {
+        [data-bs-theme="dark"] .card,
+        [data-bs-theme="dark"] .card-header,
+        [data-bs-theme="dark"] .card-body {
             background-color: #1f2535 !important;
             border-color: #2b3350 !important;
             color: #e6ecff !important;
         }
-        body[data-bs-theme="dark"] .table-dark {
+        [data-bs-theme="dark"] .table-dark {
             background-color: #2b3350 !important;
         }
-        body[data-bs-theme="dark"] .table-dark th {
+        [data-bs-theme="dark"] .table-dark th {
             background-color: #2b3350 !important;
             color: #e6ecff !important;
         }
 
+        .month-nav-btn {
+            background: none;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 4px 10px;
+            cursor: pointer;
+            color: #5A6A85;
+            transition: all 0.2s ease;
+        }
+        .month-nav-btn:hover {
+            background: #f0f0f0;
+            color: #6c5ce7;
+            border-color: #6c5ce7;
+        }
+        [data-bs-theme="dark"] .month-nav-btn {
+            border-color: #2b3350;
+            color: #8b92a8;
+        }
+        [data-bs-theme="dark"] .month-nav-btn:hover {
+            background: #2b3350;
+            color: #6c5ce7;
+            border-color: #6c5ce7;
+        }
         #fifoLoading {
             transition: opacity 0.3s ease;
         }
@@ -145,6 +168,7 @@ $pdo = getPDO();
             font-size: 0.85em;
         }
     </style>
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
@@ -158,67 +182,90 @@ $pdo = getPDO();
                 <div class="container-fluid px-4" style="max-width: 100%;">
 
                     <!-- Page Header -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <div class="card shadow-sm border-0 rounded-4" style="position: relative; overflow: hidden;">
-                                <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #6c5ce7; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-                                <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                    <div class="card shadow-sm border-0 rounded-4 mb-4" style="position: relative; overflow: hidden;">
+                        <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #6c5ce7; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                        <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
 
-                                <div class="card-body p-4" style="position: relative; z-index: 1;">
-                                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
-                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                            <i class="ti ti-currency-tenge fs-5"></i>
+                        <div class="card-body p-4" style="position: relative; z-index: 1;">
+                            <div class="row align-items-center g-3 mb-4">
+                                <div class="col-md">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                            <i class="ti ti-currency-tenge fs-4"></i>
                                         </div>
                                         <div>
                                             <h4 class="mb-0 fw-bold" style="color: #2A3547;">Módulo FIFO</h4>
                                             <small class="text-muted">Control de inventarios y ventas USDT / USD</small>
                                         </div>
                                     </div>
+                                </div>
+                                <div class="col-md-auto">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <select class="form-select form-select-sm" id="selectPeriodo" style="min-width:130px;">
+                                            <option value="todo" selected>Todo el período</option>
+                                            <option value="mes">Este Mes</option>
+                                            <option value="mes_pasado">Mes Pasado</option>
+                                            <option value="anio">Este Año</option>
+                                            <option value="rango">Fecha Personalizada</option>
+                                        </select>
+                                        <div id="fechaInicioGroup" style="display:none;min-width:120px;">
+                                            <input type="date" class="form-control form-control-sm" id="fechaInicio">
+                                        </div>
+                                        <div id="fechaFinGroup" style="display:none;min-width:120px;">
+                                            <input type="date" class="form-control form-control-sm" id="fechaFin">
+                                        </div>
+                                        <button class="btn btn-primary btn-sm" id="btnFiltrar">
+                                            <i class="ti ti-filter"></i> Aplicar
+                                        </button>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="cargarMonedaActiva()">
+                                            <i class="ti ti-refresh me-1"></i>Actualizar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
 
-                                    <!-- KPI Cards -->
-                                    <div class="row g-3" id="kpiRow">
-                                        <div class="col-md-3">
-                                            <div class="card kpi-card border-0 shadow-sm h-100">
-                                                <div class="card-body d-flex align-items-center gap-3 p-3">
-                                                    <div class="kpi-icon" style="background: rgba(108,92,231,0.1); color: #6c5ce7;"><i class="ti ti-currency-tenge"></i></div>
-                                                    <div>
-                                                        <div class="kpi-label">USDT Disponible</div>
-                                                        <div class="kpi-value" id="kpiUsdtDisponible">0.00</div>
-                                                    </div>
-                                                </div>
+                            <!-- KPI Cards -->
+                            <div class="row g-3" id="kpiRow">
+                                <div class="col-md-3">
+                                    <div class="card kpi-card border-0 shadow-sm h-100">
+                                        <div class="card-body d-flex align-items-center gap-3 p-3">
+                                            <div class="kpi-icon" style="background: rgba(108,92,231,0.1); color: #6c5ce7;"><i class="ti ti-currency-tenge"></i></div>
+                                            <div>
+                                                <div class="kpi-label">USDT Disponible</div>
+                                                <div class="kpi-value" id="kpiUsdtDisponible">0.00</div>
                                             </div>
                                         </div>
-                                        <div class="col-md-3">
-                                            <div class="card kpi-card border-0 shadow-sm h-100">
-                                                <div class="card-body d-flex align-items-center gap-3 p-3">
-                                                    <div class="kpi-icon" style="background: rgba(0,200,83,0.1); color: #00c853;"><i class="ti ti-currency-dollar"></i></div>
-                                                    <div>
-                                                        <div class="kpi-label">USD Disponible</div>
-                                                        <div class="kpi-value" id="kpiUsdDisponible">0.00</div>
-                                                    </div>
-                                                </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card kpi-card border-0 shadow-sm h-100">
+                                        <div class="card-body d-flex align-items-center gap-3 p-3">
+                                            <div class="kpi-icon" style="background: rgba(0,200,83,0.1); color: #00c853;"><i class="ti ti-currency-dollar"></i></div>
+                                            <div>
+                                                <div class="kpi-label">USD Disponible</div>
+                                                <div class="kpi-value" id="kpiUsdDisponible">0.00</div>
                                             </div>
                                         </div>
-                                        <div class="col-md-3">
-                                            <div class="card kpi-card border-0 shadow-sm h-100">
-                                                <div class="card-body d-flex align-items-center gap-3 p-3">
-                                                    <div class="kpi-icon" style="background: rgba(255,193,7,0.1); color: #ffc107;"><i class="ti ti-trending-up"></i></div>
-                                                    <div>
-                                                        <div class="kpi-label">Ganancia USDT</div>
-                                                        <div class="kpi-value" id="kpiGananciaUsdt">$0.00</div>
-                                                    </div>
-                                                </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card kpi-card border-0 shadow-sm h-100">
+                                        <div class="card-body d-flex align-items-center gap-3 p-3">
+                                            <div class="kpi-icon" style="background: rgba(255,193,7,0.1); color: #ffc107;"><i class="ti ti-trending-up"></i></div>
+                                            <div>
+                                                <div class="kpi-label">Ganancia USDT</div>
+                                                <div class="kpi-value" id="kpiGananciaUsdt">$0.00</div>
                                             </div>
                                         </div>
-                                        <div class="col-md-3">
-                                            <div class="card kpi-card border-0 shadow-sm h-100">
-                                                <div class="card-body d-flex align-items-center gap-3 p-3">
-                                                    <div class="kpi-icon" style="background: rgba(0,152,255,0.1); color: #0098ff;"><i class="ti ti-trending-up"></i></div>
-                                                    <div>
-                                                        <div class="kpi-label">Ganancia USD</div>
-                                                        <div class="kpi-value" id="kpiGananciaUsd">$0.00</div>
-                                                    </div>
-                                                </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="card kpi-card border-0 shadow-sm h-100">
+                                        <div class="card-body d-flex align-items-center gap-3 p-3">
+                                            <div class="kpi-icon" style="background: rgba(0,152,255,0.1); color: #0098ff;"><i class="ti ti-trending-up"></i></div>
+                                            <div>
+                                                <div class="kpi-label">Ganancia USD</div>
+                                                <div class="kpi-value" id="kpiGananciaUsd">$0.00</div>
                                             </div>
                                         </div>
                                     </div>
@@ -229,7 +276,7 @@ $pdo = getPDO();
 
                     <!-- FIFO Content Card -->
                     <div class="card shadow-sm mb-4">
-                        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                        <div class="card-header bg-white py-3">
                             <ul class="nav nav-moneda" id="monedaTabs">
                                 <li class="nav-item">
                                     <a class="nav-link active" data-bs-toggle="tab" href="#tabUsdt">
@@ -242,11 +289,6 @@ $pdo = getPDO();
                                     </a>
                                 </li>
                             </ul>
-                            <div class="d-flex align-items-center gap-2">
-                                <button class="btn btn-sm btn-outline-primary" onclick="cargarMonedaActiva()">
-                                    <i class="ti ti-refresh me-1"></i>Actualizar
-                                </button>
-                            </div>
                         </div>
                         <div class="card-body p-4">
                             <div class="tab-content">
@@ -382,6 +424,23 @@ $pdo = getPDO();
         let dtLotesUsd = null;
         let dtVentasUsd = null;
 
+        function getParams() {
+            const periodo = $('#selectPeriodo').val();
+            if (periodo === 'todo') return 'periodo=todo';
+            if (periodo === 'mes_pasado') {
+                const d = new Date();
+                d.setMonth(d.getMonth() - 1);
+                const anio = d.getFullYear();
+                const mes = String(d.getMonth() + 1).padStart(2, '0');
+                const dias = new Date(anio, d.getMonth() + 1, 0).getDate();
+                return 'periodo=rango&fecha_inicio=' + anio + '-' + mes + '-01&fecha_fin=' + anio + '-' + mes + '-' + String(dias).padStart(2, '0');
+            }
+            if (periodo === 'rango') {
+                return 'periodo=rango&fecha_inicio=' + $('#fechaInicio').val() + '&fecha_fin=' + $('#fechaFin').val();
+            }
+            return 'periodo=' + periodo;
+        }
+
         function fmt(n) {
             return parseFloat(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
@@ -408,7 +467,8 @@ $pdo = getPDO();
             const loading = document.getElementById('fifoLoading');
             loading.style.display = '';
             try {
-                const resp = await fetch('api/fifo.php?moneda=' + moneda);
+                let url = 'api/fifo.php?moneda=' + moneda + '&' + getParams();
+                const resp = await fetch(url);
                 const data = await resp.json();
                 if (data.error) { console.error('FIFO error:', data.error); return; }
 
@@ -532,6 +592,20 @@ $pdo = getPDO();
                 const moneda = e.target.getAttribute('href') === '#tabUsdt' ? 'USDT' : 'USD';
                 cargarMoneda(moneda);
             });
+        });
+
+        // ─── Period Filter ──────────────────────────────────
+        $(document).on('change', '#selectPeriodo', function() {
+            if ($(this).val() === 'rango') {
+                $('#fechaInicioGroup, #fechaFinGroup').show();
+            } else {
+                $('#fechaInicioGroup, #fechaFinGroup').hide();
+                recargarAmbasMonedas();
+            }
+        });
+
+        $(document).on('click', '#btnFiltrar', function() {
+            recargarAmbasMonedas();
         });
 
         // Init on load

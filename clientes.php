@@ -43,6 +43,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 
 <style>
@@ -57,12 +58,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             padding-top: 15px !important;
             margin-top: 0 !important;
         }
-     body[data-bs-theme="dark"] .logo-modo-claro,
+     [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
         }
 
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }
@@ -293,7 +294,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card shadow-sm border-0 mb-4">
                         <div class="card-body p-4 table-responsive">
                             <table id="tablaClientes" class="table table-hover align-middle w-100">
                                 <thead>
@@ -519,6 +520,14 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
     <script>
 
+        const avatarColors = ['#5D87FF', '#13DEB9', '#FA896B', '#FFAE1F', '#539BFF', '#6F42C1', '#E83E8C', '#20C997'];
+        function getAvatarColor(name) {
+            if (!name) return '#8c9ea8';
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) { hash = name.charCodeAt(i) + ((hash << 5) - hash); }
+            return avatarColors[Math.abs(hash) % avatarColors.length];
+        }
+
         const tabla = $('#tablaClientes').DataTable({
 
             ajax: {
@@ -539,7 +548,15 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                     data: 'nombre',
 
-                    render: (d, type, row) => `<a href="detalle-cliente.php?id=${row.id}" class="text-decoration-none fw-bold">${d}</a>`
+                    render: function(d, type, row) {
+                        var n = d;
+                        var color = getAvatarColor(n);
+                        var initial = n ? n.charAt(0).toUpperCase() : '?';
+                        return '<div class="d-flex align-items-center gap-2">' +
+                               '<span class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width:34px;height:34px;background:' + color + '22;color:' + color + ';font-weight:700;font-size:0.85rem;">' + initial + '</span>' +
+                               '<a href="detalle-cliente.php?id=' + row.id + '" class="text-decoration-none fw-semibold">' + n + '</a>' +
+                               '</div>';
+                    }
 
                 },
 
@@ -587,16 +604,11 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 {
                     data: null,
                     render: function(d) {
-                        // NUEVO Botón de Historial
-                        let btnHistorial = `<a href="historial-cliente.php?id=${d.id}" class="badge bg-secondary bg-opacity-10 text-secondary border-0 text-decoration-none me-2" style="font-size: 0.75rem;" title="Historial"><i class="ti ti-history"></i> Movimientos</a>`;
-                        
-                        // Botón Editar estilo Soft Badge (Amarillo/Warning)
-                        let btnEditar = `<button class="badge bg-warning bg-opacity-10 text-warning border-0 editar me-2" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Editar"><i class="ti ti-pencil"></i> Editar</button>`;
-                        
-                        // Botón Eliminar estilo Soft Badge (Rojo/Danger)
-                        let btnEliminar = `<button class="badge bg-danger bg-opacity-10 text-danger border-0 eliminar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Eliminar"><i class="ti ti-trash"></i> Eliminar</button>`;
-                        
-                        return `<div class="d-flex align-items-center">${btnHistorial}${btnEditar}${btnEliminar}</div>`;
+                        return `<div class="d-flex align-items-center gap-1">
+                            <a href="historial-cliente.php?id=${d.id}" class="btn btn-sm btn-outline-secondary" title="Historial"><i class="ti ti-history"></i></a>
+                            <button class="btn btn-sm btn-outline-warning editar" data-id="${d.id}" title="Editar"><i class="ti ti-pencil"></i></button>
+                            <button class="btn btn-sm btn-outline-danger eliminar" data-id="${d.id}" title="Eliminar"><i class="ti ti-trash"></i></button>
+                        </div>`;
                     }
                 }
 

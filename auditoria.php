@@ -61,159 +61,82 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
     <style>
-                .body-wrapper {
-            /* Aumentamos esto para librar completamente la altura del header azul */
-            padding-top: 100px !important; 
+        .body-wrapper { padding-top: 100px !important; }
+        .body-wrapper-inner, .body-wrapper .container-fluid { padding-top: 15px !important; margin-top: 0 !important; }
+        [data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
+        [data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
+
+        /* ─── Page Header ─────────────────────────────── */
+        .auditoria-header {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px !important;
         }
-        
-        .body-wrapper-inner, 
-        .body-wrapper .container-fluid {
-            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
-            padding-top: 15px !important;
-            margin-top: 0 !important;
+        .auditoria-header .bg-pattern {
+            position: absolute; top: -50%; right: -10%;
+            width: 400px; height: 400px; border-radius: 50%;
+            background: rgba(93, 135, 255, 0.08); pointer-events: none;
         }
-
-        .badge-action {
-
-            font-size: 0.75rem;
-
-            padding: 0.35rem 0.65rem;
-
+        .auditoria-header .bg-pattern-2 {
+            position: absolute; bottom: -30%; left: 20%;
+            width: 250px; height: 250px; border-radius: 50%;
+            background: rgba(19, 222, 185, 0.06); pointer-events: none;
         }
+        .auditoria-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .auditoria-header .sub-badge { font-size: 1rem; color: #8c9ea8; }
 
+        /* ─── Metric Cards ────────────────────────────── */
+        .metric-card {
+            position: relative;
+            border-radius: 12px !important;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .metric-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important; }
+        .metric-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 12px 12px 0 0; }
+        .metric-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #8c9ea8; }
+        .metric-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+        .metric-value { font-size: 1.75rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.25rem; }
+        .metric-footer { font-size: 0.8rem; color: #8c9ea8; }
 
-
+        /* ─── JSON Viewer ─────────────────────────────── */
         .json-viewer {
-
             background: #f8f9fa;
-
             border: 1px solid #dee2e6;
-
             border-radius: 4px;
-
             padding: 10px;
-
             font-family: 'Courier New', monospace;
-
             font-size: 0.85rem;
-
             max-height: 300px;
-
             overflow-y: auto;
-
         }
 
-
-
-        body[data-bs-theme="dark"] .json-viewer {
-
-            background: #1a2234;
-
-            border-color: #2e3a52;
-
-            color: #e0e0e0;
-
-        }
-
-
-
-        .stat-card {
-
-            border-left: 4px solid #5D87FF;
-
-        }
-
-         body[data-bs-theme="dark"] .logo-modo-claro,
-        .dark-mode .logo-modo-claro {
-            display: none !important;
-        }
-
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
-        .dark-mode .logo-modo-oscuro {
-            display: block !important;
-        }
-
-        body[data-bs-theme="dark"] .card,
-        body[data-bs-theme="dark"] .page-breadcrumb,
-        body[data-bs-theme="dark"] .page-breadcrumb h3,
-        body[data-bs-theme="dark"] .card-header,
-        body[data-bs-theme="dark"] .card-body,
-        body[data-bs-theme="dark"] .modal-content,
-        body[data-bs-theme="dark"] .modal-header,
-        body[data-bs-theme="dark"] .modal-footer {
-            background-color: #1f2535 !important;
-            border-color: #2b3350 !important;
-            color: #e6ecff !important;
-        }
-
-        body[data-bs-theme="dark"] .card {
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        body[data-bs-theme="dark"] .table,
-        body[data-bs-theme="dark"] .table thead th,
-        body[data-bs-theme="dark"] .table tbody td,
-        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
-            background-color: #1f2535 !important;
-            color: #e6ecff !important;
-            border-color: #2b3350 !important;
-        }
-
-        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
-            background-color: #232b3c !important;
-        }
-
-        body[data-bs-theme="dark"] .form-control,
-        body[data-bs-theme="dark"] .form-select,
-        body[data-bs-theme="dark"] .input-group-text,
-        body[data-bs-theme="dark"] .form-control-plaintext,
-        body[data-bs-theme="dark"] .alert,
-        body[data-bs-theme="dark"] .nav-tabs .nav-link {
-            background-color: #232b3c !important;
-            color: #e6ecff !important;
-            border-color: #2b3350 !important;
-        }
-
-        body[data-bs-theme="dark"] .nav-tabs .nav-link.active {
-            color: #ffffff !important;
-            border-bottom-color: #6c5ce7 !important;
-        }
-
-        body[data-bs-theme="dark"] .bg-light {
-            background-color: rgba(255, 255, 255, 0.06) !important;
-        }
-
-        body[data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
-            background-color: rgba(93, 135, 255, 0.12) !important;
-            color: #3B82F6 !important;
-        }
-
-        body[data-bs-theme="dark"] .bg-success.bg-opacity-10 {
-            background-color: rgba(25, 135, 84, 0.12) !important;
-            color: #13DEB9 !important;
-        }
-
-        body[data-bs-theme="dark"] .bg-info.bg-opacity-10 {
-            background-color: rgba(23, 162, 184, 0.12) !important;
-            color: #5D87FF !important;
-        }
-
-        body[data-bs-theme="dark"] .bg-danger.bg-opacity-10 {
-            background-color: rgba(220, 53, 69, 0.12) !important;
-            color: #F05464 !important;
-        }
-
-        body[data-bs-theme="dark"] .bg-secondary.bg-opacity-10 {
-            background-color: rgba(108, 117, 125, 0.12) !important;
-            color: #8C9EA8 !important;
-        }
-
-        body[data-bs-theme="dark"] .bg-warning.bg-opacity-10 {
-            background-color: rgba(255, 193, 7, 0.12) !important;
-            color: #FFAE1F !important;
-        }
+        /* ─── Dark mode ───────────────────────────────── */
+        [data-bs-theme="dark"] h3, [data-bs-theme="dark"] .page-breadcrumb h3 { color: #e9ecef !important; }
+        [data-bs-theme="dark"] .card { background: #1a2234; border-color: #2c344c; }
+        [data-bs-theme="dark"] .table>thead>tr>th { background-color: #1a2234 !important; color: #e9ecef !important; border-bottom-color: #2c344c !important; }
+        [data-bs-theme="dark"] .table>tbody>tr>td { color: #e9ecef !important; border-color: #2c344c !important; }
+        [data-bs-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd)>* { box-shadow: inset 0 0 0 9999px rgba(255, 255, 255, 0.02); }
+        [data-bs-theme="dark"] .table-hover>tbody>tr:hover>* { box-shadow: inset 0 0 0 9999px rgba(255, 255, 255, 0.05); }
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_length,
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter,
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_info,
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate { color: #8c9ea8 !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button { color: #8c9ea8 !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover { background: #252f43 !important; border-color: #2c344c !important; color: #e9ecef !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper select, [data-bs-theme="dark"] .dataTables_wrapper input { background-color: #252f43; border: 1px solid #2c344c; color: #e9ecef; }
+        [data-bs-theme="dark"] .json-viewer { background: #1a2234; border-color: #2e3a52; color: #e0e0e0; }
+        [data-bs-theme="dark"] .modal-content { background-color: #1a2234; border-color: #2c344c; }
+        [data-bs-theme="dark"] .modal-header { border-bottom-color: #2c344c; }
+        [data-bs-theme="dark"] .modal-footer { border-top-color: #2c344c; }
+        [data-bs-theme="dark"] .modal-title { color: #e9ecef; }
+        [data-bs-theme="dark"] .form-label { color: #e9ecef; }
+        [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select { background-color: #252f43; border-color: #2c344c; color: #e9ecef; }
+        [data-bs-theme="dark"] .form-control::placeholder { color: #8c9ea8; }
+        [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
     </style>
 
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 
 
@@ -226,66 +149,107 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
 
 
 
-        <?php include __DIR__ . '/src/assets/partials/header.php'; ?>
+        <?php include 'src/assets/partials/header.php'; ?>
 
-        <?php include __DIR__ . '/src/assets/partials/sidebar.php'; ?>
+        <?php include 'src/assets/partials/sidebar.php'; ?>
 
 
 
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
                 <div class="container-fluid px-4" style="max-width: 100%;">
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <div class="card shadow-sm border-0 rounded-4" style="position: relative; overflow: hidden;">
-                                
-                                <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #5D87FF; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-                                <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-
-                                <div class="card-body p-4" style="position: relative; z-index: 1;">
-                                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
-                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                            <i class="ti ti-shield-check fs-5"></i>
+                    <div class="card auditoria-header shadow-sm border-0 rounded-4 mb-4">
+                        <div class="bg-pattern"></div>
+                        <div class="bg-pattern-2"></div>
+                        <div class="card-body p-4">
+                            <div class="row align-items-center g-3">
+                                <div class="col-md">
+                                    <div class="d-flex align-items-center gap-3 mb-1">
+                                        <div class="d-flex align-items-center justify-content-center rounded-3"
+                                             style="width:48px;height:48px;background:rgba(93,135,255,0.12);">
+                                            <i class="ti ti-shield-check text-primary" style="font-size:1.6rem;"></i>
                                         </div>
-                                        <h5 class="card-title fw-semibold mb-0">Auditoría del Sistema</h5>
+                                        <div>
+                                            <h2 class="mb-0">Auditoría</h2>
+                                            <span class="sub-badge"><i class="ti ti-circle"></i> Monitoreo de actividades del sistema</span>
+                                        </div>
                                     </div>
-                                    
-                                    <p class="text-muted mb-0">Monitorea todas las actividades y cambios realizados en el sistema</p>
+                                </div>
+                                <div class="col-md-auto">
+                                    <div class="btn-group">
+                                        <button class="btn btn-outline-success btn-sm" onclick="exportarExcel()">
+                                            <i class="ti ti-file-spreadsheet"></i> Excel
+                                        </button>
+                                        <button class="btn btn-outline-info btn-sm" onclick="exportarCSV()">
+                                            <i class="ti ti-file-text"></i> CSV
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm" onclick="limpiarFiltros()">
+                                            <i class="ti ti-x"></i> Limpiar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="row" id="estadisticas">
-                        <div class="col-md-3 col-sm-6">
-                            <div class="card stat-card h-100">
-                                <div class="card-body">
-                                    <h6 class="text-muted">Total de Registros</h6>
-                                    <h3 class="fw-bold" id="stat-total">0</h3>
+                    <div class="row g-3 mb-4" id="estadisticas">
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card metric-card border-0 shadow-sm h-100">
+                                <div class="metric-accent bg-info"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Total</span>
+                                        <div class="metric-icon bg-info bg-opacity-10 text-info">
+                                            <i class="ti ti-database"></i>
+                                        </div>
+                                    </div>
+                                    <div class="metric-value text-info" id="stat-total">0</div>
+                                    <div class="metric-footer">Registros en el sistema</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3 col-sm-6">
-                            <div class="card stat-card h-100">
-                                <div class="card-body">
-                                    <h6 class="text-muted">Registros de Hoy</h6>
-                                    <h3 class="fw-bold" id="stat-hoy">0</h3>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card metric-card border-0 shadow-sm h-100">
+                                <div class="metric-accent bg-success"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Últimas 24h</span>
+                                        <div class="metric-icon bg-success bg-opacity-10 text-success">
+                                            <i class="ti ti-clock"></i>
+                                        </div>
+                                    </div>
+                                    <div class="metric-value text-success" id="stat-24h">0</div>
+                                    <div class="metric-footer">Actividades recientes</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3 col-sm-6">
-                            <div class="card stat-card h-100">
-                                <div class="card-body">
-                                    <h6 class="text-muted">Esta Semana</h6>
-                                    <h3 class="fw-bold" id="stat-semana">0</h3>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card metric-card border-0 shadow-sm h-100">
+                                <div class="metric-accent bg-warning"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Usuarios</span>
+                                        <div class="metric-icon bg-warning bg-opacity-10 text-warning">
+                                            <i class="ti ti-users"></i>
+                                        </div>
+                                    </div>
+                                    <div class="metric-value text-warning" id="stat-usuarios">0</div>
+                                    <div class="metric-footer">Con actividad registrada</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3 col-sm-6">
-                            <div class="card stat-card h-100">
-                                <div class="card-body">
-                                    <h6 class="text-muted">Este Mes</h6>
-                                    <h3 class="fw-bold" id="stat-mes">0</h3>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card metric-card border-0 shadow-sm h-100">
+                                <div class="metric-accent bg-primary"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Módulos</span>
+                                        <div class="metric-icon bg-primary bg-opacity-10 text-primary">
+                                            <i class="ti ti-apps"></i>
+                                        </div>
+                                    </div>
+                                    <div class="metric-value text-primary" id="stat-modulos">0</div>
+                                    <div class="metric-footer">Módulos activos</div>
                                 </div>
                             </div>
                         </div>
@@ -294,7 +258,7 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
                     <!-- Filtros -->
                     <div class="row mb-4">
                         <div class="col-12">
-                            <div class="card filter-card shadow-sm">
+                            <div class="card filter-card shadow-sm border-0">
                                 <div class="card-body py-3">
                                     <div class="row align-items-end g-3">
                                         <div class="col-md-3">
@@ -352,28 +316,9 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
                     </div>
 
                     <!-- Tabla de Auditoría -->
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="card shadow-sm">
-                                <div class="card-header bg-transparent">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <h6 class="mb-0 fw-semibold">Registro de Actividades</h6>
-                                        <div class="btn-group">
-                                            <button class="btn btn-outline-success" onclick="exportarExcel()">
-                                                <i class="ti ti-file-spreadsheet"></i> Excel
-                                            </button>
-                                            <button class="btn btn-outline-info" onclick="exportarCSV()">
-                                                <i class="ti ti-file-text"></i> CSV
-                                            </button>
-                                            <button class="btn btn-outline-danger" onclick="limpiarFiltros()">
-                                                <i class="ti ti-x"></i> Limpiar
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table id="tablaAuditoria" class="table table-striped table-hover" style="width:100%">
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-body p-4 table-responsive">
+                            <table id="tablaAuditoria" class="table table-hover align-middle w-100">
                                             <thead>
                                                 <tr>
                                                     <th>ID</th>
@@ -390,13 +335,11 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
                                 </table>
                             </div>
                         </div>
-                    </div>
 
+                    </div>
                 </div>
             </div>
         </div>
-
-    </div>
 
 
 
@@ -484,29 +427,15 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
 
     <script src="src/assets/js/sidebarmenu.js"></script>
 
-    <script src="src/assets/js/dark-mode.js"></script>
-
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
-    <script src="https://unpkg.com/typeit/dist/index.umd.js"></script>
+    <script src="src/assets/js/dark-mode.js"></script>
 
-    <script>
+    <script src="src/assets/js/pantalla-completa.js"></script>
 
-        new TypeIt("#myElement", {
-
-            strings: "Auditoría del Sistema",
-
-            speed: 80,
-
-            waitUntilVisible: true,
-
-            cursor: false
-
-        }).go();
-
-    </script>
+    <script src="src/assets/js/utils.js"></script>
 
 
 
@@ -542,7 +471,45 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
 
         }
 
+        function exportarCSV() {
+            var data = tabla.rows({ filter: 'applied' }).data();
+            if (!data.length) { alert('No hay datos para exportar'); return; }
+            var keys = Object.keys(data[0]);
+            var csv = keys.map(function(k) { return '"' + k + '"'; }).join(',');
+            data.each(function(row) {
+                csv += '\n' + keys.map(function(k) {
+                    var v = (row[k] || '').toString().replace(/"/g, '""');
+                    return '"' + v + '"';
+                }).join(',');
+            });
+            var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'auditoria_' + new Date().toISOString().slice(0,10) + '.csv';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
 
+        function exportarExcel() {
+            var data = tabla.rows({ filter: 'applied' }).data();
+            if (!data.length) { alert('No hay datos para exportar'); return; }
+            var keys = Object.keys(data[0]);
+            var html = '<table><thead><tr>' + keys.map(function(k) { return '<th>' + k + '</th>'; }).join('') + '</tr></thead><tbody>';
+            data.each(function(row) {
+                html += '<tr>' + keys.map(function(k) { return '<td>' + (row[k] || '') + '</td>'; }).join('') + '</tr>';
+            });
+            html += '</tbody></table>';
+            var blob = new Blob(['\uFEFF' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+            var a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'auditoria_' + new Date().toISOString().slice(0,10) + '.xls';
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+
+        function limpiarFiltros() {
+            $('#filtroUsuario, #filtroAccion, #filtroModulo').val('');
+            $('#filtroFechaInicio, #filtroFechaFin').val('');
+            tabla.ajax.url('api/auditoria.php').load();
+        }
 
         function inicializarTabla() {
 
@@ -566,12 +533,10 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
 
                         data: 'created_at',
 
-                        render: function(data) {
-
+                        render: function(data, type) {
+                            if (type === 'sort' || type === 'type') return data;
                             const fecha = new Date(data);
-
                             return fecha.toLocaleString('es-MX');
-
                         }
 
                     },
@@ -674,9 +639,11 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
 
         function aplicarFiltros() {
 
-            const params = new URLSearchParams($('#formFiltros').serialize());
-
-            tabla.ajax.url('api/auditoria.php?' + params.toString()).load();
+            var params = [];
+            $('#filtroUsuario, #filtroAccion, #filtroModulo, #filtroFechaInicio, #filtroFechaFin').each(function() {
+                if ($(this).val()) params.push($(this).attr('name') + '=' + encodeURIComponent($(this).val()));
+            });
+            tabla.ajax.url('api/auditoria.php' + (params.length ? '?' + params.join('&') : '')).load();
 
         }
 
@@ -769,6 +736,8 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
         }
 
     </script>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;"></div>
 
 </body>
 

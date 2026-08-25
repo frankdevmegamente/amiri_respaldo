@@ -238,12 +238,12 @@ sort($bancos_unicos);
             height: 38px;
         }
 
-         body[data-bs-theme="dark"] .logo-modo-claro,
+         [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
         }
 
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }
@@ -285,6 +285,7 @@ sort($bancos_unicos);
             }
         }
     </style>
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <style>
     /* =========================================

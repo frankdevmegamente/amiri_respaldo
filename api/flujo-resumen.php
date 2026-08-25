@@ -122,9 +122,11 @@ try {
 
 
 
-            // Buscamos la deuda directamente desde los proveedores enlazados
+            // Buscamos la deuda directamente desde los proveedores enlazados (USD, USDT y MXN)
             $stmtProv = $pdo->query("
-                SELECT COALESCE(SUM(c.valor_mxn), 0) AS total 
+                SELECT COALESCE(SUM(c.valor_mxn), 0) + COALESCE(
+                    (SELECT SUM(c2.saldo_actual) FROM proveedores p2 INNER JOIN cuentas c2 ON p2.cuenta_mxn_id = c2.id WHERE p2.activo = 1 AND c2.saldo_actual > 0.001), 0
+                ) AS total 
                 FROM proveedores p 
                 INNER JOIN cuentas c ON (p.cuenta_usd_id = c.id OR p.cuenta_usdt_id = c.id)
                 WHERE p.activo = 1
@@ -133,30 +135,16 @@ try {
 
             $totalObligaciones = $totalPrestamistas + $totalProveedores;
 
-            // RETIROS DE CAPITAL AMIRI (se restan porque redujeron capital sin afectar saldos)
-            $stmtRetiros = $pdo->query("SELECT COALESCE(SUM(monto), 0) AS total FROM retiros_capital");
-            $totalRetiros = (float)$stmtRetiros->fetch(PDO::FETCH_ASSOC)['total'];
-            
             // Redondear para evitar basura de flotantes
             $totalSaldos = round($totalSaldos, 2);
             $totalCapital = round($totalCapital, 2);
             $totalObligaciones = round($totalObligaciones, 2);
-            $totalRetiros = round($totalRetiros, 2);
 
-            $diferencia = round($totalSaldos - $totalCapital - $totalObligaciones - $totalRetiros, 2);
+            $diferencia = round($totalSaldos - $totalCapital - $totalObligaciones, 2);
             
             // Construir explicación de la diferencia
             $explicacion = [];
             $componentes = [];
-            if ($totalRetiros > 0) {
-                $explicacion[] = [
-                    'tipo' => 'retiros_capital',
-                    'concepto' => 'Retiros de Capital Amiri',
-                    'monto' => $totalRetiros,
-                    'detalle' => 'Retiros registrados que redujeron capital sin afectar saldos'
-                ];
-                $componentes[] = 'Retiros: $' . number_format($totalRetiros, 2);
-            }
             if ($totalPrestamosOtorgados > 0) {
                 $stmtDet = $pdo->query("SELECT persona_nombre, (monto_total - monto_pagado) AS pendiente FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1 ORDER BY persona_nombre");
                 $detalles = [];
@@ -333,6 +321,17 @@ try {
             $stmt->execute(['moneda' => $moneda]);
             $totalProveedoresAdeudos = (float)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
+            // Agregar deuda MXN si aplica
+            if ($moneda === 'MXN') {
+                $stmtMxn = $pdo->query("
+                    SELECT COALESCE(SUM(c.saldo_actual), 0) AS total
+                    FROM proveedores p
+                    INNER JOIN cuentas c ON p.cuenta_mxn_id = c.id
+                    WHERE p.activo = 1 AND c.saldo_actual > 0.001
+                ");
+                $totalProveedoresAdeudos += (float)$stmtMxn->fetch(PDO::FETCH_ASSOC)['total'];
+            }
+
 
 
             // 4. DIFERENCIA = Saldos - Capital - Proveedor
@@ -491,7 +490,7 @@ try {
 
         
 
-        // Sumar también las cuentas de proveedores que representan adeudos
+        // Sumar también las cuentas de proveedores que representan adeudos (USD, USDT y MXN)
         $sql = "SELECT COALESCE(SUM(c.valor_mxn), 0) AS total
                 FROM proveedores p
                 INNER JOIN cuentas c ON (p.cuenta_usd_id = c.id OR p.cuenta_usdt_id = c.id)
@@ -506,6 +505,16 @@ try {
         }
         $totalProveedoresAdeudos = (float)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
+        // Agregar deuda MXN de proveedores (cuenta_mxn_id)
+        $sqlMxn = "SELECT COALESCE(SUM(c.saldo_actual), 0) AS total
+                   FROM proveedores p
+                   INNER JOIN cuentas c ON p.cuenta_mxn_id = c.id
+                   WHERE p.activo = 1 AND c.saldo_actual > 0.001";
+        if ($moneda === 'MXN' || $moneda === 'TODAS') {
+            $stmtMxn = $pdo->query($sqlMxn);
+            $totalProveedoresAdeudos += (float)$stmtMxn->fetch(PDO::FETCH_ASSOC)['total'];
+        }
+
         
 
         $totalPrestamos = $totalPrestamosActuales + $totalProveedoresAdeudos;
@@ -519,38 +528,21 @@ try {
             $totalPrestamosOtorgados = (float)$stmtPO->fetch(PDO::FETCH_ASSOC)['total'];
         }
 
-        // RETIROS DE CAPITAL AMIRI (solo MXN, se restan porque redujeron capital sin afectar saldos)
-        $totalRetiros = 0;
-        if ($moneda === 'MXN' || $moneda === 'TODAS') {
-            $stmtRetiros = $pdo->query("SELECT COALESCE(SUM(monto), 0) AS total FROM retiros_capital");
-            $totalRetiros = (float)$stmtRetiros->fetch(PDO::FETCH_ASSOC)['total'];
-        }
-
         $totalSaldos = round($totalSaldos, 2);
         $totalCapital = round($totalCapital, 2);
         $totalPrestamos = round($totalPrestamos, 2);
         $totalProveedoresAdeudos = round($totalProveedoresAdeudos, 2);
-        $totalRetiros = round($totalRetiros, 2);
 
         // 4. DIFERENCIA
         if ($moneda === 'USD' || $moneda === 'USDT') {
             $diferencia = round($totalSaldos + $totalCapital - $totalProveedoresAdeudos, 2);
         } else {
-            $diferencia = round($totalSaldos - ($totalCapital + $totalPrestamos + $totalRetiros), 2);
+            $diferencia = round($totalSaldos - ($totalCapital + $totalPrestamos), 2);
         }
 
         // Construir explicación
         $explicacion = [];
         $componentes = [];
-        if ($totalRetiros > 0) {
-            $explicacion[] = [
-                'tipo' => 'retiros_capital',
-                'concepto' => 'Retiros de Capital Amiri',
-                'monto' => $totalRetiros,
-                'detalle' => 'Retiros registrados que redujeron capital sin afectar saldos'
-            ];
-            $componentes[] = 'Retiros: $' . number_format($totalRetiros, 2);
-        }
         if ($totalPrestamosOtorgados > 0) {
             $stmtDet = $pdo->query("SELECT persona_nombre, (monto_total - monto_pagado) AS pendiente FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1 ORDER BY persona_nombre");
             $detalles = [];
@@ -701,6 +693,8 @@ try {
 
         $condMonedaUsdt = $moneda === 'TODAS' || $moneda === 'USDT' ? "AND p.acepta_usdt = 1" : "AND 1=0";
 
+        $condMonedaMxn  = $moneda === 'TODAS' || $moneda === 'MXN'  ? "" : "AND 1=0";
+
 
 
         $sql = "
@@ -734,6 +728,24 @@ try {
             LEFT JOIN cuentas c ON p.cuenta_usdt_id = c.id
 
             WHERE p.activo = 1 $condMonedaUsdt AND COALESCE(c.saldo_actual, 0) > 0.001
+
+
+
+            UNION ALL
+
+
+
+            SELECT p.id, p.nombre, 'MXN' AS tipo_moneda,
+
+                   COALESCE(c.saldo_actual, 0) AS saldo_actual,
+
+                   COALESCE(c.saldo_actual, 0) AS valor_mxn
+
+            FROM proveedores p
+
+            LEFT JOIN cuentas c ON p.cuenta_mxn_id = c.id
+
+            WHERE p.activo = 1 $condMonedaMxn AND COALESCE(c.saldo_actual, 0) > 0.001
 
 
 

@@ -23,8 +23,8 @@ $currentUserId = (int)($_SESSION['usuario_id'] ?? 0);
     <style>
         .body-wrapper { padding-top: 100px !important; }
         .body-wrapper-inner, .body-wrapper .container-fluid { padding-top: 15px !important; margin-top: 0 !important; }
-        body[data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
-        body[data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
+        [data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
+        [data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
 
         /* ─── Page Header ─────────────────────────────── */
         .users-header {
@@ -89,6 +89,7 @@ $currentUserId = (int)($_SESSION['usuario_id'] ?? 0);
         [data-bs-theme="dark"] .form-control::placeholder { color: #8c9ea8; }
         [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
     </style>
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"

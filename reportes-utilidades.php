@@ -59,9 +59,9 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .drill-link .ti-search { font-size:14px; opacity:0.6; transition:all 0.15s; }
         .drill-link:hover { color: #6c5ce7 !important; }
         .drill-link:hover .ti-search { opacity: 1; font-size:16px; }
-        body[data-bs-theme="dark"] .logo-modo-claro,
+        [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro { display: none !important; }
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro { display: block !important; }
         /* ── Skeleton screens ── */
         @keyframes skeleton-pulse { 0%{opacity:0.6} 50%{opacity:1} 100%{opacity:0.6} }
@@ -104,7 +104,22 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         /* ── Section labels for consolidated card ── */
         .br-section-label { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#8b92a8; margin-bottom:4px; }
         [data-bs-theme="dark"] .br-section-label { color:#6b7280; }
+        /* ── Dark mode: Estado de Resultados ── */
+        [data-bs-theme="dark"] .bg-light {
+            background-color: #1e293b !important;
+            border-color: #2c344c !important;
+        }
+        [data-bs-theme="dark"] .text-dark {
+            color: #e8ecf0 !important;
+        }
+        [data-bs-theme="dark"] #totalUtilidadServicio,
+        [data-bs-theme="dark"] #totalUtilidadCliente,
+        [data-bs-theme="dark"] #totalUtilidadPromotor,
+        [data-bs-theme="dark"] #statMargenPromedio {
+            color: #e8ecf0 !important;
+        }
     </style>
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <body>
 <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6"

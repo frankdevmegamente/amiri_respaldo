@@ -101,40 +101,40 @@ $serviciosDivisas = [
    ========================================= */
 
 /* 1. RECUPERAR EL TAMAÑO ORIGINAL (Venciendo la regla global de padding) */
-body[data-bs-theme="dark"] .card .card-header.header-saldos,
-body[data-bs-theme="dark"] .card .card-header.header-capital,
-body[data-bs-theme="dark"] .card .card-header.header-prestamos {
+[data-bs-theme="dark"] .card .card-header.header-saldos,
+[data-bs-theme="dark"] .card .card-header.header-capital,
+[data-bs-theme="dark"] .card .card-header.header-prestamos {
     padding: 16px 20px !important; /* Devuelve el tamaño grande */
     border-radius: 12px 12px 0 0 !important;
 }
 
 /* 2. SALDOS BANCARIOS (SUCCESS) */
-body[data-bs-theme="dark"] .card .header-saldos {
+[data-bs-theme="dark"] .card .header-saldos {
     background-color: rgba(102, 187, 106, 0.15) !important;
     border-bottom: 1px solid rgba(102, 187, 106, 0.3) !important;
 }
-body[data-bs-theme="dark"] .card .header-saldos span,
-body[data-bs-theme="dark"] .card .header-saldos i {
+[data-bs-theme="dark"] .card .header-saldos span,
+[data-bs-theme="dark"] .card .header-saldos i {
     color: #66bb6a !important; /* Verde exacto de tu plantilla */
 }
 
 /* 3. CAPITAL (WARNING - Este color faltaba en tu dark-mode.css) */
-body[data-bs-theme="dark"] .card .header-capital {
+[data-bs-theme="dark"] .card .header-capital {
     background-color: rgba(255, 193, 7, 0.15) !important;
     border-bottom: 1px solid rgba(255, 193, 7, 0.3) !important;
 }
-body[data-bs-theme="dark"] .card .header-capital span,
-body[data-bs-theme="dark"] .card .header-capital i {
+[data-bs-theme="dark"] .card .header-capital span,
+[data-bs-theme="dark"] .card .header-capital i {
     color: #ffc107 !important; /* Amarillo brillante */
 }
 
 /* 4. PRÉSTAMOS (DANGER) */
-body[data-bs-theme="dark"] .card .header-prestamos {
+[data-bs-theme="dark"] .card .header-prestamos {
     background-color: rgba(239, 83, 80, 0.15) !important;
     border-bottom: 1px solid rgba(239, 83, 80, 0.3) !important;
 }
-body[data-bs-theme="dark"] .card .header-prestamos span,
-body[data-bs-theme="dark"] .card .header-prestamos i {
+[data-bs-theme="dark"] .card .header-prestamos span,
+[data-bs-theme="dark"] .card .header-prestamos i {
     color: #ef5350 !important; /* Rojo exacto de tu plantilla */
 }
 
@@ -161,12 +161,12 @@ body[data-bs-theme="dark"] .card .header-prestamos i {
         .badge-usd  { background: linear-gradient(135deg, #0ea5e9, #2563eb); color: white; }
 
         .badge-usdt { background: linear-gradient(135deg, #10b981, #059669); color: white; }
- body[data-bs-theme="dark"] .logo-modo-claro,
+ [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
         }
 
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }
@@ -274,30 +274,30 @@ body[data-bs-theme="dark"] .card .header-prestamos i {
 }
 
 /* 2. MODO OSCURO: FONDOS TRANSLÚCIDOS (Efecto Badge) */
-body[data-bs-theme="dark"] .header-saldos, .dark-mode .header-saldos {
+[data-bs-theme="dark"] .header-saldos, .dark-mode .header-saldos {
     background-color: rgba(25, 135, 84, 0.15) !important;
     border-bottom: 1px solid #2c344c !important;
 }
-body[data-bs-theme="dark"] .header-capital, .dark-mode .header-capital {
+[data-bs-theme="dark"] .header-capital, .dark-mode .header-capital {
     background-color: rgba(255, 193, 7, 0.15) !important;
     border-bottom: 1px solid #2c344c !important;
 }
-body[data-bs-theme="dark"] .header-prestamos, .dark-mode .header-prestamos {
+[data-bs-theme="dark"] .header-prestamos, .dark-mode .header-prestamos {
     background-color: rgba(220, 53, 69, 0.15) !important;
     border-bottom: 1px solid #2c344c !important;
 }
 
 /* 3. MODO OSCURO: FORZAR COLORES DE TEXTO E ICONOS (Para vencer al text-white) */
-body[data-bs-theme="dark"] .header-saldos, .dark-mode .header-saldos,
-body[data-bs-theme="dark"] .header-saldos *, .dark-mode .header-saldos * {
+[data-bs-theme="dark"] .header-saldos, .dark-mode .header-saldos,
+[data-bs-theme="dark"] .header-saldos *, .dark-mode .header-saldos * {
     color: #36c76c !important; /* Verde brillante */
 }
-body[data-bs-theme="dark"] .header-capital, .dark-mode .header-capital,
-body[data-bs-theme="dark"] .header-capital *, .dark-mode .header-capital * {
+[data-bs-theme="dark"] .header-capital, .dark-mode .header-capital,
+[data-bs-theme="dark"] .header-capital *, .dark-mode .header-capital * {
     color: #ffc107 !important; /* Amarillo brillante */
 }
-body[data-bs-theme="dark"] .header-prestamos, .dark-mode .header-prestamos,
-body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
+[data-bs-theme="dark"] .header-prestamos, .dark-mode .header-prestamos,
+[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
     color: #fc4b6c !important; /* Rojo brillante */
 }
 /* =========================================
@@ -324,6 +324,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
     </style>
 
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 
 
@@ -807,6 +808,212 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
 
 
+    <!-- Modal Proveedor -->
+
+    <div class="modal fade" id="modalProveedor" tabindex="-1">
+
+        <div class="modal-dialog modal-xl">
+
+            <div class="modal-content">
+
+                <div class="modal-header bg-info bg-opacity-10">
+
+                    <h5 class="modal-title"><i class="ti ti-building text-info"></i> <span id="proveedorModalNombre">Proveedor</span></h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="text-center py-3"><i class="ti ti-loader ti-spin"></i> Cargando...</div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Modal Pago Proveedor MXN (acceso directo desde card obligaciones) -->
+
+    <div class="modal fade" id="modalPagoProveedorMXN" tabindex="-1">
+
+        <div class="modal-dialog">
+
+            <div class="modal-content">
+
+                <div class="modal-header bg-warning bg-opacity-10">
+
+                    <h5 class="modal-title"><i class="ti ti-cash text-warning"></i> Pagar Proveedor MXN</h5>
+
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+
+                </div>
+
+                <form id="formPagoProveedorMXN">
+
+                    <div class="modal-body">
+
+                        <input type="hidden" id="pagoMxnProveedorId" name="proveedor_id">
+
+                        <input type="hidden" id="pagoMxnMoneda" name="moneda_proveedor" value="MXN">
+
+                        <input type="hidden" id="pagoMxnParidad" value="1">
+
+
+
+                        <div class="alert alert-secondary py-2 mb-3">
+
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+
+                                <span class="fw-bold fs-6" id="pagoMxnNombreProveedor"></span>
+
+                                <span class="badge bg-warning bg-opacity-10 text-warning border-0" style="font-size: 0.85rem;">MXN</span>
+
+                            </div>
+
+                            <div class="row text-center mt-2">
+
+                                <div class="col-4">
+
+                                    <div class="text-muted small">Adeudo MXN</div>
+
+                                    <div class="fw-bold" id="pagoMxnInfoAdeudo">—</div>
+
+                                </div>
+
+                                <div class="col-4">
+
+                                    <div class="text-muted small">Total a pagar</div>
+
+                                    <div class="fw-bold text-danger" id="pagoMxnInfoTotal">—</div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-semibold">Fecha de Pago *</label>
+
+                            <input type="date" id="pagoMxnFecha" class="form-control" required>
+
+                        </div>
+
+
+
+                        <div class="mb-3">
+
+                            <label class="form-label fw-semibold">Cuenta de Pago *</label>
+
+                            <select id="pagoMxnCuentaSelect" name="cuenta_pago_id" class="form-control" required>
+
+                                <option value="">Seleccione cuenta</option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <div class="mb-3" id="pagoMxnGrupoMonto" style="display:none;">
+
+                            <label class="form-label fw-semibold">Monto a Pagar (MXN) *</label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">$</span>
+
+                                <input type="text" id="pagoMxnMonto" class="form-control" step="0.01" min="0.01" placeholder="0.00" required>
+
+                                <span class="input-group-text">MXN</span>
+
+                            </div>
+
+                            <small id="pagoMxnMontoLabel" class="text-success fw-bold mt-1 d-block" style="min-height:1.2em;"></small>
+
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+
+                                <small class="text-muted" id="pagoMxnInfoSaldo"></small>
+
+                                <button type="button" class="btn btn-outline-success btn-sm" id="btnMxnLiquidarTotal" style="display:none;">
+
+                                    <i class="ti ti-check"></i> Liquidar Total
+
+                                </button>
+
+                            </div>
+
+                            <div id="pagoMxnAlertaSaldo" class="alert alert-warning py-2 mt-2" style="display:none;">
+
+                                <i class="ti ti-alert-triangle"></i> El monto no puede superar el adeudo ni el saldo de la cuenta.
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+
+                        <button type="submit" class="btn btn-warning" id="btnMxnProcesarPago" style="display:none;">
+
+                            <i class="ti ti-cash"></i> Procesar Pago
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- Modal Deudor -->
+
+    <div class="modal fade" id="modalDeudor" tabindex="-1">
+
+        <div class="modal-dialog modal-xl">
+
+            <div class="modal-content">
+
+                <div class="modal-header bg-warning bg-opacity-10">
+
+                    <h5 class="modal-title"><i class="ti ti-user text-warning"></i> <span id="deudorModalNombre">Deudor</span></h5>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="text-center py-3"><i class="ti ti-loader ti-spin"></i> Cargando...</div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
     <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index:9999"></div>
 
 
@@ -866,6 +1073,88 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
         #modalFlujo .form-label    { font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; }
 
         #modalFlujo .form-select   { background-position: right 16px center; }
+
+        /* ── Dark mode: Modales Proveedor / Deudor ────────────────────── */
+        /* Cards dentro de los modales */
+        [data-bs-theme="dark"] #modalProveedor .card,
+        [data-bs-theme="dark"] #modalDeudor .card                 { background-color: #111827 !important; border-color: #1f2937 !important; }
+
+        [data-bs-theme="dark"] #modalProveedor .card-body,
+        [data-bs-theme="dark"] #modalDeudor .card-body            { background-color: transparent !important; color: #e5e7eb !important; }
+
+        [data-bs-theme="dark"] #modalProveedor .card-header,
+        [data-bs-theme="dark"] #modalDeudor .card-header          { background-color: #1e293b !important; border-color: #1f2937 !important; color: #e5e7eb !important; }
+
+        /* Tablas */
+        [data-bs-theme="dark"] #modalProveedor .table,
+        [data-bs-theme="dark"] #modalDeudor .table                 { color: #e5e7eb !important; --bs-table-bg: transparent !important; }
+
+        [data-bs-theme="dark"] #modalProveedor .table > :not(caption) > * > *,
+        [data-bs-theme="dark"] #modalDeudor .table > :not(caption) > * > *   { background-color: transparent !important; color: #e5e7eb !important; border-color: #1f2937 !important; }
+
+        [data-bs-theme="dark"] #modalProveedor .table thead th,
+        [data-bs-theme="dark"] #modalDeudor .table thead th        { background-color: #1e293b !important; color: #94a3b8 !important; border-color: #1f2937 !important; }
+
+        [data-bs-theme="dark"] #modalProveedor .table-striped > tbody > tr:nth-of-type(odd) > *,
+        [data-bs-theme="dark"] #modalDeudor .table-striped > tbody > tr:nth-of-type(odd) > *  { background-color: rgba(255,255,255,0.02) !important; }
+
+        [data-bs-theme="dark"] #modalProveedor .table-hover tbody tr:hover > *,
+        [data-bs-theme="dark"] #modalDeudor .table-hover tbody tr:hover > *    { background-color: rgba(99,102,241,0.12) !important; color: #e5e7eb !important; }
+
+        [data-bs-theme="dark"] #modalProveedor .table-responsive,
+        [data-bs-theme="dark"] #modalDeudor .table-responsive      { border-color: #1f2937 !important; }
+
+        /* Textos */
+        [data-bs-theme="dark"] #modalProveedor .text-muted,
+        [data-bs-theme="dark"] #modalDeudor .text-muted            { color: #6b7280 !important; }
+
+        [data-bs-theme="dark"] #modalProveedor .text-body,
+        [data-bs-theme="dark"] #modalDeudor .text-body             { color: #e5e7eb !important; }
+
+        [data-bs-theme="dark"] #modalProveedor h4,
+        [data-bs-theme="dark"] #modalDeudor h4,
+        [data-bs-theme="dark"] #modalProveedor h6,
+        [data-bs-theme="dark"] #modalDeudor h6,
+        [data-bs-theme="dark"] #modalProveedor h5,
+        [data-bs-theme="dark"] #modalDeudor h5                     { color: #e5e7eb !important; }
+
+        [data-bs-theme="dark"] #modalProveedor small,
+        [data-bs-theme="dark"] #modalDeudor small                  { color: #9ca3af !important; }
+
+        [data-bs-theme="dark"] #modalProveedor .form-label,
+        [data-bs-theme="dark"] #modalDeudor .form-label            { color: #d1d5db !important; }
+
+        /* Badges */
+        [data-bs-theme="dark"] #modalProveedor .badge,
+        [data-bs-theme="dark"] #modalDeudor .badge                 { background-image: none !important; }
+
+        /* Input groups */
+        [data-bs-theme="dark"] #modalProveedor .input-group-text,
+        [data-bs-theme="dark"] #modalDeudor .input-group-text      { background-color: #1e293b !important; border-color: #1f2937 !important; color: #e5e7eb !important; }
+
+        /* Alertas */
+        [data-bs-theme="dark"] #modalProveedor .alert-danger,
+        [data-bs-theme="dark"] #modalDeudor .alert-danger          { background-color: rgba(220,53,69,0.15) !important; color: #f8d7da !important; border-color: rgba(220,53,69,0.3) !important; }
+
+        /* Rows */
+        [data-bs-theme="dark"] #modalProveedor .row,
+        [data-bs-theme="dark"] #modalDeudor .row                    { --bs-gutter-x: 1rem; }
+
+        /* Strong / bold */
+        [data-bs-theme="dark"] #modalProveedor strong,
+        [data-bs-theme="dark"] #modalDeudor strong                  { color: #e5e7eb !important; }
+
+        /* p tags */
+        [data-bs-theme="dark"] #modalProveedor p,
+        [data-bs-theme="dark"] #modalDeudor p                       { color: #e5e7eb !important; }
+
+        /* Iconos */
+        [data-bs-theme="dark"] #modalProveedor .ti,
+        [data-bs-theme="dark"] #modalDeudor .ti                     { color: inherit !important; }
+
+        /* hr */
+        [data-bs-theme="dark"] #modalProveedor hr,
+        [data-bs-theme="dark"] #modalDeudor hr                      { border-color: #1f2937 !important; }
 
     </style>
 
@@ -951,7 +1240,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
         processing: true,
             serverSide: true,
 
-            ajax: { url: 'api/flujo-lista.php?servicios_ids=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19', dataSrc: 'data' },
+            ajax: { url: 'api/flujo-lista.php?servicios_ids=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20', dataSrc: 'data' },
 
             columns: [
                 {
@@ -1104,7 +1393,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
             // Recargar la tabla con la nueva vista
             let vistaActual = $(e.target).data('vista');
-            let nuevaUrl = 'api/flujo-lista.php?servicios_ids=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19&vista=' + vistaActual;
+            let nuevaUrl = 'api/flujo-lista.php?servicios_ids=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20&vista=' + vistaActual;
             table.ajax.url(nuevaUrl).load();
         });
 
@@ -1128,6 +1417,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                     data.cuentas.forEach(function (c) {
                         let saldo = parseFloat(c.saldo_actual || 0);
+                        if (Math.abs(saldo) < 0.01) return;
                         let mxn   = c.tipo_moneda === 'MXN' ? saldo : parseFloat(c.valor_mxn || 0);
                         totalMxn += mxn;
                         let montoDisplay = mostrarEnMXN
@@ -1161,6 +1451,12 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                 let html = '', totalMxn = 0;
 
                 if (data.cuentas && data.cuentas.length) {
+
+                    data.cuentas.sort(function(a, b) {
+                        let mxnA = a.tipo_moneda === 'MXN' ? parseFloat(a.saldo_actual || 0) : parseFloat(a.valor_mxn || 0);
+                        let mxnB = b.tipo_moneda === 'MXN' ? parseFloat(b.saldo_actual || 0) : parseFloat(b.valor_mxn || 0);
+                        return mxnB - mxnA;
+                    });
 
                     data.cuentas.forEach(function (c) {
 
@@ -1228,6 +1524,15 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                 if (loaded < 3) return; // <--- Cambiamos a 3 peticiones
 
                 let html = '', totalMxn = 0;
+                let tipoOrden = { 'Prestamista': 0, 'Proveedor': 1, 'Deudor': 2 };
+                entries.sort(function(a, b) {
+                    let tipoA = tipoOrden[a.tipo] !== undefined ? tipoOrden[a.tipo] : 3;
+                    let tipoB = tipoOrden[b.tipo] !== undefined ? tipoOrden[b.tipo] : 3;
+                    if (tipoA !== tipoB) return tipoA - tipoB;
+                    let mxnA = a.tipo_moneda === 'MXN' ? a.monto : (a.valor_mxn || 0);
+                    let mxnB = b.tipo_moneda === 'MXN' ? b.monto : (b.valor_mxn || 0);
+                    return mxnB - mxnA;
+                });
                 entries.forEach(function (e) {
                     let monto = parseFloat(e.monto || 0);
                     let mxn   = e.tipo_moneda === 'MXN' ? monto : parseFloat(e.valor_mxn || 0);
@@ -1246,13 +1551,9 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
                     if (e.tipo === 'Prestamista') {
                         nombreCell = `<a href="detalle-prestamista.php?id=${e.id || ''}" class="text-decoration-none fw-semibold text-danger">${e.nombre}</a>`;
                     } else if (e.tipo === 'Proveedor') {
-                        nombreCell = `<a href="detalle-proveedor.php?id=${e.id || ''}" class="text-decoration-none fw-semibold text-info">${e.nombre}</a>`;
+                        nombreCell = `<a href="#" class="text-decoration-none fw-semibold text-info" onclick="pagarProveedorDirecto(${e.id || 0}); return false;">${e.nombre}</a>`;
                     } else if (e.tipo === 'Deudor') {
-                        // Si solo hay un préstamo, ir directo al detalle; si hay varios, ir a la página de deudor
-                        let enlace = (e.ids && e.ids.split(',').length === 1) 
-                            ? `detalle-prestamo-otorgado.php?id=${e.ids}` 
-                            : `detalle-deudor.php?nombre=${encodeURIComponent(e.nombre)}`;
-                        nombreCell = `<a href="${enlace}" class="text-decoration-none fw-semibold text-warning">${e.nombre}</a>`;
+                        nombreCell = `<a href="#" class="text-decoration-none fw-semibold text-warning" onclick="abrirDeudorModal('${encodeURIComponent(e.nombre)}'); return false;">${e.nombre}</a>`;
                     }
                         
                     html += `<tr>
@@ -1430,6 +1731,515 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
 
 
+        // ─── Pago directo a Proveedor (acceso directo desde card obligaciones) ──
+
+        window.pagarProveedorDirecto = function(id) {
+            if (!id) return;
+
+            $.getJSON('api/proveedores.php?id=' + id, function(proveedor) {
+                var saldoMxn  = parseFloat(proveedor.saldo_mxn  || 0);
+                var saldoUsd  = parseFloat(proveedor.saldo_usd  || 0);
+                var saldoUsdt = parseFloat(proveedor.saldo_usdt || 0);
+
+                var tieneMxn  = saldoMxn  > 0.001;
+                var tieneUsd  = proveedor.acepta_usd  && saldoUsd  > 0.001;
+                var tieneUsdt = proveedor.acepta_usdt && saldoUsdt > 0.001;
+
+                // Si solo tiene un tipo de deuda, abrir directamente
+                if (tieneMxn && !tieneUsd && !tieneUsdt) {
+                    abrirModalPagoMxn(proveedor, saldoMxn);
+                } else if (tieneUsd && !tieneMxn && !tieneUsdt) {
+                    pagarProveedorDesdeModal(id, 'USD', saldoUsd);
+                } else if (tieneUsdt && !tieneMxn && !tieneUsd) {
+                    pagarProveedorDesdeModal(id, 'USDT', saldoUsdt);
+                } else if (tieneMxn) {
+                    // Si tiene MXN (con o sin otros), priorizar MXN
+                    abrirModalPagoMxn(proveedor, saldoMxn);
+                } else {
+                    // Fallback: abrir modal de detalle
+                    abrirProveedorModal(id);
+                }
+            });
+        };
+
+        function abrirModalPagoMxn(proveedor, saldoMxn) {
+            $('#pagoMxnProveedorId').val(proveedor.id);
+            $('#pagoMxnNombreProveedor').text(proveedor.nombre);
+            $('#pagoMxnInfoAdeudo').text('$' + saldoMxn.toLocaleString('es-MX', {minimumFractionDigits:2}) + ' MXN');
+            $('#pagoMxnInfoTotal').text('$' + saldoMxn.toLocaleString('es-MX', {minimumFractionDigits:2}) + ' MXN');
+            $('#formPagoProveedorMXN').data('adeudo-mxn', saldoMxn);
+
+            // Fecha de hoy
+            $('#pagoMxnFecha').val(new Date().toISOString().split('T')[0]);
+
+            // Reset
+            $('#pagoMxnMonto').val('');
+            $('#pagoMxnMontoLabel').text('');
+            $('#pagoMxnGrupoMonto').hide();
+            $('#btnMxnLiquidarTotal').hide();
+            $('#pagoMxnAlertaSaldo').hide();
+            $('#btnMxnProcesarPago').hide();
+            $('#pagoMxnInfoSaldo').text('');
+
+            // Cargar cuentas MXN de pago
+            $.get('api/cuentas.php?tipo_moneda=MXN', function(cuentas) {
+                var sel = $('#pagoMxnCuentaSelect');
+                sel.html('<option value="">Seleccione cuenta</option>');
+                var filtradas = cuentas.filter(function(c) {
+                    return [1, 2].includes(parseInt(c.tipo_cuenta)) && parseFloat(c.saldo_actual) > 0;
+                });
+                if (filtradas.length === 0) {
+                    sel.append('<option value="" disabled>No hay cuentas MXN disponibles</option>');
+                } else {
+                    filtradas.forEach(function(c) {
+                        var saldo = parseFloat(c.saldo_actual || 0).toFixed(2);
+                        var nombreCuenta = c.nombre;
+                        if (c.banco && c.banco.trim()) nombreCuenta += ' (' + c.banco + ')';
+                        sel.append('<option value="' + c.id + '" data-saldo="' + saldo + '">' + nombreCuenta + ' — Saldo: $' + parseFloat(saldo).toLocaleString('es-MX',{minimumFractionDigits:2}) + ' MXN</option>');
+                    });
+                }
+                $('#modalPagoProveedorMXN').modal('show');
+            });
+        }
+
+        // Cambio de cuenta en modal MXN
+        $(document).on('change', '#pagoMxnCuentaSelect', function() {
+            var saldoCuenta = parseFloat($(this).find('option:selected').attr('data-saldo')) || 0;
+            var adeudoMxn   = parseFloat($('#formPagoProveedorMXN').data('adeudo-mxn')) || 0;
+
+            if (!$(this).val()) {
+                $('#pagoMxnGrupoMonto').hide();
+                $('#btnMxnProcesarPago').hide();
+                return;
+            }
+
+            $('#pagoMxnGrupoMonto').show();
+            $('#btnMxnProcesarPago').show();
+            $('#pagoMxnMonto').val('').attr('max', Math.min(saldoCuenta, adeudoMxn).toFixed(2));
+            $('#pagoMxnInfoSaldo').text('Saldo disponible: $' + saldoCuenta.toLocaleString('es-MX', {minimumFractionDigits:2}) + ' MXN');
+            $('#pagoMxnAlertaSaldo').hide();
+
+            if (saldoCuenta >= adeudoMxn) {
+                $('#btnMxnLiquidarTotal').show();
+            } else {
+                $('#btnMxnLiquidarTotal').hide();
+            }
+        });
+
+        // Liquidar total
+        $(document).on('click', '#btnMxnLiquidarTotal', function() {
+            var adeudoMxn = parseFloat($('#formPagoProveedorMXN').data('adeudo-mxn')) || 0;
+            $('#pagoMxnMonto').val(adeudoMxn.toFixed(2)).trigger('input');
+        });
+
+        // Validación en tiempo real del monto
+        $(document).on('input', '#pagoMxnMonto', function() {
+            var val         = parseFloat($(this).val()) || 0;
+            var adeudoMxn   = parseFloat($('#formPagoProveedorMXN').data('adeudo-mxn')) || 0;
+            var saldoCuenta = parseFloat($('#pagoMxnCuentaSelect').find('option:selected').attr('data-saldo')) || 0;
+            var maximo      = Math.min(saldoCuenta, adeudoMxn);
+
+            if (val > 0) {
+                $('#pagoMxnMontoLabel').text('$' + val.toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+            } else {
+                $('#pagoMxnMontoLabel').text('');
+            }
+
+            if (val > maximo) {
+                $('#pagoMxnAlertaSaldo').show();
+                $('#btnMxnProcesarPago').prop('disabled', true);
+            } else {
+                $('#pagoMxnAlertaSaldo').hide();
+                $('#btnMxnProcesarPago').prop('disabled', false);
+            }
+        });
+
+        // Procesar pago MXN
+        $(document).on('submit', '#formPagoProveedorMXN', function(e) {
+            e.preventDefault();
+
+            var monto = parseFloat($('#pagoMxnMonto').val()) || 0;
+            if (!$('#pagoMxnCuentaSelect').val()) {
+                showToast('Selecciona una cuenta de pago', 'error');
+                return;
+            }
+            if (monto <= 0) {
+                showToast('Ingresa un monto a pagar', 'error');
+                return;
+            }
+
+            var fechaElegida = $('#pagoMxnFecha').val();
+            var horaActual = new Date().toTimeString().split(' ')[0];
+
+            var payload = {
+                proveedor_id:   $('#pagoMxnProveedorId').val(),
+                cuenta_pago_id: $('#pagoMxnCuentaSelect').val(),
+                monto:          monto,
+                paridad:        1,
+                moneda:         'MXN',
+                fecha:          fechaElegida + ' ' + horaActual
+            };
+
+            var $btn = $('#btnMxnProcesarPago').prop('disabled', true).html('<i class="ti ti-loader ti-spin"></i> Procesando...');
+
+            $.ajax({
+                url: 'api/proveedores-pagos.php',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function() {
+                    $('#modalPagoProveedorMXN').modal('hide');
+                    showToast('Pago registrado', 'success');
+                    setTimeout(function() { location.reload(); }, 500);
+                },
+                error: function(xhr) {
+                    var msg = 'Error al registrar pago';
+                    try { msg = JSON.parse(xhr.responseText).error || msg; } catch (e) {}
+                    showToast(msg, 'error');
+                    $btn.prop('disabled', false).html('<i class="ti ti-cash"></i> Procesar Pago');
+                }
+            });
+        });
+
+        // Modal detalle proveedor (mantenido como fallback)
+        window.abrirProveedorModal = function(id) {
+            if (!id) return;
+            var $modal = $('#modalProveedor');
+            $modal.find('.modal-body').html('<div class="text-center py-3"><i class="ti ti-loader ti-spin"></i> Cargando...</div>');
+            $modal.find('#proveedorModalNombre').text('Proveedor');
+            $modal.modal('show');
+
+            var proveedor = null;
+            var historial = [];
+
+            $.getJSON('api/proveedores.php?id=' + id, function (data) {
+                proveedor = data;
+                $modal.find('#proveedorModalNombre').text(proveedor.nombre || 'Proveedor');
+                cargarHistorial();
+            }).fail(function() {
+                $modal.find('.modal-body').html('<div class="alert alert-danger">Error al cargar datos del proveedor</div>');
+            });
+
+            function cargarHistorial() {
+                $.getJSON('api/movimientos-todos.php?proveedor_id=' + id, function (data) {
+                    historial = data || [];
+                    renderizarProveedor();
+                }).fail(function() {
+                    historial = [];
+                    renderizarProveedor();
+                });
+            }
+
+            function renderizarProveedor() {
+                if (!proveedor) return;
+
+                var saldoUsd = parseFloat(proveedor.saldo_usd || 0);
+                var saldoUsdt = parseFloat(proveedor.saldo_usdt || 0);
+                var saldoMxn = parseFloat(proveedor.saldo_mxn || 0);
+                var valorMxnUsd = parseFloat(proveedor.valor_mxn_usd || 0);
+                var valorMxnUsdt = parseFloat(proveedor.valor_mxn_usdt || 0);
+                var totalMxn = valorMxnUsd + valorMxnUsdt + saldoMxn;
+
+                var html = '';
+
+                html += '<div class="row mb-4">';
+
+                if (saldoMxn > 0.001) {
+                    html += '<div class="col-md-3"><div class="card border-warning"><div class="card-body text-center">';
+                    html += '<p class="text-muted mb-1" style="font-size:0.75rem;">ADEUDO MXN</p>';
+                    html += '<h4 class="mb-0 text-warning fw-bold">$' + formatMXN(saldoMxn) + '</h4>';
+                    html += '</div></div></div>';
+                }
+
+                if (saldoUsd > 0.001) {
+                    html += '<div class="col-md-3"><div class="card border-primary"><div class="card-body text-center">';
+                    html += '<p class="text-muted mb-1" style="font-size:0.75rem;">ADEUDO USD</p>';
+                    html += '<h4 class="mb-0 text-primary fw-bold">' + formatNativo(saldoUsd) + ' <small>USD</small></h4>';
+                    html += '<small class="text-muted">$' + formatMXN(valorMxnUsd) + ' MXN</small>';
+                    html += '</div></div></div>';
+                }
+
+                if (saldoUsdt > 0.001) {
+                    html += '<div class="col-md-3"><div class="card border-info"><div class="card-body text-center">';
+                    html += '<p class="text-muted mb-1" style="font-size:0.75rem;">ADEUDO USDT</p>';
+                    html += '<h4 class="mb-0 text-info fw-bold">' + formatNativo(saldoUsdt) + ' <small>USDT</small></h4>';
+                    html += '<small class="text-muted">$' + formatMXN(valorMxnUsdt) + ' MXN</small>';
+                    html += '</div></div></div>';
+                }
+
+                html += '<div class="col-md-3"><div class="card border-secondary"><div class="card-body text-center">';
+                html += '<p class="text-muted mb-1" style="font-size:0.75rem;">TOTAL ADEUDO</p>';
+                html += '<h4 class="mb-0 text-secondary fw-bold">$' + formatMXN(totalMxn) + ' MXN</h4>';
+                html += '</div></div></div>';
+
+                html += '</div>';
+
+                html += '<div class="d-flex justify-content-between align-items-center mb-3">';
+                html += '<h6 class="mb-0"><i class="ti ti-list-details"></i> Historial de Movimientos</h6>';
+                html += '<div class="d-flex gap-2">';
+
+                if (saldoMxn > 0.001) {
+                    html += '<button class="btn btn-warning btn-sm" onclick="abrirModalPagoMxn(proveedor, ' + saldoMxn + ');">';
+                    html += '<i class="ti ti-cash"></i> Pagar MXN</button>';
+                }
+                if (proveedor.acepta_usd && saldoUsd > 0.001) {
+                    html += '<button class="btn btn-primary btn-sm" onclick="pagarProveedorDesdeModal(' + proveedor.id + ', \'USD\', ' + saldoUsd + ');">';
+                    html += '<i class="ti ti-cash"></i> Pagar en USD</button>';
+                }
+                if (proveedor.acepta_usdt && saldoUsdt > 0.001) {
+                    html += '<button class="btn btn-info btn-sm" onclick="pagarProveedorDesdeModal(' + proveedor.id + ', \'USDT\', ' + saldoUsdt + ');">';
+                    html += '<i class="ti ti-cash"></i> Pagar en USDT</button>';
+                }
+
+                html += '</div></div>';
+
+                if (historial.length > 0) {
+                    html += '<div class="table-responsive"><table class="table table-sm table-hover">';
+                    html += '<thead><tr><th>Fecha</th><th>Servicio</th><th>Tipo</th><th>Monto</th><th>Moneda</th><th>Descripción</th></tr></thead><tbody>';
+                    historial.forEach(function (m) {
+                        var tipoBadge = m.tipo === 'entrada' ? 'success' : (m.tipo === 'salida' ? 'danger' : 'secondary');
+                        var partes = (m.fecha || '').split('-');
+                        var fechaFmt = partes.length === 3 ? partes[2] + '/' + partes[1] + '/' + partes[0] : m.fecha;
+                        html += '<tr>';
+                        html += '<td>' + fechaFmt + '</td>';
+                        html += '<td>' + (m.servicio_nombre || '-') + '</td>';
+                        html += '<td><span class="badge bg-' + tipoBadge + ' bg-opacity-10 text-' + tipoBadge + ' border-0">' + (m.tipo || '-') + '</span></td>';
+                        html += '<td class="fw-bold">$' + formatMXN(m.monto) + '</td>';
+                        html += '<td>' + (m.moneda || 'MXN') + '</td>';
+                        html += '<td><small class="text-muted">' + (m.descripcion || '-') + '</small></td>';
+                        html += '</tr>';
+                    });
+                    html += '</tbody></table></div>';
+                } else {
+                    html += '<div class="text-center text-muted py-3"><i class="ti ti-inbox" style="font-size:2rem;"></i><p class="mt-2">Sin movimientos registrados</p></div>';
+                }
+
+                $modal.find('.modal-body').html(html);
+            }
+        }
+
+
+
+        window.pagarProveedorDesdeModal = function(proveedorId, moneda, saldoPendiente) {
+            $('#modalProveedor').modal('hide');
+
+            var servicioNombre = moneda === 'USD' ? 'Compra de Dólares' : 'Compra de USDT';
+
+            $('#servicioSelect').val(servicioNombre).trigger('change');
+
+            setTimeout(function () {
+                $('#proveedorSelect').val(proveedorId).trigger('change');
+                $('#modalFlujo').modal('show');
+            }, 300);
+        }
+
+
+
+        // ─── Modal Deudor ───────────────────────────────────────────────────
+
+        window.abrirDeudorModal = function(nombreEncoded) {
+            var nombre = decodeURIComponent(nombreEncoded);
+            if (!nombre) return;
+            var $modal = $('#modalDeudor');
+            $modal.find('.modal-body').html('<div class="text-center py-3"><i class="ti ti-loader ti-spin"></i> Cargando...</div>');
+            $modal.find('#deudorModalNombre').text(nombre);
+            $modal.modal('show');
+
+            var prestamos = [];
+            var historial = [];
+
+            $.getJSON('api/prestamos-otorgados.php?persona_nombre=' + encodeURIComponent(nombre), function (data) {
+                prestamos = data || [];
+                cargarHistorialDeudor();
+            }).fail(function() {
+                prestamos = [];
+                cargarHistorialDeudor();
+            });
+
+            function cargarHistorialDeudor() {
+                $.getJSON('api/deudor-historial.php?persona_nombre=' + encodeURIComponent(nombre), function (data) {
+                    historial = data || [];
+                    renderizarDeudor();
+                }).fail(function() {
+                    historial = [];
+                    renderizarDeudor();
+                });
+            }
+
+            function renderizarDeudor() {
+                var totalPrestado = 0, totalPagado = 0;
+                prestamos.forEach(function (p) {
+                    totalPrestado += parseFloat(p.monto_total || 0);
+                    totalPagado += parseFloat(p.monto_pagado || 0);
+                });
+                var totalPendiente = totalPrestado - totalPagado;
+
+                var html = '';
+
+                // Cards de resumen
+                html += '<div class="row mb-4">';
+                html += '<div class="col-md-4"><div class="card border-warning"><div class="card-body text-center">';
+                html += '<p class="text-muted mb-1" style="font-size:0.75rem;">TOTAL PRESTADO</p>';
+                html += '<h4 class="mb-0 text-warning fw-bold">$' + formatMXN(totalPrestado) + '</h4>';
+                html += '</div></div></div>';
+                html += '<div class="col-md-4"><div class="card border-success"><div class="card-body text-center">';
+                html += '<p class="text-muted mb-1" style="font-size:0.75rem;">TOTAL COBRADO</p>';
+                html += '<h4 class="mb-0 text-success fw-bold">$' + formatMXN(totalPagado) + '</h4>';
+                html += '</div></div></div>';
+                html += '<div class="col-md-4"><div class="card border-danger"><div class="card-body text-center">';
+                html += '<p class="text-muted mb-1" style="font-size:0.75rem;">PENDIENTE</p>';
+                html += '<h4 class="mb-0 text-danger fw-bold">$' + formatMXN(totalPendiente) + '</h4>';
+                html += '</div></div></div>';
+                html += '</div>';
+
+                // Tabla de prestamos
+                html += '<h6 class="mb-2"><i class="ti ti-list-details"></i> Prestamos</h6>';
+                if (prestamos.length > 0) {
+                    html += '<div class="table-responsive mb-4"><table class="table table-sm table-hover">';
+                    html += '<thead><tr><th>Fecha</th><th>Total</th><th>Pagado</th><th>Pendiente</th><th>Estado</th><th>Cuenta</th></tr></thead><tbody>';
+                    prestamos.forEach(function (p) {
+                        var pendiente = parseFloat(p.monto_total || 0) - parseFloat(p.monto_pagado || 0);
+                        var badge = p.estado === 'pagado' ? 'success' : (p.estado === 'parcial' ? 'warning' : 'danger');
+                        var partes = (p.fecha_prestamo || '').split('-');
+                        var fechaFmt = partes.length === 3 ? partes[2] + '/' + partes[1] + '/' + partes[0] : p.fecha_prestamo;
+                        html += '<tr>';
+                        html += '<td>' + fechaFmt + '</td>';
+                        html += '<td class="fw-bold">$' + formatMXN(p.monto_total) + '</td>';
+                        html += '<td class="text-success">$' + formatMXN(p.monto_pagado) + '</td>';
+                        html += '<td class="text-danger fw-bold">$' + formatMXN(pendiente) + '</td>';
+                        html += '<td><span class="badge bg-' + badge + ' bg-opacity-10 text-' + badge + ' border-0">' + (p.estado || '-') + '</span></td>';
+                        html += '<td>' + (p.cuenta_nombre || 'N/A') + '</td>';
+                        html += '</tr>';
+                    });
+                    html += '</tbody></table></div>';
+                } else {
+                    html += '<div class="text-center text-muted py-3"><i class="ti ti-inbox" style="font-size:2rem;"></i><p class="mt-2">Sin prestamos registrados</p></div>';
+                }
+
+                // Formulario de cobro (solo si hay pendiente)
+                if (totalPendiente > 0.01) {
+                    html += '<div class="card border-success mb-3"><div class="card-header bg-success bg-opacity-10">';
+                    html += '<h6 class="mb-0 text-success"><i class="ti ti-cash"></i> Registrar Cobro</h6></div>';
+                    html += '<div class="card-body">';
+                    html += '<form id="formCobroDeudorModal">';
+                    html += '<div class="row align-items-end">';
+                    html += '<div class="col-md-3 mb-2"><label class="form-label fw-semibold">Fecha</label>';
+                    html += '<input type="date" class="form-control" id="fechaCobroDeudor" value="' + new Date().toISOString().slice(0,10) + '" required></div>';
+                    html += '<div class="col-md-3 mb-2"><label class="form-label fw-semibold">Monto a Cobrar</label>';
+                    html += '<div class="input-group"><span class="input-group-text">$</span>';
+                    html += '<input type="number" step="0.01" min="0.01" class="form-control" id="montoCobroDeudor" max="' + totalPendiente.toFixed(2) + '" required></div>';
+                    html += '<small class="text-muted">Pendiente: $' + formatMXN(totalPendiente) + '</small></div>';
+                    html += '<div class="col-md-4 mb-2"><label class="form-label fw-semibold">Cuenta Destino</label>';
+                    html += '<select class="form-select" id="cuentaDestinoDeudor" required>';
+                    html += '<option value="">-- Selecciona --</option></select></div>';
+                    html += '<div class="col-md-2 mb-2"><button type="submit" class="btn btn-success w-100">';
+                    html += '<i class="ti ti-check"></i> Cobrar</button></div>';
+                    html += '</div></form>';
+                    html += '<div id="resumenCobroDeudor" class="mt-2"></div>';
+                    html += '</div></div>';
+                }
+
+                // Historial de movimientos
+                html += '<h6 class="mb-2"><i class="ti ti-history"></i> Historial de Movimientos</h6>';
+                if (historial.length > 0) {
+                    html += '<div class="table-responsive"><table class="table table-sm table-hover">';
+                    html += '<thead><tr><th>Fecha</th><th>Servicio</th><th>Tipo</th><th>Monto</th><th>Cuenta Origen</th><th>Cuenta Destino</th></tr></thead><tbody>';
+                    historial.forEach(function (m) {
+                        var tipoBadge = m.tipo === 'entrada' ? 'success' : 'danger';
+                        var partes = (m.fecha || '').split('-');
+                        var fechaFmt = partes.length === 3 ? partes[2] + '/' + partes[1] + '/' + partes[0] : m.fecha;
+                        html += '<tr>';
+                        html += '<td>' + fechaFmt + '</td>';
+                        html += '<td>' + (m.servicio_nombre || '-') + '</td>';
+                        html += '<td><span class="badge bg-' + tipoBadge + ' bg-opacity-10 text-' + tipoBadge + ' border-0">' + (m.tipo || '-') + '</span></td>';
+                        html += '<td class="fw-bold">$' + formatMXN(m.monto) + '</td>';
+                        html += '<td>' + (m.cuenta_origen_nombre || '-') + '</td>';
+                        html += '<td>' + (m.cuenta_destino_nombre || '-') + '</td>';
+                        html += '</tr>';
+                    });
+                    html += '</tbody></table></div>';
+                } else {
+                    html += '<div class="text-center text-muted py-3"><small>Sin movimientos registrados</small></div>';
+                }
+
+                $modal.find('.modal-body').html(html);
+
+                // Cargar cuentas destino
+                $.getJSON('api/cuentas.php?tipo_moneda=MXN&es_caja_empresa=1', function (cuentas) {
+                    var opts = '<option value="">-- Selecciona --</option>';
+                    cuentas.forEach(function (c) {
+                        opts += '<option value="' + c.id + '">' + c.nombre + ' ($' + formatMXN(c.saldo_actual) + ')</option>';
+                    });
+                    $('#cuentaDestinoDeudor').html(opts);
+                });
+
+                // Evento submit del formulario de cobro
+                $('#formCobroDeudorModal').on('submit', function (e) {
+                    e.preventDefault();
+                    guardarCobroDeudorModal(nombre, prestamos);
+                });
+            }
+        }
+
+
+
+        // ─── Guardar cobro de deudor desde modal ────────────────────────────
+
+        function guardarCobroDeudorModal(personaNombre, prestamos) {
+            var monto = parseFloat($('#montoCobroDeudor').val());
+            var cuentaId = $('#cuentaDestinoDeudor').val();
+            var fecha = $('#fechaCobroDeudor').val();
+
+            if (!monto || monto <= 0) { showToast('Ingresa un monto válido', 'error'); return; }
+            if (!cuentaId) { showToast('Selecciona una cuenta destino', 'error'); return; }
+
+            // Distribucion en cascada: pagar el prestamo mas antiguo primero
+            var pagos = [];
+            var restante = monto;
+            prestamos.forEach(function (p) {
+                if (restante <= 0.01) return;
+                var pendiente = parseFloat(p.monto_total || 0) - parseFloat(p.monto_pagado || 0);
+                if (pendiente > 0.01 && p.persona_nombre === personaNombre) {
+                    var abono = Math.min(pendiente, restante);
+                    if (abono > 0.01) {
+                        pagos.push({ id: p.id, abono: parseFloat(abono.toFixed(2)) });
+                        restante -= abono;
+                    }
+                }
+            });
+
+            if (pagos.length === 0) {
+                showToast('No hay prestamos pendientes para esta persona', 'error');
+                return;
+            }
+
+            $.ajax({
+                url: 'api/prestamos-otorgados.php',
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    pagos: pagos,
+                    cuenta_pago_id: parseInt(cuentaId),
+                    fecha_pago: fecha
+                }),
+                success: function (res) {
+                    if (res.success) {
+                        showToast('Cobro registrado correctamente', 'success');
+                        $('#modalDeudor').modal('hide');
+                        cargarObligaciones();
+                        cargarDiferencia();
+                    } else {
+                        showToast(res.error || 'Error al guardar', 'error');
+                    }
+                },
+                error: function () {
+                    showToast('Error al procesar el cobro', 'error');
+                }
+            });
+        }
+
+
+
         // ─── Carga de selectores del modal ───────────────────────────────────
 
 
@@ -1466,21 +2276,31 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
 
 
-        function cargarProveedoresMXN() {
+        function cargarProveedoresMXN(soloProveedores = false) {
 
-            let html = '<option value="">-- Sin proveedor/cliente --</option>';
+            let html = soloProveedores
+                ? '<option value="">-- Selecciona proveedor --</option>'
+                : '<option value="">-- Sin proveedor/cliente --</option>';
 
             $.getJSON('api/proveedores.php?activos=1', function (data) {
 
                 data.forEach(p => html += `<option value="${p.id}" data-tipo="proveedor">${p.nombre}</option>`);
 
-                $.getJSON('api/clientes.php', function (clients) {
+                if (!soloProveedores) {
 
-                    clients.forEach(c => html += `<option value="${c.id}" data-tipo="cliente">${c.nombre}</option>`);
+                    $.getJSON('api/clientes.php', function (clients) {
+
+                        clients.forEach(c => html += `<option value="${c.id}" data-tipo="cliente">${c.nombre}</option>`);
+
+                        $('#proveedorSelect').html(html);
+
+                    });
+
+                } else {
 
                     $('#proveedorSelect').html(html);
 
-                });
+                }
 
             });
 
@@ -1523,7 +2343,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
         function cargarCuentasMXN(soloBancarias) {
 
-            let url = soloBancarias ? 'api/cuentas.php?tipo_moneda=MXN' : 'api/cuentas.php';
+            let url = 'api/cuentas.php?tipo_moneda=MXN';
 
             $.getJSON(url, function (data) {
 
@@ -1531,7 +2351,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                 data.forEach(function (c) {
 
-                    if (!soloBancarias || parseInt(c.tipo_cuenta) === 1) {
+                    if ((!soloBancarias || parseInt(c.tipo_cuenta) === 1) && parseInt(c.tipo_cuenta) !== 3 && parseInt(c.tipo_cuenta) !== 7) {
 
                         let nombreCuenta = c.nombre;
 
@@ -1891,7 +2711,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                         cargarClientesMXN();
 
-                        cargarCuentasMXN(true);
+                        cargarCuentasMXN(false);
 
                         $campos.html(`
 
@@ -1963,11 +2783,11 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                     case 'Compra de Efectivo':
 
-                        $('#clienteGroup').show();
+                        $('#proveedorGroup').show();
 
                         $('#cuentaGroup').show();
 
-                        cargarClientesMXN();
+                        cargarProveedoresMXN(true);
 
                         $.getJSON('api/cuentas.php?tipo_moneda=MXN', function (data) {
                             let html = '<option value="">-- Selecciona la cuenta --</option>';
@@ -2248,7 +3068,7 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                             <div class="mb-3">
 
-                                <label class="form-label">Cuenta Bancaria (Origen) *</label>
+                                <label class="form-label">Cuenta / Caja de Origen *</label>
 
                                 <select class="form-select" id="cuentaBancariaOrigen" name="cuenta_bancaria_id" required></select>
 
@@ -2288,17 +3108,19 @@ body[data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
 
                         `);
 
-                        $.getJSON('api/cuentas.php?tipo_cuenta=1&con_saldo=1', function (cuentas) {
+                        $.getJSON('api/cuentas.php?solo_gastos=1&con_saldo=1&tipo_moneda=MXN', function (cuentas) {
 
-                            let html = '<option value="">-- Selecciona una cuenta bancaria --</option>';
+                            let html = '<option value="">-- Selecciona una cuenta o caja --</option>';
 
                             if (!cuentas.length) {
 
-                                html += '<option disabled>No hay cuentas bancarias con saldo</option>';
+                                html += '<option disabled>No hay cuentas o cajas con saldo</option>';
 
                             } else {
 
                                 cuentas.forEach(c => {
+
+                                    if (parseInt(c.tipo_cuenta) !== 1 && parseInt(c.tipo_cuenta) !== 2) return;
 
                                     let nombreCuenta = c.nombre;
 

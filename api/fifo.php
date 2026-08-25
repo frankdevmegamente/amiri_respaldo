@@ -10,24 +10,43 @@ if (!in_array($moneda, ['USDT', 'USD'], true)) {
     jsonError('Moneda no válida. Use USDT o USD.', 400);
 }
 
+$fechaInicio = $_GET['fecha_inicio'] ?? '';
+$fechaFin = $_GET['fecha_fin'] ?? '';
+$mes = $_GET['mes'] ?? '';
+if ($mes && !preg_match('/^\d{4}-\d{2}$/', $mes)) {
+    jsonError('Formato de mes inválido. Use YYYY-MM.', 400);
+}
+if ($mes) {
+    $fechaInicio = $mes . '-01';
+    $fechaFin = date('Y-m-t', strtotime($fechaInicio));
+}
+$tieneFiltro = ($fechaInicio && $fechaFin);
+
 try {
     $pdo = getPDO();
 
     // ============================================
-    // RESUMEN GLOBAL (sin filtro de mes)
+    // RESUMEN (con filtro opcional de fechas)
     // ============================================
-    $stmt = $pdo->prepare("
+    $sqlResumen = "
         SELECT COUNT(*) as total_lotes,
                COALESCE(SUM(cantidad_original), 0) as total_original,
                COALESCE(SUM(cantidad_restante), 0) as total_restante,
                COALESCE(SUM(ROUND(cantidad_original * paridad, 2)), 0) as total_mxn_compras
         FROM inventario_monedas
         WHERE moneda = ? AND activo = 1
-    ");
-    $stmt->execute([$moneda]);
+    ";
+    $paramsResumen = [$moneda];
+    if ($tieneFiltro) {
+        $sqlResumen .= " AND fecha BETWEEN ? AND ?";
+        $paramsResumen[] = $fechaInicio;
+        $paramsResumen[] = $fechaFin;
+    }
+    $stmt = $pdo->prepare($sqlResumen);
+    $stmt->execute($paramsResumen);
     $resumen = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $stmt = $pdo->prepare("
+    $sqlVentasResumen = "
         SELECT COUNT(DISTINCT ci.movimiento_id) as total_ventas,
                COALESCE(SUM(ci.cantidad_consumida), 0) as total_vendido,
                COALESCE(SUM(ci.ganancia), 0) as total_ganancia
@@ -35,8 +54,15 @@ try {
         JOIN inventario_monedas im ON ci.inventario_id = im.id
         JOIN movimientos mv ON ci.movimiento_id = mv.id
         WHERE im.moneda = ? AND mv.activo = 1
-    ");
-    $stmt->execute([$moneda]);
+    ";
+    $paramsVentasResumen = [$moneda];
+    if ($tieneFiltro) {
+        $sqlVentasResumen .= " AND mv.fecha BETWEEN ? AND ?";
+        $paramsVentasResumen[] = $fechaInicio;
+        $paramsVentasResumen[] = $fechaFin;
+    }
+    $stmt = $pdo->prepare($sqlVentasResumen);
+    $stmt->execute($paramsVentasResumen);
     $ventasResumen = $stmt->fetch(PDO::FETCH_ASSOC);
 
     $resumen['total_ventas'] = (int)$ventasResumen['total_ventas'];
@@ -45,7 +71,7 @@ try {
     $resumen['total_mxn_ventas'] = 0;
 
     // ============================================
-    // 1. Lotes de compra (con filtro opcional de mes)
+    // 1. Lotes de compra (con filtro opcional de fechas)
     // ============================================
     $sqlLotes = "
         SELECT im.id, im.fecha, im.cantidad_original, im.cantidad_restante,
@@ -55,15 +81,20 @@ try {
         FROM inventario_monedas im
         JOIN movimientos m ON im.movimiento_id = m.id
         WHERE im.moneda = ? AND im.activo = 1
-        ORDER BY im.fecha ASC, im.id ASC
     ";
-
+    $paramsLotes = [$moneda];
+    if ($tieneFiltro) {
+        $sqlLotes .= " AND im.fecha BETWEEN ? AND ?";
+        $paramsLotes[] = $fechaInicio;
+        $paramsLotes[] = $fechaFin;
+    }
+    $sqlLotes .= " ORDER BY im.fecha ASC, im.id ASC";
     $stmt = $pdo->prepare($sqlLotes);
-    $stmt->execute([$moneda]);
+    $stmt->execute($paramsLotes);
     $lotes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // ============================================
-    // 2. Ventas con consumos FIFO (con filtro opcional de mes)
+    // 2. Ventas con consumos FIFO (con filtro opcional de fechas)
     // ============================================
     $sqlVentas = "
         SELECT ci.movimiento_id as venta_id, mv.fecha as venta_fecha,
@@ -75,11 +106,16 @@ try {
         JOIN inventario_monedas im ON ci.inventario_id = im.id
         JOIN movimientos mv ON ci.movimiento_id = mv.id
         WHERE im.moneda = ? AND mv.activo = 1
-        ORDER BY mv.fecha ASC, ci.inventario_id ASC
     ";
-
+    $paramsVentas = [$moneda];
+    if ($tieneFiltro) {
+        $sqlVentas .= " AND mv.fecha BETWEEN ? AND ?";
+        $paramsVentas[] = $fechaInicio;
+        $paramsVentas[] = $fechaFin;
+    }
+    $sqlVentas .= " ORDER BY mv.fecha ASC, ci.inventario_id ASC";
     $stmt = $pdo->prepare($sqlVentas);
-    $stmt->execute([$moneda]);
+    $stmt->execute($paramsVentas);
     $consumos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Agrupar consumos por venta
@@ -111,15 +147,21 @@ try {
     }
     $ventas = array_values($ventas);
 
-    // Calcular total_mxn_ventas global sin filtro
-    $stmtMxn = $pdo->prepare("
+    $sqlMxn = "
         SELECT COALESCE(SUM(ci.cantidad_consumida * ci.paridad_venta), 0) as total_mxn_ventas
         FROM consumos_inventario ci
         JOIN inventario_monedas im ON ci.inventario_id = im.id
         JOIN movimientos mv ON ci.movimiento_id = mv.id
         WHERE im.moneda = ? AND mv.activo = 1
-    ");
-    $stmtMxn->execute([$moneda]);
+    ";
+    $paramsMxn = [$moneda];
+    if ($tieneFiltro) {
+        $sqlMxn .= " AND mv.fecha BETWEEN ? AND ?";
+        $paramsMxn[] = $fechaInicio;
+        $paramsMxn[] = $fechaFin;
+    }
+    $stmtMxn = $pdo->prepare($sqlMxn);
+    $stmtMxn->execute($paramsMxn);
     $resumen['total_mxn_ventas'] = (float)$stmtMxn->fetchColumn();
 
     jsonResponse([

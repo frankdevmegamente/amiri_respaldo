@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 require_once __DIR__ . '/src/config/session.php';
 
@@ -22,13 +22,13 @@ $cliente_id = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
 
 if (!$cliente_id) {
 
-    die("Error: ID de cliente no válido.");
+    die("Error: ID de cliente no v�lido.");
 
 }
 
 
 
-// Función para obtener datos del cliente
+// Funci�n para obtener datos del cliente
 
 function getCliente($pdo, $id)
 
@@ -56,7 +56,7 @@ function getCliente($pdo, $id)
 
 
 
-// Función para obtener cuentas MXN disponibles para pago
+// Funci�n para obtener cuentas MXN disponibles para pago
 
 function getCuentas($pdo)
 
@@ -120,7 +120,7 @@ try {
 
 } catch (PDOException $e) {
 
-    die("Error de conexión: " . $e->getMessage());
+    die("Error de conexi�n: " . $e->getMessage());
 
 }
 
@@ -163,7 +163,7 @@ try {
         
         .body-wrapper-inner, 
         .body-wrapper .container-fluid {
-            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
+            /* Le damos un peque�o respiro visual para que el t�tulo no quede pegando con el header */
             padding-top: 15px !important;
             margin-top: 0 !important;
         }
@@ -188,80 +188,81 @@ try {
         #tabsCliente .nav-link:not(.active):hover {
             color: #5D87FF; /* Morado Amiri al pasar el mouse */
         }
- body[data-bs-theme="dark"] .logo-modo-claro,
+ [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
         }
 
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }
 
-        body[data-bs-theme="dark"] .card,
-        body[data-bs-theme="dark"] .page-breadcrumb,
-        body[data-bs-theme="dark"] .page-breadcrumb h3,
-        body[data-bs-theme="dark"] .card-header,
-        body[data-bs-theme="dark"] .card-body,
-        body[data-bs-theme="dark"] .modal-content,
-        body[data-bs-theme="dark"] .modal-header,
-        body[data-bs-theme="dark"] .modal-footer {
+        [data-bs-theme="dark"] .card,
+        [data-bs-theme="dark"] .page-breadcrumb,
+        [data-bs-theme="dark"] .page-breadcrumb h3,
+        [data-bs-theme="dark"] .card-header,
+        [data-bs-theme="dark"] .card-body,
+        [data-bs-theme="dark"] .modal-content,
+        [data-bs-theme="dark"] .modal-header,
+        [data-bs-theme="dark"] .modal-footer {
             background-color: #1f2535 !important;
             border-color: #2b3350 !important;
             color: #e6ecff !important;
         }
 
-        body[data-bs-theme="dark"] .card {
+        [data-bs-theme="dark"] .card {
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
-        body[data-bs-theme="dark"] .table,
-        body[data-bs-theme="dark"] .table thead th,
-        body[data-bs-theme="dark"] .table tbody td,
-        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+        [data-bs-theme="dark"] .table,
+        [data-bs-theme="dark"] .table thead th,
+        [data-bs-theme="dark"] .table tbody td,
+        [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
             background-color: #1f2535 !important;
             color: #e6ecff !important;
             border-color: #2b3350 !important;
         }
 
-        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
+        [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
             background-color: #232b3c !important;
         }
 
-        body[data-bs-theme="dark"] .form-control,
-        body[data-bs-theme="dark"] .form-select,
-        body[data-bs-theme="dark"] .input-group-text,
-        body[data-bs-theme="dark"] .form-control-plaintext,
-        body[data-bs-theme="dark"] .alert,
-        body[data-bs-theme="dark"] .badge,
-        body[data-bs-theme="dark"] .nav-tabs .nav-link {
+        [data-bs-theme="dark"] .form-control,
+        [data-bs-theme="dark"] .form-select,
+        [data-bs-theme="dark"] .input-group-text,
+        [data-bs-theme="dark"] .form-control-plaintext,
+        [data-bs-theme="dark"] .alert,
+        [data-bs-theme="dark"] .badge,
+        [data-bs-theme="dark"] .nav-tabs .nav-link {
             background-color: #232b3c !important;
             color: #e6ecff !important;
             border-color: #2b3350 !important;
         }
 
-        body[data-bs-theme="dark"] .nav-tabs .nav-link.active {
+        [data-bs-theme="dark"] .nav-tabs .nav-link.active {
             color: #ffffff !important;
             border-bottom-color: #6c5ce7 !important;
         }
 
-        body[data-bs-theme="dark"] .bg-light {
+        [data-bs-theme="dark"] .bg-light {
             background-color: rgba(255, 255, 255, 0.06) !important;
         }
 
-        body[data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
+        [data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
             background-color: rgba(93, 135, 255, 0.12) !important;
         }
 
-        body[data-bs-theme="dark"] .bg-success.bg-opacity-10 {
+        [data-bs-theme="dark"] .bg-success.bg-opacity-10 {
             background-color: rgba(25, 135, 84, 0.12) !important;
         }
 
-        body[data-bs-theme="dark"] .bg-warning.bg-opacity-10 {
+        [data-bs-theme="dark"] .bg-warning.bg-opacity-10 {
             background-color: rgba(255, 193, 7, 0.12) !important;
         }
     </style>
 
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 
 
@@ -347,7 +348,7 @@ try {
                                                     <i class="ti ti-percentage fs-5"></i>
                                                 </div>
                                                 <div>
-                                                    <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Comisión AMIRI</p>
+                                                    <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Comisi�n AMIRI</p>
                                                     <span class="badge bg-warning bg-opacity-10 text-warning border-0 mt-1 fs-6"><?= htmlspecialchars($cliente['porcentaje_amiri'] ?? 0) ?>%</span>
                                                 </div>
                                             </div>
@@ -405,13 +406,13 @@ try {
                                                 <table id="tablaVentas" class="table table-hover align-middle" style="width:100%">
                                                     <thead>
                                                         <tr>
-                                                            <th style="width: 40px;"></th>
+                                                            <th style="width: 40px;"><input type="checkbox" id="checkAllVentas"></th>
                                                             <th>ID</th>
                                                             <th>Fecha</th>
                                                             <th>Total recibido</th>
-                                                            <th>Comisión AMIRI</th>
+                                                            <th>Comisi�n AMIRI</th>
                                                             <th>%</th>
-                                                            <th>Comisión Promotor</th>
+                                                            <th>Comisi�n Promotor</th>
                                                             <th>%</th>
                                                             <th>Total a pagar</th>
                                                             <th>Estado</th>
@@ -454,7 +455,7 @@ try {
         </div>
 
 
-        <!-- Botón flotante para pagos múltiples -->
+        <!-- Bot�n flotante para pagos m�ltiples -->
         <div id="btnPagarMultipleContainer" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1050;">
             <button class="btn btn-warning shadow-lg px-4 py-2" id="btnPagarMultiple" style="border-radius: 50px; font-weight: bold;">
                 <i class="ti ti-cash me-2"></i> Pagar (<span id="contadorSeleccionadas">0</span>) Ventas
@@ -483,7 +484,24 @@ try {
 
                         <div class="modal-body">
 
+    <div class="alert alert-info py-2" id="resumenPagoMultiple" style="display: none;">
+        <small>Pagando a: <strong id="nombreClientePago"></strong></small>
+    </div>
+
+    <div class="alert alert-warning py-2 text-center" id="alertaDeudaTotal" style="display: none;">
+        <small>Deuda Total: <strong id="deudaTotalCliente">$0.00</strong></small>
+    </div>
+
                             <div id="contenedorPagosMultiples" class="mb-3 p-3 bg-light border rounded" style="display: none;"></div>
+
+                    <div class="mb-3" id="grupoMontoGlobal" style="display: none;">
+                        <label class="form-label fw-bold text-success">¿Cuánto dinero vas a pagar?</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="text" step="0.01" id="monto_a_pagar_input_multi" class="form-control form-control-lg text-success fw-bold">
+                        </div>
+                        <small class="text-muted">Se distribuirá automáticamente entre las ventas seleccionadas.</small>
+                    </div>
 
                             <div class="row mb-2">
 
@@ -511,7 +529,7 @@ try {
 
                                 <div class="col-md-4">
 
-                                    <label class="form-label">Comisión AMIRI</label>
+                                    <label class="form-label">Comisi�n AMIRI</label>
 
                                     <p id="comisionAmiriDisplay" class="form-control-plaintext text-muted"></p>
 
@@ -519,7 +537,7 @@ try {
 
                                 <div class="col-md-4">
 
-                                    <label class="form-label">Comisión Promotor</label>
+                                    <label class="form-label">Comisi�n Promotor</label>
 
                                     <p id="comisionPromotorDisplay" class="form-control-plaintext text-muted"></p>
 
@@ -595,7 +613,7 @@ try {
 
                                     </select>
 
-                                    <small class="text-muted">Se restará de ambas cuentas: del cliente (digital) y de nuestra caja (efectivo físico entregado)</small>
+                                    <small class="text-muted">Se restar� de ambas cuentas: del cliente (digital) y de nuestra caja (efectivo f�sico entregado)</small>
 
                                 </div>
 
@@ -727,7 +745,7 @@ try {
 
 
 
-            // Formatear monto en tiempo real como guía visual
+            // Formatear monto en tiempo real como gu�a visual
 
             $('#inputMonto').on('input', function() {
 
@@ -835,7 +853,7 @@ try {
 
             /**
 
-             * Formatear moneda según el tipo
+             * Formatear moneda seg�n el tipo
 
              */
 
@@ -895,28 +913,28 @@ try {
                     },
                     {
                         data: 'fecha', // <-- Ahora jalamos la fecha operativa real
-                        render: function(data, type, row) {
-                            if (!data) return '';
-                            if (type === 'sort' || type === 'type') return data;
-                            // Formatear fecha operativa de YYYY-MM-DD a DD/MM/YYYY
-                            const partes = data.split('-');
-                            const fechaOperacion = partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : data;
-                            
-                            // Mostrar la fecha de captura original en pequeño
-                            let infoExtra = '';
-                            if (row.creado_en) {
-                                const fechaC = new Date(row.creado_en);
-                                if (!isNaN(fechaC)) {
-                                    const captura = fechaC.toLocaleString('es-MX', {
-                                        day: '2-digit', month: '2-digit', year: 'numeric',
-                                        hour: '2-digit', minute: '2-digit', hour12: true
-                                    });
-                                    infoExtra = `<br><small class="text-muted" style="font-size: 0.7rem;"><i class="ti ti-device-floppy"></i> Capturado: ${captura}</small>`;
-                                }
-                            }
-                            return `<span class="fw-bold text-dark">${fechaOperacion}</span>${infoExtra}`;
-                        }
-                    },
+                        render: function(data, type, row) {
+                            if (!data) return '';
+                            if (type === 'sort' || type === 'type') return data;
+                            // Formatear fecha operativa de YYYY-MM-DD a DD/MM/YYYY
+                            const partes = data.split('-');
+                            const fechaOperacion = partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : data;
+                            
+                            // Mostrar la fecha de captura original en peque�o
+                            let infoExtra = '';
+                            if (row.creado_en) {
+                                const fechaC = new Date(row.creado_en);
+                                if (!isNaN(fechaC)) {
+                                    const captura = fechaC.toLocaleString('es-MX', {
+                                        day: '2-digit', month: '2-digit', year: 'numeric',
+                                        hour: '2-digit', minute: '2-digit', hour12: true
+                                    });
+                                    infoExtra = `<br><small class="text-muted" style="font-size: 0.7rem;"><i class="ti ti-device-floppy"></i> Capturado: ${captura}</small>`;
+                                }
+                            }
+                            return `<span class="fw-bold text-dark">${fechaOperacion}</span>${infoExtra}`;
+                        }
+                    },
 
                     {
 
@@ -958,7 +976,7 @@ try {
 
                             const com = parseFloat(data.comision_amiri) || 0;
 
-                            if (total <= 0 || com <= 0) return '<span class="text-muted">—</span>';
+                            if (total <= 0 || com <= 0) return '<span class="text-muted">�</span>';
 
                             const pct = (com / total) * 100;
 
@@ -994,7 +1012,7 @@ try {
 
                             const com = parseFloat(data.comision_promotor) || 0;
 
-                            if (total <= 0 || com <= 0) return '<span class="text-muted">—</span>';
+                            if (total <= 0 || com <= 0) return '<span class="text-muted">�</span>';
 
                             const pct = (com / total) * 100;
 
@@ -1065,11 +1083,11 @@ try {
                         render: function(data) {
                             let btnPagar = '';
                             if (data.estado !== 'pagado') {
-                                // Botón Pagar estilo Badge (Naranja/Warning como lo tenías originalmente)
+                                // Bot�n Pagar estilo Badge (Naranja/Warning como lo ten�as originalmente)
                                 btnPagar = `<button class="badge bg-warning bg-opacity-10 text-warning border-0 pagar me-2" style="cursor: pointer; font-size: 0.75rem;" data-id="${data.id}"><i class="ti ti-cash"></i> Pagar</button>`;
                             }
                             
-                            // Botón Eliminar estilo Badge (Rojo/Danger)
+                            // Bot�n Eliminar estilo Badge (Rojo/Danger)
                             let btnEliminar = `<button class="badge bg-danger bg-opacity-10 text-danger border-0 eliminar" style="cursor: pointer; font-size: 0.75rem;" data-id="${data.id}" title="Eliminar"><i class="ti ti-trash"></i> Eliminar</button>`;
                             
                             return btnPagar + btnEliminar;
@@ -1092,9 +1110,11 @@ try {
                MODAL - ABRIR Y CARGAR DATOS
 
             ============================================================ */
-            // Lógica para Selección Múltiple
+            // L�gica para Selecci�n M�ltiple
             let ventasSeleccionadas = [];
             let totalPendienteMultiple = 0;
+
+            $(document).on('change', '#checkAllVentas', function() { $('.pago-checkbox').prop('checked', $(this).prop('checked')).trigger('change'); });
 
             $('#tablaVentas tbody').on('change', '.pago-checkbox', function() {
                 const id = $(this).data('id');
@@ -1106,6 +1126,7 @@ try {
                 } else {
                     ventasSeleccionadas = ventasSeleccionadas.filter(val => val.id !== id);
                     totalPendienteMultiple -= pendiente;
+                    $('#checkAllVentas').prop('checked', false);
                 }
 
                 $('#contadorSeleccionadas').text(ventasSeleccionadas.length);
@@ -1117,57 +1138,51 @@ try {
                 }
             });
 
-            // Al hacer clic en el botón de pago múltiple
+            // Al hacer clic en el bot�n de pago m�ltiple
             $('#btnPagarMultiple').on('click', function() {
-                let totalPend = 0;
-                let count = 0;
-                
-                $('#tablaVentas .pago-checkbox:checked').each(function() {
-                    totalPend += parseFloat($(this).data('pendiente'));
-                    count++;
-                });
+                let ids = [];
+                let htmlPagos = '<h6 class="mb-3 text-primary"><i class="ti ti-list-check"></i> Ventas seleccionadas:</h6>';
 
-                let htmlPagos = `
-                    <div class="alert alert-info py-2 mb-3">
-                        <strong>${count} ventas seleccionadas</strong>
-                        &mdash; Total pendiente: ${formatoMoneda(totalPend)}
-                    </div>
-                    <div class="row align-items-center">
-                        <div class="col-sm-6">
-                            <label class="form-label fw-bold mb-0">Total a pagar</label>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="input-group">
-                                <span class="input-group-text bg-success text-white border-success">$</span>
-                                <input type="text" step="0.01" class="form-control border-success fw-bold input-total-pago-multiple text-end" value="${totalPend.toFixed(2)}" max="${totalPend.toFixed(2)}">
-                            </div>
-                        </div>
-                    </div>
-                    <small class="text-muted mt-2 d-block">El pago se distribuirá en cascada: salda la primera venta, luego la siguiente.</small>
-                `;
+                $('#tablaVentas .pago-checkbox:checked').each(function() {
+                    let id = $(this).data('id');
+                    let pendiente = parseFloat($(this).data('pendiente'));
+                    ids.push(id);
+
+                    htmlPagos += '<div class="d-flex justify-content-between align-items-center py-1 px-2 bg-white border rounded mb-1 pago-item" data-id="' + id + '" data-pendiente="' + pendiente + '"><span class="fw-bold">Venta #' + id + '</span><span class="text-danger fw-bold">' + formatoMoneda(pendiente) + '</span></div>';
+                });
 
                 $('#contenedorPagosMultiples').html(htmlPagos).fadeIn();
 
-                // Ocultar filas individuales
                 $('#montoTotalDisplay').closest('.row').hide();
                 $('#comisionAmiriDisplay').closest('.row').hide();
                 $('#estadoActualDisplay').closest('.row').hide();
                 $('#montoPagarFormatted').closest('.row.mb-3').hide();
+                $('#grupoMontoGlobal').show();
 
                 $('#cuentaPagoSelect').val('');
                 $('#btnLiquidarDeuda').hide();
-                $('#resumenPago').hide();
+                $('#resumenPagoMultiple').hide();
                 $('#fechaPago').val("<?= date('Y-m-d') ?>");
 
-                $('#formPagarVenta').data('modo', 'masivo');
-                $('#modalPagarVenta').modal("show");
+                var seleccionados = $('.pago-checkbox:checked');
+                var count = seleccionados.length;
+                var totalPendiente = 0;
+                seleccionados.each(function() { totalPendiente += parseFloat($(this).data('pendiente')); });
+                $('#resumenPagoMultiple').show().find('#nombreClientePago').text('Pago m\u00faltiple (' + count + ' ventas)');
+                $('#alertaDeudaTotal').show();
+                $('#deudaTotalCliente').text('$' + totalPendiente.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','));
+                $('#monto_a_pagar_input_multi').val(totalPendiente.toFixed(2));
+
+                $('#formPagarVenta').data('modo', 'masivo').data('ids', ids);
+                $('#modalPagarVenta').modal('show');
             });
 
-            // Limpiar selección cuando la tabla se recargue
+            // Limpiar selecci�n cuando la tabla se recargue
             tablaVentas.on('draw', function() {
                 ventasSeleccionadas = [];
                 totalPendienteMultiple = 0;
                 $('#btnPagarMultipleContainer').hide();
+                $('#checkAllVentas').prop('checked', false);
             });
 
 
@@ -1176,7 +1191,7 @@ try {
                 let val = parseFloat($(this).val()) || 0;
                 if (val > max) {
                     $(this).val(max.toFixed(2));
-                    showToast("No puedes abonar más del saldo pendiente", "warning");
+                    showToast("No puedes abonar m�s del saldo pendiente", "warning");
                 }
             });
 
@@ -1232,7 +1247,7 @@ try {
 
 
 
-            // Escuchar cambios en selector de cuenta para mostrar/ocultar botón de liquidar
+            // Escuchar cambios en selector de cuenta para mostrar/ocultar bot�n de liquidar
 
             $('#cuentaPagoSelect').on('change', function() {
 
@@ -1256,7 +1271,7 @@ try {
 
                     
 
-                    // Mostrar botón solo si la cuenta tiene saldo suficiente
+                    // Mostrar bot�n solo si la cuenta tiene saldo suficiente
 
                     if (saldoCuenta >= pendiente && pendiente > 0) {
 
@@ -1278,7 +1293,7 @@ try {
 
 
 
-            // Evento clic en botón Liquidar Deuda Total
+            // Evento clic en bot�n Liquidar Deuda Total
 
             $('#btnLiquidarDeuda').on('click', function() {
 
@@ -1310,11 +1325,11 @@ try {
 
 
 
-            // Formatear monto en tiempo real como guía visual
+            // Formatear monto en tiempo real como gu�a visual
 
             $('#montoPagarFormatted').on('input', function() {
 
-                let valor = $(this).val().replace(/[^0-9.]/g, ''); // Solo números y punto
+                let valor = $(this).val().replace(/[^0-9.]/g, ''); // Solo n�meros y punto
 
                 const spanFormato = $('#montoFormateado');
 
@@ -1404,7 +1419,7 @@ try {
 
                 } else {
 
-                    resumen += ` <strong>¡Venta saldada completamente!</strong>`;
+                    resumen += ` <strong>�Venta saldada completamente!</strong>`;
 
                 }
 
@@ -1436,23 +1451,23 @@ try {
                 let arrayPagos = [];
 
                 if (modoPago === 'masivo') {
-                    let totalPago = parseFloat($('.input-total-pago-multiple').val()) || 0;
-                    if (totalPago <= 0) return alert("Ingresa un monto mayor a $0.00.");
-                    let remaining = totalPago;
-                    $('#tablaVentas .pago-checkbox:checked').each(function() {
+                    let montoTotal = parseFloat($('#monto_a_pagar_input_multi').val()) || 0;
+                    if (montoTotal <= 0) return alert("Ingresa un monto valido.");
+                    let restante = montoTotal;
+                    $('.pago-item').each(function() {
                         let id = $(this).data('id');
-                        let pendiente = parseFloat($(this).data('pendiente'));
-                        let abono = Math.min(remaining, pendiente);
-                        if (abono > 0) {
-                            arrayPagos.push({ id, abono });
-                            remaining -= abono;
+                        let pendiente = parseFloat($(this).data('pendiente')) || 0;
+                        let abono = Math.min(pendiente, restante);
+                        if (abono > 0.01) {
+                            arrayPagos.push({ id: id, abono: abono });
+                            restante -= abono;
                         }
                     });
-                    if (arrayPagos.length === 0) return alert("Ingresa un monto mayor a $0.00.");
+                    if (arrayPagos.length === 0) return alert("No se pudo distribuir el monto entre las ventas seleccionadas.");
                 } else {
                     const id = $('#ventaId').val();
                     const montoAPagar = parseMoneda($('#montoPagarHidden').val());
-                    if (montoAPagar <= 0) return alert("Ingresa un monto válido.");
+                    if (montoAPagar <= 0) return alert("Ingresa un monto v�lido.");
                     arrayPagos.push({ id: id, abono: montoAPagar });
                 }
 
@@ -1541,36 +1556,11 @@ try {
                         }
                     },
                     {
-                        data: null,
+                        data: 'moneda',
                         className: 'text-center',
                         render: function(data) {
-                            const total = parseFloat(data.monto_total) || 0;
-                            const com = parseFloat(data.comision_amiri) || 0;
-                            if (total <= 0 || com <= 0) return '<span class="text-muted">—</span>';
-                            const pct = (com / total) * 100;
-                            const cls = pct >= 2 ? 'bg-success bg-opacity-10 text-success' : 'bg-info bg-opacity-10 text-info';
-                            return `<span class="badge ${cls}">${pct.toFixed(2)}%</span>`;
-                        }
-                    },
-                    
-                    {
-                        data: null,
-                        className: 'text-center',
-                        render: function(data) {
-                            const total = parseFloat(data.monto_total) || 0;
-                            const com = parseFloat(data.comision_amiri) || 0;
-                            if (total <= 0 || com <= 0) return '<span class="text-muted">—</span>';
-                            const pct = (com / total) * 100;
-                            const cls = pct >= 2 ? 'bg-success bg-opacity-10 text-success' : 'bg-info bg-opacity-10 text-info';
-                            return `<span class="badge ${cls}">${pct.toFixed(2)}%</span>`;
-                        }
-                    },
-                    
-                    {
-                        data: null,
-                        render: function(data) {
-                            const moneda = data.moneda || 'MXN';
-                            return formatoMonedaDinamica(data.comision_promotor, moneda);
+                            const cls = data === 'USD' ? 'bg-success bg-opacity-10 text-success' : 'bg-info bg-opacity-10 text-info';
+                            return `<span class="badge ${cls}">${data}</span>`;
                         }
                     },
                     {
@@ -1615,7 +1605,7 @@ try {
 
                         render: function(data) {
 
-                            if (!data) return '<span class="text-muted">—</span>';
+                            if (!data) return '<span class="text-muted">�</span>';
 
                             return '$' + parseFloat(data).toLocaleString('es-MX', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
 
@@ -1659,7 +1649,7 @@ try {
 
 
 
-                if (!confirm("¿Eliminar esta venta? Esta acción no se puede deshacer.")) return;
+                if (!confirm("�Eliminar esta venta? Esta acci�n no se puede deshacer.")) return;
 
 
 

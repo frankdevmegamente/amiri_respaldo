@@ -40,6 +40,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
   <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 
 <style>
@@ -52,12 +53,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             padding-top: 15px !important;
             margin-top: 0 !important;
         }
-   body[data-bs-theme="dark"] .logo-modo-claro,
+   [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
         }
 
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }
@@ -356,13 +357,22 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 </div>
                 <div class="col-md-6">
                   <div class="d-flex align-items-center justify-content-md-end gap-2">
-                    <button class="month-nav-btn" id="btnMesAnterior" title="Mes anterior">
-                      <i class="ti ti-chevron-left"></i>
+                    <select class="form-select form-select-sm" id="selectPeriodo" style="min-width:130px;">
+                      <option value="mes" selected>Este Mes</option>
+                      <option value="mes_pasado">Mes Pasado</option>
+                      <option value="anio">Este Año</option>
+                      <option value="rango">Fecha Personalizada</option>
+                    </select>
+                    <div id="fechaInicioGroup" style="display:none;min-width:120px;">
+                      <input type="date" class="form-control form-control-sm" id="fechaInicio">
+                    </div>
+                    <div id="fechaFinGroup" style="display:none;min-width:120px;">
+                      <input type="date" class="form-control form-control-sm" id="fechaFin">
+                    </div>
+                    <button class="btn btn-primary btn-sm" id="btnFiltrar">
+                      <i class="ti ti-filter"></i> Aplicar
                     </button>
-                    <select class="form-select d-inline-block" id="selectMes" style="width:auto;min-width:140px;"></select>
-                    <button class="month-nav-btn" id="btnMesSiguiente" title="Mes siguiente">
-                      <i class="ti ti-chevron-right"></i>
-                    </button>
+                    <span class="badge bg-primary bg-opacity-10 text-primary border-0 py-1 px-2" id="rangoFechas"><i class="ti ti-calendar me-1"></i>Este Mes</span>
                     <div class="vr mx-1"></div>
                     <button class="btn btn-outline-primary btn-sm" id="btnPDF" title="Generar PDF">
                       <i class="ti ti-file-text"></i>
@@ -580,7 +590,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
           <!-- ============================================
                FIFO USDT
                ============================================ -->
-          <div class="card shadow-sm mb-4">
+          <div class="card shadow-sm mb-4" style="display:none">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
               <h5 class="mb-0"><i class="ti ti-currency-tenge"></i> FIFO USDT</h5>
               <ul class="nav nav-tabs card-header-tabs" id="fifoTabs">
@@ -671,8 +681,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
   <script>
 
     // ─── State ───────────────────────────────────────────────
-    let mesActual = '<?= substr($_SESSION['mes_activo'] ?? date('Y-m'), 5, 2) ?>';
-    let anioActual = '<?= substr($_SESSION['mes_activo'] ?? date('Y-m'), 0, 4) ?>';
     let comisionesChart = null;
     let gastosDonaChart = null;
 
@@ -692,53 +700,44 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         return parseFloat(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    // ─── Month Selector ──────────────────────────────────────
-    function cargarSelectMeses() {
-        let $sel = $('#selectMes');
-        $sel.empty();
-        let minMes = 4;
-        let m = parseInt(mesActual), a = parseInt(anioActual);
-        let now = new Date();
-        let currentM = now.getMonth() + 1;
-        let currentY = now.getFullYear();
-
-        while (a > 2026 || (a === 2026 && m >= minMes)) {
-            let val = a + '-' + String(m).padStart(2, '0');
-            let sel = (m === parseInt(mesActual) && a === parseInt(anioActual)) ? 'selected' : '';
-            $sel.prepend('<option value="' + val + '" ' + sel + '>' + nombresMeses[m] + ' ' + a + '</option>');
-            m--;
-            if (m < 1) { m = 12; a--; }
-            if (a === 2026 && m < minMes) break;
+    // ─── Period Filter ───────────────────────────────────────
+    function getFilterParams() {
+        const periodo = $('#selectPeriodo').val();
+        const now = new Date();
+        if (periodo === 'mes_pasado') {
+            const d = new Date(); d.setMonth(d.getMonth() - 1);
+            const anio = d.getFullYear(), mes = String(d.getMonth()+1).padStart(2,'0');
+            const dias = new Date(anio, d.getMonth()+1, 0).getDate();
+            return { periodo: 'mes_pasado', mes: mes, anio: anio, fechaInicio: anio+'-'+mes+'-01', fechaFin: anio+'-'+mes+'-'+dias };
         }
+        if (periodo === 'anio') {
+            return { periodo: 'anio', anio: now.getFullYear() };
+        }
+        if (periodo === 'rango') {
+            return { periodo: 'rango', fechaInicio: $('#fechaInicio').val(), fechaFin: $('#fechaFin').val() };
+        }
+        // mes (default)
+        const mes = String(now.getMonth()+1).padStart(2,'0');
+        return { periodo: 'mes', mes: mes, anio: now.getFullYear() };
     }
 
-    $(document).on('change', '#selectMes', function() {
-        let parts = $(this).val().split('-');
-        mesActual = parts[1];
-        anioActual = parts[0];
-        actualizarDashboard();
+    function getFilterQueryString() {
+        const p = getFilterParams();
+        if (p.periodo === 'anio') return 'anio=' + p.anio;
+        if (p.periodo === 'rango') return 'fecha_desde=' + p.fechaInicio + '&fecha_hasta=' + p.fechaFin;
+        return 'mes=' + p.mes + '&anio=' + p.anio;
+    }
+
+    $(document).on('change', '#selectPeriodo', function() {
+        if ($(this).val() === 'rango') {
+            $('#fechaInicioGroup, #fechaFinGroup').show();
+        } else {
+            $('#fechaInicioGroup, #fechaFinGroup').hide();
+            actualizarDashboard();
+        }
     });
 
-    $('#btnMesAnterior').on('click', function() {
-        let m = parseInt(mesActual) - 1;
-        let a = parseInt(anioActual);
-        if (m < 1) { m = 12; a--; }
-        if (a < 2026 || (a === 2026 && m < 4)) return;
-        mesActual = String(m).padStart(2, '0');
-        anioActual = String(a);
-        $('#selectMes').val(a + '-' + mesActual);
-        actualizarDashboard();
-    });
-
-    $('#btnMesSiguiente').on('click', function() {
-        let m = parseInt(mesActual) + 1;
-        let a = parseInt(anioActual);
-        if (m > 12) { m = 1; a++; }
-        let now = new Date();
-        if (a > now.getFullYear() || (a === now.getFullYear() && m > now.getMonth() + 1)) return;
-        mesActual = String(m).padStart(2, '0');
-        anioActual = String(a);
-        $('#selectMes').val(a + '-' + mesActual);
+    $(document).on('click', '#btnFiltrar', function() {
         actualizarDashboard();
     });
 
@@ -746,20 +745,32 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
     // ─── Cargar datos del dashboard ──────────────────────────
     function actualizarDashboard() {
-        let mesParam = anioActual + '-' + mesActual;
+        const fp = getFilterParams();
+        const periodo = $('#selectPeriodo').val();
+        var periodoTexto = { 'mes': 'Este Mes', 'mes_pasado': 'Mes Pasado', 'anio': 'Este Año', 'rango': 'Fecha Personalizada' };
+        var label = periodoTexto[periodo] || 'Este Mes';
+        $('#rangoFechas').html('<i class="ti ti-calendar me-1"></i>' + label);
 
-        // Update header
-        $('#mesLabel').text(nombresMeses[parseInt(mesActual)] + ' ' + anioActual);
+        if (fp.periodo === 'anio') {
+            $('#mesLabel').text('Año ' + fp.anio);
+        } else if (fp.periodo === 'rango') {
+            $('#mesLabel').text(fp.fechaInicio + ' al ' + fp.fechaFin);
+        } else {
+            const mm = parseInt(fp.mes);
+            const aa = parseInt(fp.anio);
+            $('#mesLabel').text(nombresMeses[mm] + ' ' + aa);
+        }
 
-        cargarResumen(mesParam);
-        cargarComisionesChart(mesActual, anioActual);
+        const qs = getFilterQueryString();
+        cargarResumen(qs);
+        cargarComisionesChart(qs);
         cargarTipoDeCambioYCripto();
     }
 
-    function cargarResumen(mesParam) {
-        $.getJSON('api/capital.php?tipo=resumen&mes=' + mesParam, function(data) {
-            let m = parseInt(data.mes_actual.substr(5,2));
-            let a = data.mes_actual.substr(0,4);
+    function cargarResumen(qs) {
+        $.getJSON('api/capital.php?tipo=resumen&' + qs, function(data) {
+            let m = data.mes_actual ? parseInt(data.mes_actual.substr(5,2)) : new Date().getMonth()+1;
+            let a = data.mes_actual ? data.mes_actual.substr(0,4) : new Date().getFullYear();
 
             // Estado del mes
             let estadoHtml = data.mes_cerrado
@@ -866,8 +877,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     }
 
     // ─── Comisiones Chart (ApexCharts Area) ──────────────────
-    function cargarComisionesChart(mes, anio) {
-        $.getJSON('api/dashboard.php?tipo=comisiones_amiri&mes=' + mes + '&anio=' + anio, function(data) {
+    function cargarComisionesChart(qs) {
+        $.getJSON('api/dashboard.php?tipo=comisiones_amiri&' + qs, function(data) {
             if (data.error) { console.error(data.error); return; }
             renderComisionesChart(data.grafica_fechas || [], data.grafica_montos || []);
         }).fail(function() { console.error('Error cargando comisiones chart'); });
@@ -1016,7 +1027,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
     // ─── PDF ─────────────────────────────────────────────────
     $('#btnPDF').on('click', function() {
-        let url = 'api/dashboard.php?tipo=comisiones_amiri&pdf=1&mes=' + mesActual + '&anio=' + anioActual;
+        const fp = getFilterParams();
+        let url = 'api/dashboard.php?tipo=comisiones_amiri&pdf=1&' + getFilterQueryString();
         window.open(url, '_blank');
     });
 
@@ -1084,7 +1096,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     }
 
     // ─── Init ────────────────────────────────────────────────
-    cargarSelectMeses();
     actualizarDashboard();
     cargarFifoUsdt();
 

@@ -22,8 +22,8 @@ $cuentas = $pdo->query("SELECT id, nombre, saldo_actual FROM cuentas WHERE activ
     <style>
         .body-wrapper { padding-top: 100px !important; }
         .body-wrapper-inner, .body-wrapper .container-fluid { padding-top: 15px !important; margin-top: 0 !important; }
-        body[data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
-        body[data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
+        [data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
+        [data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
 
         /* ─── Page Header ─────────────────────────────── */
         .loans-header { position: relative; overflow: hidden; border-radius: 16px !important; }
@@ -76,6 +76,7 @@ $cuentas = $pdo->query("SELECT id, nombre, saldo_actual FROM cuentas WHERE activ
         [data-bs-theme="dark"] .bg-warning.bg-opacity-10 { background-color: rgba(255, 193, 7, 0.12) !important; }
         [data-bs-theme="dark"] .bg-danger.bg-opacity-10 { background-color: rgba(220, 53, 69, 0.12) !important; }
     </style>
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
@@ -108,9 +109,6 @@ $cuentas = $pdo->query("SELECT id, nombre, saldo_actual FROM cuentas WHERE activ
                                 </div>
                                 <div class="col-md-auto">
                                     <div class="d-flex align-items-center gap-2">
-                                        <button id="btnCobroMasivo" class="btn btn-success btn-sm" style="display:none;">
-                                            <i class="ti ti-cash"></i> Cobro (<span id="countCheck">0</span>)
-                                        </button>
                                         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevoPrestamo">
                                             <i class="ti ti-plus"></i> Nuevo Préstamo
                                         </button>
@@ -195,7 +193,6 @@ $cuentas = $pdo->query("SELECT id, nombre, saldo_actual FROM cuentas WHERE activ
                                 <thead>
                                     <tr>
                                         <th style="width: 30px;"></th>
-                                        <th style="width: 30px;"><input type="checkbox" id="checkAll"></th>
                                         <th>Deudor</th>
                                         <th>Préstamos</th>
                                         <th>Total Prestado</th>
@@ -299,7 +296,7 @@ $cuentas = $pdo->query("SELECT id, nombre, saldo_actual FROM cuentas WHERE activ
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary"><i class="ti ti-device-floppy"></i> Confirmar Salida de Dinero</button>
+                        <button type="submit" class="btn btn-primary"><i class="ti ti-device-floppy"></i> Confirmar</button>
                     </div>
                 </form>
             </div>
@@ -363,13 +360,6 @@ $cuentas = $pdo->query("SELECT id, nombre, saldo_actual FROM cuentas WHERE activ
                         defaultContent: '<i class="ti ti-chevron-right text-muted"></i>'
                     },
                     {
-                        data: null, orderable: false,
-                        render: function(d, t, row) {
-                            if (parseFloat(row.total_pendiente) <= 0) return '';
-                            return '<input type="checkbox" class="check-d form-check-input" data-nombre="' + row.persona_nombre.replace(/"/g, '&quot;') + '" data-pendiente="' + row.total_pendiente + '">';
-                        }
-                    },
-                    {
                         data: 'persona_nombre',
                         render: function(n) {
                             var color = getAvatarColor(n);
@@ -403,7 +393,7 @@ $cuentas = $pdo->query("SELECT id, nombre, saldo_actual FROM cuentas WHERE activ
                     }
                 ],
                 scrollX: true,
-                order: [[6, 'desc']],
+                order: [[5, 'desc']],
                 language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' }
             });
 
@@ -430,22 +420,6 @@ $cuentas = $pdo->query("SELECT id, nombre, saldo_actual FROM cuentas WHERE activ
                 }
             });
 
-            // ─── Checkbox cobro masivo ───────────────────
-            $('#checkAll').change(function() {
-                $('.check-d').prop('checked', $(this).prop('checked')).trigger('change');
-            });
-            $(document).on('change', '.check-d', function() {
-                var sel = $('.check-d:checked');
-                $('#countCheck').text(sel.length);
-                if (sel.length > 0) {
-                    $('#btnCobroMasivo').fadeIn();
-                    $('#checkAll').prop('checked', sel.length === $('.check-d').length);
-                } else {
-                    $('#btnCobroMasivo').fadeOut();
-                    $('#checkAll').prop('checked', false);
-                }
-            });
-
             // ─── Cobro individual ────────────────────────
             $(document).on('click', '.btn-cobrar-deudor', function() {
                 var nombre = $(this).data('nombre');
@@ -458,31 +432,6 @@ $cuentas = $pdo->query("SELECT id, nombre, saldo_actual FROM cuentas WHERE activ
                 $('#cuenta_cobro_id').val('');
                 $('#fecha_cobro').val(new Date().toISOString().slice(0, 10));
                 $('#formCobro').data('modo', 'individual').data('nombre', nombre);
-                $('#modalCobro').modal('show');
-            });
-
-            // ─── Cobro masivo ────────────────────────────
-            $('#btnCobroMasivo').click(function() {
-                var seleccionados = [];
-                $('.check-d:checked').each(function() {
-                    seleccionados.push({ nombre: $(this).data('nombre'), pendiente: parseFloat($(this).data('pendiente')) });
-                });
-                if (!seleccionados.length) return;
-
-                var totalPendiente = seleccionados.reduce(function(s, d) { return s + d.pendiente; }, 0);
-                var htmlPagos = '<h6 class="mb-3 text-primary"><i class="ti ti-list-check"></i> Deudores seleccionados:</h6>';
-                seleccionados.forEach(function(d) {
-                    htmlPagos += '<div class="d-flex justify-content-between align-items-center py-1 px-2 bg-white border rounded mb-1"><span class="fw-bold">' + d.nombre + '</span><span class="text-danger fw-bold">$' + fmt(d.pendiente) + '</span></div>';
-                });
-
-                $('#contenedorPagosMultiples').html(htmlPagos).fadeIn();
-                $('#resumenDeudor').hide();
-                $('#alertaDeudaTotal').show();
-                $('#deudaTotalSugerida').text('$' + fmt(totalPendiente));
-                $('#monto_a_pagar_input').val(totalPendiente.toFixed(2));
-                $('#cuenta_cobro_id').val('');
-                $('#fecha_cobro').val(new Date().toISOString().slice(0, 10));
-                $('#formCobro').data('modo', 'masivo').data('nombres', seleccionados.map(function(d) { return d.nombre; }));
                 $('#modalCobro').modal('show');
             });
 
@@ -515,13 +464,7 @@ $cuentas = $pdo->query("SELECT id, nombre, saldo_actual FROM cuentas WHERE activ
                     return alert("Selecciona una cuenta de destino.");
                 }
 
-                var nombres = [];
-                var modoPago = $('#formCobro').data('modo');
-                if (modoPago === 'masivo') {
-                    nombres = $('#formCobro').data('nombres') || [];
-                } else {
-                    nombres = [$('#formCobro').data('nombre')];
-                }
+                var nombres = [$('#formCobro').data('nombre')];
                 if (!nombres.length) {
                     btnSubmit.prop('disabled', false).text('Confirmar Entrada de Efectivo');
                     return alert("No hay deudores seleccionados.");
@@ -557,8 +500,6 @@ $cuentas = $pdo->query("SELECT id, nombre, saldo_actual FROM cuentas WHERE activ
                         }),
                         success: function() {
                             $('#modalCobro').modal('hide');
-                            $('#btnCobroMasivo').hide();
-                            $('#checkAll').prop('checked', false);
                             table.ajax.reload();
                             cargarResumen();
                         },

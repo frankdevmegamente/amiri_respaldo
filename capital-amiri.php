@@ -24,6 +24,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.css" />
 <style>
+    [data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
+    [data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
     .body-wrapper { padding-top: 100px !important; }
     .body-wrapper-inner,
     .body-wrapper .container-fluid {
@@ -50,8 +52,9 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     .table-reportes th { position: sticky; top: 0; background: #fff; z-index: 2; }
     [data-bs-theme="dark"] .table-reportes th,
     .dark-mode .table-reportes th { background: #1e2a3a; }
-    body[data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
+    [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
 </style>
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
@@ -387,7 +390,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 <div class="card shadow-sm mb-3">
                     <div class="card-header bg-transparent py-2 d-flex align-items-center justify-content-between">
                         <h6 class="fw-semibold mb-0"><i class="ti ti-calendar-stats text-primary me-2"></i>Cortes Mensuales</h6>
-                        <small class="text-muted">Detalle completo mes a mes</small>
+                        <div>
+                            <small class="text-muted me-2">Detalle completo mes a mes</small>
+                            <button class="btn btn-sm btn-outline-warning" id="btnAbrirMes"><i class="ti ti-lock-open"></i> Abrir Mes</button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -425,6 +431,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                         <th>Fecha</th>
                                         <th>Monto</th>
                                         <th>Concepto</th>
+                                        <th>Cuenta</th>
                                         <th>Registrado por</th>
                                         <th>Registrado el</th>
                                     </tr>
@@ -471,6 +478,38 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 </div>
 
 <!-- Modal: Retiro -->
+<div class="modal fade" id="modalAbrirMes" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title"><i class="ti ti-lock-open text-warning me-2"></i>Abrir Mes Cerrado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning small mb-3">
+                    <i class="ti ti-alert-triangle me-1"></i>
+                    <strong>Precaución:</strong> Al abrir un mes se eliminará el corte mensual y se revertirán los ajustes de capital asociados. Podrás volver a cerrar después de verificar los datos.
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" for="abrirMesSelect">Mes a abrir</label>
+                    <select class="form-select fs-5 fw-bold" id="abrirMesSelect">
+                        <option value="">Selecciona un mes...</option>
+                    </select>
+                </div>
+                <div id="abrirMesInfo" class="bg-light rounded p-3 small" style="display:none;">
+                    <div class="d-flex justify-content-between mb-1"><span>Utilidad Neta:</span><span id="abrirMesUtilidad">$0</span></div>
+                    <div class="d-flex justify-content-between mb-1"><span>Capital Acumulado:</span><span id="abrirMesCapital">$0</span></div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-warning" id="btnConfirmarAbrirMes" disabled><i class="ti ti-lock-open"></i> Abrir Mes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Retiro -->
 <div class="modal fade" id="modalRetiroCapital" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -484,6 +523,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         <span>Capital Amiri (saldo actual):</span>
                         <span class="fw-bold text-success fs-6" id="retiroSaldoActual">$0</span>
                     </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Cuenta origen</label>
+                    <select class="form-select" id="retiroCuenta">
+                        <option value="">-- Selecciona una cuenta --</option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Monto</label>
@@ -654,43 +699,63 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         });
     }
 
-    function cargarHistorialCortes() {
-        $.getJSON('api/capital.php?tipo=cierres', function(data) {
-            var tbody = '';
-            data.forEach(function(r) {
-                tbody += '<tr><td>' + r.mes + '</td><td class="text-end text-success">$' + formatoNumero(r.utilidad_neta) + '</td><td class="text-end text-primary fw-bold">$' + formatoNumero(r.capital_acumulado) + '</td></tr>';
-            });
-            $('#tablaHistorialCortes tbody').html(tbody || '<tr><td colspan="3" class="text-muted text-center">Sin cortes registrados</td></tr>');
-            if (data.length < 2) { if (chartHistorial) chartHistorial.destroy(); chartHistorial = null; return; }
-            var labels = data.map(function(d) { return d.mes; });
-            var utilidades = data.map(function(d) { return parseFloat(d.utilidad_neta); });
-            var capitales = data.map(function(d) { return parseFloat(d.capital_acumulado); });
-            if (chartHistorial) chartHistorial.destroy();
-            chartHistorial = new Chart(document.getElementById('chartHistorialCortes'), {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [
-                        { label: 'Capital Acumulado', data: capitales, type: 'line', borderColor: '#5D87FF', backgroundColor: 'rgba(93,135,255,0.1)', fill: true, tension: 0.4, pointRadius: 3, yAxisID: 'y1' },
-                        { label: 'Utilidad Neta', data: utilidades, backgroundColor: 'rgba(19,222,185,0.7)', borderColor: '#13DEB9', borderWidth: 1, borderRadius: 4, yAxisID: 'y' },
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 8, font: { size: 10 } } } },
-                    scales: {
-                        y: { beginAtZero: true, position: 'left', grid: { display: false } },
-                        y1: { beginAtZero: false, position: 'right', grid: { display: false } }
-                    }
+    var _cierresData = null;
+
+    function _renderHistorialCortes(data) {
+        var tbody = '';
+        data.forEach(function(r) {
+            tbody += '<tr><td>' + r.mes + '</td><td class="text-end text-success">$' + formatoNumero(r.utilidad_neta) + '</td><td class="text-end text-primary fw-bold">$' + formatoNumero(r.capital_acumulado) + '</td></tr>';
+        });
+        $('#tablaHistorialCortes tbody').html(tbody || '<tr><td colspan="3" class="text-muted text-center">Sin cortes registrados</td></tr>');
+        if (data.length < 2) { if (chartHistorial) chartHistorial.destroy(); chartHistorial = null; return; }
+        var labels = data.map(function(d) { return d.mes; });
+        var utilidades = data.map(function(d) { return parseFloat(d.utilidad_neta); });
+        var capitales = data.map(function(d) { return parseFloat(d.capital_acumulado); });
+        if (chartHistorial) chartHistorial.destroy();
+        chartHistorial = new Chart(document.getElementById('chartHistorialCortes'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Capital Acumulado', data: capitales, type: 'line', borderColor: '#5D87FF', backgroundColor: 'rgba(93,135,255,0.1)', fill: true, tension: 0.4, pointRadius: 3, yAxisID: 'y1' },
+                    { label: 'Utilidad Neta', data: utilidades, backgroundColor: 'rgba(19,222,185,0.7)', borderColor: '#13DEB9', borderWidth: 1, borderRadius: 4, yAxisID: 'y' },
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', labels: { boxWidth: 12, padding: 8, font: { size: 10 } } } },
+                scales: {
+                    y: { beginAtZero: true, position: 'left', grid: { display: false } },
+                    y1: { beginAtZero: false, position: 'right', grid: { display: false } }
                 }
-            });
+            }
         });
     }
 
-    function cargarCierres() {
-        if (tablaCierres) { tablaCierres.ajax.reload(); return; }
-        tablaCierres = $('#tablaCierres').DataTable({
-            ajax: { url: 'api/capital.php?tipo=cierres', dataSrc: '' },
+    function _renderGrafica(data) {
+        if (!data.length) return;
+        if (chartEvolucion) chartEvolucion.destroy();
+        var reversed = data.slice().reverse();
+        var ctx = document.getElementById('chartEvolucionCapital').getContext('2d');
+        chartEvolucion = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: reversed.map(function(d) { return d.mes; }),
+                datasets: [
+                    { label: 'Capital Acumulado', data: reversed.map(function(d) { return parseFloat(d.capital_acumulado); }), borderColor: '#5D87FF', backgroundColor: 'rgba(93,135,255,0.1)', fill: true, tension: 0.4, pointRadius: 3 },
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: false, grid: { display: true, drawBorder: false } } }
+            }
+        });
+    }
+
+    function cargarCierres(data) {
+        if (tablaCierres) { if (data) { tablaCierres.clear().rows.add(data).draw(); } else { tablaCierres.ajax.reload(); } return; }
+        var opts = {
             columns: [
                 { data: 'mes' },
                 { data: 'fecha_cierre', render: function(d) { return d ? d.split(' ')[0] : '-'; } },
@@ -703,7 +768,9 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             order: [[0, 'desc']],
             scrollX: true,
             language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' }
-        });
+        };
+        if (data) { opts.data = data; } else { opts.ajax = { url: 'api/capital.php?tipo=cierres', dataSrc: '' }; }
+        tablaCierres = $('#tablaCierres').DataTable(opts);
     }
 
     function cargarRetiros() {
@@ -714,6 +781,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 { data: 'fecha' },
                 { data: 'monto', className: 'text-end', render: function(d) { return '$' + formatoNumero(d); } },
                 { data: 'concepto' },
+                { data: 'cuenta_nombre', render: function(d) { return d || '-'; } },
                 { data: 'usuario_nombre' },
                 { data: 'created_at', render: function(d) { return d ? d.split(' ')[0] : '-'; } },
             ],
@@ -770,26 +838,18 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         });
     }
 
-    function cargarGrafica() {
-        if (chartEvolucion) { chartEvolucion.destroy(); }
+    function cargarCierresYGraficas() {
+        if (_cierresData) {
+            cargarCierres(_cierresData);
+            _renderHistorialCortes(_cierresData);
+            _renderGrafica(_cierresData);
+            return;
+        }
         $.getJSON('api/capital.php?tipo=cierres', function(data) {
-            if (!data.length) return;
-            var reversed = data.slice().reverse();
-            var ctx = document.getElementById('chartEvolucionCapital').getContext('2d');
-            chartEvolucion = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: reversed.map(function(d) { return d.mes; }),
-                    datasets: [
-                        { label: 'Capital Acumulado', data: reversed.map(function(d) { return parseFloat(d.capital_acumulado); }), borderColor: '#5D87FF', backgroundColor: 'rgba(93,135,255,0.1)', fill: true, tension: 0.4, pointRadius: 3 },
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: false, grid: { display: true, drawBorder: false } } }
-                }
-            });
+            _cierresData = data;
+            cargarCierres(data);
+            _renderHistorialCortes(data);
+            _renderGrafica(data);
         });
     }
 
@@ -892,9 +952,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             if (res.success) {
                 $('#modalCerrarMes').modal('hide');
                 cargarResumen();
-                if (tablaCierres) tablaCierres.ajax.reload();
-                cargarHistorialCortes();
-                cargarGrafica();
+                _cierresData = null;
+                cargarCierresYGraficas();
                 if (typeof toastr !== 'undefined') { toastr.success('Mes ' + mes + ' cerrado correctamente'); } else { alert('Mes cerrado'); }
             } else {
                 alert(res.error || 'Error al cerrar mes');
@@ -906,15 +965,80 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         }).always(function() { btn.prop('disabled', false).html('<i class="ti ti-lock"></i> Confirmar Cierre'); });
     });
 
+    // Abrir mes cerrado
+    $('#btnAbrirMes').on('click', function() {
+        $('#abrirMesSelect').val('');
+        $('#abrirMesInfo').hide();
+        $('#btnConfirmarAbrirMes').prop('disabled', true);
+        $.getJSON('api/capital.php?tipo=meses_cerrados', function(data) {
+            var sel = $('#abrirMesSelect').empty().append('<option value="">Selecciona un mes...</option>');
+            data.forEach(function(m) {
+                sel.append('<option value="' + m.mes + '" data-utilidad="' + m.utilidad_neta + '" data-capital="' + m.capital_acumulado + '">' + m.mes + '</option>');
+            });
+            if (data.length === 0) {
+                sel.append('<option value="" disabled>No hay meses cerrados</option>');
+            }
+        });
+        $('#modalAbrirMes').modal('show');
+    });
+
+    $('#abrirMesSelect').on('change', function() {
+        var opt = $(this).find(':selected');
+        var mes = $(this).val();
+        if (mes) {
+            $('#abrirMesUtilidad').text('$' + formatoNumero(opt.data('utilidad')));
+            $('#abrirMesCapital').text('$' + formatoNumero(opt.data('capital')));
+            $('#abrirMesInfo').show();
+            $('#btnConfirmarAbrirMes').prop('disabled', false);
+        } else {
+            $('#abrirMesInfo').hide();
+            $('#btnConfirmarAbrirMes').prop('disabled', true);
+        }
+    });
+
+    $('#btnConfirmarAbrirMes').on('click', function() {
+        var mes = $('#abrirMesSelect').val();
+        if (!mes) { alert('Selecciona un mes'); return; }
+        if (!confirm('¿Estás seguro de abrir el mes ' + mes + '? Se eliminará el corte y se revertirán los ajustes de capital.')) return;
+        var btn = $(this).prop('disabled', true).html('<i class="ti ti-loader spinner"></i> Abriendo...');
+        $.post('api/capital.php?tipo=abrir_mes', { mes: mes }, function(res) {
+            if (res.success) {
+                $('#modalAbrirMes').modal('hide');
+                cargarResumen();
+                _cierresData = null;
+                cargarCierresYGraficas();
+                if (typeof toastr !== 'undefined') { toastr.success(res.mensaje); } else { alert(res.mensaje); }
+            } else {
+                alert(res.error || 'Error al abrir mes');
+            }
+        }).fail(function(xhr) {
+            var err = 'Error al abrir mes';
+            try { err = JSON.parse(xhr.responseText).error || err; } catch(e) {}
+            alert(err);
+        }).always(function() { btn.prop('disabled', false).html('<i class="ti ti-lock-open"></i> Abrir Mes'); });
+    });
+
     // Abrir modal de retiro
     $('#btnRetiroCapital').on('click', function() {
         $('#retiroMonto').val('');
         $('#retiroConcepto').val('');
         $('#retiroFecha').val(new Date().toISOString().split('T')[0]);
         $('#retiroSaldoActual').text('$0');
+        $('#retiroCuenta').val('');
         $.getJSON('api/capital.php?tipo=resumen', function(data) {
             $('#retiroSaldoActual').text('$' + formatoNumero(data.utilidades_acumuladas));
             $('#retiroMontoTotalLabel').text(formatoNumero(data.utilidades_acumuladas));
+        });
+        $.get('api/cuentas.php?con_saldo=1&tipo_moneda=MXN', function(cuentas) {
+            var sel = $('#retiroCuenta').empty().append('<option value="">-- Selecciona una cuenta --</option>');
+            var filtradas = cuentas.filter(function(c) { return c.tipo_cuenta == 1 || c.tipo_cuenta == 2; });
+            filtradas.forEach(function(c) {
+                var saldo = parseFloat(c.saldo_actual || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                var nombreCuenta = c.nombre;
+                if (c.banco && c.banco.trim()) nombreCuenta += ' (' + c.banco + ')';
+                var label = c.numero_cuenta ? nombreCuenta + ' - Saldo: $' + saldo : nombreCuenta + ' - Saldo: $' + saldo;
+                sel.append('<option value="' + c.id + '" data-saldo="' + c.saldo_actual + '">' + label + '</option>');
+            });
         });
         $('#modalRetiroCapital').modal('show');
     });
@@ -930,6 +1054,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         var monto = parseFloat($('#retiroMonto').val()) || 0;
         var concepto = $('#retiroConcepto').val().trim();
         var fecha = $('#retiroFecha').val();
+        var cuentaId = $('#retiroCuenta').val();
+        if (!cuentaId) { alert('Selecciona una cuenta origen'); return; }
         if (monto <= 0) { alert('Ingresa un monto válido'); return; }
         if (!concepto) { alert('Ingresa un concepto'); return; }
         var saldoDisponible = parseFloat($('#retiroSaldoActual').text().replace(/[$,]/g, '')) || 0;
@@ -937,8 +1063,13 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             alert('El monto ($' + formatoNumero(monto) + ') excede el saldo disponible ($' + formatoNumero(saldoDisponible) + ')');
             return;
         }
+        var cuentaSaldo = parseFloat($('#retiroCuenta option:selected').data('saldo')) || 0;
+        if (monto > cuentaSaldo) {
+            alert('El monto ($' + formatoNumero(monto) + ') excede el saldo de la cuenta seleccionada ($' + formatoNumero(cuentaSaldo) + ')');
+            return;
+        }
         const btn = $(this).prop('disabled', true).html('<i class="ti ti-loader spinner"></i> Registrando...');
-        $.post('api/capital.php?tipo=retiro', { monto: monto, concepto: concepto, fecha: fecha }, function(res) {
+        $.post('api/capital.php?tipo=retiro', { monto: monto, concepto: concepto, fecha: fecha, cuenta_id: cuentaId }, function(res) {
             if (res.success) {
                 $('#modalRetiroCapital').modal('hide');
                 cargarResumen();
@@ -1021,10 +1152,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     // Init
     $(document).ready(function() {
         cargarResumen();
-        cargarCierres();
         cargarRetiros();
-        cargarHistorialCortes();
-        cargarGrafica();
+        cargarCierresYGraficas();
         cargarFiltroMeses();
         // Inicializar tooltips de Bootstrap
         $('[data-bs-toggle="tooltip"]').tooltip();

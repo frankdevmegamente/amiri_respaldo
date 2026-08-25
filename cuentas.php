@@ -71,12 +71,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         #cuentasTab .nav-link:not(.active):hover {
             color: #5D87FF;
         }
-         body[data-bs-theme="dark"] .logo-modo-claro,
+         [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
         }
 
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }
@@ -227,6 +227,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
     </style>
 
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 
 

@@ -45,6 +45,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 
 <style>
@@ -59,12 +60,12 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
             padding-top: 15px !important;
             margin-top: 0 !important;
         }
-     body[data-bs-theme="dark"] .logo-modo-claro,
+     [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
         }
 
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }
@@ -298,7 +299,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
                     <div class="row">
                         <div class="col-12">
-                            <div class="card">
+                            <div class="card shadow-sm border-0 mb-4">
                                 <div class="card-body p-4 table-responsive">
                                     <table id="tablaPromotores" class="table table-hover align-middle w-100">
                                         <thead>
@@ -526,7 +527,13 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
             console.log('🔵 usuario_rol desde PHP:', '<?= $_SESSION['usuario_rol'] ?? "undefined" ?>');
 
-            
+            const avatarColors = ['#5D87FF', '#13DEB9', '#FA896B', '#FFAE1F', '#539BFF', '#6F42C1', '#E83E8C', '#20C997'];
+            function getAvatarColor(name) {
+                if (!name) return '#8c9ea8';
+                let hash = 0;
+                for (let i = 0; i < name.length; i++) { hash = name.charCodeAt(i) + ((hash << 5) - hash); }
+                return avatarColors[Math.abs(hash) % avatarColors.length];
+            }
 
             const tabla = $('#tablaPromotores').DataTable({
 
@@ -568,7 +575,15 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
                         data: 'nombre',
 
-                        render: (d, type, row) => `<a href="detalle-promotor.php?id=${row.id}" class="text-decoration-none fw-bold">${d}</a>`
+                        render: function(d, type, row) {
+                            var n = d;
+                            var color = getAvatarColor(n);
+                            var initial = n ? n.charAt(0).toUpperCase() : '?';
+                            return '<div class="d-flex align-items-center gap-2">' +
+                                   '<span class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width:34px;height:34px;background:' + color + '22;color:' + color + ';font-weight:700;font-size:0.85rem;">' + initial + '</span>' +
+                                   '<a href="detalle-promotor.php?id=' + row.id + '" class="text-decoration-none fw-semibold">' + n + '</a>' +
+                                   '</div>';
+                        }
 
                     },
 
@@ -616,13 +631,11 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 {
     data: null,
     render: function(d) {
-        return `<div class="d-flex align-items-center gap-2">
-            <a href="historial-promotor.php?id=${d.id}" class="badge bg-info bg-opacity-10 text-info border-0 text-decoration-none" style="font-size: 0.75rem;" title="Historial"><i class="ti ti-history"></i> Movimientos</a>
-            
-            <a href="detalle-promotor.php?id=${d.id}" class="badge bg-primary bg-opacity-10 text-primary border-0 text-decoration-none" style="font-size: 0.75rem;" title="Comisiones"><i class="ti ti-cash"></i> Comisiones</a>
-            
-            <button class="badge bg-warning bg-opacity-10 text-warning border-0 editar" data-id="${d.id}"><i class="ti ti-pencil"></i></button>
-            <button class="badge bg-danger bg-opacity-10 text-danger border-0 eliminar" data-id="${d.id}"><i class="ti ti-trash"></i></button>
+        return `<div class="d-flex align-items-center gap-1">
+            <a href="historial-promotor.php?id=${d.id}" class="btn btn-sm btn-outline-secondary" title="Historial"><i class="ti ti-history"></i></a>
+            <a href="detalle-promotor.php?id=${d.id}" class="btn btn-sm btn-outline-info" title="Comisiones"><i class="ti ti-cash"></i></a>
+            <button class="btn btn-sm btn-outline-warning editar" data-id="${d.id}" title="Editar"><i class="ti ti-pencil"></i></button>
+            <button class="btn btn-sm btn-outline-danger eliminar" data-id="${d.id}" title="Eliminar"><i class="ti ti-trash"></i></button>
         </div>`;
     }
 }

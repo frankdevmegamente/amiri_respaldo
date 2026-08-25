@@ -186,17 +186,31 @@ function obtenerMetricas($pdo) {
 
     // 5. Espacio en disco
 
-    $diskTotal = disk_total_space(__DIR__);
+    try {
 
-    $diskFree = disk_free_space(__DIR__);
+        $diskTotal = disk_total_space(__DIR__);
 
-    $metricas['disk_total_gb'] = round($diskTotal / 1024 / 1024 / 1024, 2);
+        $diskFree = disk_free_space(__DIR__);
 
-    $metricas['disk_free_gb'] = round($diskFree / 1024 / 1024 / 1024, 2);
+        $metricas['disk_total_gb'] = round($diskTotal / 1024 / 1024 / 1024, 2);
 
-    $metricas['disk_used_gb'] = $metricas['disk_total_gb'] - $metricas['disk_free_gb'];
+        $metricas['disk_free_gb'] = round($diskFree / 1024 / 1024 / 1024, 2);
 
-    $metricas['disk_percent'] = round(($diskFree / $diskTotal) * 100, 1);
+        $metricas['disk_used_gb'] = $metricas['disk_total_gb'] - $metricas['disk_free_gb'];
+
+        $metricas['disk_percent'] = $diskTotal > 0 ? round(($diskFree / $diskTotal) * 100, 1) : 0;
+
+    } catch (Exception $e) {
+
+        $metricas['disk_total_gb'] = 'N/A';
+
+        $metricas['disk_free_gb'] = 'N/A';
+
+        $metricas['disk_used_gb'] = 'N/A';
+
+        $metricas['disk_percent'] = 0;
+
+    }
 
     
 
@@ -246,11 +260,29 @@ function obtenerMetricas($pdo) {
 
         if (file_exists($path)) {
 
+            $lineCount = 0;
+
+            $handle = fopen($path, 'r');
+
+            if ($handle) {
+
+                while (!feof($handle)) {
+
+                    fgets($handle);
+
+                    $lineCount++;
+
+                }
+
+                fclose($handle);
+
+            }
+
             $metricas['logs'][$logFile] = [
 
                 'size' => round(filesize($path) / 1024 / 1024, 2),
 
-                'lines' => count(file($path)),
+                'lines' => $lineCount,
 
                 'modified' => date('Y-m-d H:i:s', filemtime($path))
 
@@ -314,7 +346,7 @@ $metricas = obtenerMetricas($pdo);
 
 <!DOCTYPE html>
 
-<html lang="es">
+<html lang="es" data-bs-theme="light">
 
 <head>
 
@@ -337,114 +369,68 @@ $metricas = obtenerMetricas($pdo);
     <link rel="stylesheet" href="src/assets/css/layout-custom.css">
 
     <style>
-                .body-wrapper {
-            /* Aumentamos esto para librar completamente la altura del header azul */
-            padding-top: 100px !important; 
-        }
-        
-        .body-wrapper-inner, 
-        .body-wrapper .container-fluid {
-            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
-            padding-top: 15px !important;
-            margin-top: 0 !important;
-        }
+        .body-wrapper { padding-top: 100px !important; }
+        .body-wrapper-inner, .body-wrapper .container-fluid { padding-top: 15px !important; margin-top: 0 !important; }
+        [data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
+        [data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
 
+        /* ─── Page Header ─────────────────────────────── */
+        .monitor-header {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px !important;
+        }
+        .monitor-header .bg-pattern {
+            position: absolute; top: -50%; right: -10%;
+            width: 400px; height: 400px; border-radius: 50%;
+            background: rgba(93, 135, 255, 0.08); pointer-events: none;
+        }
+        .monitor-header .bg-pattern-2 {
+            position: absolute; bottom: -30%; left: 20%;
+            width: 250px; height: 250px; border-radius: 50%;
+            background: rgba(19, 222, 185, 0.06); pointer-events: none;
+        }
+        .monitor-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .monitor-header .sub-badge { font-size: 1rem; color: #8c9ea8; }
+
+        /* ─── Metric Cards ────────────────────────────── */
         .metric-card {
-
-            transition: transform 0.2s;
-
+            position: relative;
+            border-radius: 12px !important;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-
-        .metric-card:hover {
-
-            transform: translateY(-5px);
-
-        }
+        .metric-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important; }
+        .metric-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 12px 12px 0 0; }
+        .metric-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #8c9ea8; }
+        .metric-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+        .metric-value { font-size: 1.75rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.25rem; }
+        .metric-footer { font-size: 0.8rem; color: #8c9ea8; }
 
         .status-good { color: #13deb9; }
-
         .status-warning { color: #ffae1f; }
-
         .status-danger { color: #fa896b; }
+        .log-stats { font-size: 0.85rem; }
 
-        .log-stats {
-            font-size: 0.85rem;
-        }
-
-        body[data-bs-theme="dark"] .logo-modo-claro,
-        .dark-mode .logo-modo-claro {
-            display: none !important;
-        }
-
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
-        .dark-mode .logo-modo-oscuro {
-            display: block !important;
-        }
-
-        body[data-bs-theme="dark"] .card,
-        body[data-bs-theme="dark"] .page-breadcrumb,
-        body[data-bs-theme="dark"] .page-breadcrumb h3,
-        body[data-bs-theme="dark"] .card-header,
-        body[data-bs-theme="dark"] .card-body,
-        body[data-bs-theme="dark"] .modal-content,
-        body[data-bs-theme="dark"] .modal-header,
-        body[data-bs-theme="dark"] .modal-footer {
-            background-color: #1f2535 !important;
-            border-color: #2b3350 !important;
-            color: #e6ecff !important;
-        }
-
-        body[data-bs-theme="dark"] .card {
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        body[data-bs-theme="dark"] .table,
-        body[data-bs-theme="dark"] .table thead th,
-        body[data-bs-theme="dark"] .table tbody td,
-        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
-            background-color: #1f2535 !important;
-            color: #e6ecff !important;
-            border-color: #2b3350 !important;
-        }
-
-        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
-            background-color: #232b3c !important;
-        }
-
-        body[data-bs-theme="dark"] .form-control,
-        body[data-bs-theme="dark"] .form-select,
-        body[data-bs-theme="dark"] .input-group-text,
-        body[data-bs-theme="dark"] .form-control-plaintext,
-        body[data-bs-theme="dark"] .alert,
-        body[data-bs-theme="dark"] .badge,
-        body[data-bs-theme="dark"] .nav-tabs .nav-link {
-            background-color: #232b3c !important;
-            color: #e6ecff !important;
-            border-color: #2b3350 !important;
-        }
-
-        body[data-bs-theme="dark"] .nav-tabs .nav-link.active {
-            color: #ffffff !important;
-            border-bottom-color: #6c5ce7 !important;
-        }
-
-        body[data-bs-theme="dark"] .bg-light {
-            background-color: rgba(255, 255, 255, 0.06) !important;
-        }
-
-        body[data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
-            background-color: rgba(93, 135, 255, 0.12) !important;
-        }
-
-        body[data-bs-theme="dark"] .bg-success.bg-opacity-10 {
-            background-color: rgba(25, 135, 84, 0.12) !important;
-        }
-
-        body[data-bs-theme="dark"] .bg-warning.bg-opacity-10 {
-            background-color: rgba(255, 193, 7, 0.12) !important;
-        }
+        /* ─── Dark mode ───────────────────────────────── */
+        [data-bs-theme="dark"] h3, [data-bs-theme="dark"] .page-breadcrumb h3 { color: #e9ecef !important; }
+        [data-bs-theme="dark"] .card { background: #1a2234; border-color: #2c344c; }
+        [data-bs-theme="dark"] .table>thead>tr>th { background-color: #1a2234 !important; color: #e9ecef !important; border-bottom-color: #2c344c !important; }
+        [data-bs-theme="dark"] .table>tbody>tr>td { color: #e9ecef !important; border-color: #2c344c !important; }
+        [data-bs-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd)>* { box-shadow: inset 0 0 0 9999px rgba(255, 255, 255, 0.02); }
+        [data-bs-theme="dark"] .table-hover>tbody>tr:hover>* { box-shadow: inset 0 0 0 9999px rgba(255, 255, 255, 0.05); }
+        [data-bs-theme="dark"] .modal-content { background-color: #1a2234; border-color: #2c344c; }
+        [data-bs-theme="dark"] .modal-header { border-bottom-color: #2c344c; }
+        [data-bs-theme="dark"] .modal-footer { border-top-color: #2c344c; }
+        [data-bs-theme="dark"] .modal-title { color: #e9ecef; }
+        [data-bs-theme="dark"] .form-label { color: #e9ecef; }
+        [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select { background-color: #252f43; border-color: #2c344c; color: #e9ecef; }
+        [data-bs-theme="dark"] .form-control::placeholder { color: #8c9ea8; }
+        [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
+        [data-bs-theme="dark"] .progress { background-color: #2c344c; }
+        [data-bs-theme="dark"] code { color: #e9ecef; }
     </style>
 
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 
 <body>
@@ -462,96 +448,96 @@ $metricas = obtenerMetricas($pdo);
 
 
         <div class="body-wrapper">
-            <div class="container-fluid px-4" style="max-width: 100%;">
-                
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <div class="card shadow-sm border-0 rounded-4" style="position: relative; overflow: hidden;">
-                            
-                            <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #5D87FF; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-                            <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+            <div class="body-wrapper-inner">
+                <div class="container-fluid px-4" style="max-width: 100%;">
 
-                            <div class="card-body p-4" style="position: relative; z-index: 1;">
-                                <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
-                                    <div class="d-flex align-items-center">
-                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                            <i class="ti ti-device-heart-monitor fs-5"></i>
+                    <div class="card monitor-header shadow-sm border-0 rounded-4 mb-4">
+                        <div class="bg-pattern"></div>
+                        <div class="bg-pattern-2"></div>
+                        <div class="card-body p-4">
+                            <div class="row align-items-center g-3">
+                                <div class="col-md">
+                                    <div class="d-flex align-items-center gap-3 mb-1">
+                                        <div class="d-flex align-items-center justify-content-center rounded-3"
+                                             style="width:48px;height:48px;background:rgba(93,135,255,0.12);">
+                                            <i class="ti ti-device-heart-monitor text-primary" style="font-size:1.6rem;"></i>
                                         </div>
                                         <div>
-                                            <h5 class="card-title fw-semibold mb-0">Monitor del Sistema</h5>
-                                            <p class="text-muted mb-0">Monitorea el estado y rendimiento del sistema en tiempo real</p>
+                                            <h2 class="mb-0">Monitor del Sistema</h2>
+                                            <span class="sub-badge"><i class="ti ti-circle"></i> Estado y rendimiento del sistema en tiempo real</span>
                                         </div>
                                     </div>
-                                    <button class="btn btn-primary" onclick="location.reload()">
+                                </div>
+                                <div class="col-md-auto">
+                                    <button class="btn btn-primary btn-sm" onclick="location.reload()">
                                         <i class="ti ti-refresh"></i> Actualizar
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="card metric-card h-100">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="me-3">
-                                        <i class="ti ti-alert-triangle fs-8 <?= $metricas['errores_24h'] > 0 ? 'status-danger' : 'status-good' ?>"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="mb-0"><?= $metricas['errores_24h'] ?></h4>
-                                        <p class="mb-0 text-muted">Errores (24h)</p>
+                <div class="row g-3 mb-4">
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card metric-card border-0 shadow-sm h-100">
+                            <div class="metric-accent <?= $metricas['errores_24h'] > 0 ? 'bg-danger' : 'bg-success' ?>"></div>
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="metric-label">Errores</span>
+                                    <div class="metric-icon <?= $metricas['errores_24h'] > 0 ? 'bg-danger bg-opacity-10 text-danger' : 'bg-success bg-opacity-10 text-success' ?>">
+                                        <i class="ti ti-alert-triangle"></i>
                                     </div>
                                 </div>
+                                <div class="metric-value <?= $metricas['errores_24h'] > 0 ? 'text-danger' : 'text-success' ?>" id="metric-errores"><?= $metricas['errores_24h'] ?></div>
+                                <div class="metric-footer">Errores en las últimas 24h</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <div class="card metric-card h-100">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="me-3">
-                                        <i class="ti ti-alert-circle fs-8 <?= $metricas['warnings_24h'] > 0 ? 'status-warning' : 'status-good' ?>"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="mb-0"><?= $metricas['warnings_24h'] ?></h4>
-                                        <p class="mb-0 text-muted">Warnings (24h)</p>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card metric-card border-0 shadow-sm h-100">
+                            <div class="metric-accent <?= $metricas['warnings_24h'] > 0 ? 'bg-warning' : 'bg-success' ?>"></div>
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="metric-label">Warnings</span>
+                                    <div class="metric-icon <?= $metricas['warnings_24h'] > 0 ? 'bg-warning bg-opacity-10 text-warning' : 'bg-success bg-opacity-10 text-success' ?>">
+                                        <i class="ti ti-alert-circle"></i>
                                     </div>
                                 </div>
+                                <div class="metric-value <?= $metricas['warnings_24h'] > 0 ? 'text-warning' : 'text-success' ?>"><?= $metricas['warnings_24h'] ?></div>
+                                <div class="metric-footer">Warnings en las últimas 24h</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <div class="card metric-card h-100">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="me-3">
-                                        <i class="ti ti-lock-off fs-8 <?= $metricas['login_fallidos'] > 10 ? 'status-danger' : 'status-good' ?>"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="mb-0"><?= $metricas['login_fallidos'] ?></h4>
-                                        <p class="mb-0 text-muted">Login fallidos (24h)</p>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card metric-card border-0 shadow-sm h-100">
+                            <div class="metric-accent <?= $metricas['login_fallidos'] > 10 ? 'bg-danger' : 'bg-success' ?>"></div>
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="metric-label">Login fallidos</span>
+                                    <div class="metric-icon <?= $metricas['login_fallidos'] > 10 ? 'bg-danger bg-opacity-10 text-danger' : 'bg-success bg-opacity-10 text-success' ?>">
+                                        <i class="ti ti-lock-off"></i>
                                     </div>
                                 </div>
+                                <div class="metric-value <?= $metricas['login_fallidos'] > 10 ? 'text-danger' : 'text-success' ?>"><?= $metricas['login_fallidos'] ?></div>
+                                <div class="metric-footer">Intentos fallidos (24h)</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-md-3">
-                        <div class="card metric-card h-100">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="me-3">
-                                        <i class="ti ti-activity fs-8 status-good"></i>
-                                    </div>
-                                    <div>
-                                        <h4 class="mb-0"><?= $metricas['movimientos_hoy'] ?></h4>
-                                        <p class="mb-0 text-muted">Movimientos hoy</p>
+                    <div class="col-xl-3 col-md-6">
+                        <div class="card metric-card border-0 shadow-sm h-100">
+                            <div class="metric-accent bg-info"></div>
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="metric-label">Movimientos</span>
+                                    <div class="metric-icon bg-info bg-opacity-10 text-info">
+                                        <i class="ti ti-activity"></i>
                                     </div>
                                 </div>
+                                <div class="metric-value text-info"><?= $metricas['movimientos_hoy'] ?></div>
+                                <div class="metric-footer">Movimientos registrados hoy</div>
                             </div>
                         </div>
                     </div>
@@ -559,7 +545,7 @@ $metricas = obtenerMetricas($pdo);
 
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="card h-100">
+                        <div class="card h-100 border-0 shadow-sm">
                             <div class="card-body">
                                 <h5 class="card-title mb-4"><i class="ti ti-database me-2"></i>Base de Datos</h5>
                                 <div class="row">
@@ -585,7 +571,7 @@ $metricas = obtenerMetricas($pdo);
                     </div>
 
                     <div class="col-md-6">
-                        <div class="card h-100">
+                        <div class="card h-100 border-0 shadow-sm">
                             <div class="card-body">
                                 <h5 class="card-title mb-4"><i class="ti ti-device-floppy me-2"></i>Espacio en Disco</h5>
                                 <div class="row">
@@ -616,7 +602,7 @@ $metricas = obtenerMetricas($pdo);
 
                 <div class="row mt-4">
                     <div class="col-md-12">
-                        <div class="card">
+                        <div class="card border-0 shadow-sm">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-4">
                                     <h5 class="card-title mb-0"><i class="ti ti-backup me-2"></i>Backups</h5>
@@ -653,7 +639,7 @@ $metricas = obtenerMetricas($pdo);
 
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="card">
+                        <div class="card border-0 shadow-sm">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-4">
                                     <h5 class="card-title mb-0"><i class="ti ti-file-text me-2"></i>Estado de Logs</h5>
@@ -672,6 +658,13 @@ $metricas = obtenerMetricas($pdo);
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            <?php if (empty($metricas['logs'])): ?>
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted py-3">
+                                                    <i class="ti ti-info-circle me-1"></i>Sin logs disponibles
+                                                </td>
+                                            </tr>
+                                            <?php else: ?>
                                             <?php foreach ($metricas['logs'] as $nombre => $info): ?>
                                             <tr>
                                                 <td><code><?= $nombre ?></code></td>
@@ -680,6 +673,7 @@ $metricas = obtenerMetricas($pdo);
                                                 <td><?= $info['modified'] ?></td>
                                             </tr>
                                             <?php endforeach; ?>
+                                            <?php endif; ?>
                                         </tbody>
                                     </table>
                                 </div>
@@ -690,23 +684,23 @@ $metricas = obtenerMetricas($pdo);
 
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="card">
+                        <div class="card border-0 shadow-sm">
                             <div class="card-body">
                                 <h5 class="card-title mb-4"><i class="ti ti-tool me-2"></i>Acciones Rápidas</h5>
-                                <div class="btn-group" role="group">
-                                    <a href="logs-viewer.php" class="btn btn-outline-primary">
+                                <div class="d-flex flex-wrap gap-2" role="group">
+                                    <a href="logs-viewer.php" class="btn btn-outline-primary" title="Ver registros de log del sistema">
                                         <i class="ti ti-file-text"></i> Ver Logs
                                     </a>
-                                    <a href="auditoria.php" class="btn btn-outline-info">
+                                    <a href="auditoria.php" class="btn btn-outline-info" title="Historial de auditoría del sistema">
                                         <i class="ti ti-history"></i> Auditoría
                                     </a>
-                                    <a href="usuarios.php" class="btn btn-outline-success">
+                                    <a href="usuarios.php" class="btn btn-outline-success" title="Gestionar usuarios del sistema">
                                         <i class="ti ti-users"></i> Usuarios
                                     </a>
-                                    <button class="btn btn-outline-warning" onclick="if(confirm('¿Limpiar logs y backups antiguos?')) window.location.href='scripts/cleanup.php'">
+                                    <button class="btn btn-outline-warning" title="Eliminar logs y backups antiguos" data-bs-toggle="modal" data-bs-target="#modalCleanup">
                                         <i class="ti ti-trash"></i> Limpiar archivos antiguos
                                     </button>
-                                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalResetDatos">
+                                    <button type="button" class="btn btn-outline-danger" title="Resetear datos financieros del sistema" data-bs-toggle="modal" data-bs-target="#modalResetDatos">
                                         <i class="ti ti-refresh"></i> Reset de Datos
                                     </button>
                                 </div>
@@ -719,8 +713,32 @@ $metricas = obtenerMetricas($pdo);
         </div>
 
     </div>
+</div>
 
 
+    <!-- Modal Limpiar Archivos Antiguos -->
+    <div class="modal fade" id="modalCleanup" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold"><i class="ti ti-trash text-warning me-2"></i>Limpiar Archivos Antiguos</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning d-flex align-items-center" role="alert">
+                        <i class="ti ti-info-circle fs-5 me-2"></i>
+                        <div>Se eliminar&aacute;n logs y backups con m&aacute;s de 30 d&iacute;as de antigüedad.</div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-warning" onclick="window.location.href='scripts/cleanup.php'">
+                        <i class="ti ti-trash me-1"></i>Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal Reset de Datos -->
     <div class="modal fade" id="modalResetDatos" tabindex="-1" aria-hidden="true">
@@ -816,29 +834,13 @@ $metricas = obtenerMetricas($pdo);
 
     <script src="src/assets/js/sidebarmenu.js"></script>
 
-    <script src="src/assets/libs/simplebar/dist/simplebar.js"></script>
-
     <script src="src/assets/js/dark-mode.js"></script>
 
     <script src="src/assets/js/pantalla-completa.js"></script>
 
-        <script src="https://unpkg.com/typeit/dist/index.umd.js"></script>
+    <script src="src/assets/js/utils.js"></script>
 
-    <script>
-
-    new TypeIt("#myElement", {
-
-      strings: "Monitor del Sistema",
-
-      speed: 80,
-
-      waitUntilVisible: true,
-
-      cursor: false
-
-    }).go();
-
-    </script>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;"></div>
 
 </body>
 

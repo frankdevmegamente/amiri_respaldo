@@ -135,17 +135,18 @@ $serviciosDivisas = [
             color: white;
 
         }
- body[data-bs-theme="dark"] .logo-modo-claro,
+ [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
         }
 
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }
     </style>
 
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 
 
@@ -1842,7 +1843,7 @@ $serviciosDivisas = [
 
                             totalMxn += mxn;
 
-                            let badgeClass = p.tipo_moneda === 'USD' ? 'badge-usd' : 'badge-usdt';
+                            let badgeClass = p.tipo_moneda === 'USD' ? 'badge-usd' : (p.tipo_moneda === 'MXN' ? 'badge-mxn' : 'badge-usdt');
 
                             html += `<tr>
 

@@ -43,6 +43,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 
 <style>
@@ -57,12 +58,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             padding-top: 15px !important;
             margin-top: 0 !important;
         }
-     body[data-bs-theme="dark"] .logo-modo-claro,
+     [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
         }
 
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }
@@ -314,7 +315,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         </div>
                     </div>
 
-                    <div class="card">
+                    <div class="card shadow-sm border-0 mb-4">
                         <div class="card-body p-4 table-responsive">
                             <table id="tablaProveedores" class="table table-hover align-middle w-100">
                                 <thead>
@@ -640,6 +641,14 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
     <script>
 
+        const avatarColors = ['#5D87FF', '#13DEB9', '#FA896B', '#FFAE1F', '#539BFF', '#6F42C1', '#E83E8C', '#20C997'];
+        function getAvatarColor(name) {
+            if (!name) return '#8c9ea8';
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) { hash = name.charCodeAt(i) + ((hash << 5) - hash); }
+            return avatarColors[Math.abs(hash) % avatarColors.length];
+        }
+
         const tabla = $('#tablaProveedores').DataTable({
 
             ajax: {
@@ -654,7 +663,18 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                 { data: 'id' },
 
-                { data: 'nombre' },
+                {
+                    data: 'nombre',
+                    render: function(d, type, row) {
+                        var n = d;
+                        var color = getAvatarColor(n);
+                        var initial = n ? n.charAt(0).toUpperCase() : '?';
+                        return '<div class="d-flex align-items-center gap-2">' +
+                               '<span class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width:34px;height:34px;background:' + color + '22;color:' + color + ';font-weight:700;font-size:0.85rem;">' + initial + '</span>' +
+                               '<span class="fw-semibold">' + n + '</span>' +
+                               '</div>';
+                    }
+                },
 
                 {
 
@@ -706,6 +726,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                         let adeudos = '';
 
+                        if (parseFloat(row.saldo_mxn || 0) > 0.001) {
+
+                            adeudos += `<div>MXN $${parseFloat(row.saldo_mxn).toLocaleString('es-MX', {minimumFractionDigits: 2})}</div>`;
+
+                        }
+
                         if (row.acepta_usd && parseFloat(row.saldo_usd || 0) > 0.001) {
 
                             adeudos += `<div>USD ${parseFloat(row.saldo_usd).toFixed(2)}</div>`;
@@ -727,21 +753,20 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 {
                     data: null,
                     render: d => {
-                        let botones = '<div class="d-flex align-items-center gap-2">';
+                        let botones = '<div class="d-flex align-items-center gap-1">';
                         
-                        // 1. NUEVO BOTÓN DE HISTORIAL (Siempre visible)
-                        botones += `<a href="historial-proveedor.php?id=${d.id}" class="badge bg-secondary bg-opacity-10 text-secondary border-0 text-decoration-none" style="font-size: 0.75rem;" title="Historial"><i class="ti ti-history"></i> Movimientos</a>`;
+                        botones += `<a href="historial-proveedor.php?id=${d.id}" class="btn btn-sm btn-outline-secondary" title="Historial"><i class="ti ti-history"></i></a>`;
 
-                        // 2. LÓGICA EXISTENTE DE PAGOS CONDICIONALES
+                        const tieneAdeudoMxn  = parseFloat(d.saldo_mxn  || 0) > 0.001;
                         const tieneAdeudoUsd  = d.acepta_usd  && parseFloat(d.saldo_usd  || 0) > 0.001;
                         const tieneAdeudoUsdt = d.acepta_usdt && parseFloat(d.saldo_usdt || 0) > 0.001;
                         
-                        if (tieneAdeudoUsd)  botones += `<button class="badge bg-primary bg-opacity-10 text-primary border-0 pagar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" data-moneda="USD"><i class="ti ti-cash"></i> Pagar USD</button>`;
-                        if (tieneAdeudoUsdt) botones += `<button class="badge bg-info bg-opacity-10 text-info border-0 pagar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" data-moneda="USDT"><i class="ti ti-cash"></i> Pagar USDT</button>`;
+                        if (tieneAdeudoMxn)  botones += `<button class="btn btn-sm btn-outline-warning pagar-mxn" data-id="${d.id}" data-moneda="MXN" title="Pagar MXN"><i class="ti ti-cash"></i></button>`;
+                        if (tieneAdeudoUsd)  botones += `<button class="btn btn-sm btn-outline-primary pagar" data-id="${d.id}" data-moneda="USD" title="Pagar USD"><i class="ti ti-cash"></i></button>`;
+                        if (tieneAdeudoUsdt) botones += `<button class="btn btn-sm btn-outline-info pagar" data-id="${d.id}" data-moneda="USDT" title="Pagar USDT"><i class="ti ti-cash"></i></button>`;
                         
-                        // 3. BOTONES DE EDITAR Y ELIMINAR
-                        botones += `<button class="badge bg-warning bg-opacity-10 text-warning border-0 editar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Editar"><i class="ti ti-pencil"></i> Editar</button>`;
-                        botones += `<button class="badge bg-danger bg-opacity-10 text-danger border-0 eliminar" style="cursor: pointer; font-size: 0.75rem;" data-id="${d.id}" title="Eliminar"><i class="ti ti-trash"></i> Eliminar</button>`;
+                        botones += `<button class="btn btn-sm btn-outline-warning editar" data-id="${d.id}" title="Editar"><i class="ti ti-pencil"></i></button>`;
+                        botones += `<button class="btn btn-sm btn-outline-danger eliminar" data-id="${d.id}" title="Eliminar"><i class="ti ti-trash"></i></button>`;
                         
                         botones += '</div>';
                         return botones;
@@ -991,6 +1016,98 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
 
                 // Cargar cuentas MXN — solo Bancarias (1) y Cajas (2), saldo > 0
+
+                $.get('api/cuentas.php?tipo_moneda=MXN', function(cuentas) {
+
+                    const sel = $('#cuentaPagoProveedorSelect');
+
+                    sel.html('<option value="">Seleccione cuenta</option>');
+
+                    const filtradas = cuentas.filter(c => [1, 2].includes(parseInt(c.tipo_cuenta)) && parseFloat(c.saldo_actual) > 0);
+
+                    if (filtradas.length === 0) {
+
+                        sel.append('<option value="" disabled>No hay cuentas MXN disponibles</option>');
+
+                    } else {
+
+                        filtradas.forEach(c => {
+
+                            const saldo = parseFloat(c.saldo_actual || 0).toFixed(2);
+
+                            let nombreCuenta = c.nombre;
+
+                            if (c.banco && c.banco.trim()) {
+
+                                nombreCuenta += ' (' + c.banco + ')';
+
+                            }
+
+                            sel.append(`<option value="${c.id}" data-saldo="${saldo}">${nombreCuenta} — Saldo: $${parseFloat(saldo).toLocaleString('es-MX',{minimumFractionDigits:2})} MXN</option>`);
+
+                        });
+
+                    }
+
+                    $('#modalPagoProveedor').modal('show');
+
+                });
+
+            });
+
+        });
+
+
+
+        // Pago MXN al proveedor (Compra de Efectivo)
+
+        $(document).on('click', '.pagar-mxn', function() {
+
+            const id = $(this).data('id');
+
+            $.get('api/proveedores.php?id=' + id, function(data) {
+
+                $('#pagoProveedorId').val(data.id);
+
+                $('#monedaProveedor').val('MXN');
+
+                $('#nombreProveedorDisplay').text(data.nombre);
+
+                $('#badgeMonedaProveedor').removeClass('bg-success bg-info').addClass('bg-warning').text('MXN');
+
+                // Adeudo MXN
+
+                const adeudoMxn = parseFloat(data.saldo_mxn || 0);
+
+                // Para MXN, paridad es 1
+
+                $('#infoAdeudoDivisa').text('MXN $' + adeudoMxn.toLocaleString('es-MX', {minimumFractionDigits:2}));
+
+                $('#infoTcCompra').text('$1.0000');
+
+                $('#infoTotalMxn').text('$' + adeudoMxn.toLocaleString('es-MX', {minimumFractionDigits:2}) + ' MXN');
+
+                $('#pagoParidadProveedor').val('1');
+
+                $('#formPagoProveedor').data('adeudo-mxn', adeudoMxn);
+
+                // Resetear campos
+
+                $('#inputMontoPagoProveedor').val('');
+
+                $('#labelMontoFormateadoPago').text('');
+
+                $('#grupoMontoPago').hide();
+
+                $('#btnLiquidarAdeudo').hide();
+
+                $('#alertaSaldoInsuficiente').hide();
+
+                $('#btnProcesarPago').hide();
+
+                $('#infoSaldoCuentaPago').text('');
+
+                // Cuentas MXN de pago
 
                 $.get('api/cuentas.php?tipo_moneda=MXN', function(cuentas) {
 

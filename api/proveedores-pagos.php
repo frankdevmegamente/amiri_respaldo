@@ -51,7 +51,7 @@ try {
 
         // Obtener datos del proveedor — incluye las cuentas por moneda
 
-        $stmtProveedor = $pdo->prepare("SELECT cuenta_id, cuenta_usd_id, cuenta_usdt_id, tipo_moneda, nombre FROM proveedores WHERE id = ?");
+        $stmtProveedor = $pdo->prepare("SELECT cuenta_id, cuenta_usd_id, cuenta_usdt_id, cuenta_mxn_id, tipo_moneda, nombre FROM proveedores WHERE id = ?");
 
         $stmtProveedor->execute([$proveedor_id]);
 
@@ -61,11 +61,19 @@ try {
 
         // Determinar la cuenta del proveedor según la moneda a pagar
 
-        $cuentaProveedorId = $moneda_pago === 'USD'
+        if ($moneda_pago === 'MXN') {
 
-            ? ($proveedor['cuenta_usd_id']  ?? $proveedor['cuenta_id'])
+            $cuentaProveedorId = $proveedor['cuenta_mxn_id'] ?? $proveedor['cuenta_id'];
 
-            : ($proveedor['cuenta_usdt_id'] ?? $proveedor['cuenta_id']);
+        } else if ($moneda_pago === 'USD') {
+
+            $cuentaProveedorId = $proveedor['cuenta_usd_id'] ?? $proveedor['cuenta_id'];
+
+        } else {
+
+            $cuentaProveedorId = $proveedor['cuenta_usdt_id'] ?? $proveedor['cuenta_id'];
+
+        }
 
 
 
@@ -117,9 +125,9 @@ try {
 
         $monedaProveedor = $moneda_pago;
 
-        // Equivalente en divisa del monto MXN pagado
+        // Equivalente en divisa del monto MXN pagado (para MXN es 1:1)
 
-        $monto_divisa = ($paridad > 0) ? round($monto_mxn / $paridad, 8) : 0;
+        $monto_divisa = ($moneda_pago === 'MXN') ? $monto_mxn : (($paridad > 0) ? round($monto_mxn / $paridad, 8) : 0);
 
 
 
@@ -140,10 +148,27 @@ try {
             $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?")
                 ->execute([$monto_mxn, $cuenta_pago_id]);
 
-            // 2. Reducir el adeudo del proveedor: saldo_actual (divisa) y valor_mxn
+            // 2. Reducir el adeudo del proveedor
+
             $pdo->exec("SET @hyperion_saldo_auth = 1");
-            $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ?, valor_mxn = valor_mxn - ? WHERE id = ?")
-                ->execute([$monto_divisa, $monto_mxn, $cuentaProveedorId]);
+
+            if ($moneda_pago === 'MXN') {
+
+                // Para MXN: solo reducir saldo_actual (ya es MXN)
+
+                $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ? WHERE id = ?")
+
+                    ->execute([$monto_mxn, $cuentaProveedorId]);
+
+            } else {
+
+                // Para USD/USDT: reducir saldo_actual (divisa) y valor_mxn
+
+                $pdo->prepare("UPDATE cuentas SET saldo_actual = saldo_actual - ?, valor_mxn = valor_mxn - ? WHERE id = ?")
+
+                    ->execute([$monto_divisa, $monto_mxn, $cuentaProveedorId]);
+
+            }
 
 
 
@@ -173,7 +198,7 @@ try {
 
                 $paridad,
 
-                "Pago a proveedor {$proveedor['nombre']} — {$monto_divisa} {$monedaProveedor} (TC: {$paridad})",
+                "Pago a proveedor {$proveedor['nombre']} — {$monto_divisa} {$monedaProveedor}" . ($moneda_pago !== 'MXN' ? " (TC: {$paridad})" : ""),
 
                 $_SESSION['usuario_id']
 

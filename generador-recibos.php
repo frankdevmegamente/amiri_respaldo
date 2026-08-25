@@ -110,8 +110,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .btn-check:checked + .btn-outline-primary { color: #ffffff !important; }
         [data-bs-theme="dark"] .btn-outline-primary { color: #799dfb; border-color: #6c5ce7; }
 
-        body[data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
-        body[data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
+        [data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
+        [data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
 
         /* =========================================
            📱 MÓVIL (IDÉNTICO A ESCRITORIO, VERSIÓN MINIATURA)
@@ -260,6 +260,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             }
         }
     </style>
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 
 <body>

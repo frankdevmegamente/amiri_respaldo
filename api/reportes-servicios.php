@@ -121,6 +121,25 @@ try {
 
             $servicios = array_values($serviciosMap);
 
+            // Obtener ganancia de consumos_inventario (servicios 2 y 3: Venta de Dolares/USDT)
+            $stmtGanancia = $pdo->prepare("
+                SELECT mv.servicio_id, COALESCE(SUM(ci.ganancia), 0) as ganancia
+                FROM consumos_inventario ci
+                JOIN movimientos mv ON ci.movimiento_id = mv.id
+                JOIN inventario_monedas im ON ci.inventario_id = im.id
+                WHERE mv.fecha BETWEEN ? AND ? AND mv.activo = 1
+                GROUP BY mv.servicio_id
+            ");
+            $stmtGanancia->execute([$fechaInicio, $fechaFin]);
+            $gananciaPorServicio = [];
+            foreach ($stmtGanancia->fetchAll(PDO::FETCH_ASSOC) as $g) {
+                $gananciaPorServicio[$g['servicio_id']] = (float)$g['ganancia'];
+            }
+            foreach ($servicios as &$s) {
+                $s['ganancia'] = $gananciaPorServicio[$s['id']] ?? 0;
+            }
+            unset($s);
+
             // Venta de Efectivo (servicio 1): usar deudas_clientes como fuente canónica
             $stmtDc = $pdo->prepare("SELECT COUNT(*) as cantidad, COALESCE(SUM(monto_total), 0) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1");
             $stmtDc->execute([$fechaInicio, $fechaFin]);
@@ -132,7 +151,8 @@ try {
                     'servicio' => 'Venta de Efectivo',
                     'total' => $totalMxn,
                     'total_mxn' => $totalMxn,
-                    'cantidad' => (int)$dc['cantidad']
+                    'cantidad' => (int)$dc['cantidad'],
+                    'ganancia' => 0
                 ];
             }
 

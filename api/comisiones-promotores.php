@@ -56,7 +56,7 @@ function generarPDF($pdo, $promotor, $promotor_id, $cuentaPromotorId, $filtroFec
     $saldo_pendiente = empty($filtroFecha) ? $saldo_real : $saldo_real; 
     $total_comisiones = $saldo_pendiente + $total_pagos; // Autocorrección matemática para el PDF
     
-    $periodo = 'Todo el Historial';
+        $periodo = 'Todo el Historial';
     if (isset($_GET['mes']) && isset($_GET['anio'])) {
         $meses = ['01'=>'Enero', '02'=>'Febrero', '03'=>'Marzo', '04'=>'Abril', '05'=>'Mayo', '06'=>'Junio',
                   '07'=>'Julio', '08'=>'Agosto', '09'=>'Septiembre', '10'=>'Octubre', '11'=>'Noviembre', '12'=>'Diciembre'];
@@ -65,6 +65,8 @@ function generarPDF($pdo, $promotor, $promotor_id, $cuentaPromotorId, $filtroFec
         $periodo = 'Año ' . $_GET['anio'];
     } elseif (isset($_GET['fecha_desde']) && isset($_GET['fecha_hasta'])) {
         $periodo = $_GET['fecha_desde'] . ' al ' . $_GET['fecha_hasta'];
+    } elseif (isset($_GET['fecha_inicio']) && isset($_GET['fecha_fin'])) {
+        $periodo = $_GET['fecha_inicio'] . ' al ' . $_GET['fecha_fin'];
     }
     
     header('Content-Type: text/html; charset=UTF-8');
@@ -191,6 +193,10 @@ try {
             $filtroFecha = " AND fecha BETWEEN :desde AND :hasta";
             $params[':desde'] = $_GET['fecha_desde'];
             $params[':hasta'] = $_GET['fecha_hasta'];
+        } elseif (isset($_GET['fecha_inicio']) && isset($_GET['fecha_fin'])) {
+            $filtroFecha = " AND fecha BETWEEN :desde AND :hasta";
+            $params[':desde'] = $_GET['fecha_inicio'];
+            $params[':hasta'] = $_GET['fecha_fin'];
         }
 
         if (isset($_GET['pdf'])) {

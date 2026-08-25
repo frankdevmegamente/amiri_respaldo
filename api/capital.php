@@ -11,6 +11,39 @@ $usuario_nombre = $_SESSION['usuario_nombre'] ?? 'Sistema';
 
 $tipo = $_GET['tipo'] ?? '';
 
+// Resolve date range parameters
+$anioParam = $_GET['anio'] ?? null;
+$fechaInicio = $_GET['fecha_desde'] ?? $_GET['fecha_inicio'] ?? null;
+$fechaFin = $_GET['fecha_hasta'] ?? $_GET['fecha_fin'] ?? null;
+$mesParam = $_GET['mes'] ?? null;
+
+// For resumen: determine fInicio/fFin based on params
+$fInicio = null;
+$fFin = null;
+
+if ($fechaInicio && $fechaFin) {
+    // Range filter
+    $fInicio = $fechaInicio;
+    $fFin = $fechaFin;
+    $mesActual = substr($fechaInicio, 0, 7);
+} elseif ($anioParam && !$mesParam) {
+    // Year filter (no specific month)
+    $fInicio = $anioParam . '-01-01';
+    $fFin = $anioParam . '-12-31';
+    $mesActual = null;
+} else {
+    // Single month filter (mes=YYYY-MM or mes=MM + anio=YYYY)
+    if ($anioParam && $mesParam) {
+        $mesActual = $anioParam . '-' . str_pad($mesParam, 2, '0', STR_PAD_LEFT);
+    } elseif ($mesParam && preg_match('/^\d{4}-\d{2}$/', $mesParam)) {
+        $mesActual = $mesParam;
+    } else {
+        $mesActual = date('Y-m');
+    }
+    $fInicio = $mesActual . '-01';
+    $fFin = date('Y-m-t', strtotime($fInicio));
+}
+
 try {
     $pdo = getPDO();
 
@@ -20,7 +53,7 @@ try {
             SELECT DISTINCT m FROM (
                 SELECT DATE_FORMAT(fecha, '%Y-%m') as m FROM deudas_clientes WHERE activo = 1
                 UNION
-                SELECT DATE_FORMAT(fecha, '%Y-%m') FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND activo = 1
+                SELECT DATE_FORMAT(fecha, '%Y-%m') FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND activo = 1 AND estado = 'activo'
                 UNION
                 SELECT DATE_FORMAT(fecha, '%Y-%m') FROM gastos WHERE activo = 1
             ) meses ORDER BY m ASC
@@ -36,22 +69,19 @@ try {
     if ($tipo === 'resumen') {
         $fechaIni = getFechaInicializacion($pdo);
 
-        $mesConsulta = $_GET['mes'] ?? null;
-        if ($mesConsulta && preg_match('/^\d{4}-\d{2}$/', $mesConsulta)) {
-            $mesActual = $mesConsulta;
-        } else {
-            $mesActual = $_SESSION['mes_activo'] ?? date('Y-m');
+        $mesCerrado = false;
+        $corteDelMes = null;
+
+        if ($mesActual) {
+            // Single month: check if it's closed
+            $stmtCorte = $pdo->prepare("SELECT * FROM cierres_mensuales WHERE mes = ?");
+            $stmtCorte->execute([$mesActual]);
+            $corteDelMes = $stmtCorte->fetch(PDO::FETCH_ASSOC);
+            $mesCerrado = (bool)$corteDelMes;
         }
 
-        // Buscar si el mes seleccionado ya tiene un corte
-        $stmtCorte = $pdo->prepare("SELECT * FROM cierres_mensuales WHERE mes = ?");
-        $stmtCorte->execute([$mesActual]);
-        $corteDelMes = $stmtCorte->fetch(PDO::FETCH_ASSOC);
-
-        $mesCerrado = (bool)$corteDelMes;
-
-        if ($mesCerrado) {
-            // Usar los datos del corte
+        if ($mesCerrado && $corteDelMes) {
+            // Use closed data
             $comisiones = (float)$corteDelMes['comisiones_amiri'];
             $divisas = (float)$corteDelMes['ganancia_divisas'];
             $gastos = [
@@ -61,15 +91,13 @@ try {
             ];
             $utilidadMes = (float)$corteDelMes['utilidad_neta'];
         } else {
-            // Calcular en vivo
-            $fInicio = $mesActual . '-01';
-            $fFin = date('Y-m-t', strtotime($fInicio));
+            // Calculate live using fInicio/fFin
 
             $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_amiri), 0) FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1");
             $stmt->execute([$fInicio, $fFin]);
             $comisiones = (float)$stmt->fetchColumn();
 
-            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'activo'");
             $stmt->execute([$fInicio, $fFin]);
             $divisas = (float)$stmt->fetchColumn();
 
@@ -102,24 +130,32 @@ try {
 
         $capitalActual = $capitalAmiriSaldo;
 
-        // Capital anterior = capital al inicio del mes actual
-        $mesAnterior = date('Y-m', strtotime($mesActual . '-01 -1 month'));
-        $stmtAnt = $pdo->prepare("SELECT capital_acumulado FROM cierres_mensuales WHERE mes = ?");
-        $stmtAnt->execute([$mesAnterior]);
-        $capAnterior = $stmtAnt->fetchColumn();
-        if ($capAnterior === false) {
-            if ($corteDelMes) {
-                $capAnterior = (float)$corteDelMes['capital_acumulado'] - (float)$corteDelMes['utilidad_neta'];
+        // Capital anterior = capital at end of period before this one
+        if ($mesActual) {
+            $mesAnterior = date('Y-m', strtotime($mesActual . '-01 -1 month'));
+            $stmtAnt = $pdo->prepare("SELECT capital_acumulado FROM cierres_mensuales WHERE mes = ?");
+            $stmtAnt->execute([$mesAnterior]);
+            $capAnterior = $stmtAnt->fetchColumn();
+            if ($capAnterior === false) {
+                if ($corteDelMes) {
+                    $capAnterior = (float)$corteDelMes['capital_acumulado'] - (float)$corteDelMes['utilidad_neta'];
+                } else {
+                    $capAnterior = 0;
+                }
             } else {
-                $capAnterior = 0;
+                $capAnterior = (float)$capAnterior;
             }
         } else {
-            $capAnterior = (float)$capAnterior;
+            // Year or range: find last closed corte before fInicio
+            $stmtAnt = $pdo->prepare("SELECT capital_acumulado FROM cierres_mensuales WHERE mes < ? ORDER BY mes DESC LIMIT 1");
+            $stmtAnt->execute([$fInicio]);
+            $capAnterior = $stmtAnt->fetchColumn();
+            $capAnterior = $capAnterior !== false ? (float)$capAnterior : 0;
         }
 
         // Detectar si falta corte inicial o está vacío
         $needsCorteUpdate = false;
-        if ($capitalAmiriSaldo > 0.01) {
+        if ($capitalAmiriSaldo > 0.01 && $mesActual) {
             if ($ultimoCorte && $ultimoCorte['mes'] === $mesActual) {
                 $comisionesCorte = (float)$ultimoCorte['comisiones_amiri'];
                 $divisasCorte = (float)$ultimoCorte['ganancia_divisas'];
@@ -165,7 +201,7 @@ try {
 
     // ==================== RETIROS ====================
     if ($tipo === 'retiros') {
-        $stmt = $pdo->query("SELECT * FROM retiros_capital ORDER BY fecha DESC, id DESC");
+        $stmt = $pdo->query("SELECT r.*, c.nombre AS cuenta_nombre FROM retiros_capital r LEFT JOIN cuentas c ON r.cuenta_id = c.id ORDER BY r.fecha DESC, r.id DESC");
         echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
         exit;
     }
@@ -204,7 +240,7 @@ try {
         $stmt->execute([$fInicio, $fFin]);
         $comisiones = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $stmt = $pdo->prepare("SELECT m.id, m.fecha, m.monto, m.descripcion FROM movimientos m WHERE m.servicio_id IN (2,3) AND m.tipo = 'comision' AND m.cuenta_destino_id = 1 AND m.fecha BETWEEN ? AND ? AND m.activo = 1 ORDER BY m.fecha");
+        $stmt = $pdo->prepare("SELECT m.id, m.fecha, m.monto, m.descripcion FROM movimientos m WHERE m.servicio_id IN (2,3) AND m.tipo = 'comision' AND m.cuenta_destino_id = 1 AND m.fecha BETWEEN ? AND ? AND m.activo = 1 AND m.estado = 'activo' ORDER BY m.fecha");
         $stmt->execute([$fInicio, $fFin]);
         $divisas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -239,7 +275,7 @@ try {
         $stmt->execute([$fInicio, $fFin]);
         $comisiones = (float)$stmt->fetchColumn();
 
-        $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
+        $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'activo'");
         $stmt->execute([$fInicio, $fFin]);
         $divisas = (float)$stmt->fetchColumn();
 
@@ -279,13 +315,18 @@ try {
             registrarAuditoria($pdo, $usuario_id, 'capital_cerrar_mes', "Cierre del mes $mes", json_encode(['id' => $idCierre, 'utilidad' => $utilidad, 'capital' => $capitalAcumulado]));
         }
 
-        // Sincronizar cuenta de Capital Amiri con capital_acumulado
+        // Restar retiros de capital_acumulado para evitar double-counting en la diferencia
+        $stmtTotalRetiros = $pdo->query("SELECT COALESCE(SUM(monto), 0) FROM retiros_capital");
+        $totalRetiros = (float)$stmtTotalRetiros->fetchColumn();
+        $capitalEsperado = $capitalAcumulado - $totalRetiros;
+
+        // Sincronizar cuenta de Capital Amiri con capital_acumulado (descontando retiros)
         $stmtCap = $pdo->query("SELECT id, saldo_actual FROM cuentas WHERE tipo_cuenta = 7 AND activo = 1 LIMIT 1");
         $capitalRow = $stmtCap->fetch(PDO::FETCH_ASSOC);
         if ($capitalRow) {
             $capitalId = (int)$capitalRow['id'];
             $saldoCapAnt = (float)$capitalRow['saldo_actual'];
-            $diferencia = round($capitalAcumulado - $saldoCapAnt, 2);
+            $diferencia = round($capitalEsperado - $saldoCapAnt, 2);
             if (abs($diferencia) > 0.01) {
                 $grupoId = round(microtime(true) * 1000);
                 $tipoMov = $diferencia > 0 ? 'entrada' : 'salida';
@@ -297,8 +338,8 @@ try {
                 $stmtMov->execute([$grupoId, $tipoMov, $montoAbs, $desc, $origenId, $destinoId, $usuario_id]);
                 $movId = $pdo->lastInsertId();
                 $pdo->exec("SET @hyperion_saldo_auth = 1");
-                $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?")->execute([$capitalAcumulado, $capitalId]);
-                $pdo->prepare("INSERT INTO historial_saldos (cuenta_id, movimiento_id, tipo, monto, saldo_anterior, saldo_nuevo) VALUES (?, ?, ?, ?, ?, ?)")->execute([$capitalId, $movId, $tipoMov, $montoAbs, $saldoCapAnt, $capitalAcumulado]);
+                $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?")->execute([$capitalEsperado, $capitalId]);
+                $pdo->prepare("INSERT INTO historial_saldos (cuenta_id, movimiento_id, tipo, monto, saldo_anterior, saldo_nuevo) VALUES (?, ?, ?, ?, ?, ?)")->execute([$capitalId, $movId, $tipoMov, $montoAbs, $saldoCapAnt, $capitalEsperado]);
 
                 // También sincronizar Utilidades (tipo_cuenta = 3)
                 $stmtUtil = $pdo->query("SELECT id, saldo_actual FROM cuentas WHERE tipo_cuenta = 3 AND activo = 1 LIMIT 1");
@@ -397,8 +438,9 @@ try {
         }
 
         // Insertar retiro
-        $stmt = $pdo->prepare("INSERT INTO retiros_capital (monto, concepto, fecha, usuario_id, usuario_nombre) VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$monto, $concepto, $fecha, $usuario_id, $usuario_nombre]);
+        $cuentaIdPost = (int)($_POST['cuenta_id'] ?? 0);
+        $stmt = $pdo->prepare("INSERT INTO retiros_capital (monto, concepto, fecha, usuario_id, usuario_nombre, cuenta_id) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$monto, $concepto, $fecha, $usuario_id, $usuario_nombre, $cuentaIdPost > 0 ? $cuentaIdPost : null]);
         $retiroId = $pdo->lastInsertId();
 
         // Descontar de Capital Amiri (igual que gastos.php)
@@ -416,6 +458,26 @@ try {
             $pdo->exec("SET @hyperion_saldo_auth = 1");
             $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?")->execute([$nuevoSaldo, $capitalId]);
             $pdo->prepare("INSERT INTO historial_saldos (cuenta_id, movimiento_id, tipo, monto, saldo_anterior, saldo_nuevo) VALUES (?, ?, 'salida', ?, ?, ?)")->execute([$capitalId, $movId, $monto, $saldoAnt, $nuevoSaldo]);
+        }
+
+        // Descontar también de la cuenta seleccionada (si es diferente a Capital Amiri)
+        $cuentaIdPost = (int)($_POST['cuenta_id'] ?? 0);
+        if ($cuentaIdPost && $capitalRow && $cuentaIdPost !== (int)$capitalRow['id']) {
+            $stmtCuenta = $pdo->prepare("SELECT id, saldo_actual FROM cuentas WHERE id = ? AND activo = 1");
+            $stmtCuenta->execute([$cuentaIdPost]);
+            $cuentaRow = $stmtCuenta->fetch(PDO::FETCH_ASSOC);
+            if ($cuentaRow) {
+                $saldoCuentaAnt = (float)$cuentaRow['saldo_actual'];
+                $saldoCuentaNuevo = round($saldoCuentaAnt - $monto, 2);
+                $grupoIdCuenta = round(microtime(true) * 1000);
+                $descCuenta = "Retiro de capital: $concepto";
+                $stmtMovCuenta = $pdo->prepare("INSERT INTO movimientos (grupo_id, fecha, tipo, monto, moneda, descripcion, cuenta_origen_id, cuenta_destino_id, usuario_id, servicio_id, referencia_id, referencia_tipo, activo) VALUES (?, ?, 'salida', ?, 'MXN', ?, ?, NULL, ?, 18, ?, 'retiro_capital', 1)");
+                $stmtMovCuenta->execute([$grupoIdCuenta, $fecha, $monto, $descCuenta, $cuentaIdPost, $usuario_id, $retiroId]);
+                $movCuentaId = $pdo->lastInsertId();
+                $pdo->exec("SET @hyperion_saldo_auth = 1");
+                $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?")->execute([$saldoCuentaNuevo, $cuentaIdPost]);
+                $pdo->prepare("INSERT INTO historial_saldos (cuenta_id, movimiento_id, tipo, monto, saldo_anterior, saldo_nuevo) VALUES (?, ?, 'salida', ?, ?, ?)")->execute([$cuentaIdPost, $movCuentaId, $monto, $saldoCuentaAnt, $saldoCuentaNuevo]);
+            }
         }
 
         echo json_encode(['success' => true, 'id' => $retiroId, 'monto' => $monto]);
@@ -501,7 +563,7 @@ try {
                 SELECT DISTINCT m FROM (
                     SELECT DATE_FORMAT(fecha, '%Y-%m') as m FROM deudas_clientes WHERE activo = 1
                     UNION
-                    SELECT DATE_FORMAT(fecha, '%Y-%m') FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND activo = 1
+                    SELECT DATE_FORMAT(fecha, '%Y-%m') FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND activo = 1 AND estado = 'activo'
                     UNION
                     SELECT DATE_FORMAT(fecha, '%Y-%m') FROM gastos WHERE activo = 1
                 ) meses ORDER BY m ASC
@@ -513,23 +575,32 @@ try {
             }
 
             $capitalAnterior = 0;
-            $stmtCom = $pdo->prepare("SELECT COALESCE(SUM(comision_amiri), 0) FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1");
-            $stmtDiv = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
-            $stmtGas = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total, COALESCE(SUM(CASE WHEN clasificacion = 'fijo' THEN monto ELSE 0 END), 0) as fijos, COALESCE(SUM(CASE WHEN clasificacion = 'variable' THEN monto ELSE 0 END), 0) as variables FROM gastos WHERE fecha BETWEEN ? AND ? AND activo = 1");
+
+            // Batch queries: 3 queries total en vez de 3N
+            $comisionesPorMes = [];
+            $stmtComBatch = $pdo->query("SELECT DATE_FORMAT(fecha, '%Y-%m') as mes, COALESCE(SUM(comision_amiri), 0) as total FROM deudas_clientes WHERE activo = 1 GROUP BY DATE_FORMAT(fecha, '%Y-%m')");
+            while ($row = $stmtComBatch->fetch(PDO::FETCH_ASSOC)) {
+                $comisionesPorMes[$row['mes']] = (float)$row['total'];
+            }
+
+            $divisasPorMes = [];
+            $stmtDivBatch = $pdo->query("SELECT DATE_FORMAT(fecha, '%Y-%m') as mes, COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND activo = 1 AND estado = 'activo' GROUP BY DATE_FORMAT(fecha, '%Y-%m')");
+            while ($row = $stmtDivBatch->fetch(PDO::FETCH_ASSOC)) {
+                $divisasPorMes[$row['mes']] = (float)$row['total'];
+            }
+
+            $gastosPorMes = [];
+            $stmtGasBatch = $pdo->query("SELECT DATE_FORMAT(fecha, '%Y-%m') as mes, COALESCE(SUM(monto), 0) as total, COALESCE(SUM(CASE WHEN clasificacion = 'fijo' THEN monto ELSE 0 END), 0) as fijos, COALESCE(SUM(CASE WHEN clasificacion = 'variable' THEN monto ELSE 0 END), 0) as variables FROM gastos WHERE activo = 1 GROUP BY DATE_FORMAT(fecha, '%Y-%m')");
+            while ($row = $stmtGasBatch->fetch(PDO::FETCH_ASSOC)) {
+                $gastosPorMes[$row['mes']] = $row;
+            }
+
             $stmtIns = $pdo->prepare("INSERT INTO cierres_mensuales (mes, fecha_cierre, comisiones_amiri, ganancia_divisas, gastos_fijos, gastos_variables, gastos_total, utilidad_neta, capital_acumulado) VALUES (?, NOW(), ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE fecha_cierre = NOW(), comisiones_amiri = VALUES(comisiones_amiri), ganancia_divisas = VALUES(ganancia_divisas), gastos_fijos = VALUES(gastos_fijos), gastos_variables = VALUES(gastos_variables), gastos_total = VALUES(gastos_total), utilidad_neta = VALUES(utilidad_neta), capital_acumulado = VALUES(capital_acumulado)");
 
             foreach ($meses as $mes) {
-                $fInicioMes = $mes . '-01';
-                $fFinMes = date('Y-m-t', strtotime($fInicioMes));
-
-                $stmtCom->execute([$fInicioMes, $fFinMes]);
-                $com = (float)$stmtCom->fetchColumn();
-
-                $stmtDiv->execute([$fInicioMes, $fFinMes]);
-                $div = (float)$stmtDiv->fetchColumn();
-
-                $stmtGas->execute([$fInicioMes, $fFinMes]);
-                $gasRow = $stmtGas->fetch(PDO::FETCH_ASSOC);
+                $com = $comisionesPorMes[$mes] ?? 0;
+                $div = $divisasPorMes[$mes] ?? 0;
+                $gasRow = $gastosPorMes[$mes] ?? ['total' => 0, 'fijos' => 0, 'variables' => 0];
                 $gasTotal = (float)$gasRow['total'];
                 $gasFijos = (float)$gasRow['fijos'];
                 $gasVars = (float)$gasRow['variables'];
@@ -570,6 +641,101 @@ try {
                     ? "Cortes históricos actualizados (" . count($meses) . " meses)"
                     : "Capital inicializado con \$$montoTransferir desde Utilidades AMIRI (" . count($meses) . " cortes creados)",
             ]);
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            http_response_code(400);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+        exit;
+    }
+
+    if ($tipo === 'meses_cerrados') {
+        $stmt = $pdo->query("SELECT mes, fecha_cierre, utilidad_neta, capital_acumulado FROM cierres_mensuales ORDER BY mes DESC");
+        $meses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        echo json_encode($meses);
+        exit;
+    }
+
+    if ($tipo === 'abrir_mes') {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['error' => 'Método no permitido']);
+            exit;
+        }
+
+        $mes = $_POST['mes'] ?? '';
+        if (!$mes || !preg_match('/^\d{4}-\d{2}$/', $mes)) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Mes inválido. Formato: YYYY-MM']);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("SELECT id, comisiones_amiri, ganancia_divisas, gastos_total, utilidad_neta, capital_acumulado FROM cierres_mensuales WHERE mes = ?");
+        $stmt->execute([$mes]);
+        $cierre = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$cierre) {
+            http_response_code(404);
+            echo json_encode(['error' => "El mes $mes no está cerrado"]);
+            exit;
+        }
+
+        $hayPosteriores = $pdo->prepare("SELECT COUNT(*) FROM cierres_mensuales WHERE mes > ?");
+        $hayPosteriores->execute([$mes]);
+        if ((int)$hayPosteriores->fetchColumn() > 0) {
+            http_response_code(409);
+            echo json_encode(['error' => "No puedes abrir el mes $mes porque hay cierres posteriores. Abre primero los meses más recientes."]);
+            exit;
+        }
+
+        $pdo->beginTransaction();
+        try {
+            $grupoTs = round(microtime(true) * 1000);
+
+            $stmtMovs = $pdo->prepare("SELECT id, grupo_id, tipo, monto, cuenta_origen_id, cuenta_destino_id, descripcion FROM movimientos WHERE servicio_id = 19 AND activo = 1 AND (descripcion LIKE ? OR descripcion LIKE ?)");
+            $likeCierre = "Ajuste por cierre de mes $mes%";
+            $likeResidual = "Ajuste por absorción de centavos%mes $mes%";
+            $stmtMovs->execute([$likeCierre, $likeResidual]);
+            $movsARevertir = $stmtMovs->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($movsARevertir as $mov) {
+                $pdo->prepare("UPDATE movimientos SET activo = 0 WHERE id = ?")->execute([$mov['id']]);
+
+                if ($mov['cuenta_origen_id']) {
+                    $pdo->exec("SET @hyperion_saldo_auth = 1");
+                    $stmtSaldo = $pdo->prepare("SELECT saldo_actual FROM cuentas WHERE id = ?");
+                    $stmtSaldo->execute([$mov['cuenta_origen_id']]);
+                    $saldoAnt = (float)$stmtSaldo->fetchColumn();
+                    $saldoNuevo = round($saldoAnt + (float)$mov['monto'], 2);
+                    $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?")->execute([$saldoNuevo, $mov['cuenta_origen_id']]);
+                    $movReversa = round(microtime(true) * 1000);
+                    $pdo->prepare("INSERT INTO movimientos (grupo_id, fecha, tipo, monto, moneda, descripcion, cuenta_destino_id, usuario_id, servicio_id, activo) VALUES (?, NOW(), ?, ?, 'MXN', ?, ?, ?, 19, 1)")->execute([$movReversa, $mov['tipo'] === 'entrada' ? 'salida' : 'entrada', $mov['monto'], "Reversión por apertura de mes $mes", $mov['cuenta_origen_id'], $usuario_id]);
+                    $movReversaId = $pdo->lastInsertId();
+                    $pdo->prepare("INSERT INTO historial_saldos (cuenta_id, movimiento_id, tipo, monto, saldo_anterior, saldo_nuevo) VALUES (?, ?, ?, ?, ?, ?)")->execute([$mov['cuenta_origen_id'], $movReversaId, $mov['tipo'] === 'entrada' ? 'salida' : 'entrada', $mov['monto'], $saldoAnt, $saldoNuevo]);
+                }
+
+                if ($mov['cuenta_destino_id']) {
+                    $pdo->exec("SET @hyperion_saldo_auth = 1");
+                    $stmtSaldo = $pdo->prepare("SELECT saldo_actual FROM cuentas WHERE id = ?");
+                    $stmtSaldo->execute([$mov['cuenta_destino_id']]);
+                    $saldoAnt = (float)$stmtSaldo->fetchColumn();
+                    $saldoNuevo = round($saldoAnt - (float)$mov['monto'], 2);
+                    $pdo->prepare("UPDATE cuentas SET saldo_actual = ? WHERE id = ?")->execute([$saldoNuevo, $mov['cuenta_destino_id']]);
+                    $movReversa = round(microtime(true) * 1000);
+                    $pdo->prepare("INSERT INTO movimientos (grupo_id, fecha, tipo, monto, moneda, descripcion, cuenta_origen_id, usuario_id, servicio_id, activo) VALUES (?, NOW(), ?, ?, 'MXN', ?, ?, ?, 19, 1)")->execute([$movReversa, $mov['tipo'] === 'entrada' ? 'salida' : 'entrada', $mov['monto'], "Reversión por apertura de mes $mes", $mov['cuenta_destino_id'], $usuario_id]);
+                    $movReversaId = $pdo->lastInsertId();
+                    $pdo->prepare("INSERT INTO historial_saldos (cuenta_id, movimiento_id, tipo, monto, saldo_anterior, saldo_nuevo) VALUES (?, ?, ?, ?, ?, ?)")->execute([$mov['cuenta_destino_id'], $movReversaId, $mov['tipo'] === 'entrada' ? 'salida' : 'entrada', $mov['monto'], $saldoAnt, $saldoNuevo]);
+                }
+            }
+
+            $stmtCierre = $pdo->prepare("DELETE FROM cierres_mensuales WHERE id = ?");
+            $stmtCierre->execute([$cierre['id']]);
+
+            if (function_exists('registrarAuditoria')) {
+                registrarAuditoria($pdo, $usuario_id, 'capital_abrir_mes', "Apertura del mes $mes", json_encode(['cierre_anterior' => $cierre]));
+            }
+
+            $pdo->commit();
+            echo json_encode(['success' => true, 'mes' => $mes, 'mensaje' => "Mes $mes abierto correctamente. Los movimientos de ese mes ya no están bloqueados."]);
         } catch (Exception $e) {
             $pdo->rollBack();
             http_response_code(400);

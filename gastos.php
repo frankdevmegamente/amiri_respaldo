@@ -24,8 +24,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <style>
         .body-wrapper { padding-top: 100px !important; }
         .body-wrapper-inner, .body-wrapper .container-fluid { padding-top: 15px !important; margin-top: 0 !important; }
-        body[data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
-        body[data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
+        [data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
+        [data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
 
         /* ─── Page Header ─────────────────────────────── */
         .gastos-header {
@@ -55,17 +55,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         }
         .gastos-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
         .gastos-header .mes-badge { font-size: 1rem; color: #8c9ea8; }
-
-        .month-nav-btn {
-            width: 36px; height: 36px;
-            display: inline-flex; align-items: center; justify-content: center;
-            border-radius: 8px; border: 1px solid #dee2e6;
-            background: transparent; color: inherit; cursor: pointer;
-            transition: all 0.15s ease;
-        }
-        .month-nav-btn:hover { background: rgba(93, 135, 255, 0.1); border-color: #5D87FF; }
-        [data-bs-theme="dark"] .month-nav-btn { border-color: #2c344c; }
-        [data-bs-theme="dark"] .month-nav-btn:hover { background: rgba(93, 135, 255, 0.2); }
 
         /* ─── Metric Cards ────────────────────────────── */
         .metric-card {
@@ -128,6 +117,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .form-control::placeholder { color: #8c9ea8; }
         [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
     </style>
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
@@ -160,22 +150,28 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                 </div>
                                 <div class="col-md-auto">
                                     <div class="d-flex align-items-center gap-2">
-                                        <button class="month-nav-btn" id="btnMesAnterior" title="Mes anterior">
-                                            <i class="ti ti-chevron-left"></i>
+                                        <select class="form-select form-select-sm" id="selectPeriodo" style="min-width:130px;">
+                                            <option value="mes" selected>Este Mes</option>
+                                            <option value="mes_pasado">Mes Pasado</option>
+                                            <option value="anio">Este Año</option>
+                                            <option value="rango">Fecha Personalizada</option>
+                                        </select>
+                                        <div id="fechaInicioGroup" style="display:none;min-width:120px;">
+                                            <input type="date" class="form-control form-control-sm" id="fechaInicio">
+                                        </div>
+                                        <div id="fechaFinGroup" style="display:none;min-width:120px;">
+                                            <input type="date" class="form-control form-control-sm" id="fechaFin">
+                                        </div>
+                                        <button class="btn btn-primary btn-sm" id="btnFiltrar">
+                                            <i class="ti ti-filter"></i> Aplicar
                                         </button>
-                                        <select class="form-select d-inline-block" id="selectMes" style="width:auto;min-width:140px;"></select>
-                                        <button class="month-nav-btn" id="btnMesSiguiente" title="Mes siguiente">
-                                            <i class="ti ti-chevron-right"></i>
-                                        </button>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary border-0 py-1 px-2" id="rangoFechas"><i class="ti ti-calendar me-1"></i>Este Mes</span>
                                         <div class="vr mx-1"></div>
                                         <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalGasto">
                                             <i class="ti ti-plus"></i> Nuevo Gasto
                                         </button>
                                         <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modalAgregarTipo">
                                             <i class="ti ti-tag"></i> Tipo
-                                        </button>
-                                        <button class="btn btn-outline-secondary btn-sm" id="btnRefrescar" title="Refrescar">
-                                            <i class="ti ti-refresh"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -408,83 +404,53 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             }
 
             // ─── Globals ─────────────────────────────────
-            let mesActual = String(new Date().getMonth() + 1).padStart(2, '0');
-            let anioActual = String(new Date().getFullYear());
             let tabla = null;
 
-            const nombresMeses = ['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                                  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-
-            // ─── Mes Label ───────────────────────────────
-            function actualizarLabelMes() {
-                let m = parseInt(mesActual), a = parseInt(anioActual);
-                $('#mesLabel').text(nombresMeses[m] + ' ' + a);
-            }
-
-            // ─── Select de meses ─────────────────────────
-            function cargarSelectMeses() {
-                let $sel = $('#selectMes');
-                $sel.empty();
-                let minMes = 4;
-                let m = parseInt(mesActual), a = parseInt(anioActual);
-                let now = new Date();
-                let currentM = now.getMonth() + 1;
-                let currentY = now.getFullYear();
-                while (a > 2026 || (a === 2026 && m >= minMes)) {
-                    let val = a + '-' + String(m).padStart(2, '0');
-                    let sel = (m === parseInt(mesActual) && a === parseInt(anioActual)) ? 'selected' : '';
-                    $sel.prepend('<option value="' + val + '" ' + sel + '>' + nombresMeses[m] + ' ' + a + '</option>');
-                    m--;
-                    if (m < 1) { m = 12; a--; }
-                    if (a === 2026 && m < minMes) break;
+            // ─── Period Filter ───────────────────────────
+            function getParams() {
+                const periodo = $('#selectPeriodo').val();
+                if (periodo === 'mes_pasado') {
+                    const d = new Date();
+                    d.setMonth(d.getMonth() - 1);
+                    const anio = d.getFullYear();
+                    const mes = String(d.getMonth() + 1).padStart(2, '0');
+                    const dias = new Date(anio, d.getMonth() + 1, 0).getDate();
+                    return 'periodo=rango&fecha_inicio=' + anio + '-' + mes + '-01&fecha_fin=' + anio + '-' + mes + '-' + String(dias).padStart(2, '0');
                 }
+                if (periodo === 'rango') {
+                    return 'periodo=rango&fecha_inicio=' + $('#fechaInicio').val() + '&fecha_fin=' + $('#fechaFin').val();
+                }
+                return 'periodo=' + periodo;
             }
 
-            $(document).on('change', '#selectMes', function() {
-                let parts = $(this).val().split('-');
-                mesActual = parts[1];
-                anioActual = parts[0];
-                actualizarDashboard();
+            $(document).on('change', '#selectPeriodo', function() {
+                if ($(this).val() === 'rango') {
+                    $('#fechaInicioGroup, #fechaFinGroup').show();
+                } else {
+                    $('#fechaInicioGroup, #fechaFinGroup').hide();
+                    actualizarDashboard();
+                }
             });
 
-            $('#btnMesAnterior').on('click', function() {
-                let m = parseInt(mesActual) - 1;
-                let a = parseInt(anioActual);
-                if (m < 1) { m = 12; a--; }
-                if (a < 2026 || (a === 2026 && m < 4)) return;
-                mesActual = String(m).padStart(2, '0');
-                anioActual = String(a);
-                $('#selectMes').val(a + '-' + mesActual);
+            $(document).on('click', '#btnFiltrar', function() {
                 actualizarDashboard();
             });
-
-            $('#btnMesSiguiente').on('click', function() {
-                let m = parseInt(mesActual) + 1;
-                let a = parseInt(anioActual);
-                if (m > 12) { m = 1; a++; }
-                let now = new Date();
-                if (a > now.getFullYear() || (a === now.getFullYear() && m > now.getMonth() + 1)) return;
-                mesActual = String(m).padStart(2, '0');
-                anioActual = String(a);
-                $('#selectMes').val(a + '-' + mesActual);
-                actualizarDashboard();
-            });
-
-            $('#btnRefrescar').on('click', function() { actualizarDashboard(); });
 
             // ─── Cargar Resumen (KPI Cards) ──────────────
             function cargarResumen() {
-                let m = mesActual, a = anioActual;
-                let mLabel = nombresMeses[parseInt(m)] + ' ' + a;
-                $.get('api/gastos.php?resumen=1&mes=' + a + '-' + m, function(data) {
+                var periodoTexto = { 'mes': 'Este Mes', 'mes_pasado': 'Mes Pasado', 'anio': 'Este Año', 'rango': 'Fecha Personalizada' };
+                var label = periodoTexto[$('#selectPeriodo').val()] || 'Este Mes';
+                $('#rangoFechas').html('<i class="ti ti-calendar me-1"></i>' + label);
+                $.getJSON('api/gastos.php?resumen=1&' + getParams(), function(data) {
                     $('#kpiTotal').text(formatoMoneda(data.total_monto));
                     $('#kpiPromedio').text(formatoMoneda(data.promedio_monto));
                     $('#kpiCantidad').text(data.total_gastos);
                     $('#kpiMaximo').text(formatoMoneda(data.max_monto));
 
-                    $('#kpiTotalFooter').html('<i class="ti ti-calendar"></i> ' + mLabel);
-                    $('#kpiPromedioFooter').html('<i class="ti ti-calendar"></i> ' + mLabel);
-                    $('#kpiCantidadFooter').html('<i class="ti ti-calendar"></i> ' + mLabel);
+                    var subtxt = (data.total_gastos || 0) + ' gastos';
+                    $('#kpiTotalFooter').html('<i class="ti ti-calendar"></i> ' + subtxt);
+                    $('#kpiPromedioFooter').html('<i class="ti ti-calendar"></i> ' + subtxt);
+                    $('#kpiCantidadFooter').html('<i class="ti ti-calendar"></i> ' + subtxt);
                     $('#kpiMaximoFooter').html('<i class="ti ti-tag"></i> ' + (data.max_concepto || '—'));
                 }).fail(function() {
                     $('#kpiTotal').text('Error');
@@ -552,8 +518,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             }
 
             function cargarDesglose() {
-                let m = mesActual, a = anioActual;
-                $.get('api/gastos.php?chart=1&mes=' + a + '-' + m, function(data) {
+                $.getJSON('api/gastos.php?chart=1&' + getParams(), function(data) {
                     renderDesglose(data);
                 }).fail(function() {
                     renderDesglose([]);
@@ -602,8 +567,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
             // ─── DataTable ───────────────────────────────
             function cargarTabla() {
-                let m = mesActual, a = anioActual;
-                let url = 'api/gastos.php?mes=' + a + '-' + m;
+                let url = 'api/gastos.php?' + getParams();
 
                 if (tabla) {
                     tabla.ajax.url(url).load();
@@ -657,7 +621,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             // ─── Dashboard completo ──────────────────────
             function actualizarDashboard() {
                 limpiarFiltro();
-                actualizarLabelMes();
                 cargarResumen();
                 cargarDesglose();
                 cargarTabla();
@@ -765,7 +728,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
             // ─── Init ────────────────────────────────────
             $(document).ready(function() {
-                cargarSelectMeses();
                 actualizarDashboard();
             });
         </script>

@@ -19,8 +19,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <style>
         .body-wrapper { padding-top: 100px !important; }
         .body-wrapper-inner, .body-wrapper .container-fluid { padding-top: 15px !important; margin-top: 0 !important; }
-        body[data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
-        body[data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
+        [data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
+        [data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
 
         /* ─── Page Header ─────────────────────────────── */
         .loans-header { position: relative; overflow: hidden; border-radius: 16px !important; }
@@ -66,6 +66,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .bg-warning.bg-opacity-10 { background-color: rgba(255, 193, 7, 0.12) !important; }
         [data-bs-theme="dark"] .bg-danger.bg-opacity-10 { background-color: rgba(220, 53, 69, 0.12) !important; }
     </style>
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">

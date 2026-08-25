@@ -52,10 +52,11 @@ $total_mxn = floatval($proveedor['valor_mxn_usd'] ?? 0) + floatval($proveedor['v
     <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css">
     <link rel="stylesheet" href="src/assets/css/layout-custom.css">
     <style>
-        body[data-bs-theme="dark"] .card { background: #1a2234; border-color: #2c344c; }
-        body[data-bs-theme="dark"] .table { color: #e9ecef; }
-        body[data-bs-theme="dark"] .table thead th { background-color: #1a2234 !important; color: #e9ecef; }
+        [data-bs-theme="dark"] .card { background: #1a2234; border-color: #2c344c; }
+        [data-bs-theme="dark"] .table { color: #e9ecef; }
+        [data-bs-theme="dark"] .table thead th { background-color: #1a2234 !important; color: #e9ecef; }
     </style>
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">

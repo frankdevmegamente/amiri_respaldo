@@ -115,6 +115,28 @@ if ($cliente_id) {
 
 
 
+// Obtener cuenta del proveedor si existe
+
+$cuenta_proveedor_mxn_id = null;
+
+if ($proveedor_id) {
+
+    $stmtProv = $pdo->prepare("SELECT cuenta_mxn_id, cuenta_id FROM proveedores WHERE id = ?");
+
+    $stmtProv->execute([$proveedor_id]);
+
+    $provData = $stmtProv->fetch(PDO::FETCH_ASSOC);
+
+    if ($provData) {
+
+        $cuenta_proveedor_mxn_id = $provData['cuenta_mxn_id'] ?? $provData['cuenta_id'] ?? null;
+
+    }
+
+}
+
+
+
 try {
 
     $pdo->beginTransaction();
@@ -238,8 +260,27 @@ try {
 
     } else if ($servicio === 'Compra de Efectivo') {
 
-        if (!$cuenta_cliente_id) {
-            throw new Exception('El cliente no tiene cuenta/caja asociada');
+        if (!$proveedor_id) {
+            throw new Exception('Debe seleccionar un proveedor');
+        }
+        if (!$cuenta_proveedor_mxn_id) {
+            // Auto-crear cuenta MXN si no existe
+            $stmtAuto = $pdo->prepare("SELECT nombre FROM proveedores WHERE id = ?");
+            $stmtAuto->execute([$proveedor_id]);
+            $nombreProv = $stmtAuto->fetchColumn();
+            $nombreCuenta = 'Caja Proveedor MXN - ' . $nombreProv;
+            $stmtCheck = $pdo->prepare("SELECT id FROM cuentas WHERE nombre = ?");
+            $stmtCheck->execute([$nombreCuenta]);
+            $existing = $stmtCheck->fetch(PDO::FETCH_ASSOC);
+            if ($existing) {
+                $cuenta_proveedor_mxn_id = $existing['id'];
+                $pdo->prepare("UPDATE cuentas SET activo = 1 WHERE id = ?")->execute([$cuenta_proveedor_mxn_id]);
+            } else {
+                $stmtC = $pdo->prepare("INSERT INTO cuentas (nombre, tipo_cuenta, tipo_moneda, saldo_actual, activo) VALUES (?, 6, 'MXN', 0, 1)");
+                $stmtC->execute([$nombreCuenta]);
+                $cuenta_proveedor_mxn_id = $pdo->lastInsertId();
+            }
+            $pdo->prepare("UPDATE proveedores SET cuenta_mxn_id = ? WHERE id = ?")->execute([$cuenta_proveedor_mxn_id, $proveedor_id]);
         }
         if (!$cuenta_id) {
             throw new Exception('Debe seleccionar una cuenta/caja para recibir el efectivo');
@@ -250,19 +291,19 @@ try {
 
         $comAmiri = round($monto * ($porcentaje_amiri / 100), 2);
         $comPromotor = round($monto * ($porcentaje_promotor / 100), 2);
-        $montoAlCliente = round($monto - $comAmiri - $comPromotor, 2);
+        $montoAlProveedor = round($monto - $comAmiri - $comPromotor, 2);
 
-        if ($montoAlCliente <= 0) {
-            throw new Exception('El monto al cliente debe ser mayor a $0. Las comisiones suman ' . ($porcentaje_amiri + $porcentaje_promotor) . '%');
+        if ($montoAlProveedor <= 0) {
+            throw new Exception('El monto al proveedor debe ser mayor a $0. Las comisiones suman ' . ($porcentaje_amiri + $porcentaje_promotor) . '%');
         }
 
         $tipo_pago = $data['tipo_pago'] ?? 'credito';
         $cuenta_pago_id = $data['cuenta_pago_id'] ?? null;
 
-        // 1) ENTRADA to the selected cuenta (caja/banco) — full monto recibido del cliente
+        // 1) ENTRADA to the selected cuenta (caja/banco) — full monto recibido del proveedor
         $stmtMovimiento->execute([
             $grupo_id, $fecha, $servicio_id, 'entrada', 'MXN', $monto,
-            null, $cuenta_id, $cliente_id, null, null, null, null, 1, 'Ingreso por ' . $servicio
+            null, $cuenta_id, null, null, $proveedor_id, null, null, 1, 'Ingreso por ' . $servicio
         ]);
         $mov_id1 = $pdo->lastInsertId();
         actualizarSaldoCuenta($pdo, $cuenta_id, $monto, 'entrada', $mov_id1, 'Ingreso por ' . $servicio);
@@ -287,7 +328,7 @@ try {
             actualizarSaldoCuenta($pdo, $cuenta_promotor_id, $comPromotor, 'salida', $mov_id3, 'Comisión Promotor - ' . $servicio);
         }
 
-        // 4) SALIDA to cliente (contado) o deuda (credito)
+        // 4) PAGO al proveedor (contado) o deuda (credito)
         if ($tipo_pago === 'contado') {
             if (!$cuenta_pago_id) {
                 throw new Exception('Debe seleccionar una cuenta para realizar el pago');
@@ -296,29 +337,23 @@ try {
             $stmtSaldo = $pdo->prepare("SELECT saldo_actual FROM cuentas WHERE id = ?");
             $stmtSaldo->execute([$cuenta_pago_id]);
             $saldoPago = (float)$stmtSaldo->fetchColumn();
-            if ($montoAlCliente > $saldoPago + 0.001) {
+            if ($montoAlProveedor > $saldoPago + 0.001) {
                 throw new Exception('Saldo insuficiente en la cuenta de pago. Disponible: $' . number_format($saldoPago, 2));
             }
             $stmtMovimiento->execute([
-                $grupo_id, $fecha, $servicio_id, 'salida', 'MXN', $montoAlCliente,
-                $cuenta_pago_id, null, $cliente_id, null, null, null, null, 1, 'Pago por ' . $servicio
+                $grupo_id, $fecha, $servicio_id, 'salida', 'MXN', $montoAlProveedor,
+                $cuenta_pago_id, null, null, null, $proveedor_id, null, null, 1, 'Pago por ' . $servicio
             ]);
             $mov_id4 = $pdo->lastInsertId();
-            actualizarSaldoCuenta($pdo, $cuenta_pago_id, $montoAlCliente, 'salida', $mov_id4, 'Pago por ' . $servicio);
+            actualizarSaldoCuenta($pdo, $cuenta_pago_id, $montoAlProveedor, 'salida', $mov_id4, 'Pago por ' . $servicio);
         } else {
-            // Crédito: registrar deuda de AMIRI hacia el cliente
-            $stmtDeuda = $pdo->prepare("INSERT INTO deudas_clientes (cliente_id, cuenta_cliente_id, movimiento_venta_id, monto_total, comision_amiri, comision_promotor, monto_neto_cliente, fecha, descripcion, estado, activo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pendiente', 1)");
-            $stmtDeuda->execute([
-                $cliente_id,
-                $cuenta_cliente_id,
-                $grupo_id,
-                $monto,
-                $comAmiri,
-                $comPromotor,
-                $montoAlCliente,
-                $fecha,
-                'Compra de efectivo - Pendiente de pago al cliente'
+            // Crédito: incrementar saldo de cuenta MXN del proveedor (AMIRI le debe)
+            $stmtMovimiento->execute([
+                $grupo_id, $fecha, $servicio_id, 'salida', 'MXN', $montoAlProveedor,
+                null, $cuenta_proveedor_mxn_id, null, null, $proveedor_id, null, null, 1, 'Adeudo proveedor: $' . number_format($montoAlProveedor, 2) . ' MXN'
             ]);
+            $mov_id5 = $pdo->lastInsertId();
+            actualizarSaldoCuenta($pdo, $cuenta_proveedor_mxn_id, $montoAlProveedor, 'entrada', $mov_id5, 'Adeudo proveedor MXN - ' . $servicio);
         }
 
     } else if ($servicio === 'Cambio de Flujo') {
@@ -399,9 +434,9 @@ try {
 
         $cuentaBancaria = $cuentaBancariaStmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$cuentaBancaria || $cuentaBancaria['tipo_cuenta'] != 1) {
+        if (!$cuentaBancaria || !in_array($cuentaBancaria['tipo_cuenta'], [1, 2])) {
 
-            throw new Exception('Debe seleccionar una cuenta bancaria');
+            throw new Exception('Debe seleccionar una cuenta bancaria o caja válida');
 
         }
 

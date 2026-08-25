@@ -104,12 +104,12 @@ try {
             
             // 5. Ganancia REAL en divisas (utilidad FIFO exacta desglosada)
             // Utilidad de Dólares Físicos (Servicio ID 2 = Venta de USD)
-            $stmtUSD = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 2 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
+            $stmtUSD = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 2 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'activo'");
             $stmtUSD->execute([$fechaInicio, $fechaFin]);
             $gananciaUSD = (float)$stmtUSD->fetchColumn();
 
             // Utilidad de USDT (Servicio ID 3 = Venta de USDT)
-            $stmtUSDT = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 3 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
+            $stmtUSDT = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 3 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'activo'");
             $stmtUSDT->execute([$fechaInicio, $fechaFin]);
             $gananciaUSDT = (float)$stmtUSDT->fetchColumn();
 
@@ -446,7 +446,7 @@ try {
             $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_amiri), 0) FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1");
             $stmt->execute([$fInicio, $fFin]);
             $comisiones = (float)$stmt->fetchColumn();
-            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'activo'");
             $stmt->execute([$fInicio, $fFin]);
             $divisas = (float)$stmt->fetchColumn();
             $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) FROM gastos WHERE fecha BETWEEN ? AND ? AND activo = 1");
@@ -472,6 +472,156 @@ try {
                 'total_retiros' => $totalRetiros,
                 'ultimo_corte' => $ultimoCorte ? $ultimoCorte['mes'] : null,
             ]);
+            break;
+
+        // ==================== FULL DASHBOARD (COMBINADO) ====================
+        case 'full_dashboard':
+            $resultado = [];
+
+            // 1. Resumen (mismos queries que 'resumen')
+            $r = [];
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_amiri), 0) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $r['comisiones_amiri'] = (float)$stmt->fetchColumn();
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_amiri), 0) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'pagado'");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $r['comisiones_amiri_cobradas'] = (float)$stmt->fetchColumn();
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_amiri), 0) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1 AND estado IN ('pendiente','parcial')");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $r['comisiones_amiri_por_cobrar'] = (float)$stmt->fetchColumn();
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_promotor), 0) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $r['comisiones_promotores'] = (float)$stmt->fetchColumn();
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_promotor), 0) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'pagado'");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $r['comisiones_promotores_cobradas'] = (float)$stmt->fetchColumn();
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_promotor), 0) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1 AND estado IN ('pendiente','parcial')");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $r['comisiones_promotores_por_cobrar'] = (float)$stmt->fetchColumn();
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto_total), 0) as total, COUNT(*) as cantidad FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $r['ventas_efectivo_total'] = (float)$row['total'];
+            $r['ventas_efectivo_cantidad'] = (int)$row['cantidad'];
+            $stmt = $pdo->prepare("SELECT fm.moneda, s.nombre as servicio, COUNT(DISTINCT fm.grupo_id) as operaciones, SUM(fm.monto) as total_monto, AVG(fm.paridad) as tc_promedio FROM movimientos fm JOIN servicios s ON fm.servicio_id = s.id WHERE fm.moneda IN ('USD', 'USDT') AND fm.fecha BETWEEN ? AND ? AND fm.activo = 1 AND ((fm.servicio_id IN (5, 6) AND fm.tipo = 'entrada') OR (fm.servicio_id IN (2, 3) AND fm.tipo = 'salida')) GROUP BY fm.moneda, fm.servicio_id, s.nombre");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $r['operaciones_divisas'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmtUSD = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 2 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'activo'");
+            $stmtUSD->execute([$fechaInicio, $fechaFin]);
+            $gananciaUSD = (float)$stmtUSD->fetchColumn();
+            $stmtUSDT = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 3 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'activo'");
+            $stmtUSDT->execute([$fechaInicio, $fechaFin]);
+            $gananciaUSDT = (float)$stmtUSDT->fetchColumn();
+            $r['ganancia_usd'] = $gananciaUSD;
+            $r['ganancia_usdt'] = $gananciaUSDT;
+            $r['ganancia_divisas_total'] = $gananciaUSD + $gananciaUSDT;
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total_gastos, COALESCE(SUM(CASE WHEN clasificacion = 'fijo' THEN monto ELSE 0 END), 0) as gastos_fijos, COALESCE(SUM(CASE WHEN clasificacion = 'variable' THEN monto ELSE 0 END), 0) as gastos_variables FROM gastos WHERE fecha BETWEEN ? AND ? AND activo = 1");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $gastos = $stmt->fetch(PDO::FETCH_ASSOC);
+            $r['gastos_total'] = (float)$gastos['total_gastos'];
+            $r['gastos_fijos'] = (float)$gastos['gastos_fijos'];
+            $r['gastos_variables'] = (float)$gastos['gastos_variables'];
+            $stmtUtil = $pdo->query("SELECT COALESCE(SUM(saldo_actual), 0) as total FROM cuentas WHERE tipo_cuenta = 3 AND activo = 1");
+            $r['utilidades_acumuladas'] = (float)$stmtUtil->fetchColumn();
+            $r['ganancia_bruta'] = $r['comisiones_amiri'] + $r['ganancia_divisas_total'];
+            $r['ganancia_bruta_por_cobrar'] = $r['comisiones_amiri_por_cobrar'];
+            $r['resultado_bruta_menos_fijos'] = $r['ganancia_bruta'] - $r['gastos_fijos'];
+            $r['resultado_operativo_real'] = $r['ganancia_bruta'] - $r['gastos_total'];
+            $r['ganancia_neta'] = $r['resultado_operativo_real'];
+            $r['_explicacion'] = [
+                'comisiones_amiri' => 'Suma de la columna comision_amiri en la tabla deudas_clientes (todos los estados: pagado + pendiente + parcial).',
+                'comisiones_amiri_cobradas' => 'Suma de comision_amiri solo de registros con estado = pagado en deudas_clientes.',
+                'comisiones_amiri_por_cobrar' => 'Suma de comision_amiri de registros con estado pendiente o parcial.',
+                'comisiones_promotores' => 'Suma de comision_promotor en deudas_clientes.',
+                'ganancia_usd' => 'Utilidad FIFO generada por compra/venta de Dólares Físicos (servicio_id = 2).',
+                'ganancia_usdt' => 'Utilidad FIFO generada por compra/venta de USDT (servicio_id = 3).',
+                'ganancia_divisas_total' => 'Suma de ganancia USD + ganancia USDT.',
+                'ventas_efectivo_total' => 'Suma de monto_total en deudas_clientes activas.',
+                'ventas_efectivo_cantidad' => 'Número total de operaciones de venta de efectivo.',
+                'gastos_total' => 'Suma de todos los gastos operativos (fijos + variables).',
+                'gastos_fijos' => 'Gastos operativos clasificados como fijos.',
+                'gastos_variables' => 'Gastos operativos clasificados como variables.',
+                'ganancia_bruta' => 'Comisiones AMIRI (devengadas) + Ganancia Divisas (FIFO).',
+                'resultado_operativo_real' => 'Ganancia Bruta - Gastos Totales.',
+                'utilidades_acumuladas' => 'Saldo acumulado histórico de la cuenta "Utilidades AMIRI".',
+            ];
+            $resultado['resumen'] = $r;
+
+            // 2. Gráfica: comisiones diarias
+            $stmt = $pdo->prepare("SELECT DATE(fecha) as fecha, SUM(comision_amiri) as amiri, SUM(comision_promotor) as promotores FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1 GROUP BY DATE(fecha) ORDER BY fecha");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $resultado['comisiones_diarias'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 3. Gráfica: comisiones por promotor
+            $stmt = $pdo->prepare("SELECT p.nombre as promotor, SUM(vec.comision_promotor) as comision FROM promotores p JOIN clientes c ON c.promotor_id = p.id JOIN deudas_clientes vec ON vec.cliente_id = c.id WHERE vec.fecha BETWEEN ? AND ? AND vec.activo = 1 AND p.activo = 1 GROUP BY p.id, p.nombre HAVING comision > 0 ORDER BY comision DESC LIMIT 10");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $resultado['comisiones_por_promotor'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 4. Gráfica: ventas diarias
+            $stmt = $pdo->prepare("SELECT DATE(fecha) as fecha, COUNT(*) as cantidad, SUM(monto_total) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1 GROUP BY DATE(fecha) ORDER BY fecha");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $resultado['ventas_diarias'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 5. Gráfica: divisas diarias
+            $stmt = $pdo->prepare("SELECT DATE(fm.fecha) as fecha, fm.moneda, SUM(CASE WHEN fm.servicio_id IN (5, 6) AND fm.tipo = 'entrada' THEN fm.monto ELSE 0 END) as compras, SUM(CASE WHEN fm.servicio_id IN (2, 3) AND fm.tipo = 'salida' THEN fm.monto ELSE 0 END) as ventas FROM movimientos fm WHERE fm.moneda IN ('USD', 'USDT') AND fm.fecha BETWEEN ? AND ? AND fm.activo = 1 GROUP BY DATE(fm.fecha), fm.moneda ORDER BY fecha");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $resultado['divisas_diarias'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 6. Comisiones (todas, por fecha) — tabla inicial
+            $stmt = $pdo->prepare("SELECT MAX(creado_en) as creado_en, DATE(fecha) as fecha, SUM(comision_amiri) as comision_amiri, SUM(comision_promotor) as comision_promotor, SUM(comision_amiri + comision_promotor) as total FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1 GROUP BY DATE(fecha) ORDER BY fecha DESC");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $resultado['comisiones'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 7. Divisas (USD) — tabla inicial
+            $stmt = $pdo->prepare("SELECT fm.creado_en, fm.id, fm.fecha, s.nombre as servicio, fm.monto as cantidad, fm.paridad as tipo_cambio, (fm.monto * fm.paridad) as monto_mxn, COALESCE(c.nombre, '-') as cliente, COALESCE(p.nombre, '-') as proveedor FROM movimientos fm JOIN servicios s ON fm.servicio_id = s.id LEFT JOIN clientes c ON fm.cliente_id = c.id LEFT JOIN proveedores p ON fm.proveedor_id = p.id WHERE fm.moneda = 'USD' AND fm.fecha BETWEEN ? AND ? AND fm.activo = 1 AND ((fm.servicio_id IN (5, 6) AND fm.tipo = 'entrada') OR (fm.servicio_id IN (2, 3) AND fm.tipo = 'salida')) ORDER BY fm.fecha DESC, fm.id DESC LIMIT 500");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $resultado['divisas_operaciones'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt = $pdo->prepare("SELECT SUM(CASE WHEN servicio_id IN (5, 6) AND tipo = 'entrada' THEN monto ELSE 0 END) as total_comprado, SUM(CASE WHEN servicio_id IN (2, 3) AND tipo = 'salida' THEN monto ELSE 0 END) as total_vendido, SUM(CASE WHEN servicio_id IN (5, 6) AND tipo = 'entrada' THEN monto * paridad ELSE 0 END) as mxn_gastado, SUM(CASE WHEN servicio_id IN (2, 3) AND tipo = 'salida' THEN monto * paridad ELSE 0 END) as mxn_recibido FROM movimientos WHERE moneda = 'USD' AND fecha BETWEEN ? AND ? AND activo = 1");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $resumenDiv = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmtGan = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as ganancia_real FROM movimientos WHERE servicio_id = 2 AND tipo = 'comision' AND fecha BETWEEN ? AND ? AND activo = 1");
+            $stmtGan->execute([$fechaInicio, $fechaFin]);
+            $resumenDiv['ganancia_mxn'] = (float)$stmtGan->fetchColumn();
+            $resumenDiv['flujo_caja'] = (float)$resumenDiv['mxn_recibido'] - (float)$resumenDiv['mxn_gastado'];
+            $resultado['divisas_resumen'] = $resumenDiv;
+
+            // 8. Ventas de efectivo — tabla
+            $stmt = $pdo->prepare("SELECT vec.creado_en, vec.id, vec.fecha, c.nombre as cliente, p.nombre as promotor, vec.monto_total, vec.comision_amiri, vec.comision_promotor, vec.monto_neto_cliente, vec.estado, vec.monto_pagado, vec.moneda FROM deudas_clientes vec JOIN clientes c ON vec.cliente_id = c.id LEFT JOIN promotores p ON c.promotor_id = p.id WHERE vec.fecha BETWEEN ? AND ? AND vec.activo = 1 ORDER BY vec.fecha DESC LIMIT 500");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $resultado['ventas_efectivo'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 9. Lista de promotores (sin filtro de fecha)
+            $stmt = $pdo->query("SELECT id, nombre FROM promotores WHERE activo = 1 ORDER BY nombre");
+            $resultado['lista_promotores'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // 10. Capital Amiri
+            $stmt = $pdo->query("SELECT * FROM cierres_mensuales ORDER BY mes DESC LIMIT 1");
+            $ultimoCorte = $stmt->fetch(PDO::FETCH_ASSOC);
+            $capitalCerrado = $ultimoCorte ? (float)$ultimoCorte['capital_acumulado'] : 0;
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(comision_amiri), 0) FROM deudas_clientes WHERE fecha BETWEEN ? AND ? AND activo = 1");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $comisionesCap = (float)$stmt->fetchColumn();
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'activo'");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $divisasCap = (float)$stmt->fetchColumn();
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) FROM gastos WHERE fecha BETWEEN ? AND ? AND activo = 1");
+            $stmt->execute([$fechaInicio, $fechaFin]);
+            $totalGastosCap = (float)$stmt->fetchColumn();
+            $utilidadMes = $comisionesCap + $divisasCap - $totalGastosCap;
+            $stmt = $pdo->query("SELECT COALESCE(SUM(monto), 0) FROM retiros_capital");
+            $totalRetirosCap = (float)$stmt->fetchColumn();
+            $stmt = $pdo->query("SELECT COALESCE(SUM(saldo_actual), 0) as total FROM cuentas WHERE tipo_cuenta = 7 AND activo = 1");
+            $utilidadesAcumuladasCap = (float)$stmt->fetchColumn();
+            $resultado['capital_amiri'] = [
+                'capital_actual' => $capitalCerrado + $utilidadMes - $totalRetirosCap,
+                'capital_cerrado' => $capitalCerrado,
+                'utilidades_acumuladas' => $utilidadesAcumuladasCap,
+                'utilidad_mes' => $utilidadMes,
+                'total_retiros' => $totalRetirosCap,
+                'ultimo_corte' => $ultimoCorte ? $ultimoCorte['mes'] : null,
+            ];
+
+            echo json_encode($resultado);
             break;
 
         default:

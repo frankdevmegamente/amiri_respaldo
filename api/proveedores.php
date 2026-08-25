@@ -48,7 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                    cusd.nombre  AS cuenta_usd_nombre,  cusd.saldo_actual  AS saldo_usd,  cusd.valor_mxn  AS valor_mxn_usd,
 
-                   cusdt.nombre AS cuenta_usdt_nombre, cusdt.saldo_actual AS saldo_usdt, cusdt.valor_mxn AS valor_mxn_usdt
+                   cusdt.nombre AS cuenta_usdt_nombre, cusdt.saldo_actual AS saldo_usdt, cusdt.valor_mxn AS valor_mxn_usdt,
+
+                   cmxn.nombre AS cuenta_mxn_nombre, cmxn.saldo_actual AS saldo_mxn
 
             FROM proveedores p
 
@@ -57,6 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             LEFT JOIN cuentas cusd  ON p.cuenta_usd_id  = cusd.id
 
             LEFT JOIN cuentas cusdt ON p.cuenta_usdt_id = cusdt.id
+
+            LEFT JOIN cuentas cmxn  ON p.cuenta_mxn_id  = cmxn.id
 
             WHERE p.id = ?
 
@@ -80,7 +84,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
                    cusd.nombre AS cuenta_usd_nombre, cusd.saldo_actual AS saldo_usd, cusd.valor_mxn AS valor_mxn_usd,
 
-                   cusdt.nombre AS cuenta_usdt_nombre, cusdt.saldo_actual AS saldo_usdt, cusdt.valor_mxn AS valor_mxn_usdt
+                   cusdt.nombre AS cuenta_usdt_nombre, cusdt.saldo_actual AS saldo_usdt, cusdt.valor_mxn AS valor_mxn_usdt,
+
+                   cmxn.nombre AS cuenta_mxn_nombre, cmxn.saldo_actual AS saldo_mxn
 
             FROM proveedores p
 
@@ -89,6 +95,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             LEFT JOIN cuentas cusd  ON p.cuenta_usd_id  = cusd.id
 
             LEFT JOIN cuentas cusdt ON p.cuenta_usdt_id = cusdt.id
+
+            LEFT JOIN cuentas cmxn  ON p.cuenta_mxn_id  = cmxn.id
 
             WHERE 1=1";
 
@@ -310,6 +318,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             }
 
+            // Crear cuenta MXN siempre (para Compra de Efectivo)
+
+            $cuenta_mxn_id = $crearCuentaProveedor('Caja Proveedor MXN - ' . $nombre, 'MXN');
+
+            $pdo->prepare("UPDATE proveedores SET cuenta_mxn_id = ? WHERE id = ?")->execute([$cuenta_mxn_id, $proveedor_id]);
+
         }
 
 
@@ -358,9 +372,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
         
 
-        // Desactivar cuentas asociadas (USD, USDT y legacy)
+        // Desactivar cuentas asociadas (USD, USDT, MXN y legacy)
 
-        foreach (['cuenta_id', 'cuenta_usd_id', 'cuenta_usdt_id'] as $campo) {
+        foreach (['cuenta_id', 'cuenta_usd_id', 'cuenta_usdt_id', 'cuenta_mxn_id'] as $campo) {
 
             if (!empty($datos_proveedor[$campo])) {
 

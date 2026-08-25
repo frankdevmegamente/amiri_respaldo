@@ -23,16 +23,52 @@ try {
 
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        $periodo = $_GET['periodo'] ?? null;
+        $fechaInicio = $_GET['fecha_inicio'] ?? null;
+        $fechaFin = $_GET['fecha_fin'] ?? null;
         $mes = $_GET['mes'] ?? null;
+
+        if ($periodo) {
+            switch ($periodo) {
+                case 'mes':
+                    $fechaInicio = date('Y-m-01');
+                    $fechaFin = date('Y-m-t');
+                    break;
+                case 'mes_pasado':
+                    $fechaInicio = date('Y-m-01', strtotime('-1 month'));
+                    $fechaFin = date('Y-m-t', strtotime('-1 month'));
+                    break;
+                case 'anio':
+                    $fechaInicio = date('Y-01-01');
+                    $fechaFin = date('Y-12-31');
+                    break;
+                case 'rango':
+                    break;
+            }
+        } elseif ($mes) {
+            $fechaInicio = $mes . '-01';
+            $fechaFin = date('Y-m-t', strtotime($fechaInicio));
+        }
+
+        function buildFechaWhere($tableAlias, &$fi, &$ff) {
+            if ($fi && $ff) {
+                return " AND {$tableAlias}.fecha BETWEEN ? AND ?";
+            }
+            return '';
+        }
+        function addFechaParams(&$params, $fi, $ff) {
+            if ($fi && $ff) {
+                $params[] = $fi;
+                $params[] = $ff;
+            }
+        }
 
         // ─── Resumen ─────────────────────────────────────
         if (isset($_GET['resumen'])) {
             $where = 'g.activo = 1';
             $params = [];
-            if ($mes) {
-                $where .= ' AND g.fecha LIKE ?';
-                $params[] = $mes . '-%';
-            }
+            $where .= buildFechaWhere('g', $fechaInicio, $fechaFin);
+            addFechaParams($params, $fechaInicio, $fechaFin);
             $stmt = $pdo->prepare("
                 SELECT
                     COUNT(*) AS total_gastos,
@@ -48,10 +84,8 @@ try {
             if ($resumen['max_monto'] > 0) {
                 $w2 = 'g.activo = 1';
                 $p2 = [];
-                if ($mes) {
-                    $w2 .= ' AND g.fecha LIKE ?';
-                    $p2[] = $mes . '-%';
-                }
+                $w2 .= buildFechaWhere('g', $fechaInicio, $fechaFin);
+                addFechaParams($p2, $fechaInicio, $fechaFin);
                 $stmt2 = $pdo->prepare("
                     SELECT g.concepto, tg.nombre AS tipo
                     FROM gastos g
@@ -80,10 +114,8 @@ try {
         if (isset($_GET['chart'])) {
             $where = 'g.activo = 1';
             $params = [];
-            if ($mes) {
-                $where .= ' AND g.fecha LIKE ?';
-                $params[] = $mes . '-%';
-            }
+            $where .= buildFechaWhere('g', $fechaInicio, $fechaFin);
+            addFechaParams($params, $fechaInicio, $fechaFin);
 
             $stmt = $pdo->prepare("
                 SELECT tg.nombre AS tipo, COALESCE(g.clasificacion, 'sin_definir') AS clasificacion, COALESCE(SUM(g.monto), 0) AS total
@@ -132,10 +164,8 @@ try {
         } else {
             $where = 'g.activo = 1';
             $params = [];
-            if ($mes) {
-                $where .= ' AND g.fecha LIKE ?';
-                $params[] = $mes . '-%';
-            }
+            $where .= buildFechaWhere('g', $fechaInicio, $fechaFin);
+            addFechaParams($params, $fechaInicio, $fechaFin);
             $stmt = $pdo->prepare("
                 SELECT g.*, c.nombre cuenta_nombre, tg.nombre tipo_gasto_nombre
                 FROM gastos g

@@ -62,9 +62,9 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .drill-link .ti-search { font-size:14px; opacity:0.6; transition:all 0.15s; }
         .drill-link:hover { color: #6c5ce7 !important; }
         .drill-link:hover .ti-search { opacity: 1; font-size:16px; }
-        body[data-bs-theme="dark"] .logo-modo-claro,
+        [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro { display: none !important; }
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro { display: block !important; }
         @keyframes skeleton-pulse { 0%{opacity:0.6} 50%{opacity:1} 100%{opacity:0.6} }
         .skeleton { animation:skeleton-pulse 1.4s ease-in-out infinite; background:linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%); background-size:200% 100%; border-radius:6px; }
@@ -102,6 +102,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .br-section-label { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#8b92a8; margin-bottom:4px; }
         [data-bs-theme="dark"] .br-section-label { color:#6b7280; }
     </style>
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <body>
 <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6"

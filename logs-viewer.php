@@ -208,6 +208,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
     </style>
 
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 
 <body>

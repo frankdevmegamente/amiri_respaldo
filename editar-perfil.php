@@ -61,6 +61,7 @@ $twoFAEnabled = $user2FA['two_fa_enabled'] ?? false;
 
   <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 
 <style>
@@ -73,12 +74,12 @@ $twoFAEnabled = $user2FA['two_fa_enabled'] ?? false;
             padding-top: 15px !important;
             margin-top: 0 !important;
         }
-     body[data-bs-theme="dark"] .logo-modo-claro,
+     [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
         }
 
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }

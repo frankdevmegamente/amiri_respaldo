@@ -43,6 +43,7 @@ try {
     <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
     <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <style>
         .body-wrapper {

@@ -1,4 +1,4 @@
-ï»¿<?php
+<?php
 /**
  * Verificar valores exactos de la diferencia contable
  */
@@ -63,7 +63,7 @@ $nf = function($n) { return '$' . number_format((float)$n, 2); };
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Verificar EcuaciÃ³n Contable</title>
+    <title>Verificar Ecuación Contable</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="src/assets/css/styles.min.css">
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css">
@@ -116,11 +116,12 @@ $nf = function($n) { return '$' . number_format((float)$n, 2); };
         [data-bs-theme="dark"] .status-card .status-detail { color: #9aa4c8; }
         [data-bs-theme="dark"] .progress-bar { background: #2b3350; }
     </style>
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <body>
 <div class="wrapper">
     <div class="header-card">
-        <h1><i class="ti ti-scale"></i> VerificaciÃ³n de EcuaciÃ³n Contable</h1>
+        <h1><i class="ti ti-scale"></i> Verificación de Ecuación Contable</h1>
         <p>Diferencia = Saldos &minus; Capital &minus; Obligaciones &nbsp;&middot;&nbsp; El resultado debe ser $0.00</p>
     </div>
     <div class="grid">
@@ -133,7 +134,7 @@ $nf = function($n) { return '$' . number_format((float)$n, 2); };
             <ul class="breakdown">
                 <li><span class="label">Cuentas tipo 1,2 MXN</span><span class="value"><?= $nf($totalSaldosMxn) ?></span></li>
                 <li><span class="label">Inventario FIFO</span><span class="value"><?= $nf($totalSaldosDiv) ?></span></li>
-                <li><span class="label">PrÃ©stamos otorgados</span><span class="value"><?= $nf($totalPrestamosOtorgados) ?></span></li>
+                <li><span class="label">Préstamos otorgados</span><span class="value"><?= $nf($totalPrestamosOtorgados) ?></span></li>
             </ul>
         </div>
         <div class="card-stat">
@@ -157,7 +158,7 @@ $nf = function($n) { return '$' . number_format((float)$n, 2); };
             </div>
             <div class="total" style="color:#FA896B;"><?= $nf($totalObligaciones) ?></div>
             <ul class="breakdown">
-                <li><span class="label">PrÃ©stamos empresa</span><span class="value"><?= $nf($totalPrestamistas) ?></span></li>
+                <li><span class="label">Préstamos empresa</span><span class="value"><?= $nf($totalPrestamistas) ?></span></li>
                 <li><span class="label">Proveedores</span><span class="value"><?= $nf($totalProveedores) ?></span></li>
             </ul>
         </div>
@@ -191,11 +192,11 @@ $nf = function($n) { return '$' . number_format((float)$n, 2); };
     </div>
     <div class="table-detail">
         <table>
-            <thead><tr><th>Concepto</th><th>CategorÃ­a</th><th style="text-align:right;">Monto MXN</th></tr></thead>
+            <thead><tr><th>Concepto</th><th>Categoría</th><th style="text-align:right;">Monto MXN</th></tr></thead>
             <tbody>
                 <tr><td>Cuentas tipo 1,2 (MXN)</td><td>SALDOS</td><td style="text-align:right;"><?= $nf($totalSaldosMxn) ?></td></tr>
                 <tr><td>Inventario FIFO</td><td>SALDOS</td><td style="text-align:right;"><?= $nf($totalSaldosDiv) ?></td></tr>
-                <tr><td>PrÃ©stamos otorgados pendientes</td><td>SALDOS</td><td style="text-align:right;"><?= $nf($totalPrestamosOtorgados) ?></td></tr>
+                <tr><td>Préstamos otorgados pendientes</td><td>SALDOS</td><td style="text-align:right;"><?= $nf($totalPrestamosOtorgados) ?></td></tr>
                 <tr><td>Subtotal SALDOS</td><td></td><td style="text-align:right;font-weight:700;"><?= $nf($totalSaldos) ?></td></tr>
                 <tr><td>Cuentas tipo 3 (Capital)</td><td>CAPITAL</td><td style="text-align:right;"><?= $nf($totalCapitalVal - $totalCliMxn - $totalProm - $USD['convertido'] - $USDT['convertido']) ?></td></tr>
                 <tr><td>Deudas clientes MXN pendientes</td><td>CAPITAL</td><td style="text-align:right;"><?= $nf($totalCliMxn) ?></td></tr>
@@ -203,7 +204,7 @@ $nf = function($n) { return '$' . number_format((float)$n, 2); };
                 <?php if ((float)$USD['total'] > 0): ?><tr><td>Deudas clientes USD</td><td>CAPITAL</td><td style="text-align:right;"><?= $nf($USD['convertido']) ?></td></tr><?php endif; ?>
                 <?php if ((float)$USDT['total'] > 0): ?><tr><td>Deudas clientes USDT</td><td>CAPITAL</td><td style="text-align:right;"><?= $nf($USDT['convertido']) ?></td></tr><?php endif; ?>
                 <tr><td>Subtotal CAPITAL</td><td></td><td style="text-align:right;font-weight:700;"><?= $nf($totalCapitalVal) ?></td></tr>
-                <tr><td>PrÃ©stamos empresa pendientes</td><td>OBLIGACIONES</td><td style="text-align:right;"><?= $nf($totalPrestamistas) ?></td></tr>
+                <tr><td>Préstamos empresa pendientes</td><td>OBLIGACIONES</td><td style="text-align:right;"><?= $nf($totalPrestamistas) ?></td></tr>
                 <tr><td>Proveedores</td><td>OBLIGACIONES</td><td style="text-align:right;"><?= $nf($totalProveedores) ?></td></tr>
                 <tr><td>Subtotal OBLIGACIONES</td><td></td><td style="text-align:right;font-weight:700;"><?= $nf($totalObligaciones) ?></td></tr>
                 <tr style="background:#f8f9fa;">

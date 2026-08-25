@@ -187,8 +187,6 @@ try {
 
         }
 
-
-
         // Filtro para gastos: cuentas bancarias (tipo 1) y caja de efectivo (tipo 2)
 
         // Se excluye tipo 3 (Comisiones AMIRI) porque se descuenta automáticamente
@@ -238,6 +236,60 @@ try {
             exit;
 
         }
+
+        if (isset($_GET['tipo_moneda'])) {
+
+            $tipoMoneda = $_GET['tipo_moneda'];
+
+            $esCajaEmpresa = isset($_GET['es_caja_empresa']) ? (int)$_GET['es_caja_empresa'] : null;
+
+            $conSaldo = isset($_GET['con_saldo']) ? (int)$_GET['con_saldo'] : 0;
+
+            
+
+            // Construir condiciones
+
+            $conditions = ["tipo_moneda = ?", "activo = 1"];
+
+            $params = [$tipoMoneda];
+
+            
+
+            if ($esCajaEmpresa !== null) {
+
+                $conditions[] = "es_caja_empresa = ?";
+
+                $params[] = $esCajaEmpresa;
+
+            }
+
+            
+
+            if ($conSaldo) {
+
+                $conditions[] = "saldo_actual > 0";
+
+            }
+
+            
+
+            $whereClause = implode(' AND ', $conditions);
+
+            $stmt = $pdo->prepare("SELECT * FROM cuentas WHERE $whereClause ORDER BY nombre");
+
+            $stmt->execute($params);
+
+            
+
+            echo json_encode($stmt->fetchAll(PDO::FETCH_ASSOC));
+
+            exit;
+
+        }
+
+
+
+
 
 
 

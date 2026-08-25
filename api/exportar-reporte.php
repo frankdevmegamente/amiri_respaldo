@@ -328,11 +328,11 @@ switch ($reporte) {
         $ventas = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // Ganancia Divisas (FIFO real: comisiones de servicios 2 y 3)
-        $stmtUSD = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 2 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
+        $stmtUSD = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 2 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'activo'");
         $stmtUSD->execute([$fechaInicio, $fechaFin]);
         $gananciaUSD = (float)$stmtUSD->fetchColumn();
 
-        $stmtUSDT = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 3 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
+        $stmtUSDT = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 3 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'activo'");
         $stmtUSDT->execute([$fechaInicio, $fechaFin]);
         $gananciaUSDT = (float)$stmtUSDT->fetchColumn();
 
@@ -384,7 +384,7 @@ switch ($reporte) {
         $stmt->execute([$fechaInicio, $fechaFin]);
         $comisiones = (float)$stmt->fetchColumn();
 
-        $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
+        $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'activo'");
         $stmt->execute([$fechaInicio, $fechaFin]);
         $divisas = (float)$stmt->fetchColumn();
 

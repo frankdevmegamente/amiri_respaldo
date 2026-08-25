@@ -43,11 +43,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .metric-card-serv { background-color: #1f2535 !important; border-color: #2b3350 !important; }
         [data-bs-theme="dark"] .metric-card-serv .svc-icon { background-color: rgba(255,255,255,0.06) !important; }
         .metric-card-serv[data-servicio-id]:hover { border-color: #cbd5e1 !important; }
-        body[data-bs-theme="dark"] .logo-modo-claro,
+        [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro { display: none !important; }
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro { display: block !important; }
     </style>
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <body>
 <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6"

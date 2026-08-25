@@ -189,12 +189,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             background-color: #1e293b;
 
         }
- body[data-bs-theme="dark"] .logo-modo-claro,
+ [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
         }
 
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }
@@ -229,70 +229,71 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .card-stat .bg-light .text-warning {
             color: #fbbf24 !important;
         }
-        body[data-bs-theme="dark"] .card,
-        body[data-bs-theme="dark"] .page-breadcrumb,
-        body[data-bs-theme="dark"] .page-breadcrumb h3,
-        body[data-bs-theme="dark"] .card-header,
-        body[data-bs-theme="dark"] .card-body,
-        body[data-bs-theme="dark"] .modal-content,
-        body[data-bs-theme="dark"] .modal-header,
-        body[data-bs-theme="dark"] .modal-footer {
+        [data-bs-theme="dark"] .card,
+        [data-bs-theme="dark"] .page-breadcrumb,
+        [data-bs-theme="dark"] .page-breadcrumb h3,
+        [data-bs-theme="dark"] .card-header,
+        [data-bs-theme="dark"] .card-body,
+        [data-bs-theme="dark"] .modal-content,
+        [data-bs-theme="dark"] .modal-header,
+        [data-bs-theme="dark"] .modal-footer {
             background-color: #1f2535 !important;
             border-color: #2b3350 !important;
             color: #e6ecff !important;
         }
 
-        body[data-bs-theme="dark"] .card {
+        [data-bs-theme="dark"] .card {
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
-        body[data-bs-theme="dark"] .table,
-        body[data-bs-theme="dark"] .table thead th,
-        body[data-bs-theme="dark"] .table tbody td,
-        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+        [data-bs-theme="dark"] .table,
+        [data-bs-theme="dark"] .table thead th,
+        [data-bs-theme="dark"] .table tbody td,
+        [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
             background-color: #1f2535 !important;
             color: #e6ecff !important;
             border-color: #2b3350 !important;
         }
 
-        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
+        [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
             background-color: #232b3c !important;
         }
 
-        body[data-bs-theme="dark"] .form-control,
-        body[data-bs-theme="dark"] .form-select,
-        body[data-bs-theme="dark"] .input-group-text,
-        body[data-bs-theme="dark"] .form-control-plaintext,
-        body[data-bs-theme="dark"] .alert,
-        body[data-bs-theme="dark"] .badge,
-        body[data-bs-theme="dark"] .nav-tabs .nav-link {
+        [data-bs-theme="dark"] .form-control,
+        [data-bs-theme="dark"] .form-select,
+        [data-bs-theme="dark"] .input-group-text,
+        [data-bs-theme="dark"] .form-control-plaintext,
+        [data-bs-theme="dark"] .alert,
+        [data-bs-theme="dark"] .badge,
+        [data-bs-theme="dark"] .nav-tabs .nav-link {
             background-color: #232b3c !important;
             color: #e6ecff !important;
             border-color: #2b3350 !important;
         }
 
-        body[data-bs-theme="dark"] .nav-tabs .nav-link.active {
+        [data-bs-theme="dark"] .nav-tabs .nav-link.active {
             color: #ffffff !important;
             border-bottom-color: #6c5ce7 !important;
         }
 
-        body[data-bs-theme="dark"] .bg-light {
+        [data-bs-theme="dark"] .bg-light {
             background-color: rgba(255, 255, 255, 0.06) !important;
         }
 
-        body[data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
+        [data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
             background-color: rgba(93, 135, 255, 0.12) !important;
         }
 
-        body[data-bs-theme="dark"] .bg-success.bg-opacity-10 {
+        [data-bs-theme="dark"] .bg-success.bg-opacity-10 {
             background-color: rgba(25, 135, 84, 0.12) !important;
         }
 
-        body[data-bs-theme="dark"] .bg-warning.bg-opacity-10 {
+        [data-bs-theme="dark"] .bg-warning.bg-opacity-10 {
             background-color: rgba(255, 193, 7, 0.12) !important;
         }
     </style>
 
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 
 
@@ -1182,78 +1183,76 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
 
         // Cargar resumen con desglose detallado
-        function cargarResumen() {
-            $.getJSON(`api/reportes.php?tipo=resumen&${getParams()}`, function(data) {
-                
-                // 1. Llenar Ganancia Neta
-                const neta = parseFloat(data.ganancia_neta) || 0;
-                const gastosFijos = parseFloat(data.gastos_fijos) || 0;
-                const gastosVariables = parseFloat(data.gastos_variables) || 0;
-                const totalGastos = gastosFijos + gastosVariables;
-                $('#statGananciaTotal').text('$' + formatoNumero(neta));
-                $('#lblFormulaBruta').text('$' + formatoNumero(data.ganancia_bruta));
-                $('#lblTotalGastos').text('-$' + formatoNumero(totalGastos));
-                $('#lblGastosFijos').text('-$' + formatoNumero(gastosFijos));
-                $('#lblGastosVariables').text('-$' + formatoNumero(gastosVariables));
-                $('#lblFormulaNeta').text('$' + formatoNumero(neta));
+        function _renderResumen(data) {
+            const neta = parseFloat(data.ganancia_neta) || 0;
+            const gastosFijos = parseFloat(data.gastos_fijos) || 0;
+            const gastosVariables = parseFloat(data.gastos_variables) || 0;
+            const totalGastos = gastosFijos + gastosVariables;
+            $('#statGananciaTotal').text('$' + formatoNumero(neta));
+            $('#lblFormulaBruta').text('$' + formatoNumero(data.ganancia_bruta));
+            $('#lblTotalGastos').text('-$' + formatoNumero(totalGastos));
+            $('#lblGastosFijos').text('-$' + formatoNumero(gastosFijos));
+            $('#lblGastosVariables').text('-$' + formatoNumero(gastosVariables));
+            $('#lblFormulaNeta').text('$' + formatoNumero(neta));
 
-                // Colores para ganancia/pérdida
-                if(neta < 0) {
-                    $('#statGananciaTotal, #lblFormulaNeta').removeClass('text-success').addClass('text-danger');
-                    $('#iconNetaBg').removeClass('bg-success text-success').addClass('bg-danger text-danger');
-                    $('#iconNeta').removeClass('ti-trending-up').addClass('ti-trending-down');
-                } else {
-                    $('#statGananciaTotal, #lblFormulaNeta').removeClass('text-danger').addClass('text-success');
-                    $('#iconNetaBg').removeClass('bg-danger text-danger').addClass('bg-success text-success');
-                    $('#iconNeta').removeClass('ti-trending-down').addClass('ti-trending-up');
-                }
+            if(neta < 0) {
+                $('#statGananciaTotal, #lblFormulaNeta').removeClass('text-success').addClass('text-danger');
+                $('#iconNetaBg').removeClass('bg-success text-success').addClass('bg-danger text-danger');
+                $('#iconNeta').removeClass('ti-trending-up').addClass('ti-trending-down');
+            } else {
+                $('#statGananciaTotal, #lblFormulaNeta').removeClass('text-danger').addClass('text-success');
+                $('#iconNetaBg').removeClass('bg-danger text-danger').addClass('bg-success text-success');
+                $('#iconNeta').removeClass('ti-trending-down').addClass('ti-trending-up');
+            }
 
-                let totalRetencion = parseFloat(data.comisiones_amiri) + parseFloat(data.comisiones_promotores);
+            let totalRetencion = parseFloat(data.comisiones_amiri) + parseFloat(data.comisiones_promotores);
+            let usd = parseFloat(data.ganancia_usd) || 0;
+            let usdt = parseFloat(data.ganancia_usdt) || 0;
+            
+            $('#statGananciaDivisas, #lblUtilidadTotal').text('$' + formatoNumero(data.ganancia_divisas_total));
+            $('#lblUtilidadUSDT').text('$' + formatoNumero(usdt));
+            $('#lblUtilidadUSD').text('$' + formatoNumero(usd));
 
-                // 3. Llenar Ganancia Divisas (USDT vs USD)
-                let usd = parseFloat(data.ganancia_usd) || 0;
-                let usdt = parseFloat(data.ganancia_usdt) || 0;
-                
-                $('#statGananciaDivisas, #lblUtilidadTotal').text('$' + formatoNumero(data.ganancia_divisas_total));
-                $('#lblUtilidadUSDT').text('$' + formatoNumero(usdt));
-                $('#lblUtilidadUSD').text('$' + formatoNumero(usd));
+            let ventasTotales = parseFloat(data.ventas_efectivo_total) || 0;
+            let operaciones = parseInt(data.ventas_efectivo_cantidad) || 0;
+            let ticketPromedio = operaciones > 0 ? (ventasTotales / operaciones) : 0;
+            let margen = ventasTotales > 0 ? ((totalRetencion / ventasTotales) * 100) : 0;
 
-                // 4. Llenar Ventas de Efectivo (Analíticas)
-                let ventasTotales = parseFloat(data.ventas_efectivo_total) || 0;
-                let operaciones = parseInt(data.ventas_efectivo_cantidad) || 0;
-                let ticketPromedio = operaciones > 0 ? (ventasTotales / operaciones) : 0;
-                let margen = ventasTotales > 0 ? ((totalRetencion / ventasTotales) * 100) : 0;
+            $('#statVentasEfectivo').text('$' + formatoNumero(ventasTotales));
+            $('#lblVentasOperaciones').text(operaciones);
+            $('#lblVentasPromedio').text('$' + formatoNumero(ticketPromedio));
+            $('#lblVentasMargen').text(margen.toFixed(2) + '%');
 
-                $('#statVentasEfectivo').text('$' + formatoNumero(ventasTotales));
-                $('#lblVentasOperaciones').text(operaciones);
-                $('#lblVentasPromedio').text('$' + formatoNumero(ticketPromedio));
-                $('#lblVentasMargen').text(margen.toFixed(2) + '%');
+            const periodoTexto = {
+                'dia': 'Hoy', 'semana': 'Esta Semana', 'mes': 'Este Mes',
+                'anio': 'Este Año', 'rango': 'Rango Personalizado'
+            };
+            $('#rangoFechas').text(periodoTexto[$('#selectPeriodo').val()]);
 
-                // Actualizar texto del rango de fechas superior
-                const periodoTexto = {
-                    'dia': 'Hoy',
-                    'semana': 'Esta Semana',
-                    'mes': 'Este Mes',
-                    'anio': 'Este Año',
-                    'rango': 'Rango Personalizado'
-                };
-                $('#rangoFechas').text(periodoTexto[$('#selectPeriodo').val()]);
+            if (data._explicacion) {
+                $('.tooltip-icon').each(function() {
+                    const key = $(this).data('explica');
+                    const texto = data._explicacion[key];
+                    if (texto) $(this).attr('title', texto);
+                });
+                $('.tooltip-icon').tooltip('dispose');
+                $('[title]').tooltip({ placement: 'top', trigger: 'hover' });
+            }
+        }
 
-                // Inicializar tooltips con explicaciones
-                if (data._explicacion) {
-                    $('.tooltip-icon').each(function() {
-                        const key = $(this).data('explica');
-                        const texto = data._explicacion[key];
-                        if (texto) {
-                            $(this).attr('title', texto);
-                        }
-                    });
-                    // Destruir tooltips previos y recrear
-                    $('.tooltip-icon').tooltip('dispose');
-                    $('[title]').tooltip({ placement: 'top', trigger: 'hover' });
-                }
-            });
-            // Capital Amiri
+        function cargarResumen(data) {
+            if (data) { _renderResumen(data); return; }
+            $.getJSON(`api/reportes.php?tipo=resumen&${getParams()}`, _renderResumen);
+        }
+
+        function cargarCapitalAmiri(data) {
+            if (data) {
+                $('#capitalAmiriTotal').text('$' + formatoNumero(data.utilidades_acumuladas));
+                $('#capitalAmiriCorte').text(data.ultimo_corte || 'Sin cortes');
+                $('#capitalAmiriRetiros').text('$' + formatoNumero(data.total_retiros));
+                $('#capitalAmiriActual').text('$' + formatoNumero(data.capital_actual));
+                return;
+            }
             $.getJSON('api/capital.php?tipo=resumen', function(cap) {
                 $('#capitalAmiriTotal').text('$' + formatoNumero(cap.utilidades_acumuladas));
                 $('#capitalAmiriCorte').text(cap.ultimo_corte || 'Sin cortes');
@@ -1268,342 +1267,135 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         // Cargar gráfica de comisiones diarias
 
-        function cargarGraficaComisionesDiarias() {
-
-            $.getJSON(`api/reportes.php?tipo=graficas&grafica=comisiones_diarias&${getParams()}`, function(data) {
-
-                const ctx = document.getElementById('chartComisionesDiarias').getContext('2d');
-
-
-
-                if (chartComisionesDiarias) chartComisionesDiarias.destroy();
-
-
-
-                chartComisionesDiarias = new Chart(ctx, {
-
-                    type: 'line',
-
-                    data: {
-
-                        labels: data.map(d => d.fecha),
-
-                        datasets: [{
-
-                                label: 'AMIRI',
-
-                                data: data.map(d => parseFloat(d.amiri || 0)),
-
-                                borderColor: '#5D87FF',
-
-                                backgroundColor: 'rgba(93, 135, 255, 0.1)',
-
-                                fill: true,
-
-                                tension: 0.4
-
-                            },
-
-                            {
-
-                                label: 'Promotores',
-
-                                data: data.map(d => parseFloat(d.promotores || 0)),
-
-                                borderColor: '#13DEB9',
-
-                                backgroundColor: 'rgba(19, 222, 185, 0.1)',
-
-                                fill: true,
-
-                                tension: 0.4
-
-                            }
-
-                        ]
-
-                    },
-
-                    options: {
-
-                        responsive: true,
-
-                        maintainAspectRatio: false,
-
-                        plugins: {
-
-                            legend: {
-
-                                position: 'bottom'
-
-                            }
-
-                        },
-
-                        scales: {
-
-                            y: {
-
-                                beginAtZero: true
-
-                            }
-
-                        }
-
-                    }
-
-                });
-
+        function _renderGraficaComisionesDiarias(data) {
+            const ctx = document.getElementById('chartComisionesDiarias').getContext('2d');
+            if (chartComisionesDiarias) chartComisionesDiarias.destroy();
+            chartComisionesDiarias = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.fecha),
+                    datasets: [{
+                        label: 'AMIRI',
+                        data: data.map(d => parseFloat(d.amiri || 0)),
+                        borderColor: '#5D87FF',
+                        backgroundColor: 'rgba(93, 135, 255, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Promotores',
+                        data: data.map(d => parseFloat(d.promotores || 0)),
+                        borderColor: '#13DEB9',
+                        backgroundColor: 'rgba(19, 222, 185, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: { y: { beginAtZero: true } }
+                }
             });
+        }
 
+        function cargarGraficaComisionesDiarias(data) {
+            if (data) { _renderGraficaComisionesDiarias(data); return; }
+            $.getJSON(`api/reportes.php?tipo=graficas&grafica=comisiones_diarias&${getParams()}`, _renderGraficaComisionesDiarias);
         }
 
 
 
         // Cargar gráfica de comisiones por promotor
 
-        function cargarGraficaComisionesPromotor() {
-
-            $.getJSON(`api/reportes.php?tipo=graficas&grafica=comisiones_por_promotor&${getParams()}`, function(data) {
-
-                const ctx = document.getElementById('chartComisionesPromotor').getContext('2d');
-
-
-
-                if (chartComisionesPromotor) chartComisionesPromotor.destroy();
-
-
-
-                const colores = [
-
-                    '#5D87FF', '#13DEB9', '#FFAE1F', '#FA896B', '#539BFF',
-
-                    '#49BEFF', '#FF6692', '#36A2EB', '#FFCE56', '#4BC0C0'
-
-                ];
-
-
-
-                chartComisionesPromotor = new Chart(ctx, {
-
-                    type: 'doughnut',
-
-                    data: {
-
-                        labels: data.map(d => d.promotor),
-
-                        datasets: [{
-
-                            data: data.map(d => parseFloat(d.comision || 0)),
-
-                            backgroundColor: colores.slice(0, data.length),
-
-                            borderWidth: 2
-
-                        }]
-
-                    },
-
-                    options: {
-
-                        responsive: true,
-
-                        maintainAspectRatio: false,
-
-                        plugins: {
-
-                            legend: {
-
-                                position: 'right'
-
-                            }
-
-                        }
-
-                    }
-
-                });
-
+        function _renderGraficaComisionesPromotor(data) {
+            const ctx = document.getElementById('chartComisionesPromotor').getContext('2d');
+            if (chartComisionesPromotor) chartComisionesPromotor.destroy();
+            const colores = ['#5D87FF', '#13DEB9', '#FFAE1F', '#FA896B', '#539BFF', '#49BEFF', '#FF6692', '#36A2EB', '#FFCE56', '#4BC0C0'];
+            chartComisionesPromotor = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(d => d.promotor),
+                    datasets: [{ data: data.map(d => parseFloat(d.comision || 0)), backgroundColor: colores.slice(0, data.length), borderWidth: 2 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
             });
+        }
 
+        function cargarGraficaComisionesPromotor(data) {
+            if (data) { _renderGraficaComisionesPromotor(data); return; }
+            $.getJSON(`api/reportes.php?tipo=graficas&grafica=comisiones_por_promotor&${getParams()}`, _renderGraficaComisionesPromotor);
         }
 
 
 
         // Cargar gráfica de ventas diarias
 
-        function cargarGraficaVentasDiarias() {
-
-            $.getJSON(`api/reportes.php?tipo=graficas&grafica=ventas_diarias&${getParams()}`, function(data) {
-
-                const ctx = document.getElementById('chartVentasDiarias').getContext('2d');
-
-
-
-                if (chartVentasDiarias) chartVentasDiarias.destroy();
-
-
-
-                chartVentasDiarias = new Chart(ctx, {
-
-                    type: 'bar',
-
-                    data: {
-
-                        labels: data.map(d => d.fecha),
-
-                        datasets: [{
-
-                            label: 'Monto Total',
-
-                            data: data.map(d => parseFloat(d.total || 0)),
-
-                            backgroundColor: 'rgba(255, 174, 31, 0.7)',
-
-                            borderColor: '#FFAE1F',
-
-                            borderWidth: 1
-
-                        }]
-
-                    },
-
-                    options: {
-
-                        responsive: true,
-
-                        maintainAspectRatio: false,
-
-                        plugins: {
-
-                            legend: {
-
-                                display: false
-
-                            }
-
-                        },
-
-                        scales: {
-
-                            y: {
-
-                                beginAtZero: true
-
-                            }
-
-                        }
-
-                    }
-
-                });
-
+        function _renderGraficaVentasDiarias(data) {
+            const ctx = document.getElementById('chartVentasDiarias').getContext('2d');
+            if (chartVentasDiarias) chartVentasDiarias.destroy();
+            chartVentasDiarias = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.fecha),
+                    datasets: [{
+                        label: 'Monto Total',
+                        data: data.map(d => parseFloat(d.total || 0)),
+                        backgroundColor: 'rgba(255, 174, 31, 0.7)',
+                        borderColor: '#FFAE1F',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true } }
+                }
             });
+        }
 
+        function cargarGraficaVentasDiarias(data) {
+            if (data) { _renderGraficaVentasDiarias(data); return; }
+            $.getJSON(`api/reportes.php?tipo=graficas&grafica=ventas_diarias&${getParams()}`, _renderGraficaVentasDiarias);
         }
 
 
 
         // Cargar gráfica de divisas
 
-        function cargarGraficaDivisas() {
-
-            $.getJSON(`api/reportes.php?tipo=graficas&grafica=divisas_diarias&${getParams()}`, function(data) {
-
-                const ctx = document.getElementById('chartDivisasDiarias').getContext('2d');
-
-
-
-                if (chartDivisasDiarias) chartDivisasDiarias.destroy();
-
-
-
-                // Agrupar por fecha
-
-                const fechas = [...new Set(data.map(d => d.fecha))];
-
-                const usdCompras = fechas.map(f => {
-
-                    const item = data.find(d => d.fecha === f && d.moneda === 'USD');
-
-                    return item ? parseFloat(item.compras || 0) : 0;
-
-                });
-
-                const usdVentas = fechas.map(f => {
-
-                    const item = data.find(d => d.fecha === f && d.moneda === 'USD');
-
-                    return item ? parseFloat(item.ventas || 0) : 0;
-
-                });
-
-
-
-                chartDivisasDiarias = new Chart(ctx, {
-
-                    type: 'bar',
-
-                    data: {
-
-                        labels: fechas,
-
-                        datasets: [{
-
-                                label: 'Compras USD',
-
-                                data: usdCompras,
-
-                                backgroundColor: 'rgba(93, 135, 255, 0.7)'
-
-                            },
-
-                            {
-
-                                label: 'Ventas USD',
-
-                                data: usdVentas,
-
-                                backgroundColor: 'rgba(19, 222, 185, 0.7)'
-
-                            }
-
-                        ]
-
-                    },
-
-                    options: {
-
-                        responsive: true,
-
-                        maintainAspectRatio: false,
-
-                        plugins: {
-
-                            legend: {
-
-                                position: 'bottom'
-
-                            }
-
-                        },
-
-                        scales: {
-
-                            y: {
-
-                                beginAtZero: true
-
-                            }
-
-                        }
-
-                    }
-
-                });
-
+        function _renderGraficaDivisas(data) {
+            const ctx = document.getElementById('chartDivisasDiarias').getContext('2d');
+            if (chartDivisasDiarias) chartDivisasDiarias.destroy();
+            const fechas = [...new Set(data.map(d => d.fecha))];
+            const usdCompras = fechas.map(f => { const item = data.find(d => d.fecha === f && d.moneda === 'USD'); return item ? parseFloat(item.compras || 0) : 0; });
+            const usdVentas = fechas.map(f => { const item = data.find(d => d.fecha === f && d.moneda === 'USD'); return item ? parseFloat(item.ventas || 0) : 0; });
+            chartDivisasDiarias = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: fechas,
+                    datasets: [{
+                        label: 'Compras USD',
+                        data: usdCompras,
+                        backgroundColor: 'rgba(93, 135, 255, 0.7)'
+                    }, {
+                        label: 'Ventas USD',
+                        data: usdVentas,
+                        backgroundColor: 'rgba(19, 222, 185, 0.7)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } },
+                    scales: { y: { beginAtZero: true } }
+                }
             });
+        }
 
+        function cargarGraficaDivisas(data) {
+            if (data) { _renderGraficaDivisas(data); return; }
+            $.getJSON(`api/reportes.php?tipo=graficas&grafica=divisas_diarias&${getParams()}`, _renderGraficaDivisas);
         }
 
 
@@ -1758,22 +1550,15 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         // Cargar lista de promotores
 
-        function cargarListaPromotores() {
+        function _renderListaPromotores(data) {
+            let html = '<option value="">Todos los promotores</option>';
+            data.forEach(p => { html += `<option value="${p.id}">${p.nombre}</option>`; });
+            $('#selectPromotor').html(html);
+        }
 
-            $.getJSON('api/reportes.php?tipo=lista_promotores', function(data) {
-
-                let html = '<option value="">Todos los promotores</option>';
-
-                data.forEach(p => {
-
-                    html += `<option value="${p.id}">${p.nombre}</option>`;
-
-                });
-
-                $('#selectPromotor').html(html);
-
-            });
-
+        function cargarListaPromotores(data) {
+            if (data) { _renderListaPromotores(data); return; }
+            $.getJSON('api/reportes.php?tipo=lista_promotores', _renderListaPromotores);
         }
 
 
@@ -1808,66 +1593,27 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         // Cargar tabla de divisas
 
-        function cargarTablaDivisas() {
-
+        function _renderTablaDivisas(data) {
             const moneda = $('#selectMonedaDivisa').val();
-
-
-
-            $.getJSON(`api/reportes.php?tipo=divisas&moneda=${moneda}&${getParams()}`, function(data) {
-
-                // Resumen
-
-                const r = data.resumen;
-
-                $('#divisaComprado').text(formatoNumero(r.total_comprado) + ' ' + moneda);
-
-                $('#divisaVendido').text(formatoNumero(r.total_vendido) + ' ' + moneda);
-
-                $('#divisaMxnGastado').text('$' + formatoNumero(r.mxn_gastado));
-
-                $('#divisaGanancia').text('$' + formatoNumero(r.ganancia_mxn));
-
-
-
-                // Tabla
-
-                let html = '';
-
-                data.operaciones.forEach(op => {
-
-                    const esCompra = op.servicio.includes('Compra');
-
-                    const badgeClass = esCompra ? 'bg-primary' : 'bg-success';
-
-                    const persona = op.proveedor !== '-' ? op.proveedor : op.cliente;
-
-
-
-                    html += `<tr>
-
-                        <td>${formatearFechaHora(op.creado_en)}</td>
-
-                        <td><span class="badge ${badgeClass}">${op.servicio}</span></td>
-
-                        <td class="text-end">${formatoNumero(op.cantidad)} ${moneda}</td>
-
-                        <td class="text-end">$${formatoNumero(op.tipo_cambio)}</td>
-
-                        <td class="text-end">$${formatoNumero(op.monto_mxn)}</td>
-
-                        <td>${persona}</td>
-
-                    </tr>`;
-
-                });
-
-
-
-                $('#bodyDivisas').html(html || '<tr><td colspan="6" class="text-center">No hay datos</td></tr>');
-
+            const r = data.resumen;
+            $('#divisaComprado').text(formatoNumero(r.total_comprado) + ' ' + moneda);
+            $('#divisaVendido').text(formatoNumero(r.total_vendido) + ' ' + moneda);
+            $('#divisaMxnGastado').text('$' + formatoNumero(r.mxn_gastado));
+            $('#divisaGanancia').text('$' + formatoNumero(r.ganancia_mxn));
+            let html = '';
+            data.operaciones.forEach(op => {
+                const esCompra = op.servicio.includes('Compra');
+                const badgeClass = esCompra ? 'bg-primary' : 'bg-success';
+                const persona = op.proveedor !== '-' ? op.proveedor : op.cliente;
+                html += `<tr><td>${formatearFechaHora(op.creado_en)}</td><td><span class="badge ${badgeClass}">${op.servicio}</span></td><td class="text-end">${formatoNumero(op.cantidad)} ${moneda}</td><td class="text-end">$${formatoNumero(op.tipo_cambio)}</td><td class="text-end">$${formatoNumero(op.monto_mxn)}</td><td>${persona}</td></tr>`;
             });
+            $('#bodyDivisas').html(html || '<tr><td colspan="6" class="text-center">No hay datos</td></tr>');
+        }
 
+        function cargarTablaDivisas(data) {
+            if (data) { _renderTablaDivisas(data); return; }
+            const moneda = $('#selectMonedaDivisa').val();
+            $.getJSON(`api/reportes.php?tipo=divisas&moneda=${moneda}&${getParams()}`, _renderTablaDivisas);
         }
 
 
@@ -1939,23 +1685,18 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         // Cargar todo
 
         function cargarTodo() {
-
-            cargarResumen();
-
-            cargarGraficaComisionesDiarias();
-
-            cargarGraficaComisionesPromotor();
-
-            cargarGraficaVentasDiarias();
-
-            cargarGraficaDivisas();
-
-            cargarTablaComisiones();
-
-            cargarTablaDivisas();
-
-            cargarTablaVentas();
-
+            $.getJSON(`api/reportes.php?tipo=full_dashboard&${getParams()}`, function(d) {
+                cargarResumen(d.resumen);
+                cargarGraficaComisionesDiarias(d.comisiones_diarias);
+                cargarGraficaComisionesPromotor(d.comisiones_por_promotor);
+                cargarGraficaVentasDiarias(d.ventas_diarias);
+                cargarGraficaDivisas(d.divisas_diarias);
+                _renderTablaComisiones(d.comisiones);
+                _renderTablaDivisas({operaciones: d.divisas_operaciones, resumen: d.divisas_resumen});
+                _renderTablaVentas(d.ventas_efectivo);
+                cargarCapitalAmiri(d.capital_amiri);
+                cargarListaPromotores(d.lista_promotores);
+            });
         }
 
 

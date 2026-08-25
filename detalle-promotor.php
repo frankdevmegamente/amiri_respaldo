@@ -155,80 +155,81 @@ try {
             color: #5D87FF; /* Morado Amiri al pasar el mouse */
         }
 
-        body[data-bs-theme="dark"] .logo-modo-claro,
+        [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
         }
 
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }
 
-        body[data-bs-theme="dark"] .card,
-        body[data-bs-theme="dark"] .page-breadcrumb,
-        body[data-bs-theme="dark"] .page-breadcrumb h3,
-        body[data-bs-theme="dark"] .card-header,
-        body[data-bs-theme="dark"] .card-body,
-        body[data-bs-theme="dark"] .modal-content,
-        body[data-bs-theme="dark"] .modal-header,
-        body[data-bs-theme="dark"] .modal-footer {
+        [data-bs-theme="dark"] .card,
+        [data-bs-theme="dark"] .page-breadcrumb,
+        [data-bs-theme="dark"] .page-breadcrumb h3,
+        [data-bs-theme="dark"] .card-header,
+        [data-bs-theme="dark"] .card-body,
+        [data-bs-theme="dark"] .modal-content,
+        [data-bs-theme="dark"] .modal-header,
+        [data-bs-theme="dark"] .modal-footer {
             background-color: #1f2535 !important;
             border-color: #2b3350 !important;
             color: #e6ecff !important;
         }
 
-        body[data-bs-theme="dark"] .card {
+        [data-bs-theme="dark"] .card {
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
-        body[data-bs-theme="dark"] .table,
-        body[data-bs-theme="dark"] .table thead th,
-        body[data-bs-theme="dark"] .table tbody td,
-        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+        [data-bs-theme="dark"] .table,
+        [data-bs-theme="dark"] .table thead th,
+        [data-bs-theme="dark"] .table tbody td,
+        [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
             background-color: #1f2535 !important;
             color: #e6ecff !important;
             border-color: #2b3350 !important;
         }
 
-        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
+        [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
             background-color: #232b3c !important;
         }
 
-        body[data-bs-theme="dark"] .form-control,
-        body[data-bs-theme="dark"] .form-select,
-        body[data-bs-theme="dark"] .input-group-text,
-        body[data-bs-theme="dark"] .form-control-plaintext,
-        body[data-bs-theme="dark"] .alert,
-        body[data-bs-theme="dark"] .badge,
-        body[data-bs-theme="dark"] .nav-tabs .nav-link {
+        [data-bs-theme="dark"] .form-control,
+        [data-bs-theme="dark"] .form-select,
+        [data-bs-theme="dark"] .input-group-text,
+        [data-bs-theme="dark"] .form-control-plaintext,
+        [data-bs-theme="dark"] .alert,
+        [data-bs-theme="dark"] .badge,
+        [data-bs-theme="dark"] .nav-tabs .nav-link {
             background-color: #232b3c !important;
             color: #e6ecff !important;
             border-color: #2b3350 !important;
         }
 
-        body[data-bs-theme="dark"] .nav-tabs .nav-link.active {
+        [data-bs-theme="dark"] .nav-tabs .nav-link.active {
             color: #ffffff !important;
             border-bottom-color: #6c5ce7 !important;
         }
 
-        body[data-bs-theme="dark"] .bg-light {
+        [data-bs-theme="dark"] .bg-light {
             background-color: rgba(255, 255, 255, 0.06) !important;
         }
 
-        body[data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
+        [data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
             background-color: rgba(93, 135, 255, 0.12) !important;
         }
 
-        body[data-bs-theme="dark"] .bg-success.bg-opacity-10 {
+        [data-bs-theme="dark"] .bg-success.bg-opacity-10 {
             background-color: rgba(25, 135, 84, 0.12) !important;
         }
 
-        body[data-bs-theme="dark"] .bg-warning.bg-opacity-10 {
+        [data-bs-theme="dark"] .bg-warning.bg-opacity-10 {
             background-color: rgba(255, 193, 7, 0.12) !important;
         }
     </style>
 
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 
 
@@ -267,52 +268,25 @@ try {
                                 <div class="card-body p-4">
                                     <div class="row align-items-end">
                                         <div class="col-md-2">
-                                            <label class="form-label fw-bold">Filtrar por:</label>
-                                            <select class="form-select" id="tipoFiltro">
-                                                <option value="mes">Mes</option>
-                                                <option value="anio">Año</option>
-                                                <option value="rango">Rango Personalizado</option>
+                                            <label class="form-label fw-bold">Período:</label>
+                                            <select class="form-select" id="selectPeriodo">
                                                 <option value="todo" selected>Todo el Historial</option>
+                                                <option value="mes">Este Mes</option>
+                                                <option value="mes_pasado">Mes Pasado</option>
+                                                <option value="anio">Este Año</option>
+                                                <option value="rango">Fecha Personalizada</option>
                                             </select>
                                         </div>
-                                        <div class="col-md-2" id="filtroMes" style="display:none;">
-                                            <label class="form-label">Mes</label>
-                                            <select class="form-select" id="selectMes">
-                                                <option value="01">Enero</option>
-                                                <option value="02">Febrero</option>
-                                                <option value="03">Marzo</option>
-                                                <option value="04">Abril</option>
-                                                <option value="05">Mayo</option>
-                                                <option value="06">Junio</option>
-                                                <option value="07">Julio</option>
-                                                <option value="08">Agosto</option>
-                                                <option value="09">Septiembre</option>
-                                                <option value="10">Octubre</option>
-                                                <option value="11">Noviembre</option>
-                                                <option value="12">Diciembre</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-2" id="filtroAnio" style="display:none;">
-                                            <label class="form-label">Año</label>
-                                            <select class="form-select" id="selectAnio">
-                                                <?php 
-                                                $anioActual = date('Y');
-                                                for($i = $anioActual; $i >= 2024; $i--): 
-                                                ?>
-                                                    <option value="<?= $i ?>" <?= $i == $anioActual ? 'selected' : '' ?>><?= $i ?></option>
-                                                <?php endfor; ?>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-2" id="filtroDesde" style="display:none;">
+                                        <div class="col-md-2" id="fechaInicioGroup" style="display:none;">
                                             <label class="form-label">Desde</label>
-                                            <input type="date" class="form-control" id="fechaDesde">
+                                            <input type="date" class="form-control" id="fechaInicio">
                                         </div>
-                                        <div class="col-md-2" id="filtroHasta" style="display:none;">
+                                        <div class="col-md-2" id="fechaFinGroup" style="display:none;">
                                             <label class="form-label">Hasta</label>
-                                            <input type="date" class="form-control" id="fechaHasta" value="<?= date('Y-m-d') ?>">
+                                            <input type="date" class="form-control" id="fechaFin" value="<?= date('Y-m-d') ?>">
                                         </div>
                                         <div class="col-md-2">
-                                            <button class="btn btn-primary w-100" id="btnAplicarFiltro">
+                                            <button class="btn btn-primary w-100" id="btnFiltrar">
                                                 <i class="ti ti-filter"></i> Aplicar
                                             </button>
                                         </div>
@@ -553,74 +527,30 @@ try {
 
             const promotorId = <?= $promotor_id ?>;
 
-            let filtroActual = { tipo: 'todo' };
 
 
 
-            // Manejar cambio de tipo de filtro
 
-            $('#tipoFiltro').on('change', function() {
-
-                const tipo = $(this).val();
-
-                // Ocultar todos los filtros
-
-                $('#filtroMes, #filtroAnio, #filtroDesde, #filtroHasta').hide();
-
-                
-
-                // Mostrar los filtros relevantes
-
-                if (tipo === 'mes') {
-
-                    $('#filtroMes, #filtroAnio').show();
-
-                } else if (tipo === 'anio') {
-
-                    $('#filtroAnio').show();
-
-                } else if (tipo === 'rango') {
-
-                    $('#filtroDesde, #filtroHasta').show();
-
+            // ─── Period Filter ──────────────────────────────────
+            function getParams() {
+                const periodo = $('#selectPeriodo').val();
+                if (periodo === 'todo') return 'periodo=todo';
+                if (periodo === 'mes_pasado') {
+                    const d = new Date();
+                    d.setMonth(d.getMonth() - 1);
+                    const anio = d.getFullYear();
+                    const mes = String(d.getMonth() + 1).padStart(2, '0');
+                    const dias = new Date(anio, d.getMonth() + 1, 0).getDate();
+                    return 'periodo=rango&fecha_inicio=' + anio + '-' + mes + '-01&fecha_fin=' + anio + '-' + mes + '-' + String(dias).padStart(2, '0');
                 }
-
-            });
-
-
-
-            // Establecer mes actual por defecto
-
-            $('#selectMes').val('<?= date('m') ?>');
-
-
-
-            // Función para construir URL con filtros
+                if (periodo === 'rango') {
+                    return 'periodo=rango&fecha_inicio=' + $('#fechaInicio').val() + '&fecha_fin=' + $('#fechaFin').val();
+                }
+                return 'periodo=' + periodo;
+            }
 
             function construirURL() {
-
-                let url = `api/comisiones-promotores.php?promotor_id=${promotorId}`;
-
-                
-
-                if (filtroActual.tipo === 'mes') {
-
-                    url += `&mes=${filtroActual.mes}&anio=${filtroActual.anio}`;
-
-                } else if (filtroActual.tipo === 'anio') {
-
-                    url += `&anio=${filtroActual.anio}`;
-
-                } else if (filtroActual.tipo === 'rango') {
-
-                    url += `&fecha_desde=${filtroActual.desde}&fecha_hasta=${filtroActual.hasta}`;
-
-                }
-
-                
-
-                return url;
-
+                return `api/comisiones-promotores.php?promotor_id=${promotorId}&${getParams()}`;
             }
 
 
@@ -716,133 +646,42 @@ try {
 
 
 
-            // Aplicar filtro
-
-            $('#btnAplicarFiltro').on('click', function() {
-
-                const tipoFiltro = $('#tipoFiltro').val();
-
-                
-
-                if (tipoFiltro === 'mes') {
-
-                    filtroActual = {
-
-                        tipo: 'mes',
-
-                        mes: $('#selectMes').val(),
-
-                        anio: $('#selectAnio').val()
-
-                    };
-
-                } else if (tipoFiltro === 'anio') {
-
-                    filtroActual = {
-
-                        tipo: 'anio',
-
-                        anio: $('#selectAnio').val()
-
-                    };
-
-                } else if (tipoFiltro === 'rango') {
-
-                    const desde = $('#fechaDesde').val();
-
-                    const hasta = $('#fechaHasta').val();
-
-                    
-
-                    if (!desde || !hasta) {
-
-                        alert('Por favor selecciona ambas fechas');
-
-                        return;
-
-                    }
-
-                    
-
-                    filtroActual = {
-
-                        tipo: 'rango',
-
-                        desde: desde,
-
-                        hasta: hasta
-
-                    };
-
+            // ─── Period events ────────────────────────────────
+            $('#selectPeriodo').on('change', function() {
+                if ($(this).val() === 'rango') {
+                    $('#fechaInicioGroup, #fechaFinGroup').show();
                 } else {
-
-                    filtroActual = { tipo: 'todo' };
-
+                    $('#fechaInicioGroup, #fechaFinGroup').hide();
+                    table.ajax.url(construirURL()).load();
+                    actualizarTotales();
                 }
-
-                
-
-                // Recargar datos con nueva URL
-
-                table.ajax.url(construirURL()).load();
-
-                actualizarTotales();
-
             });
 
+            // Aplicar filtro
 
+            $('#btnFiltrar').on('click', function() {
+                const params = getParams();
+                if ($('#selectPeriodo').val() === 'rango') {
+                    if (!$('#fechaInicio').val() || !$('#fechaFin').val()) {
+                        alert('Por favor selecciona ambas fechas');
+                        return;
+                    }
+                }
+                table.ajax.url(construirURL()).load();
+                actualizarTotales();
+            });
 
             // Generar PDF
 
             $('#btnGenerarPDF').on('click', function() {
-
-                let url = `api/comisiones-promotores.php?promotor_id=${promotorId}&pdf=1`;
-
-                
-
-                if (filtroActual.tipo === 'mes') {
-
-                    url += `&mes=${filtroActual.mes}&anio=${filtroActual.anio}`;
-
-                } else if (filtroActual.tipo === 'anio') {
-
-                    url += `&anio=${filtroActual.anio}`;
-
-                } else if (filtroActual.tipo === 'rango') {
-
-                    url += `&fecha_desde=${filtroActual.desde}&fecha_hasta=${filtroActual.hasta}`;
-
-                }
-
-                
-
+                let url = `api/comisiones-promotores.php?promotor_id=${promotorId}&pdf=1&${getParams()}`;
                 window.open(url, '_blank');
-
             });
-
-
 
             // 2. Función para actualizar los Cards de Totales
 
             function actualizarTotales() {
-
-                let url = `api/comisiones-promotores.php?promotor_id=${promotorId}&totales=1`;
-
-                
-
-                if (filtroActual.tipo === 'mes') {
-
-                    url += `&mes=${filtroActual.mes}&anio=${filtroActual.anio}`;
-
-                } else if (filtroActual.tipo === 'anio') {
-
-                    url += `&anio=${filtroActual.anio}`;
-
-                } else if (filtroActual.tipo === 'rango') {
-
-                    url += `&fecha_desde=${filtroActual.desde}&fecha_hasta=${filtroActual.hasta}`;
-
-                }
+                let url = `api/comisiones-promotores.php?promotor_id=${promotorId}&totales=1&${getParams()}`;
 
                 
 

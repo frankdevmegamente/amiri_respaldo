@@ -70,7 +70,7 @@ if (!isset($pagina_actual)) {
 
           <li class="nav-small-cap">
 
-            <span class="hide-menu">Administración</span>
+            <span class="hide-menu">Operaciones</span>
 
           </li>
 
@@ -86,18 +86,6 @@ if (!isset($pagina_actual)) {
 
           </li>
 
-          <!-- <li class="sidebar-item <?= in_array($pagina_actual, ['flujo-divisas.php']) ? 'active' : '' ?>">
-
-            <a class="sidebar-link" href="flujo-divisas.php" aria-expanded="false">
-
-              <i class="ti ti-currency-dollar"></i>
-
-              <span class="hide-menu">Flujo Divisas</span>
-
-            </a>
-
-          </li> -->
-
           <li class="sidebar-item <?= in_array($pagina_actual, ['cuentas.php', 'cuentas_bancarias.php', 'cuentas_cajas.php']) ? 'active' : '' ?>">
 
             <a class="sidebar-link" href="cuentas.php" aria-expanded="false">
@@ -105,6 +93,18 @@ if (!isset($pagina_actual)) {
               <i class="ti ti-wallet"></i>
 
               <span class="hide-menu">Cuentas</span>
+
+            </a>
+
+          </li>
+
+          <li class="sidebar-item <?= in_array($pagina_actual, ['movimientos.php']) ? 'active' : '' ?>">
+
+            <a class="sidebar-link" href="movimientos.php" aria-expanded="false">
+
+              <i class="ti ti-list-details"></i>
+
+              <span class="hide-menu">Movimientos</span>
 
             </a>
 
@@ -119,6 +119,24 @@ if (!isset($pagina_actual)) {
               <span class="hide-menu">Capital Amiri</span>
 
             </a>
+
+          </li>
+
+          <li class="sidebar-item <?= in_array($pagina_actual, ['gastos.php']) ? 'active' : '' ?>">
+
+            <a class="sidebar-link" href="gastos.php" aria-expanded="false">
+
+              <i class="ti ti-file-dollar"></i>
+
+              <span class="hide-menu">Gastos</span>
+
+            </a>
+
+          </li>
+
+          <li class="nav-small-cap">
+
+            <span class="hide-menu">Contrapartes</span>
 
           </li>
 
@@ -177,18 +195,100 @@ if (!isset($pagina_actual)) {
             </a>
           </li>
 
-          <li class="sidebar-item <?= in_array($pagina_actual, ['gastos.php']) ? 'active' : '' ?>">
+          <li class="sidebar-item">
+            <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+              <span>
+                <i class="ti ti-chart-bar"></i>
+              </span>
+              <span class="hide-menu">Reportes</span>
+            </a>
+            <ul aria-expanded="false" class="collapse first-level">
+              <li class="sidebar-item <?= in_array($pagina_actual, ['reportes.php']) ? 'active' : '' ?>">
+                <a href="reportes.php" class="sidebar-link">
+                  <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle fs-2"></i>
+                  </div>
+                  <span class="hide-menu">Reportes Totales</span>
+                </a>
+              </li>
+              <li class="sidebar-item <?= in_array($pagina_actual, ['reportes-utilidades.php']) ? 'active' : '' ?>">
+                <a href="reportes-utilidades.php" class="sidebar-link">
+                  <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle fs-2"></i>
+                  </div>
+                  <span class="hide-menu">Utilidades</span>
+                </a>
+              </li>
+              <li class="sidebar-item <?= in_array($pagina_actual, ['reportes-servicios.php']) ? 'active' : '' ?>">
+                <a href="reportes-servicios.php" class="sidebar-link">
+                  <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle fs-2"></i>
+                  </div>
+                  <span class="hide-menu">Servicios</span>
+                </a>
+              </li>
+            </ul>
+          </li>
 
-            <a class="sidebar-link" href="gastos.php" aria-expanded="false">
+          <li class="nav-small-cap">
 
-              <i class="ti ti-file-dollar"></i>
+            <span class="hide-menu">Herramientas</span>
 
-              <span class="hide-menu">Gastos</span>
+          </li>
+
+          <li class="sidebar-item">
+            <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+              <span>
+                <i class="ti ti-tools"></i>
+              </span>
+              <span class="hide-menu">Generadores</span>
+            </a>
+            <ul aria-expanded="false" class="collapse first-level">
+              <li class="sidebar-item">
+                <a href="generador-recibos.php" class="sidebar-link">
+                  <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle fs-2"></i>
+                  </div>
+                  <span class="hide-menu">Cotizador Divisas</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="generador-depositos.php" class="sidebar-link">
+                  <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle fs-2"></i>
+                  </div>
+                  <span class="hide-menu">Depósito Efectivo</span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="generador-transferencias.php" class="sidebar-link">
+                  <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-circle fs-2"></i>
+                  </div>
+                  <span class="hide-menu">Depósito Transferencia</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+
+          <li class="sidebar-item <?= in_array($pagina_actual, ['fifo.php']) ? 'active' : '' ?>">
+
+            <a class="sidebar-link" href="fifo.php" aria-expanded="false">
+
+              <i class="ti ti-currency-tenge"></i>
+
+              <span class="hide-menu">FIFO</span>
 
             </a>
 
           </li>
-          
+
+          <li class="nav-small-cap">
+
+            <span class="hide-menu">Administración</span>
+
+          </li>
+
           <li class="sidebar-item <?= in_array($pagina_actual, ['usuarios.php']) ? 'active' : '' ?>">
 
             <a class="sidebar-link" href="usuarios.php" aria-expanded="false">
@@ -200,78 +300,6 @@ if (!isset($pagina_actual)) {
             </a>
 
           </li>
-
-        <li class="sidebar-item">
-    <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
-        <span>
-            <i class="ti ti-tools"></i> </span>
-        <span class="hide-menu">Generadores</span>
-    </a>
-    <ul aria-expanded="false" class="collapse first-level">
-        
-        <li class="sidebar-item">
-            <a href="generador-recibos.php" class="sidebar-link">
-                <div class="round-16 d-flex align-items-center justify-content-center">
-                    <i class="ti ti-circle fs-2"></i> </div>
-                <span class="hide-menu">Cotizador Divisas</span>
-            </a>
-        </li>
-
-        <li class="sidebar-item">
-            <a href="generador-depositos.php" class="sidebar-link">
-                <div class="round-16 d-flex align-items-center justify-content-center">
-                    <i class="ti ti-circle fs-2"></i>
-                </div>
-                <span class="hide-menu">Depósito Efectivo</span>
-            </a>
-        </li>
-
-        <li class="sidebar-item">
-            <a href="generador-transferencias.php" class="sidebar-link">
-                <div class="round-16 d-flex align-items-center justify-content-center">
-                    <i class="ti ti-circle fs-2"></i>
-                </div>
-                <span class="hide-menu">Depósito Transferencia</span>
-            </a>
-        </li>
-
-        </ul>
-</li>
-
-<li class="sidebar-item">
-    <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
-        <span>
-            <i class="ti ti-chart-bar"></i>
-        </span>
-        <span class="hide-menu">Reportes</span>
-    </a>
-    <ul aria-expanded="false" class="collapse first-level">
-        <li class="sidebar-item <?= in_array($pagina_actual, ['reportes.php']) ? 'active' : '' ?>">
-            <a href="reportes.php" class="sidebar-link">
-                <div class="round-16 d-flex align-items-center justify-content-center">
-                    <i class="ti ti-circle fs-2"></i>
-                </div>
-                <span class="hide-menu">Reportes Totales</span>
-            </a>
-        </li>
-        <li class="sidebar-item <?= in_array($pagina_actual, ['reportes-utilidades.php']) ? 'active' : '' ?>">
-            <a href="reportes-utilidades.php" class="sidebar-link">
-                <div class="round-16 d-flex align-items-center justify-content-center">
-                    <i class="ti ti-circle fs-2"></i>
-                </div>
-                <span class="hide-menu">Utilidades</span>
-            </a>
-        </li>
-        <li class="sidebar-item <?= in_array($pagina_actual, ['reportes-servicios.php']) ? 'active' : '' ?>">
-            <a href="reportes-servicios.php" class="sidebar-link">
-                <div class="round-16 d-flex align-items-center justify-content-center">
-                    <i class="ti ti-circle fs-2"></i>
-                </div>
-                <span class="hide-menu">Servicios</span>
-            </a>
-        </li>
-    </ul>
-</li>
 
           <li class="sidebar-item <?= in_array($pagina_actual, ['auditoria.php']) ? 'active' : '' ?>">
 
@@ -292,18 +320,6 @@ if (!isset($pagina_actual)) {
               <i class="ti ti-activity"></i>
 
               <span class="hide-menu">Monitor</span>
-
-            </a>
-
-          </li>
-
-          <li class="sidebar-item <?= in_array($pagina_actual, ['fifo.php']) ? 'active' : '' ?>">
-
-            <a class="sidebar-link" href="fifo.php" aria-expanded="false">
-
-              <i class="ti ti-currency-tenge"></i>
-
-              <span class="hide-menu">FIFO</span>
 
             </a>
 

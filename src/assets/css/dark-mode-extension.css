@@ -2,7 +2,7 @@
 
 /* Selector de Moneda */
 
-body[data-bs-theme="dark"] #filtroMoneda {
+[data-bs-theme="dark"] #filtroMoneda {
   background-color: #1a2234 !important;
 
   border-color: #2c344c !important;
@@ -10,7 +10,7 @@ body[data-bs-theme="dark"] #filtroMoneda {
   color: #e9ecef !important;
 }
 
-body[data-bs-theme="dark"] #filtroMoneda:focus {
+[data-bs-theme="dark"] #filtroMoneda:focus {
   border-color: #6c5ce7 !important;
 
   box-shadow: 0 0 0 0.25rem rgba(108, 92, 231, 0.25) !important;
@@ -18,7 +18,7 @@ body[data-bs-theme="dark"] #filtroMoneda:focus {
 
 /* Nota Informativa (Alert) */
 
-body[data-bs-theme="dark"] .alert-info {
+[data-bs-theme="dark"] .alert-info {
   background-color: #1a2d42 !important;
 
   border-color: #2c4a6c !important;
@@ -26,7 +26,7 @@ body[data-bs-theme="dark"] .alert-info {
   color: #a8d5ff !important;
 }
 
-body[data-bs-theme="dark"] #infoMoneda {
+[data-bs-theme="dark"] #infoMoneda {
   background-color: #1a2d42 !important;
 
   border-left: 4px solid #0d6efd !important;
@@ -34,9 +34,9 @@ body[data-bs-theme="dark"] #infoMoneda {
 
 /* Badges de Moneda en Headers */
 
-body[data-bs-theme="dark"] #badgeMonedaCajas,
-body[data-bs-theme="dark"] #badgeMonedaCapital,
-body[data-bs-theme="dark"] #badgeMonedaPrestamos {
+[data-bs-theme="dark"] #badgeMonedaCajas,
+[data-bs-theme="dark"] #badgeMonedaCapital,
+[data-bs-theme="dark"] #badgeMonedaPrestamos {
   background-color: #2c344c !important;
 
   color: #ffffff !important;
@@ -46,7 +46,7 @@ body[data-bs-theme="dark"] #badgeMonedaPrestamos {
 
 /* Card Headers con Badges */
 
-body[data-bs-theme="dark"] .card-header {
+[data-bs-theme="dark"] .card-header {
   background-color: #1e2638 !important;
 
   border-bottom: 1px solid #2c344c !important;
@@ -54,13 +54,13 @@ body[data-bs-theme="dark"] .card-header {
 
 /* Tabla de Detalle de Movimientos en Modal */
 
-body[data-bs-theme="dark"] .table-light {
+[data-bs-theme="dark"] .table-light {
   background-color: #2c344c !important;
 
   color: #ffffff !important;
 }
 
-body[data-bs-theme="dark"] .table-light th {
+[data-bs-theme="dark"] .table-light th {
   background-color: #2c344c !important;
 
   color: #ffffff !important;
@@ -68,18 +68,18 @@ body[data-bs-theme="dark"] .table-light th {
   border-color: #3c445c !important;
 }
 
-body[data-bs-theme="dark"] .table-bordered {
+[data-bs-theme="dark"] .table-bordered {
   border-color: #2c344c !important;
 }
 
-body[data-bs-theme="dark"] .table-bordered th,
-body[data-bs-theme="dark"] .table-bordered td {
+[data-bs-theme="dark"] .table-bordered th,
+[data-bs-theme="dark"] .table-bordered td {
   border-color: #2c344c !important;
 
   background-color: #1a2234 !important;
 }
 
-body[data-bs-theme="dark"] .table-bordered thead th {
+[data-bs-theme="dark"] .table-bordered thead th {
   background-color: #2c344c !important;
 
   color: #ffffff !important;
@@ -87,126 +87,126 @@ body[data-bs-theme="dark"] .table-bordered thead th {
 
 /* Badges de Tipo de Movimiento */
 
-body[data-bs-theme="dark"] .badge.bg-success {
+[data-bs-theme="dark"] .badge.bg-success {
   background-color: #28a745 !important;
 
   color: #ffffff !important;
 }
 
-body[data-bs-theme="dark"] .badge.bg-danger {
+[data-bs-theme="dark"] .badge.bg-danger {
   background-color: #dc3545 !important;
 
   color: #ffffff !important;
 }
 
-body[data-bs-theme="dark"] .badge.bg-warning {
+[data-bs-theme="dark"] .badge.bg-warning {
   background-color: #ffc107 !important;
 
   color: #000000 !important;
 }
 
-body[data-bs-theme="dark"] .badge.bg-info {
+[data-bs-theme="dark"] .badge.bg-info {
   background-color: #17a2b8 !important;
 
   color: #ffffff !important;
 }
 
-body[data-bs-theme="dark"] .badge.bg-secondary {
+[data-bs-theme="dark"] .badge.bg-secondary {
   background-color: #6c757d !important;
 
   color: #ffffff !important;
 }
 
-body[data-bs-theme="dark"] .badge.bg-light {
+[data-bs-theme="dark"] .badge.bg-light {
   background-color: #2c344c !important;
 
   color: #ffffff !important;
 }
 
-body[data-bs-theme="dark"] .badge.bg-success.bg-opacity-10,
-body[data-bs-theme="dark"] .badge.bg-info.bg-opacity-10,
-body[data-bs-theme="dark"] .badge.bg-primary.bg-opacity-10,
-body[data-bs-theme="dark"] .badge.bg-danger.bg-opacity-10,
-body[data-bs-theme="dark"] .badge.bg-warning.bg-opacity-10,
-body[data-bs-theme="dark"] .badge.bg-secondary.bg-opacity-10,
-body[data-bs-theme="dark"] .badge.bg-light.bg-opacity-10 {
+[data-bs-theme="dark"] .badge.bg-success.bg-opacity-10,
+[data-bs-theme="dark"] .badge.bg-info.bg-opacity-10,
+[data-bs-theme="dark"] .badge.bg-primary.bg-opacity-10,
+[data-bs-theme="dark"] .badge.bg-danger.bg-opacity-10,
+[data-bs-theme="dark"] .badge.bg-warning.bg-opacity-10,
+[data-bs-theme="dark"] .badge.bg-secondary.bg-opacity-10,
+[data-bs-theme="dark"] .badge.bg-light.bg-opacity-10 {
   background-image: none !important;
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 
-body[data-bs-theme="dark"] .badge.bg-success.bg-opacity-10 {
+[data-bs-theme="dark"] .badge.bg-success.bg-opacity-10 {
   background-color: rgba(19, 222, 185, 0.15) !important;
   color: #13deb9 !important;
 }
 
-body[data-bs-theme="dark"] .badge.bg-info.bg-opacity-10 {
+[data-bs-theme="dark"] .badge.bg-info.bg-opacity-10 {
   background-color: rgba(93, 135, 255, 0.15) !important;
   color: #6c5ce7 !important;
 }
 
-body[data-bs-theme="dark"] .badge.bg-primary.bg-opacity-10 {
+[data-bs-theme="dark"] .badge.bg-primary.bg-opacity-10 {
   background-color: rgba(59, 130, 246, 0.15) !important;
   color: #3b82f6 !important;
 }
 
-body[data-bs-theme="dark"] .badge.bg-danger.bg-opacity-10 {
+[data-bs-theme="dark"] .badge.bg-danger.bg-opacity-10 {
   background-color: rgba(220, 53, 69, 0.15) !important;
   color: #f05464 !important;
 }
 
-body[data-bs-theme="dark"] .badge.bg-warning.bg-opacity-10 {
+[data-bs-theme="dark"] .badge.bg-warning.bg-opacity-10 {
   background-color: rgba(255, 174, 31, 0.15) !important;
   color: #ffae1f !important;
 }
 
-body[data-bs-theme="dark"] .badge.bg-secondary.bg-opacity-10 {
+[data-bs-theme="dark"] .badge.bg-secondary.bg-opacity-10 {
   background-color: rgba(140, 158, 168, 0.15) !important;
   color: #8c9ea8 !important;
 }
 
-body[data-bs-theme="dark"] .badge.bg-light.bg-opacity-10 {
+[data-bs-theme="dark"] .badge.bg-light.bg-opacity-10 {
   background-color: rgba(255, 255, 255, 0.08) !important;
   color: #e9ecef !important;
 }
 
 /* Modal en Modo Oscuro */
 
-body[data-bs-theme="dark"] .modal-content {
+[data-bs-theme="dark"] .modal-content {
   background-color: #1a2234 !important;
 
   border-color: #2c344c !important;
 }
 
-body[data-bs-theme="dark"] .modal-header {
+[data-bs-theme="dark"] .modal-header {
   background-color: #1e2638 !important;
 
   border-bottom: 1px solid #2c344c !important;
 }
 
-body[data-bs-theme="dark"] .modal-footer {
+[data-bs-theme="dark"] .modal-footer {
   background-color: #1e2638 !important;
 
   border-top: 1px solid #2c344c !important;
 }
 
-body[data-bs-theme="dark"] .modal-title {
+[data-bs-theme="dark"] .modal-title {
   color: #e9ecef !important;
 }
 
-body[data-bs-theme="dark"] .btn-close {
+[data-bs-theme="dark"] .btn-close {
   filter: invert(1) grayscale(100%) brightness(200%);
 }
 
 /* Columna "Involucrados" con iconos */
 
-body[data-bs-theme="dark"] .ti {
+[data-bs-theme="dark"] .ti {
   color: #a8d5ff !important;
 }
 
 /* DataTable en modo oscuro */
 
-body[data-bs-theme="dark"] .dataTables_wrapper .dataTables_length select,
-body[data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter input {
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_length select,
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter input {
   background-color: #1a2234 !important;
 
   border-color: #2c344c !important;
@@ -214,12 +214,12 @@ body[data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter input {
   color: #e9ecef !important;
 }
 
-body[data-bs-theme="dark"] .dataTables_wrapper .dataTables_info,
-body[data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate {
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_info,
+[data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate {
   color: #e9ecef !important;
 }
 
-body[data-bs-theme="dark"] .page-item .page-link {
+[data-bs-theme="dark"] .page-item .page-link {
   background-color: #1a2234 !important;
 
   border-color: #2c344c !important;
@@ -227,13 +227,13 @@ body[data-bs-theme="dark"] .page-item .page-link {
   color: #e9ecef !important;
 }
 
-body[data-bs-theme="dark"] .page-item.active .page-link {
+[data-bs-theme="dark"] .page-item.active .page-link {
   background-color: #6c5ce7 !important;
 
   border-color: #6c5ce7 !important;
 }
 
-body[data-bs-theme="dark"] .page-item.disabled .page-link {
+[data-bs-theme="dark"] .page-item.disabled .page-link {
   background-color: #1a2234 !important;
 
   color: #6c757d !important;
@@ -241,35 +241,35 @@ body[data-bs-theme="dark"] .page-item.disabled .page-link {
 
 /* Tabla Responsive */
 
-body[data-bs-theme="dark"] .table-responsive {
+[data-bs-theme="dark"] .table-responsive {
   border-color: #2c344c !important;
 }
 
 /* Iconos tabler en elementos nuevos */
 
-body[data-bs-theme="dark"] .ti-exchange,
-body[data-bs-theme="dark"] .ti-wallet,
-body[data-bs-theme="dark"] .ti-building-bank,
-body[data-bs-theme="dark"] .ti-coin,
-body[data-bs-theme="dark"] .ti-list-details,
-body[data-bs-theme="dark"] .ti-package,
-body[data-bs-theme="dark"] .ti-info-circle,
-body[data-bs-theme="dark"] .ti-user,
-body[data-bs-theme="dark"] .ti-building,
-body[data-bs-theme="dark"] .ti-arrow-right,
-body[data-bs-theme="dark"] .ti-arrow-left {
+[data-bs-theme="dark"] .ti-exchange,
+[data-bs-theme="dark"] .ti-wallet,
+[data-bs-theme="dark"] .ti-building-bank,
+[data-bs-theme="dark"] .ti-coin,
+[data-bs-theme="dark"] .ti-list-details,
+[data-bs-theme="dark"] .ti-package,
+[data-bs-theme="dark"] .ti-info-circle,
+[data-bs-theme="dark"] .ti-user,
+[data-bs-theme="dark"] .ti-building,
+[data-bs-theme="dark"] .ti-arrow-right,
+[data-bs-theme="dark"] .ti-arrow-left {
   color: inherit !important;
 }
 
 /* Texto pequeño en tablas */
 
-body[data-bs-theme="dark"] small {
+[data-bs-theme="dark"] small {
   color: #adb5bd !important;
 }
 
 /* Separadores HR */
 
-body[data-bs-theme="dark"] hr {
+[data-bs-theme="dark"] hr {
   border-color: #2c344c !important;
 
   opacity: 0.5;
@@ -277,51 +277,51 @@ body[data-bs-theme="dark"] hr {
 
 /* Card de Diferencia en modo oscuro */
 
-body[data-bs-theme="dark"] #cardDiferencia {
+[data-bs-theme="dark"] #cardDiferencia {
   background-color: #1a2234 !important;
 }
 
-body[data-bs-theme="dark"] #cardDiferencia .card-body {
+[data-bs-theme="dark"] #cardDiferencia .card-body {
   color: #e9ecef !important;
 }
 
-body[data-bs-theme="dark"] #diferenciaIcon {
+[data-bs-theme="dark"] #diferenciaIcon {
   background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Ajustes de contraste para mejor visibilidad */
 
-body[data-bs-theme="dark"] strong {
+[data-bs-theme="dark"] strong {
   color: #ffffff !important;
 }
 
-body[data-bs-theme="dark"] .text-muted {
+[data-bs-theme="dark"] .text-muted {
   color: #6c757d !important;
 }
 
-body[data-bs-theme="dark"] .text-end strong {
+[data-bs-theme="dark"] .text-end strong {
   color: #ffffff !important;
 }
 
 /* Sticky headers en tablas scrollables */
 
-body[data-bs-theme="dark"] thead[style*="sticky"] {
+[data-bs-theme="dark"] thead[style*="sticky"] {
   background-color: #1e2638 !important;
 }
 
-body[data-bs-theme="dark"] tbody tr:nth-child(even) {
+[data-bs-theme="dark"] tbody tr:nth-child(even) {
   background-color: rgba(255, 255, 255, 0.02) !important;
 }
 
 /* Hover effects mejorados */
 
-body[data-bs-theme="dark"] .table tbody tr:hover {
+[data-bs-theme="dark"] .table tbody tr:hover {
   background-color: rgba(108, 92, 231, 0.1) !important;
 }
 
 /* Labels de formulario */
 
-body[data-bs-theme="dark"] .form-label {
+[data-bs-theme="dark"] .form-label {
   color: #e9ecef !important;
 
   font-weight: 500;
@@ -329,13 +329,13 @@ body[data-bs-theme="dark"] .form-label {
 
 /* Gap en elementos flex */
 
-body[data-bs-theme="dark"] .d-flex.gap-2 > * {
+[data-bs-theme="dark"] .d-flex.gap-2 > * {
   color: #e9ecef !important;
 }
 
 /* Badges con mejor contraste */
 
-body[data-bs-theme="dark"] .badge {
+[data-bs-theme="dark"] .badge {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -343,24 +343,24 @@ body[data-bs-theme="dark"] .badge {
 
 /* Contenido del modal de detalle */
 
-body[data-bs-theme="dark"] #detalleContent {
+[data-bs-theme="dark"] #detalleContent {
   background-color: #1a2234 !important;
 
   color: #e9ecef !important;
 }
 
-body[data-bs-theme="dark"] #detalleContent .row {
+[data-bs-theme="dark"] #detalleContent .row {
   color: #e9ecef !important;
 }
 
-body[data-bs-theme="dark"] #detalleContent .col-md-6,
-body[data-bs-theme="dark"] #detalleContent .col-md-12 {
+[data-bs-theme="dark"] #detalleContent .col-md-6,
+[data-bs-theme="dark"] #detalleContent .col-md-12 {
   color: #e9ecef !important;
 }
 
 /* Títulos y headers en el detalle */
 
-body[data-bs-theme="dark"] #detalleContent h6 {
+[data-bs-theme="dark"] #detalleContent h6 {
   color: #ffffff !important;
 
   border-bottom: 1px solid #2c344c;
@@ -372,20 +372,20 @@ body[data-bs-theme="dark"] #detalleContent h6 {
 
 /* Textos strong en el detalle */
 
-body[data-bs-theme="dark"] #detalleContent strong {
+[data-bs-theme="dark"] #detalleContent strong {
   color: #a8d5ff !important;
 }
 
 /* Valores después de strong */
 
-body[data-bs-theme="dark"] #detalleContent br + text,
-body[data-bs-theme="dark"] #detalleContent strong + text {
+[data-bs-theme="dark"] #detalleContent br + text,
+[data-bs-theme="dark"] #detalleContent strong + text {
   color: #e9ecef !important;
 }
 
 /* Tabla dentro del modal de detalle */
 
-body[data-bs-theme="dark"] #detalleContent .table {
+[data-bs-theme="dark"] #detalleContent .table {
   color: #e9ecef !important;
 
   border-color: #2c344c !important;
@@ -393,11 +393,11 @@ body[data-bs-theme="dark"] #detalleContent .table {
   background-color: #1a2234 !important;
 }
 
-body[data-bs-theme="dark"] #detalleContent .table thead {
+[data-bs-theme="dark"] #detalleContent .table thead {
   background-color: #2c344c !important;
 }
 
-body[data-bs-theme="dark"] #detalleContent .table thead th {
+[data-bs-theme="dark"] #detalleContent .table thead th {
   color: #ffffff !important;
 
   border-color: #3c445c !important;
@@ -409,7 +409,7 @@ body[data-bs-theme="dark"] #detalleContent .table thead th {
   padding: 0.75rem;
 }
 
-body[data-bs-theme="dark"] #detalleContent .table tbody td {
+[data-bs-theme="dark"] #detalleContent .table tbody td {
   color: #e9ecef !important;
 
   border-color: #2c344c !important;
@@ -419,33 +419,33 @@ body[data-bs-theme="dark"] #detalleContent .table tbody td {
   padding: 0.75rem;
 }
 
-body[data-bs-theme="dark"] #detalleContent .table tbody tr {
+[data-bs-theme="dark"] #detalleContent .table tbody tr {
   background-color: #1a2234 !important;
 }
 
-body[data-bs-theme="dark"] #detalleContent .table tbody tr:hover {
+[data-bs-theme="dark"] #detalleContent .table tbody tr:hover {
   background-color: rgba(108, 92, 231, 0.15) !important;
 }
 
-body[data-bs-theme="dark"] #detalleContent .table tbody tr:hover td {
+[data-bs-theme="dark"] #detalleContent .table tbody tr:hover td {
   background-color: transparent !important;
 }
 
 /* Badges dentro del modal */
 
-body[data-bs-theme="dark"] #detalleContent .badge {
+[data-bs-theme="dark"] #detalleContent .badge {
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 /* Small text en el detalle */
 
-body[data-bs-theme="dark"] #detalleContent small {
+[data-bs-theme="dark"] #detalleContent small {
   color: #adb5bd !important;
 }
 
 /* Separadores en el modal */
 
-body[data-bs-theme="dark"] #detalleContent hr {
+[data-bs-theme="dark"] #detalleContent hr {
   border-color: #2c344c !important;
 
   opacity: 0.7;
@@ -455,7 +455,7 @@ body[data-bs-theme="dark"] #detalleContent hr {
 
 /* Iconos dentro del modal de detalle */
 
-body[data-bs-theme="dark"] #detalleContent .ti {
+[data-bs-theme="dark"] #detalleContent .ti {
   color: #a8d5ff !important;
 
   margin-right: 0.25rem;
@@ -463,7 +463,7 @@ body[data-bs-theme="dark"] #detalleContent .ti {
 
 /* Table-responsive dentro del modal */
 
-body[data-bs-theme="dark"] #detalleContent .table-responsive {
+[data-bs-theme="dark"] #detalleContent .table-responsive {
   background-color: transparent !important;
 
   border: 1px solid #2c344c !important;
@@ -473,17 +473,17 @@ body[data-bs-theme="dark"] #detalleContent .table-responsive {
 
 /* Celdas con alineación de texto */
 
-body[data-bs-theme="dark"] #detalleContent .text-end {
+[data-bs-theme="dark"] #detalleContent .text-end {
   color: #e9ecef !important;
 }
 
-body[data-bs-theme="dark"] #detalleContent .text-end strong {
+[data-bs-theme="dark"] #detalleContent .text-end strong {
   color: #ffffff !important;
 }
 
 /* Números y montos */
 
-body[data-bs-theme="dark"] #detalleContent td strong {
+[data-bs-theme="dark"] #detalleContent td strong {
   color: #ffffff !important;
 
   font-weight: 600;
@@ -491,27 +491,27 @@ body[data-bs-theme="dark"] #detalleContent td strong {
 
 /* Scrollbar del modal de detalle */
 
-body[data-bs-theme="dark"] #detalleContent::-webkit-scrollbar {
+[data-bs-theme="dark"] #detalleContent::-webkit-scrollbar {
   width: 8px;
 }
 
-body[data-bs-theme="dark"] #detalleContent::-webkit-scrollbar-track {
+[data-bs-theme="dark"] #detalleContent::-webkit-scrollbar-track {
   background: #1a2234;
 }
 
-body[data-bs-theme="dark"] #detalleContent::-webkit-scrollbar-thumb {
+[data-bs-theme="dark"] #detalleContent::-webkit-scrollbar-thumb {
   background: #2c344c;
 
   border-radius: 4px;
 }
 
-body[data-bs-theme="dark"] #detalleContent::-webkit-scrollbar-thumb:hover {
+[data-bs-theme="dark"] #detalleContent::-webkit-scrollbar-thumb:hover {
   background: #3c445c;
 }
 
 /* Modal body del detalle */
 
-body[data-bs-theme="dark"] #modalDetalle .modal-body {
+[data-bs-theme="dark"] #modalDetalle .modal-body {
   background-color: #1a2234 !important;
 
   max-height: 70vh;
@@ -521,7 +521,7 @@ body[data-bs-theme="dark"] #modalDetalle .modal-body {
 
 /* Números de fila en tabla de detalle */
 
-body[data-bs-theme="dark"] #detalleContent .table tbody td:first-child {
+[data-bs-theme="dark"] #detalleContent .table tbody td:first-child {
   font-weight: 600;
 
   color: #a8d5ff !important;
@@ -531,110 +531,110 @@ body[data-bs-theme="dark"] #detalleContent .table tbody td:first-child {
 
 /* Breadcrumb Card en dark mode */
 
-body[data-bs-theme="dark"] .card.bg-light-info {
+[data-bs-theme="dark"] .card.bg-light-info {
   background-color: #1a2d42 !important;
 
   border-color: #2c4a6c !important;
 }
 
-body[data-bs-theme="dark"] .bg-light-info {
+[data-bs-theme="dark"] .bg-light-info {
   background-color: #1a2d42 !important;
 
   border-color: #2c4a6c !important;
 }
 
-body[data-bs-theme="dark"] .breadcrumb-item a {
+[data-bs-theme="dark"] .breadcrumb-item a {
   color: #a8d5ff !important;
 }
 
-body[data-bs-theme="dark"] .breadcrumb-item.active {
+[data-bs-theme="dark"] .breadcrumb-item.active {
   color: #ffffff !important;
 }
 
-body[data-bs-theme="dark"] .breadcrumb-item + .breadcrumb-item::before {
+[data-bs-theme="dark"] .breadcrumb-item + .breadcrumb-item::before {
   color: #6c757d !important;
 }
 
 /* Cards de Estadísticas */
 
-body[data-bs-theme="dark"] .card-stats .card {
+[data-bs-theme="dark"] .card-stats .card {
   background-color: #1a2234 !important;
 
   border-color: #2c344c !important;
 }
 
-body[data-bs-theme="dark"] .card-stats .card-body h6 {
+[data-bs-theme="dark"] .card-stats .card-body h6 {
   color: #adb5bd !important;
 }
 
-body[data-bs-theme="dark"] .card-stats .card-body h3 {
+[data-bs-theme="dark"] .card-stats .card-body h3 {
   color: #ffffff !important;
 }
 
 /* Mantener colores de los bordes de estado */
 
-body[data-bs-theme="dark"] .border-success {
+[data-bs-theme="dark"] .border-success {
   border-left-color: #28a745 !important;
 }
 
-body[data-bs-theme="dark"] .border-primary {
+[data-bs-theme="dark"] .border-primary {
   border-left-color: #0d6efd !important;
 }
 
-body[data-bs-theme="dark"] .border-danger {
+[data-bs-theme="dark"] .border-danger {
   border-left-color: #dc3545 !important;
 }
 
 /* Mantener colores de texto de montos */
 
-body[data-bs-theme="dark"] .text-success {
+[data-bs-theme="dark"] .text-success {
   color: #28a745 !important;
 }
 
-body[data-bs-theme="dark"] .text-primary {
+[data-bs-theme="dark"] .text-primary {
   color: #0d6efd !important;
 }
 
-body[data-bs-theme="dark"] .text-danger {
+[data-bs-theme="dark"] .text-danger {
   color: #dc3545 !important;
 }
 
 /* Card Header blanco en dark mode */
 
-body[data-bs-theme="dark"] .card-header.bg-white {
+[data-bs-theme="dark"] .card-header.bg-white {
   background-color: #1e2638 !important;
 
   border-bottom: 1px solid #2c344c !important;
 }
 
-body[data-bs-theme="dark"] .card-header.bg-white h5 {
+[data-bs-theme="dark"] .card-header.bg-white h5 {
   color: #ffffff !important;
 }
 
 /* Asegurar que todos los card-header tengan fondo oscuro */
 
-body[data-bs-theme="dark"] .card .card-header {
+[data-bs-theme="dark"] .card .card-header {
   background-color: #1e2638 !important;
 
   border-bottom: 1px solid #2c344c !important;
 }
 
-body[data-bs-theme="dark"] .card-header {
+[data-bs-theme="dark"] .card-header {
   background-color: #1e2638 !important;
 
   border-bottom: 1px solid #2c344c !important;
 }
 
-body[data-bs-theme="dark"] .card-header h5,
-body[data-bs-theme="dark"] .card-header h4,
-body[data-bs-theme="dark"] .card-header h3 {
+[data-bs-theme="dark"] .card-header h5,
+[data-bs-theme="dark"] .card-header h4,
+[data-bs-theme="dark"] .card-header h3 {
   color: #ffffff !important;
 }
 
 /* Forzar fondo oscuro en card-header con bg-white */
 
-body[data-bs-theme="dark"] .card-header.bg-white,
-body[data-bs-theme="dark"] .card .card-header.bg-white {
+[data-bs-theme="dark"] .card-header.bg-white,
+[data-bs-theme="dark"] .card .card-header.bg-white {
   background-color: #1e2638 !important;
 
   border-bottom: 1px solid #2c344c !important;
@@ -642,73 +642,73 @@ body[data-bs-theme="dark"] .card .card-header.bg-white {
 
 /* Estilos para tabla de comisiones */
 
-body[data-bs-theme="dark"] .table-entrada {
+[data-bs-theme="dark"] .table-entrada {
   color: #28a745 !important;
 }
 
-body[data-bs-theme="dark"] .table-salida {
+[data-bs-theme="dark"] .table-salida {
   color: #dc3545 !important;
 }
 
 /* Badges de tipo de movimiento */
 
-body[data-bs-theme="dark"] .bg-light-success {
+[data-bs-theme="dark"] .bg-light-success {
   background-color: rgba(74, 222, 128, 0.25) !important;
 
   border: 1px solid rgba(74, 222, 128, 0.6) !important;
 }
 
-body[data-bs-theme="dark"] .bg-light-danger {
+[data-bs-theme="dark"] .bg-light-danger {
   background-color: rgba(248, 113, 113, 0.25) !important;
 
   border: 1px solid rgba(248, 113, 113, 0.6) !important;
 }
 
-body[data-bs-theme="dark"] .badge.bg-light-success .text-success,
-body[data-bs-theme="dark"] .badge .text-success {
+[data-bs-theme="dark"] .badge.bg-light-success .text-success,
+[data-bs-theme="dark"] .badge .text-success {
   color: #4ade80 !important;
 
   font-weight: 600 !important;
 }
 
-body[data-bs-theme="dark"] .badge.bg-light-danger .text-danger,
-body[data-bs-theme="dark"] .badge .text-danger {
+[data-bs-theme="dark"] .badge.bg-light-danger .text-danger,
+[data-bs-theme="dark"] .badge .text-danger {
   color: #f87171 !important;
 
   font-weight: 600 !important;
 }
 
-body[data-bs-theme="dark"] .text-success {
+[data-bs-theme="dark"] .text-success {
   color: #28a745 !important;
 }
 
-body[data-bs-theme="dark"] .text-danger {
+[data-bs-theme="dark"] .text-danger {
   color: #dc3545 !important;
 }
 
 /* Modal de Pago de Comisiones */
 
-body[data-bs-theme="dark"] #modalPagarComisiones .modal-content {
+[data-bs-theme="dark"] #modalPagarComisiones .modal-content {
   background-color: #1a2234 !important;
 
   border-color: #2c344c !important;
 }
 
-body[data-bs-theme="dark"] #modalPagarComisiones .form-label {
+[data-bs-theme="dark"] #modalPagarComisiones .form-label {
   color: #e9ecef !important;
 }
 
-body[data-bs-theme="dark"] #modalPagarComisiones .text-danger {
+[data-bs-theme="dark"] #modalPagarComisiones .text-danger {
   color: #dc3545 !important;
 }
 
-body[data-bs-theme="dark"] #modalPagarComisiones #labelPendiente {
+[data-bs-theme="dark"] #modalPagarComisiones #labelPendiente {
   color: #dc3545 !important;
 
   font-weight: bold !important;
 }
 
-body[data-bs-theme="dark"] #modalPagarComisiones .form-control-lg {
+[data-bs-theme="dark"] #modalPagarComisiones .form-control-lg {
   background-color: #1e2638 !important;
 
   border-color: #2c344c !important;
@@ -718,7 +718,7 @@ body[data-bs-theme="dark"] #modalPagarComisiones .form-control-lg {
   font-size: 1.25rem !important;
 }
 
-body[data-bs-theme="dark"] #modalPagarComisiones .form-control-lg:focus {
+[data-bs-theme="dark"] #modalPagarComisiones .form-control-lg:focus {
   background-color: #1e2638 !important;
 
   border-color: #6c5ce7 !important;
@@ -730,7 +730,7 @@ body[data-bs-theme="dark"] #modalPagarComisiones .form-control-lg:focus {
 
 /* Botón de registrar pago */
 
-body[data-bs-theme="dark"] #btnPagarComisiones {
+[data-bs-theme="dark"] #btnPagarComisiones {
   background-color: #6c5ce7 !important;
 
   border-color: #6c5ce7 !important;
@@ -738,13 +738,13 @@ body[data-bs-theme="dark"] #btnPagarComisiones {
   color: #ffffff !important;
 }
 
-body[data-bs-theme="dark"] #btnPagarComisiones:hover {
+[data-bs-theme="dark"] #btnPagarComisiones:hover {
   background-color: #5a4dc9 !important;
 
   border-color: #5a4dc9 !important;
 }
 
-body[data-bs-theme="dark"] #btnPagarComisiones:disabled {
+[data-bs-theme="dark"] #btnPagarComisiones:disabled {
   background-color: #6c757d !important;
 
   border-color: #6c757d !important;
@@ -752,13 +752,13 @@ body[data-bs-theme="dark"] #btnPagarComisiones:disabled {
   opacity: 0.6;
 }
 
-body[data-bs-theme="dark"] #btnPagarComisiones .ti {
+[data-bs-theme="dark"] #btnPagarComisiones .ti {
   color: #ffffff !important;
 }
 
 /* Botones en modal */
 
-body[data-bs-theme="dark"] .btn-light {
+[data-bs-theme="dark"] .btn-light {
   background-color: #2c344c !important;
 
   border-color: #2c344c !important;
@@ -766,7 +766,7 @@ body[data-bs-theme="dark"] .btn-light {
   color: #e9ecef !important;
 }
 
-body[data-bs-theme="dark"] .btn-light:hover {
+[data-bs-theme="dark"] .btn-light:hover {
   background-color: #3c445c !important;
 
   border-color: #3c445c !important;
@@ -776,7 +776,7 @@ body[data-bs-theme="dark"] .btn-light:hover {
 
 /* Mejora para options de select */
 
-body[data-bs-theme="dark"] .form-select option {
+[data-bs-theme="dark"] .form-select option {
   background-color: #1a2234 !important;
 
   color: #e9ecef !important;
@@ -784,29 +784,29 @@ body[data-bs-theme="dark"] .form-select option {
 
 /* Descripción pequeña en tabla */
 
-body[data-bs-theme="dark"] #tablaComisiones small.text-muted {
+[data-bs-theme="dark"] #tablaComisiones small.text-muted {
   color: #6c757d !important;
 }
 
-body[data-bs-theme="dark"] #tablaComisiones strong {
+[data-bs-theme="dark"] #tablaComisiones strong {
   color: #ffffff !important;
 }
 
 /* Estilos específicos para badges de comisión en DataTable */
 
-body[data-bs-theme="dark"] #tablaComisiones .badge.bg-light-success {
+[data-bs-theme="dark"] #tablaComisiones .badge.bg-light-success {
   background-color: rgba(74, 222, 128, 0.25) !important;
 
   border: 1px solid rgba(74, 222, 128, 0.6) !important;
 }
 
-body[data-bs-theme="dark"] #tablaComisiones .badge.bg-light-danger {
+[data-bs-theme="dark"] #tablaComisiones .badge.bg-light-danger {
   background-color: rgba(248, 113, 113, 0.25) !important;
 
   border: 1px solid rgba(248, 113, 113, 0.6) !important;
 }
 
-body[data-bs-theme="dark"] #tablaComisiones .badge {
+[data-bs-theme="dark"] #tablaComisiones .badge {
   padding: 0.5em 0.75em !important;
 
   font-size: 0.875rem !important;
@@ -818,37 +818,37 @@ body[data-bs-theme="dark"] #tablaComisiones .badge {
 
 /* Cards dentro del modal de detalle de flujo */
 
-body[data-bs-theme="dark"] #modalDetalle .card {
+[data-bs-theme="dark"] #modalDetalle .card {
   background-color: #1a2234 !important;
 
   border-color: #2c344c !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .card-header {
+[data-bs-theme="dark"] #modalDetalle .card-header {
   background-color: #1e2638 !important;
 
   border-bottom: 1px solid #2c344c !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .card-header.bg-primary {
+[data-bs-theme="dark"] #modalDetalle .card-header.bg-primary {
   background-color: #0d6efd !important;
 
   border-color: #0d6efd !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .card-header.bg-dark {
+[data-bs-theme="dark"] #modalDetalle .card-header.bg-dark {
   background-color: #1e2638 !important;
 
   border-bottom: 1px solid #2c344c !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .card-header.bg-warning {
+[data-bs-theme="dark"] #modalDetalle .card-header.bg-warning {
   background-color: #ffc107 !important;
 
   color: #000000 !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .card-body {
+[data-bs-theme="dark"] #modalDetalle .card-body {
   background-color: #1a2234 !important;
 
   color: #e9ecef !important;
@@ -856,21 +856,21 @@ body[data-bs-theme="dark"] #modalDetalle .card-body {
 
 /* Tabla dentro del modal de flujo */
 
-body[data-bs-theme="dark"] #modalDetalle .table {
+[data-bs-theme="dark"] #modalDetalle .table {
   color: #e9ecef !important;
 
   background-color: #1a2234 !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table thead {
+[data-bs-theme="dark"] #modalDetalle .table thead {
   background-color: #2c344c !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table thead.table-dark {
+[data-bs-theme="dark"] #modalDetalle .table thead.table-dark {
   background-color: #1e2638 !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table thead th {
+[data-bs-theme="dark"] #modalDetalle .table thead th {
   background-color: #2c344c !important;
 
   color: #ffffff !important;
@@ -878,7 +878,7 @@ body[data-bs-theme="dark"] #modalDetalle .table thead th {
   border-color: #3c445c !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table tbody td {
+[data-bs-theme="dark"] #modalDetalle .table tbody td {
   background-color: #1a2234 !important;
 
   color: #e9ecef !important;
@@ -886,11 +886,11 @@ body[data-bs-theme="dark"] #modalDetalle .table tbody td {
   border-color: #2c344c !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table tbody tr {
+[data-bs-theme="dark"] #modalDetalle .table tbody tr {
   background-color: #1a2234 !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table tbody tr td {
+[data-bs-theme="dark"] #modalDetalle .table tbody tr td {
   background-color: #1a2234 !important;
 
   color: #e9ecef !important;
@@ -900,63 +900,63 @@ body[data-bs-theme="dark"] #modalDetalle .table tbody tr td {
 
 /* Asegurar que TODAS las filas tengan fondo oscuro */
 
-body[data-bs-theme="dark"] #modalDetalle table tbody tr {
+[data-bs-theme="dark"] #modalDetalle table tbody tr {
   background-color: #1a2234 !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle table tbody tr td {
+[data-bs-theme="dark"] #modalDetalle table tbody tr td {
   background-color: #1a2234 !important;
 }
 
 /* Filas con colores sutiles en dark mode - Reforzado */
 
-body[data-bs-theme="dark"] #modalDetalle .table-success-subtle {
+[data-bs-theme="dark"] #modalDetalle .table-success-subtle {
   background-color: rgba(40, 167, 69, 0.15) !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table-success-subtle td {
+[data-bs-theme="dark"] #modalDetalle .table-success-subtle td {
   background-color: rgba(40, 167, 69, 0.15) !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table-danger-subtle {
+[data-bs-theme="dark"] #modalDetalle .table-danger-subtle {
   background-color: rgba(220, 53, 69, 0.15) !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table-danger-subtle td {
+[data-bs-theme="dark"] #modalDetalle .table-danger-subtle td {
   background-color: rgba(220, 53, 69, 0.15) !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table-warning-subtle {
+[data-bs-theme="dark"] #modalDetalle .table-warning-subtle {
   background-color: rgba(255, 193, 7, 0.15) !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table-warning-subtle td {
+[data-bs-theme="dark"] #modalDetalle .table-warning-subtle td {
   background-color: rgba(255, 193, 7, 0.15) !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table-info-subtle {
+[data-bs-theme="dark"] #modalDetalle .table-info-subtle {
   background-color: rgba(13, 202, 240, 0.15) !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table-info-subtle td {
+[data-bs-theme="dark"] #modalDetalle .table-info-subtle td {
   background-color: rgba(13, 202, 240, 0.15) !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table-dark-subtle {
+[data-bs-theme="dark"] #modalDetalle .table-dark-subtle {
   background-color: #1a2234 !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table-dark-subtle td {
+[data-bs-theme="dark"] #modalDetalle .table-dark-subtle td {
   background-color: #1a2234 !important;
 }
 
 /* Forzar filas sin clase a tener fondo oscuro */
 
-body[data-bs-theme="dark"] #modalDetalle tbody tr:not([class*="table-"]) {
+[data-bs-theme="dark"] #modalDetalle tbody tr:not([class*="table-"]) {
   background-color: #1a2234 !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle tbody tr:not([class*="table-"]) td {
+[data-bs-theme="dark"] #modalDetalle tbody tr:not([class*="table-"]) td {
   background-color: #1a2234 !important;
 
   color: #e9ecef !important;
@@ -964,45 +964,45 @@ body[data-bs-theme="dark"] #modalDetalle tbody tr:not([class*="table-"]) td {
 
 /* Hover en filas */
 
-body[data-bs-theme="dark"] #modalDetalle .table tbody tr:hover {
+[data-bs-theme="dark"] #modalDetalle .table tbody tr:hover {
   background-color: rgba(108, 92, 231, 0.15) !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table tbody tr:hover td {
+[data-bs-theme="dark"] #modalDetalle .table tbody tr:hover td {
   background-color: transparent !important;
 }
 
 /* Hover específico para cada tipo de fila */
 
-body[data-bs-theme="dark"] #modalDetalle .table-success-subtle:hover,
-body[data-bs-theme="dark"] #modalDetalle .table-success-subtle:hover td {
+[data-bs-theme="dark"] #modalDetalle .table-success-subtle:hover,
+[data-bs-theme="dark"] #modalDetalle .table-success-subtle:hover td {
   background-color: rgba(40, 167, 69, 0.25) !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table-danger-subtle:hover,
-body[data-bs-theme="dark"] #modalDetalle .table-danger-subtle:hover td {
+[data-bs-theme="dark"] #modalDetalle .table-danger-subtle:hover,
+[data-bs-theme="dark"] #modalDetalle .table-danger-subtle:hover td {
   background-color: rgba(220, 53, 69, 0.25) !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table-warning-subtle:hover,
-body[data-bs-theme="dark"] #modalDetalle .table-warning-subtle:hover td {
+[data-bs-theme="dark"] #modalDetalle .table-warning-subtle:hover,
+[data-bs-theme="dark"] #modalDetalle .table-warning-subtle:hover td {
   background-color: rgba(255, 193, 7, 0.25) !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table-info-subtle:hover,
-body[data-bs-theme="dark"] #modalDetalle .table-info-subtle:hover td {
+[data-bs-theme="dark"] #modalDetalle .table-info-subtle:hover,
+[data-bs-theme="dark"] #modalDetalle .table-info-subtle:hover td {
   background-color: rgba(13, 202, 240, 0.25) !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .table-dark-subtle:hover,
-body[data-bs-theme="dark"] #modalDetalle .table-dark-subtle:hover td {
+[data-bs-theme="dark"] #modalDetalle .table-dark-subtle:hover,
+[data-bs-theme="dark"] #modalDetalle .table-dark-subtle:hover td {
   background-color: rgba(108, 92, 231, 0.2) !important;
 }
 
 /* Hover en filas sin clase */
 
-body[data-bs-theme="dark"] #modalDetalle tbody tr:not([class*="table-"]):hover,
-body[data-bs-theme="dark"]
+[data-bs-theme="dark"] #modalDetalle tbody tr:not([class*="table-"]):hover,
+[data-bs-theme="dark"]
   #modalDetalle
   tbody
   tr:not([class*="table-"]):hover
@@ -1012,51 +1012,51 @@ body[data-bs-theme="dark"]
 
 /* Text muted dentro del modal */
 
-body[data-bs-theme="dark"] #modalDetalle .text-muted {
+[data-bs-theme="dark"] #modalDetalle .text-muted {
   color: #adb5bd !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle small.text-muted {
+[data-bs-theme="dark"] #modalDetalle small.text-muted {
   color: #6c757d !important;
 }
 
 /* Iconos */
 
-body[data-bs-theme="dark"] #modalDetalle .ti {
+[data-bs-theme="dark"] #modalDetalle .ti {
   color: inherit !important;
 }
 
 /* Badges en el modal */
 
-body[data-bs-theme="dark"] #modalDetalle .badge {
+[data-bs-theme="dark"] #modalDetalle .badge {
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-body[data-bs-theme="dark"] #modalDetalle .badge.bg-secondary {
+[data-bs-theme="dark"] #modalDetalle .badge.bg-secondary {
   background-color: #6c757d !important;
 
   color: #ffffff !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .badge.bg-success {
+[data-bs-theme="dark"] #modalDetalle .badge.bg-success {
   background-color: #28a745 !important;
 
   color: #ffffff !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .badge.bg-danger {
+[data-bs-theme="dark"] #modalDetalle .badge.bg-danger {
   background-color: #dc3545 !important;
 
   color: #ffffff !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .badge.bg-warning {
+[data-bs-theme="dark"] #modalDetalle .badge.bg-warning {
   background-color: #ffc107 !important;
 
   color: #000000 !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle .badge.bg-info {
+[data-bs-theme="dark"] #modalDetalle .badge.bg-info {
   background-color: #17a2b8 !important;
 
   color: #ffffff !important;
@@ -1064,7 +1064,7 @@ body[data-bs-theme="dark"] #modalDetalle .badge.bg-info {
 
 /* Separadores HR */
 
-body[data-bs-theme="dark"] #modalDetalle hr {
+[data-bs-theme="dark"] #modalDetalle hr {
   border-color: #2c344c !important;
 
   opacity: 0.7;
@@ -1072,23 +1072,23 @@ body[data-bs-theme="dark"] #modalDetalle hr {
 
 /* Strong tags */
 
-body[data-bs-theme="dark"] #modalDetalle strong {
+[data-bs-theme="dark"] #modalDetalle strong {
   color: #ffffff !important;
 }
 
 /* Table responsive */
 
-body[data-bs-theme="dark"] #modalDetalle .table-responsive {
+[data-bs-theme="dark"] #modalDetalle .table-responsive {
   background-color: transparent !important;
 }
 
 /* thead.table-light en dark mode */
 
-body[data-bs-theme="dark"] #modalDetalle thead.table-light {
+[data-bs-theme="dark"] #modalDetalle thead.table-light {
   background-color: #2c344c !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle thead.table-light th {
+[data-bs-theme="dark"] #modalDetalle thead.table-light th {
   background-color: #2c344c !important;
 
   color: #ffffff !important;
@@ -1096,11 +1096,11 @@ body[data-bs-theme="dark"] #modalDetalle thead.table-light th {
 
 /* Asegurar contraste en texto de celdas */
 
-body[data-bs-theme="dark"] #modalDetalle td small {
+[data-bs-theme="dark"] #modalDetalle td small {
   color: #adb5bd !important;
 }
 
-body[data-bs-theme="dark"] #modalDetalle td strong {
+[data-bs-theme="dark"] #modalDetalle td strong {
   color: #ffffff !important;
 }
 
@@ -1108,13 +1108,13 @@ body[data-bs-theme="dark"] #modalDetalle td strong {
 
 /* Card de desglose */
 
-body[data-bs-theme="dark"] #totalesGroup .card {
+[data-bs-theme="dark"] #totalesGroup .card {
   background-color: #1a2234 !important;
 
   border-color: #2c344c !important;
 }
 
-body[data-bs-theme="dark"] #totalesGroup .card-header {
+[data-bs-theme="dark"] #totalesGroup .card-header {
   background-color: #0d6efd !important;
 
   border-color: #0d6efd !important;
@@ -1124,13 +1124,13 @@ body[data-bs-theme="dark"] #totalesGroup .card-header {
 
 /* Tabla de desglose */
 
-body[data-bs-theme="dark"] #desgloseBody table {
+[data-bs-theme="dark"] #desgloseBody table {
   background-color: #1a2234 !important;
 
   color: #e9ecef !important;
 }
 
-body[data-bs-theme="dark"] #desgloseBody tbody tr {
+[data-bs-theme="dark"] #desgloseBody tbody tr {
   background-color: #1a2234 !important;
 
   color: #e9ecef !important;
@@ -1138,13 +1138,13 @@ body[data-bs-theme="dark"] #desgloseBody tbody tr {
 
 /* Fila de Monto Total (primera fila sin clase especial) */
 
-body[data-bs-theme="dark"] #desgloseBody tbody tr:first-child {
+[data-bs-theme="dark"] #desgloseBody tbody tr:first-child {
   background-color: #1a2234 !important;
 
   color: #e9ecef !important;
 }
 
-body[data-bs-theme="dark"] #desgloseBody tbody tr:first-child td {
+[data-bs-theme="dark"] #desgloseBody tbody tr:first-child td {
   background-color: #1a2234 !important;
 
   color: #e9ecef !important;
@@ -1154,13 +1154,13 @@ body[data-bs-theme="dark"] #desgloseBody tbody tr:first-child td {
 
 /* Todas las filas sin clase específica */
 
-body[data-bs-theme="dark"] #desgloseBody tbody tr:not([class*="table-"]) {
+[data-bs-theme="dark"] #desgloseBody tbody tr:not([class*="table-"]) {
   background-color: #1a2234 !important;
 
   color: #e9ecef !important;
 }
 
-body[data-bs-theme="dark"] #desgloseBody tbody tr:not([class*="table-"]) td {
+[data-bs-theme="dark"] #desgloseBody tbody tr:not([class*="table-"]) td {
   background-color: #1a2234 !important;
 
   color: #e9ecef !important;
@@ -1170,7 +1170,7 @@ body[data-bs-theme="dark"] #desgloseBody tbody tr:not([class*="table-"]) td {
 
 /* Filas con colores específicos en modo oscuro */
 
-body[data-bs-theme="dark"] #desgloseBody .table-warning {
+[data-bs-theme="dark"] #desgloseBody .table-warning {
   background-color: rgba(255, 193, 7, 0.2) !important;
 
   color: #ffffff !important;
@@ -1178,13 +1178,13 @@ body[data-bs-theme="dark"] #desgloseBody .table-warning {
   border-color: rgba(255, 193, 7, 0.3) !important;
 }
 
-body[data-bs-theme="dark"] #desgloseBody .table-warning td {
+[data-bs-theme="dark"] #desgloseBody .table-warning td {
   background-color: rgba(255, 193, 7, 0.2) !important;
 
   color: #ffffff !important;
 }
 
-body[data-bs-theme="dark"] #desgloseBody .table-info {
+[data-bs-theme="dark"] #desgloseBody .table-info {
   background-color: rgba(13, 202, 240, 0.2) !important;
 
   color: #ffffff !important;
@@ -1192,13 +1192,13 @@ body[data-bs-theme="dark"] #desgloseBody .table-info {
   border-color: rgba(13, 202, 240, 0.3) !important;
 }
 
-body[data-bs-theme="dark"] #desgloseBody .table-info td {
+[data-bs-theme="dark"] #desgloseBody .table-info td {
   background-color: rgba(13, 202, 240, 0.2) !important;
 
   color: #ffffff !important;
 }
 
-body[data-bs-theme="dark"] #desgloseBody .table-success {
+[data-bs-theme="dark"] #desgloseBody .table-success {
   background-color: rgba(40, 167, 69, 0.2) !important;
 
   color: #ffffff !important;
@@ -1206,7 +1206,7 @@ body[data-bs-theme="dark"] #desgloseBody .table-success {
   border-color: rgba(40, 167, 69, 0.3) !important;
 }
 
-body[data-bs-theme="dark"] #desgloseBody .table-success td {
+[data-bs-theme="dark"] #desgloseBody .table-success td {
   background-color: rgba(40, 167, 69, 0.2) !important;
 
   color: #ffffff !important;
@@ -1214,7 +1214,7 @@ body[data-bs-theme="dark"] #desgloseBody .table-success td {
 
 /* Alert info dentro del desglose */
 
-body[data-bs-theme="dark"] #desgloseBody .alert-info {
+[data-bs-theme="dark"] #desgloseBody .alert-info {
   background-color: rgba(13, 110, 253, 0.2) !important;
 
   border: 1px solid rgba(13, 110, 253, 0.4) !important;
@@ -1224,22 +1224,22 @@ body[data-bs-theme="dark"] #desgloseBody .alert-info {
 
 /* Iconos en el desglose */
 
-body[data-bs-theme="dark"] #desgloseBody .ti {
+[data-bs-theme="dark"] #desgloseBody .ti {
   color: inherit !important;
 }
 
 /* Strong y textos en el desglose */
 
-body[data-bs-theme="dark"] #desgloseBody strong {
+[data-bs-theme="dark"] #desgloseBody strong {
   color: #ffffff !important;
 }
 
-body[data-bs-theme="dark"] #desgloseBody td {
+[data-bs-theme="dark"] #desgloseBody td {
   border-color: #2c344c !important;
 }
 
 /* Asegurar contraste en montos */
 
-body[data-bs-theme="dark"] #desgloseBody .text-end {
+[data-bs-theme="dark"] #desgloseBody .text-end {
   color: #ffffff !important;
 }

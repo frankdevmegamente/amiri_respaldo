@@ -51,22 +51,23 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .chart-container-clickable { cursor:pointer; }
 
         /* ─── Dark Mode ─── */
-        body[data-bs-theme="dark"] .metric-card .metric-value { color:#e8ecf0; }
-        body[data-bs-theme="dark"] .metric-card { background:#1e293b !important; }
-        body[data-bs-theme="dark"] .metric-card .metric-label { color:#8c9ea8; }
-        body[data-bs-theme="dark"] .metric-card .metric-footer { color:#6b7a90; }
-        body[data-bs-theme="dark"] .section-card { background:#1e293b !important; }
-        body[data-bs-theme="dark"] .section-card .card-header { border-bottom-color:rgba(255,255,255,0.04); }
-        body[data-bs-theme="dark"] .servicios-header .subtitle { color:#8c9ea8; }
+        [data-bs-theme="dark"] .metric-card .metric-value { color:#e8ecf0; }
+        [data-bs-theme="dark"] .metric-card { background:#1e293b !important; }
+        [data-bs-theme="dark"] .metric-card .metric-label { color:#8c9ea8; }
+        [data-bs-theme="dark"] .metric-card .metric-footer { color:#6b7a90; }
+        [data-bs-theme="dark"] .section-card { background:#1e293b !important; }
+        [data-bs-theme="dark"] .section-card .card-header { border-bottom-color:rgba(255,255,255,0.04); }
+        [data-bs-theme="dark"] .servicios-header .subtitle { color:#8c9ea8; }
 
-        body[data-bs-theme="dark"] .logo-modo-claro,
+        [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro { display: none !important; }
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro { display: block !important; }
 
         .animating { animation:fadeInUp 0.4s ease forwards; opacity:0; }
         @keyframes fadeInUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
     </style>
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <body>
 <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6"
@@ -296,15 +297,26 @@ const resumenCardStyles = [
     { icon: 'ti ti-businessplan', color: 'success' },
 ];
 
-function crearTarjetaResumen(nombre, total, cantidad, icon, color, delay, servicioId, subtitulo, totalMxn) {
+function crearTarjetaResumen(nombre, total, cantidad, icon, color, delay, servicioId, subtitulo, totalMxn, ganancia) {
     var iconClass = icon || 'ti ti-cash';
     var colorClass = color || 'primary';
     var delayStyle = delay !== undefined ? ' style="animation-delay:' + delay + 's;"' : '';
     var sid = servicioId || 0;
     var subHtml = subtitulo ? '<div class="metric-subtitle text-muted small">' + subtitulo + '</div>' : '';
-    var montoHtml = '$' + formatoNumero(total);
+    var montoHtml = '<span class="d-block">$' + formatoNumero(total) + '</span>';
     if (totalMxn !== undefined && totalMxn !== null) {
-        montoHtml += '<br><small class="text-muted fw-normal">$' + formatoNumero(totalMxn) + ' MXN</small>';
+        montoHtml += '<span class="d-block small text-muted mt-1"><i class="ti ti-arrow-right-to-arc"></i> $' + formatoNumero(totalMxn) + ' MXN recibidos</span>';
+    }
+    if (ganancia !== undefined && ganancia !== null && totalMxn !== undefined && totalMxn !== null && ganancia !== 0) {
+        var reposicion = totalMxn - ganancia;
+        var gananciaClass = ganancia >= 0 ? 'text-success' : 'text-danger';
+        montoHtml += '<div class="d-block small mt-1" style="padding-left:1rem;border-left:2px solid #dee2e6;">' +
+            '<span class="d-block text-muted"><i class="ti ti-recycle"></i> $' + formatoNumero(reposicion) + ' reposición inventario</span>' +
+            '<span class="d-block ' + gananciaClass + ' fw-bold"><i class="ti ti-trending-up"></i> $' + formatoNumero(ganancia) + ' utilidad Amiri</span>' +
+            '</div>';
+    } else if (ganancia !== undefined && ganancia !== null && ganancia !== 0) {
+        var gananciaClass = ganancia >= 0 ? 'text-success' : 'text-danger';
+        montoHtml += '<span class="d-block small ' + gananciaClass + ' fw-bold mt-1"><i class="ti ti-trending-up"></i> Utilidad: $' + formatoNumero(ganancia) + '</span>';
     }
     return '<div class="col-xl-3 col-lg-4 col-md-6 mb-3">' +
         '<div class="card card-stat metric-card border-0 shadow-sm h-100 animating"' + delayStyle +
@@ -343,7 +355,7 @@ function cargarResumen() {
                     }
                     var style = resumenCardStyles[idx % resumenCardStyles.length];
                     var esDivisaVenta = (s.id == 2 || s.id == 3);
-                    html += crearTarjetaResumen(s.servicio, s.total, s.cantidad, style.icon, style.color, idx * 0.05, s.id, null, esDivisaVenta ? s.total_mxn : null);
+                    html += crearTarjetaResumen(s.servicio, s.total, s.cantidad, style.icon, style.color, idx * 0.05, s.id, null, esDivisaVenta ? s.total_mxn : null, esDivisaVenta ? s.ganancia : null);
                     idx++;
                 });
             }

@@ -68,15 +68,15 @@ try {
             $stmt->execute([$fechaInicio, $fechaFin]);
             $resultado['comisiones_promotores'] = (float)$stmt->fetchColumn();
 
-            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'activo'");
             $stmt->execute([$fechaInicio, $fechaFin]);
             $resultado['ganancia_divisas'] = (float)$stmt->fetchColumn();
 
-            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 2 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 2 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'activo'");
             $stmt->execute([$fechaInicio, $fechaFin]);
             $resultado['ganancia_usd'] = (float)$stmt->fetchColumn();
 
-            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 3 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id = 3 AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'activo'");
             $stmt->execute([$fechaInicio, $fechaFin]);
             $resultado['ganancia_usdt'] = (float)$stmt->fetchColumn();
 
@@ -368,7 +368,7 @@ try {
             $stmt->execute([$prevFechaInicio, $prevFechaFin]);
             $prev['comisiones_amiri'] = (float)$stmt->fetchColumn();
 
-            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1");
+            $stmt = $pdo->prepare("SELECT COALESCE(SUM(monto), 0) as total FROM movimientos WHERE servicio_id IN (2,3) AND tipo = 'comision' AND cuenta_destino_id = 1 AND fecha BETWEEN ? AND ? AND activo = 1 AND estado = 'activo'");
             $stmt->execute([$prevFechaInicio, $prevFechaFin]);
             $prev['ganancia_divisas'] = (float)$stmt->fetchColumn();
 

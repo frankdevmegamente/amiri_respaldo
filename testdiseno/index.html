@@ -1,0 +1,137 @@
+﻿<!DOCTYPE html>
+<html lang="es" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Diseno - Cards Flujo (2 Columnas)</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tabler-icons@latest/tabler-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Inter', sans-serif; }
+        body { background-color: #f5f7fa; transition: background-color 0.3s ease; }
+        [data-bs-theme="dark"] body { background-color: #0a101a; }
+        .theme-toggle { position: fixed; top: 20px; right: 20px; z-index: 1000; width: 48px; height: 48px; border-radius: 50%; border: 2px solid #e2e8f0; background: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .theme-toggle:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+        [data-bs-theme="dark"] .theme-toggle { background: #1a2234; border-color: #2c344c; }
+        .theme-toggle .icon-sun, .theme-toggle .icon-moon { font-size: 1.3rem; }
+        [data-bs-theme="light"] .theme-toggle .icon-moon { display: none; }
+        [data-bs-theme="dark"] .theme-toggle .icon-sun { display: none; }
+        .card-diferencia { border-radius: 12px; border: none; transition: all 0.3s ease; }
+        .card-diferencia:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,0,0,0.12) !important; }
+        [data-bs-theme="dark"] .card-diferencia { background: #1a2234; border-color: #2c344c; }
+        .card-diferencia.border-success { border-left: 5px solid #198754 !important; }
+        .card-summary { border-radius: 12px; border: none; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .card-summary:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.12) !important; }
+        [data-bs-theme="dark"] .card-summary { background: #1a2234; border-color: #2c344c; }
+        .card-summary .card-header-custom { display: flex; align-items: center; padding: 14px 16px; background: rgba(0,0,0,0.02); border-bottom: 1px solid rgba(0,0,0,0.06); position: relative; }
+        .card-summary .card-header-custom::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
+        .card-saldos .card-header-custom::before { background: #198754; }
+        .card-capital .card-header-custom::before { background: #ffc107; }
+        .card-prestamos .card-header-custom::before { background: #dc3545; }
+        .card-saldos .card-header-custom { background: rgba(25,135,84,0.04); }
+        .card-capital .card-header-custom { background: rgba(255,193,7,0.04); }
+        .card-prestamos .card-header-custom { background: rgba(220,53,69,0.04); }
+        .card-header-custom .header-icon { width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 10px; font-size: 1rem; }
+        .card-saldos .header-icon { background: rgba(25,135,84,0.12); color: #198754; }
+        .card-capital .header-icon { background: rgba(255,193,7,0.12); color: #e6a800; }
+        .card-prestamos .header-icon { background: rgba(220,53,69,0.12); color: #dc3545; }
+        [data-bs-theme="dark"] .card-header-custom { background: rgba(255,255,255,0.03); border-bottom-color: #2c344c; }
+        [data-bs-theme="dark"] .card-saldos .header-icon { background: rgba(102,187,106,0.15); color: #66bb6a; }
+        [data-bs-theme="dark"] .card-capital .header-icon { background: rgba(255,193,7,0.15); color: #ffc107; }
+        [data-bs-theme="dark"] .card-prestamos .header-icon { background: rgba(239,83,80,0.15); color: #ef5350; }
+        .card-header-custom .header-text h6 { margin: 0; font-weight: 700; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; color: #4a5568; }
+        [data-bs-theme="dark"] .card-header-custom .header-text h6 { color: #e9ecef; }
+        .card-header-custom .header-text .header-sub { font-size: 0.68rem; color: #98a4ae; margin-top: 1px; }
+        [data-bs-theme="dark"] .header-text .header-sub { color: #6c757d; }
+        .list-compact { list-style: none; margin: 0; padding: 4px 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+        .list-item { display: flex; align-items: center; justify-content: space-between; padding: 5px 8px; transition: background-color 0.2s; cursor: default; border-radius: 4px; }
+        .list-item:hover { background-color: rgba(0,0,0,0.03); }
+        [data-bs-theme="dark"] .list-item:hover { background-color: rgba(255,255,255,0.04); }
+        .list-item-left { display: flex; align-items: center; gap: 4px; min-width: 0; }
+        .list-item-name { font-weight: 600; font-size: 0.75rem; color: #4a5568; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+        [data-bs-theme="dark"] .list-item-name { color: #e9ecef; }
+        .list-item-right { font-weight: 700; font-size: 0.75rem; white-space: nowrap; margin-left: 4px; color: #198754; }
+        [data-bs-theme="dark"] .list-item-right { color: #66bb6a; }
+        .list-item-right.danger { color: #dc3545; }
+        [data-bs-theme="dark"] .list-item-right.danger { color: #ef5350; }
+        .badge-mxn { background: rgba(25,135,84,0.1); color: #198754; font-size: 0.58rem; font-weight: 600; padding: 1px 5px; border-radius: 4px; }
+        .badge-usd { background: rgba(13,110,253,0.1); color: #0d6efd; font-size: 0.58rem; font-weight: 600; padding: 1px 5px; border-radius: 4px; }
+        .badge-usdt { background: rgba(13,202,240,0.1); color: #0ca8dc; font-size: 0.58rem; font-weight: 600; padding: 1px 5px; border-radius: 4px; }
+        .badge-tipo { font-size: 0.56rem; font-weight: 600; padding: 1px 5px; border-radius: 4px; }
+        .badge-tipo-prestamista { background: rgba(220,53,69,0.08); color: #dc3545; }
+        .badge-tipo-proveedor { background: rgba(13,110,253,0.08); color: #0d6efd; }
+        .badge-tipo-deudor { background: rgba(255,193,7,0.12); color: #b58a00; }
+        [data-bs-theme="dark"] .badge-mxn { background: rgba(102,187,106,0.15); color: #66bb6a; }
+        [data-bs-theme="dark"] .badge-usd { background: rgba(93,135,255,0.15); color: #5D87FF; }
+        [data-bs-theme="dark"] .badge-usdt { background: rgba(19,222,185,0.15); color: #13DEB9; }
+        [data-bs-theme="dark"] .badge-tipo-prestamista { background: rgba(239,83,80,0.15); color: #ef5350; }
+        [data-bs-theme="dark"] .badge-tipo-proveedor { background: rgba(93,135,255,0.15); color: #5D87FF; }
+        [data-bs-theme="dark"] .badge-tipo-deudor { background: rgba(255,174,31,0.15); color: #FFAE1F; }
+        .page-title { font-weight: 800; font-size: 1.5rem; color: #2d3748; padding: 20px 0 0; }
+        [data-bs-theme="dark"] .page-title { color: #e9ecef; }
+        .page-subtitle { font-size: 0.85rem; color: #98a4ae; margin-top: -4px; margin-bottom: 24px; }
+        @media (max-width: 768px) { .list-compact { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()"><i class="ti ti-sun icon-sun"></i><i class="ti ti-moon icon-moon"></i></button>
+    <div class="container-fluid px-4" style="max-width: 1200px;">
+        <p class="page-title">Flujo - Datos Reales</p>
+        <p class="page-subtitle">Diseno compacto 2 columnas sin scroll</p>
+        <div class="row mb-4"><div class="col-12"><div class="card shadow card-diferencia border-success"><div class="card-body py-3"><div class="row align-items-center"><div class="col-md-8"><div class="d-flex align-items-center"><div class="p-2 rounded-circle me-3" style="background-color: rgba(25,135,84,0.12);"><i class="ti ti-calculator text-success" style="font-size: 1.4rem;"></i></div><div><h6 class="mb-0 text-muted fw-bold" style="font-size:0.75rem; letter-spacing:0.5px;">DIFERENCIA</h6><p class="mb-0" style="font-size: 0.82rem; color:#4a5568;">Verificar cuadre contable</p></div></div></div><div class="col-md-4 text-end"><h2 class="mb-0 fw-bold text-success">$0.00</h2></div></div></div></div></div></div>
+        <div class="row mb-4">
+            <div class="col-lg-4 mb-3"><div class="card card-summary card-saldos h-100"><div class="card-header-custom"><div class="header-icon"><i class="ti ti-wallet"></i></div><div class="header-text"><h6>Saldos Bancarios</h6><div class="header-sub">17 cuentas</div></div></div><div class="card-body p-0"><ul class="list-compact">
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Caja de Efectivo</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$854,788</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Capital Amiri</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$366,052</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Rosa Huerta</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$330,811</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Mantela (BBVA)</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$245,186</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">King Of Watches</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$231,475</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Tarpen (Fondeadora)</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$144,849</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Utilidades AMIRI</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$67,709</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Angelica Albo</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$53,000</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Osvaldo Vazquez</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$34,139</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Binance Emiliano</span><span class="badge-usdt">USDT</span></div><div class="list-item-right">$27,024</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Comis. Ana Maria</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$18,493</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Rojas Retiros</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$15,000</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Dolares</span><span class="badge-usd">USD</span></div><div class="list-item-right">$1,940</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Azules Retiros</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$4,000</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Comis. Alfonso</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$3,122</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Scotias</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$888</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Ref. Santander</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$150</div></li>
+            </ul></div></div></div>
+            <div class="col-lg-4 mb-3"><div class="card card-summary card-capital h-100"><div class="card-header-custom"><div class="header-icon"><i class="ti ti-building-bank"></i></div><div class="header-text"><h6>Capital</h6><div class="header-sub">5 cuentas</div></div></div><div class="card-body p-0"><ul class="list-compact">
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">King Of Watches</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$231,475</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Utilidades AMIRI</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$67,709</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Osvaldo Vazquez</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$34,139</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Comis. Ana Maria</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$18,493</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Comis. Alfonso</span><span class="badge-mxn">MXN</span></div><div class="list-item-right">$3,122</div></li>
+            </ul></div></div></div>
+            <div class="col-lg-4 mb-3"><div class="card card-summary card-prestamos h-100"><div class="card-header-custom"><div class="header-icon"><i class="ti ti-coin"></i></div><div class="header-text"><h6>Prestamos / Proveedores</h6><div class="header-sub">18 obligaciones</div></div></div><div class="card-body p-0"><ul class="list-compact">
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Tono Hernandez</span><span class="badge-tipo badge-tipo-deudor">Deudor</span></div><div class="list-item-right">$5,143,813</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Amiri Corp</span><span class="badge-tipo badge-tipo-prestamista">Prest.</span></div><div class="list-item-right danger">$801,041</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">King Of Watches</span><span class="badge-tipo badge-tipo-deudor">Deudor</span></div><div class="list-item-right">$571,000</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Alejandro Mora</span><span class="badge-tipo badge-tipo-prestamista">Prest.</span></div><div class="list-item-right danger">$599,356</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Clientes Kike</span><span class="badge-tipo badge-tipo-deudor">Deudor</span></div><div class="list-item-right">$406,091</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Cliente Cancun</span><span class="badge-tipo badge-tipo-deudor">Deudor</span></div><div class="list-item-right">$314,441</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Miguel Cisneros</span><span class="badge-tipo badge-tipo-deudor">Deudor</span></div><div class="list-item-right">$250,000</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Estructura Amiri</span><span class="badge-tipo badge-tipo-deudor">Deudor</span></div><div class="list-item-right">$100,000</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Publico Gral</span><span class="badge-tipo badge-tipo-deudor">Deudor</span></div><div class="list-item-right">$83,633</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Osvaldo Vazquez</span><span class="badge-tipo badge-tipo-deudor">Deudor</span></div><div class="list-item-right">$67,478</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">R10 Prop</span><span class="badge-tipo badge-tipo-deudor">Deudor</span></div><div class="list-item-right">$49,900</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Felipe P1-1</span><span class="badge-tipo badge-tipo-deudor">Deudor</span></div><div class="list-item-right">$43,000</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Nataly Azul</span><span class="badge-tipo badge-tipo-deudor">Deudor</span></div><div class="list-item-right">$33,500</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Adriana Hurtado</span><span class="badge-tipo badge-tipo-deudor">Deudor</span></div><div class="list-item-right">$15,000</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Citlaly Azul</span><span class="badge-tipo badge-tipo-deudor">Deudor</span></div><div class="list-item-right">$11,440</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">R1-2 Karina</span><span class="badge-tipo badge-tipo-deudor">Deudor</span></div><div class="list-item-right">$1,547</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Comida</span><span class="badge-tipo badge-tipo-deudor">Deudor</span></div><div class="list-item-right">$2,000</div></li>
+                <li class="list-item"><div class="list-item-left"><span class="list-item-name">Wb - Gas</span><span class="badge-tipo badge-tipo-deudor">Deudor</span></div><div class="list-item-right">$1,000</div></li>
+            </ul></div></div></div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleTheme() { const html = document.documentElement; const current = html.getAttribute('data-bs-theme'); const next = current === 'light' ? 'dark' : 'light'; html.setAttribute('data-bs-theme', next); }
+    </script>
+</body>
+</html>

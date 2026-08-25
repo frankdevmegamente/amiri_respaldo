@@ -43,6 +43,7 @@ try {
     <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
     <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
+    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <style>
         .body-wrapper {
@@ -57,77 +58,77 @@ try {
             margin-top: 0 !important;
         }
 
-        body[data-bs-theme="dark"] .logo-modo-claro,
+        [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
         }
 
-        body[data-bs-theme="dark"] .logo-modo-oscuro,
+        [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro {
             display: block !important;
         }
 
-        body[data-bs-theme="dark"] .card,
-        body[data-bs-theme="dark"] .page-breadcrumb,
-        body[data-bs-theme="dark"] .page-breadcrumb h3,
-        body[data-bs-theme="dark"] .card-header,
-        body[data-bs-theme="dark"] .card-body,
-        body[data-bs-theme="dark"] .modal-content,
-        body[data-bs-theme="dark"] .modal-header,
-        body[data-bs-theme="dark"] .modal-footer,
-        body[data-bs-theme="dark"] .table-light {
+        [data-bs-theme="dark"] .card,
+        [data-bs-theme="dark"] .page-breadcrumb,
+        [data-bs-theme="dark"] .page-breadcrumb h3,
+        [data-bs-theme="dark"] .card-header,
+        [data-bs-theme="dark"] .card-body,
+        [data-bs-theme="dark"] .modal-content,
+        [data-bs-theme="dark"] .modal-header,
+        [data-bs-theme="dark"] .modal-footer,
+        [data-bs-theme="dark"] .table-light {
             background-color: #1f2535 !important;
             border-color: #2b3350 !important;
             color: #e6ecff !important;
         }
 
-        body[data-bs-theme="dark"] .card {
+        [data-bs-theme="dark"] .card {
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
-        body[data-bs-theme="dark"] .table,
-        body[data-bs-theme="dark"] .table thead th,
-        body[data-bs-theme="dark"] .table tbody td,
-        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
+        [data-bs-theme="dark"] .table,
+        [data-bs-theme="dark"] .table thead th,
+        [data-bs-theme="dark"] .table tbody td,
+        [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
             background-color: #1f2535 !important;
             color: #e6ecff !important;
             border-color: #2b3350 !important;
         }
 
-        body[data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
+        [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
             background-color: #232b3c !important;
         }
 
-        body[data-bs-theme="dark"] .form-control,
-        body[data-bs-theme="dark"] .form-select,
-        body[data-bs-theme="dark"] .input-group-text,
-        body[data-bs-theme="dark"] .form-control-plaintext,
-        body[data-bs-theme="dark"] .alert,
-        body[data-bs-theme="dark"] .badge,
-        body[data-bs-theme="dark"] .nav-tabs .nav-link {
+        [data-bs-theme="dark"] .form-control,
+        [data-bs-theme="dark"] .form-select,
+        [data-bs-theme="dark"] .input-group-text,
+        [data-bs-theme="dark"] .form-control-plaintext,
+        [data-bs-theme="dark"] .alert,
+        [data-bs-theme="dark"] .badge,
+        [data-bs-theme="dark"] .nav-tabs .nav-link {
             background-color: #232b3c !important;
             color: #e6ecff !important;
             border-color: #2b3350 !important;
         }
 
-        body[data-bs-theme="dark"] .nav-tabs .nav-link.active {
+        [data-bs-theme="dark"] .nav-tabs .nav-link.active {
             color: #ffffff !important;
             border-bottom-color: #6c5ce7 !important;
         }
 
-        body[data-bs-theme="dark"] .bg-light {
+        [data-bs-theme="dark"] .bg-light {
             background-color: rgba(255, 255, 255, 0.06) !important;
         }
 
-        body[data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
+        [data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
             background-color: rgba(93, 135, 255, 0.12) !important;
         }
 
-        body[data-bs-theme="dark"] .bg-success.bg-opacity-10 {
+        [data-bs-theme="dark"] .bg-success.bg-opacity-10 {
             background-color: rgba(25, 135, 84, 0.12) !important;
         }
 
-        body[data-bs-theme="dark"] .bg-warning.bg-opacity-10 {
+        [data-bs-theme="dark"] .bg-warning.bg-opacity-10 {
             background-color: rgba(255, 193, 7, 0.12) !important;
         }
 </style>

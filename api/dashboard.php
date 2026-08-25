@@ -279,8 +279,8 @@ try {
 
         // Ganancia Divisas (USD + USDT) para sumar al total (Sync con Reportes)
         $filtroFechaMov = str_replace('fm.fecha', 'fecha', $filtroFecha);
-        $sqlUSD = "SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE servicio_id = 2 AND tipo = 'comision' AND cuenta_destino_id = 1 AND activo = 1" . $filtroFechaMov;
-        $sqlUSDT = "SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE servicio_id = 3 AND tipo = 'comision' AND cuenta_destino_id = 1 AND activo = 1" . $filtroFechaMov;
+        $sqlUSD = "SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE servicio_id = 2 AND tipo = 'comision' AND cuenta_destino_id = 1 AND activo = 1 AND estado = 'activo'" . $filtroFechaMov;
+        $sqlUSDT = "SELECT COALESCE(SUM(monto), 0) FROM movimientos WHERE servicio_id = 3 AND tipo = 'comision' AND cuenta_destino_id = 1 AND activo = 1 AND estado = 'activo'" . $filtroFechaMov;
         $stmtUSD = $pdo->prepare($sqlUSD);
         $stmtUSD->execute($paramsComisiones);
         $gananciaUSD = (float)$stmtUSD->fetchColumn();
