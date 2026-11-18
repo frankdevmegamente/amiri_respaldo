@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/src/config/session.php';
 
-if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_rol'] !== 'admin') {
+if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_rol'] ?? '', ['admin','usuario'])) {
 
     header('Location: login.php');
 
@@ -286,6 +286,15 @@ $serviciosDivisas = [
     background-color: rgba(220, 53, 69, 0.15) !important;
     border-bottom: 1px solid #2c344c !important;
 }
+
+/* ── Capital destacado: Capital Amiri / Utilidades AMIRI ──────────── */
+.capital-destacado { background: #fff8e1 !important; border-left: 4px solid #ffc107 !important; font-weight: 700 !important; position: sticky; z-index: 11; }
+.capital-destacado td { background: transparent !important; font-weight: 700 !important; }
+.capital-destacado:nth-of-type(1) { top: 38px; }
+.capital-destacado:nth-of-type(2) { top: 76px; }
+.capital-destacado .ti { color: #ffb300 !important; }
+[data-bs-theme="dark"] .capital-destacado, .dark-mode .capital-destacado { background: rgba(255,193,7,0.18) !important; border-left-color: #ffc107 !important; }
+[data-bs-theme="dark"] .capital-destacado td, .dark-mode .capital-destacado td { color: #ffe08a !important; }
 
 /* 3. MODO OSCURO: FORZAR COLORES DE TEXTO E ICONOS (Para vencer al text-white) */
 [data-bs-theme="dark"] .header-saldos, .dark-mode .header-saldos,
@@ -838,7 +847,7 @@ $serviciosDivisas = [
 
 
 
-    <!-- Modal Pago Proveedor MXN (acceso directo desde card obligaciones) -->
+    <!-- Modal Pago Proveedor (unificado MXN / USD / USDT) -->
 
     <div class="modal fade" id="modalPagoProveedorMXN" tabindex="-1">
 
@@ -848,7 +857,7 @@ $serviciosDivisas = [
 
                 <div class="modal-header bg-warning bg-opacity-10">
 
-                    <h5 class="modal-title"><i class="ti ti-cash text-warning"></i> Pagar Proveedor MXN</h5>
+                    <h5 class="modal-title" id="pagoMxnModalTitle"><i class="ti ti-cash text-warning"></i> Pagar Proveedor</h5>
 
                     <button class="btn-close" data-bs-dismiss="modal"></button>
 
@@ -872,21 +881,23 @@ $serviciosDivisas = [
 
                                 <span class="fw-bold fs-6" id="pagoMxnNombreProveedor"></span>
 
-                                <span class="badge bg-warning bg-opacity-10 text-warning border-0" style="font-size: 0.85rem;">MXN</span>
+                                <span class="badge border-0" id="pagoMxnBadgeMoneda" style="font-size: 0.85rem;">MXN</span>
 
                             </div>
 
                             <div class="row text-center mt-2">
 
-                                <div class="col-4">
+                                <div class="col-6">
 
-                                    <div class="text-muted small">Adeudo MXN</div>
+                                    <div class="text-muted small" id="pagoMxnLabelAdeudo">Adeudo</div>
 
                                     <div class="fw-bold" id="pagoMxnInfoAdeudo">—</div>
 
+                                    <small class="text-muted" id="pagoMxnInfoAdeudoMxn" style="display:none;"></small>
+
                                 </div>
 
-                                <div class="col-4">
+                                <div class="col-6">
 
                                     <div class="text-muted small">Total a pagar</div>
 
@@ -926,19 +937,20 @@ $serviciosDivisas = [
 
                         <div class="mb-3" id="pagoMxnGrupoMonto" style="display:none;">
 
-                            <label class="form-label fw-semibold">Monto a Pagar (MXN) *</label>
+                            <label class="form-label fw-semibold" id="pagoMxnLabelMonto">Monto a Pagar (MXN) *</label>
 
                             <div class="input-group">
 
-                                <span class="input-group-text">$</span>
+                                <span class="input-group-text" id="pagoMxnSimboloIzq">$</span>
 
                                 <input type="text" id="pagoMxnMonto" class="form-control" step="0.01" min="0.01" placeholder="0.00" required>
 
-                                <span class="input-group-text">MXN</span>
+                                <span class="input-group-text" id="pagoMxnSimboloDer">MXN</span>
 
                             </div>
 
                             <small id="pagoMxnMontoLabel" class="text-success fw-bold mt-1 d-block" style="min-height:1.2em;"></small>
+                            <small id="pagoMxnEquivalencia" class="text-muted d-block" style="display:none;"></small>
 
                             <div class="d-flex justify-content-between align-items-center mt-1">
 
@@ -984,7 +996,7 @@ $serviciosDivisas = [
 
 
 
-    <!-- Modal Deudor -->
+    <!-- Modal Deudor (historial completo) -->
 
     <div class="modal fade" id="modalDeudor" tabindex="-1">
 
@@ -1010,6 +1022,67 @@ $serviciosDivisas = [
 
         </div>
 
+    </div>
+
+    <!-- Modal Cobro Deudor Directo (igual que Proveedores: pago en MXN) -->
+    <div class="modal fade" id="modalCobroDeudor" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success bg-opacity-10">
+                    <h5 class="modal-title" id="cobroDeudorModalTitle"><i class="ti ti-cash text-success"></i> Cobrar Deudor</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formCobroDeudorDirecto">
+                    <div class="modal-body">
+                        <input type="hidden" id="cobroDeudorNombre">
+                        <div class="alert alert-secondary py-2 mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold fs-6" id="cobroDeudorNombreDisplay">—</span>
+                                <span class="badge bg-warning bg-opacity-10 text-warning border-0" style="font-size:0.85rem;">MXN</span>
+                            </div>
+                            <div class="row text-center mt-2">
+                                <div class="col-6">
+                                    <div class="text-muted small">Pendiente por cobrar</div>
+                                    <div class="fw-bold text-danger" id="cobroDeudorInfoPendiente">—</div>
+                                    <small class="text-muted" id="cobroDeudorInfoCobrado"></small>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-muted small">Total a cobrar</div>
+                                    <div class="fw-bold" id="cobroDeudorInfoTotal">—</div>
+                                    <small class="text-muted" id="cobroDeudorInfoInteres" style="display:none;"></small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Fecha de Cobro *</label>
+                            <input type="date" id="cobroDeudorFecha" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Cuenta Destino (MXN) *</label>
+                            <select id="cobroDeudorCuenta" class="form-control" required><option value="">Seleccione cuenta</option></select>
+                        </div>
+                        <div class="mb-3" id="cobroDeudorGrupoMonto" style="display:none;">
+                            <label class="form-label fw-semibold">Monto a Cobrar (MXN) *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="text" id="cobroDeudorMonto" class="form-control" step="0.01" min="0.01" placeholder="0.00" required>
+                                <span class="input-group-text">MXN</span>
+                            </div>
+                            <small id="cobroDeudorMontoLabel" class="text-success fw-bold mt-1 d-block" style="min-height:1.2em;"></small>
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                <small class="text-muted" id="cobroDeudorInfoSaldo"></small>
+                                <button type="button" class="btn btn-outline-success btn-sm" id="btnCobroLiquidar" style="display:none;"><i class="ti ti-check"></i> Liquidar Total</button>
+                            </div>
+                            <div id="cobroDeudorAlerta" class="alert alert-warning py-2 mt-2" style="display:none;"><i class="ti ti-alert-triangle"></i> El monto no puede superar el pendiente.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success" id="btnCobroProcesar" style="display:none;"><i class="ti ti-check"></i> Procesar Cobro</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
 
@@ -1300,8 +1373,21 @@ $serviciosDivisas = [
                 {
                     data: null, title: 'Monto',
                     render: function (data, type, row) {
-                        let monto = parseFloat(row.monto_principal);
-                        return '<span class="fw-bold text-success">$' + monto.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</span>';
+                        let monto = parseFloat(row.monto_principal || 0);
+                        let html = '<span class="fw-bold text-success">$' + monto.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '</span>';
+                        // Desglose préstamo otorgado con interés compuesto
+                        if (row.servicio === 'Préstamo Otorgado' && row.po_total) {
+                            let cap = parseFloat(row.po_capital || 0);
+                            let interes = parseFloat(row.po_interes || 0);
+                            if (interes > 0.01) {
+                                let tasa = row.po_tasa ? parseFloat(row.po_tasa).toFixed(2) + '% ' + (row.po_tasa_periodo || 'mensual') : '';
+                                let venc = row.po_vencimiento ? row.po_vencimiento.split('-').reverse().join('/') : '';
+                                html += '<br><small class="text-muted" style="font-size:0.70rem;">Cap $' + cap.toLocaleString('es-MX',{minimumFractionDigits:2}) + ' + Int $' + interes.toLocaleString('es-MX',{minimumFractionDigits:2}) + '</small>';
+                                if (tasa) html += '<br><small class="badge bg-warning bg-opacity-10 text-warning border-0" style="font-size:0.65rem;">' + tasa + '</small>';
+                                if (venc) html += ' <small class="text-muted" style="font-size:0.65rem;">vence ' + venc + '</small>';
+                            }
+                        }
+                        return html;
                     }
                 },
                 {
@@ -1452,27 +1538,44 @@ $serviciosDivisas = [
 
                 if (data.cuentas && data.cuentas.length) {
 
-                    data.cuentas.sort(function(a, b) {
+                    const esDestacado = c => {
+                        const n = (c.nombre || '').trim();
+                        return n === 'Capital Amiri' || n.toUpperCase() === 'UTILIDADES AMIRI' || n === 'Utilidades AMIRI';
+                    };
+                    const destacados = data.cuentas.filter(esDestacado);
+                    const resto = data.cuentas.filter(c => !esDestacado(c));
+
+                    // Orden fijo para destacados: Capital Amiri primero, luego Utilidades
+                    destacados.sort((a,b) => {
+                        const order = { 'Capital Amiri': 0, 'Utilidades AMIRI': 1, 'Utilidades Amiri': 1 };
+                        return (order[a.nombre] ?? 99) - (order[b.nombre] ?? 99);
+                    });
+                    resto.sort(function(a, b) {
                         let mxnA = a.tipo_moneda === 'MXN' ? parseFloat(a.saldo_actual || 0) : parseFloat(a.valor_mxn || 0);
                         let mxnB = b.tipo_moneda === 'MXN' ? parseFloat(b.saldo_actual || 0) : parseFloat(b.valor_mxn || 0);
                         return mxnB - mxnA;
                     });
+                    const ordenadas = [...destacados, ...resto];
 
-                    data.cuentas.forEach(function (c) {
+                    ordenadas.forEach(function (c) {
+                        const destacado = esDestacado(c);
 
                         let saldo = parseFloat(c.saldo_actual || 0);
 
                         let mxn   = c.tipo_moneda === 'MXN' ? saldo : parseFloat(c.valor_mxn || 0);
 
-                        if (Math.abs(saldo) < 0.01) return;
+                        // Destacados se muestran aunque estén en 0 para que no se pierdan
+                        if (!destacado && Math.abs(saldo) < 0.01) return;
 
                         totalMxn += mxn;
 
 
 
                         let nombre = c.nombre;
-
-                        if (c.es_deuda_cliente && c.cliente_id) {
+                        if (destacado) {
+                            const icon = c.nombre === 'Capital Amiri' ? 'ti ti-pig-money' : 'ti ti-building-bank';
+                            nombre = `<span class="d-inline-flex align-items-center gap-1"><i class="${icon}"></i> ${c.nombre} <i class="ti ti-star-filled" style="font-size:0.7rem; color:#ffb300;"></i></span>`;
+                        } else if (c.es_deuda_cliente && c.cliente_id) {
 
                             nombre = `<a href="detalle-cliente.php?id=${c.cliente_id}" class="text-decoration-none">${c.nombre}</a>`;
 
@@ -1490,13 +1593,14 @@ $serviciosDivisas = [
 
                             : (c.tipo_moneda === 'MXN' ? '$' + formatMXN(saldo) + ' MXN' : formatNativo(saldo) + ' ' + c.tipo_moneda);
 
+                        const filaCls = destacado ? 'capital-destacado' : '';
+                        const badgeCls = destacado ? 'bg-warning text-dark border' : 'bg-warning bg-opacity-10 text-warning border-0';
 
-
-                        html += `<tr>
+                        html += `<tr class="${filaCls}">
 
                             <td>${nombre}</td>
 
-                            <td><span class="badge bg-warning bg-opacity-10 text-warning border-0">${c.tipo_cuenta_nombre || 'Capital'}</span></td>
+                            <td><span class="badge ${badgeCls}">${c.tipo_cuenta_nombre || 'Capital'}</span></td>
 
                             <td class="text-end fw-bold">${montoDisplay}</td>
 
@@ -1551,9 +1655,10 @@ $serviciosDivisas = [
                     if (e.tipo === 'Prestamista') {
                         nombreCell = `<a href="detalle-prestamista.php?id=${e.id || ''}" class="text-decoration-none fw-semibold text-danger">${e.nombre}</a>`;
                     } else if (e.tipo === 'Proveedor') {
-                        nombreCell = `<a href="#" class="text-decoration-none fw-semibold text-info" onclick="pagarProveedorDirecto(${e.id || 0}); return false;">${e.nombre}</a>`;
+                        const monedaRow = (e.tipo_moneda || 'MXN').toUpperCase();
+                        nombreCell = `<a href="#" class="text-decoration-none fw-semibold text-info" onclick="abrirPagoProveedorDirecto(${e.id || 0}, '${monedaRow}'); return false;" title="Pagar ${monedaRow} - click para pagar directo">${e.nombre}</a> <a href="#" class="text-muted ms-1" style="font-size:0.8rem;" onclick="abrirProveedorModal(${e.id || 0}); return false;" title="Ver historial"><i class="ti ti-history"></i></a>`;
                     } else if (e.tipo === 'Deudor') {
-                        nombreCell = `<a href="#" class="text-decoration-none fw-semibold text-warning" onclick="abrirDeudorModal('${encodeURIComponent(e.nombre)}'); return false;">${e.nombre}</a>`;
+                        nombreCell = `<a href="#" class="text-decoration-none fw-semibold text-warning" onclick="abrirCobroDeudorDirecto('${encodeURIComponent(e.nombre)}'); return false;" title="Cobrar - click para cobrar directo">${e.nombre}</a> <a href="#" class="text-muted ms-1" style="font-size:0.8rem;" onclick="abrirDeudorModal('${encodeURIComponent(e.nombre)}'); return false;" title="Ver historial"><i class="ti ti-history"></i></a>`;
                     }
                         
                     html += `<tr>
@@ -1600,17 +1705,20 @@ $serviciosDivisas = [
                 render();
             }).fail(render);
 
-            // 3. Préstamos Otorgados (Lo que NOS DEBEN a nosotros) <-- ¡LA NUEVA CONEXIÓN!
+            // 3. Préstamos Otorgados (Lo que NOS DEBEN a nosotros) <-- incluye interés compuesto
             $.getJSON('api/prestamos-otorgados.php', function (data) {
                 if (data && data.length) {
-                    // Agrupamos por persona (por si le prestaste 2 veces al mismo)
                     let agrupado = {};
                     data.forEach(function (p) {
-                        let pendiente = parseFloat(p.monto_total) - parseFloat(p.monto_pagado);
+                        let total = parseFloat(p.monto_total_con_interes || p.monto_total || 0);
+                        let pendiente = total - parseFloat(p.monto_pagado || 0);
+                        // fallback si monto_total_con_interes es 0 por bug viejo
+                        if (pendiente <= 0.001 && total === 0) pendiente = parseFloat(p.monto_total || 0) - parseFloat(p.monto_pagado || 0);
                         if (pendiente > 0.001) {
-                            if (!agrupado[p.persona_nombre]) agrupado[p.persona_nombre] = { total: 0, ids: [] };
-                            agrupado[p.persona_nombre].total += pendiente;
-                            agrupado[p.persona_nombre].ids.push(p.id);
+                            let key = p.deudor_nombre || p.persona_nombre;
+                            if (!agrupado[key]) agrupado[key] = { total: 0, ids: [] };
+                            agrupado[key].total += pendiente;
+                            agrupado[key].ids.push(p.id);
                         }
                     });
                     
@@ -1693,6 +1801,7 @@ $serviciosDivisas = [
                     if (resumen) msg += '<br><small class="text-muted">' + resumen + '</small>';
                     $texto.html(msg);
                     $detalle.html(detalleHtml).show();
+                    cargarAlertasIntegridad($detalle);
                 } else {
                     $card.removeClass('border-success border-danger border-info').addClass('border-warning');
                     $cardBody.css('background-color', 'rgba(255,193,7,0.1)');
@@ -1709,6 +1818,30 @@ $serviciosDivisas = [
                 $texto.append(`<br><small class="text-muted">${desglose}</small>`);
             });
 
+        }
+
+
+
+        // Solo ante descuadre: trae api/integridad.php y anexa las pruebas FIFO fallidas
+        // (test #5 inventario, test #10 consumos/saldos-vs-inventario) para apuntar la causa.
+        // Se filtran solo esas dos para no ahogar la señal con deuda histórica de otros tests.
+        function cargarAlertasIntegridad($detalle) {
+            $.getJSON('api/integridad.php', function (res) {
+                const malas = (res.tests || []).filter(function (t) { return (t.num === 5 || t.num === 10) && t.status === 'error'; });
+                if (!malas.length) return;
+                let html = '<div class="mt-2 p-2 rounded border border-danger" style="background-color:rgba(220,53,69,0.06);">';
+                html += '<strong><i class="ti ti-shield-alert"></i> Posibles causas (integridad):</strong>';
+                malas.forEach(function (t) {
+                    html += '<div class="mt-1"><span class="badge bg-danger">Test #' + t.num + ' ' + t.nombre + '</span>';
+                    html += '<div class="small">' + t.msg + '</div>';
+                    (t.detalles || []).slice(0, 5).forEach(function (d) {
+                        html += '<div class="small text-muted">• ' + (d.error || d.msg || '') + '</div>';
+                    });
+                    html += '</div>';
+                });
+                html += '</div>';
+                $detalle.append(html);
+            }).fail(function () { /* integridad no disponible: no bloquear */ });
         }
 
 
@@ -1747,14 +1880,14 @@ $serviciosDivisas = [
 
                 // Si solo tiene un tipo de deuda, abrir directamente
                 if (tieneMxn && !tieneUsd && !tieneUsdt) {
-                    abrirModalPagoMxn(proveedor, saldoMxn);
+                    window.abrirModalPagoMxn(proveedor, saldoMxn);
                 } else if (tieneUsd && !tieneMxn && !tieneUsdt) {
                     pagarProveedorDesdeModal(id, 'USD', saldoUsd);
                 } else if (tieneUsdt && !tieneMxn && !tieneUsd) {
                     pagarProveedorDesdeModal(id, 'USDT', saldoUsdt);
                 } else if (tieneMxn) {
                     // Si tiene MXN (con o sin otros), priorizar MXN
-                    abrirModalPagoMxn(proveedor, saldoMxn);
+                    window.abrirModalPagoMxn(proveedor, saldoMxn);
                 } else {
                     // Fallback: abrir modal de detalle
                     abrirProveedorModal(id);
@@ -1762,12 +1895,98 @@ $serviciosDivisas = [
             });
         };
 
-        function abrirModalPagoMxn(proveedor, saldoMxn) {
+        // Modal unificado para MXN / USD / USDT (usa api/proveedores-pagos.php)
+        window.abrirModalPagoProveedor = function(proveedor, moneda) {
+            moneda = (moneda || 'MXN').toUpperCase();
+            var saldoMxnDirecto = parseFloat(proveedor.saldo_mxn || 0);
+            var saldoUsd = parseFloat(proveedor.saldo_usd || 0);
+            var saldoUsdt = parseFloat(proveedor.saldo_usdt || 0);
+            var valorMxnUsd = parseFloat(proveedor.valor_mxn_usd || 0);
+            var valorMxnUsdt = parseFloat(proveedor.valor_mxn_usdt || 0);
+            var saldo, valorMxn, paridad;
+            if (moneda === 'USD') { saldo = saldoUsd; valorMxn = valorMxnUsd; }
+            else if (moneda === 'USDT') { saldo = saldoUsdt; valorMxn = valorMxnUsdt; }
+            else { moneda = 'MXN'; saldo = saldoMxnDirecto; valorMxn = saldoMxnDirecto; }
+            if (saldo < 0.001) { showToast('Sin adeudo en ' + moneda, 'warning'); return; }
+            paridad = (moneda === 'MXN') ? 1 : (saldo > 0 ? valorMxn / saldo : 0);
+
+            var $modalProv = $('#modalProveedor');
+            if ($modalProv.hasClass('show')) {
+                $modalProv.modal('hide');
+                $modalProv.one('hidden.bs.modal', function() {
+                    doAbrirModalPagoProveedor(proveedor, moneda, saldo, valorMxn, paridad);
+                });
+                setTimeout(function(){
+                    if (!$('#modalPagoProveedorMXN').hasClass('show')) doAbrirModalPagoProveedor(proveedor, moneda, saldo, valorMxn, paridad);
+                }, 400);
+                return;
+            }
+            doAbrirModalPagoProveedor(proveedor, moneda, saldo, valorMxn, paridad);
+        };
+        // Click directo desde card obligaciones: abre modal de pago sin pasar por historial
+        window.abrirPagoProveedorDirecto = function(id, monedaSugerida) {
+            if (!id) return;
+            monedaSugerida = (monedaSugerida || '').toUpperCase();
+            $.getJSON('api/proveedores.php?id=' + id, function(proveedor) {
+                if (!proveedor || !proveedor.id) { showToast('Proveedor no encontrado','error'); return; }
+                // Si la fila sugiere una moneda y hay adeudo, usarla; si no, auto-detectar
+                var saldoMxn = parseFloat(proveedor.saldo_mxn || 0);
+                var saldoUsd = parseFloat(proveedor.saldo_usd || 0);
+                var saldoUsdt = parseFloat(proveedor.saldo_usdt || 0);
+                var valorMxnUsd = parseFloat(proveedor.valor_mxn_usd || 0);
+                var valorMxnUsdt = parseFloat(proveedor.valor_mxn_usdt || 0);
+                var moneda = monedaSugerida;
+                var tieneSugerida = false;
+                if (moneda === 'USD' && saldoUsd > 0.001 && proveedor.acepta_usd) tieneSugerida = true;
+                else if (moneda === 'USDT' && saldoUsdt > 0.001 && proveedor.acepta_usdt) tieneSugerida = true;
+                else if (moneda === 'MXN' && saldoMxn > 0.001) tieneSugerida = true;
+                if (!tieneSugerida) {
+                    // Auto-detección: priorizar la moneda de la fila si corresponde, si no la primera con adeudo
+                    if (moneda && ['MXN','USD','USDT'].includes(moneda)) {
+                        // fila con moneda pero sin saldo (deuda ya saldada?) -> buscar cualquiera con saldo
+                        if (saldoMxn > 0.001) moneda = 'MXN';
+                        else if (saldoUsd > 0.001) moneda = 'USD';
+                        else if (saldoUsdt > 0.001) moneda = 'USDT';
+                        else moneda = 'MXN';
+                    } else {
+                        if (saldoMxn > 0.001) moneda = 'MXN';
+                        else if (saldoUsd > 0.001) moneda = 'USD';
+                        else if (saldoUsdt > 0.001) moneda = 'USDT';
+                        else { showToast('Sin adeudo pendiente','warning'); return; }
+                    }
+                }
+                window.abrirModalPagoProveedor(proveedor, moneda);
+            }).fail(function(){ showToast('Error al cargar proveedor','error'); });
+        };
+        // Compatibilidad: wrapper MXN antiguo
+        window.abrirModalPagoMxn = function(proveedor, saldoMxn) {
+            // si saldoMxn no coincide con proveedor.saldo_mxn, forzar moneda MXN igualmente
+            return window.abrirModalPagoProveedor(proveedor, 'MXN');
+        };
+        function doAbrirModalPagoProveedor(proveedor, moneda, saldo, valorMxn, paridad) {
             $('#pagoMxnProveedorId').val(proveedor.id);
+            $('#pagoMxnMoneda').val(moneda);
+            $('#pagoMxnParidad').val(paridad);
             $('#pagoMxnNombreProveedor').text(proveedor.nombre);
-            $('#pagoMxnInfoAdeudo').text('$' + saldoMxn.toLocaleString('es-MX', {minimumFractionDigits:2}) + ' MXN');
-            $('#pagoMxnInfoTotal').text('$' + saldoMxn.toLocaleString('es-MX', {minimumFractionDigits:2}) + ' MXN');
-            $('#formPagoProveedorMXN').data('adeudo-mxn', saldoMxn);
+            // Badge / titulo dinamico
+            var badgeCls = moneda === 'USD' ? 'bg-primary bg-opacity-10 text-primary' : moneda === 'USDT' ? 'bg-info bg-opacity-10 text-info' : 'bg-warning bg-opacity-10 text-warning';
+            $('#pagoMxnBadgeMoneda').attr('class', 'badge border-0 ' + badgeCls).text(moneda);
+            $('#pagoMxnModalTitle').html('<i class="ti ti-cash text-warning"></i> Pagar Proveedor ' + moneda);
+            if (moneda === 'MXN') {
+                $('#pagoMxnLabelAdeudo').text('Adeudo MXN');
+                $('#pagoMxnInfoAdeudo').text('$' + saldo.toLocaleString('es-MX', {minimumFractionDigits:2}) + ' MXN');
+                $('#pagoMxnInfoAdeudoMxn').hide();
+                $('#pagoMxnInfoTotal').text('$' + valorMxn.toLocaleString('es-MX', {minimumFractionDigits:2}) + ' MXN');
+            } else {
+                $('#pagoMxnLabelAdeudo').text('Adeudo ' + moneda);
+                $('#pagoMxnInfoAdeudo').text(formatNativo(saldo) + ' ' + moneda);
+                $('#pagoMxnInfoAdeudoMxn').text('$' + valorMxn.toLocaleString('es-MX', {minimumFractionDigits:2}) + ' MXN').show();
+                $('#pagoMxnInfoTotal').text('$' + valorMxn.toLocaleString('es-MX', {minimumFractionDigits:2}) + ' MXN');
+            }
+            // Como en proveedores.php: siempre se paga en MXN
+            $('#pagoMxnLabelMonto').text('Monto a Pagar (MXN) *');
+            $('#pagoMxnSimboloIzq').text('$'); $('#pagoMxnSimboloDer').text('MXN');
+            $('#formPagoProveedorMXN').data('adeudo-mxn', valorMxn).data('adeudo-divisa', saldo).data('moneda', moneda).data('paridad', paridad);
 
             // Fecha de hoy
             $('#pagoMxnFecha').val(new Date().toISOString().split('T')[0]);
@@ -1775,6 +1994,7 @@ $serviciosDivisas = [
             // Reset
             $('#pagoMxnMonto').val('');
             $('#pagoMxnMontoLabel').text('');
+            $('#pagoMxnEquivalencia').hide().text('');
             $('#pagoMxnGrupoMonto').hide();
             $('#btnMxnLiquidarTotal').hide();
             $('#pagoMxnAlertaSaldo').hide();
@@ -1802,7 +2022,7 @@ $serviciosDivisas = [
             });
         }
 
-        // Cambio de cuenta en modal MXN
+        // Cambio de cuenta en modal pago proveedor (unificado - pago siempre en MXN como proveedores.php)
         $(document).on('change', '#pagoMxnCuentaSelect', function() {
             var saldoCuenta = parseFloat($(this).find('option:selected').attr('data-saldo')) || 0;
             var adeudoMxn   = parseFloat($('#formPagoProveedorMXN').data('adeudo-mxn')) || 0;
@@ -1826,26 +2046,40 @@ $serviciosDivisas = [
             }
         });
 
-        // Liquidar total
+        // Liquidar total (unificado - MXN)
         $(document).on('click', '#btnMxnLiquidarTotal', function() {
             var adeudoMxn = parseFloat($('#formPagoProveedorMXN').data('adeudo-mxn')) || 0;
-            $('#pagoMxnMonto').val(adeudoMxn.toFixed(2)).trigger('input');
+            var saldoCuenta = parseFloat($('#pagoMxnCuentaSelect').find('option:selected').attr('data-saldo')) || 0;
+            var maximo = Math.min(adeudoMxn, saldoCuenta);
+            $('#pagoMxnMonto').val(maximo.toFixed(2)).trigger('input');
         });
 
-        // Validación en tiempo real del monto
+        // Validación en tiempo real del monto (siempre MXN como en proveedores.php:1949)
         $(document).on('input', '#pagoMxnMonto', function() {
             var val         = parseFloat($(this).val()) || 0;
             var adeudoMxn   = parseFloat($('#formPagoProveedorMXN').data('adeudo-mxn')) || 0;
+            var adeudoDivisa= parseFloat($('#formPagoProveedorMXN').data('adeudo-divisa')) || adeudoMxn;
+            var moneda      = $('#formPagoProveedorMXN').data('moneda') || 'MXN';
+            var paridad     = parseFloat($('#formPagoProveedorMXN').data('paridad')) || 1;
             var saldoCuenta = parseFloat($('#pagoMxnCuentaSelect').find('option:selected').attr('data-saldo')) || 0;
-            var maximo      = Math.min(saldoCuenta, adeudoMxn);
+            var maximoMxn = Math.min(saldoCuenta, adeudoMxn);
 
             if (val > 0) {
-                $('#pagoMxnMontoLabel').text('$' + val.toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2}));
+                $('#pagoMxnMontoLabel').text('$' + val.toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' MXN');
+                if (moneda !== 'MXN' && paridad > 0) {
+                    var equivDivisa = val / paridad;
+                    $('#pagoMxnEquivalencia').text('≈ ' + formatNativo(equivDivisa) + ' ' + moneda + ' (TC ' + formatMXN(paridad) + ')').show();
+                } else {
+                    $('#pagoMxnEquivalencia').hide();
+                }
             } else {
                 $('#pagoMxnMontoLabel').text('');
+                $('#pagoMxnEquivalencia').hide();
             }
 
-            if (val > maximo) {
+            var excede = val > maximoMxn + 0.001;
+
+            if (excede) {
                 $('#pagoMxnAlertaSaldo').show();
                 $('#btnMxnProcesarPago').prop('disabled', true);
             } else {
@@ -1854,17 +2088,25 @@ $serviciosDivisas = [
             }
         });
 
-        // Procesar pago MXN
+        // Procesar pago proveedor (unificado MXN/USD/USDT)
         $(document).on('submit', '#formPagoProveedorMXN', function(e) {
             e.preventDefault();
 
-            var monto = parseFloat($('#pagoMxnMonto').val()) || 0;
+            var montoInput = parseFloat($('#pagoMxnMonto').val()) || 0;
+            var moneda = $('#formPagoProveedorMXN').data('moneda') || $('#pagoMxnMoneda').val() || 'MXN';
+            var paridad = parseFloat($('#formPagoProveedorMXN').data('paridad') || $('#pagoMxnParidad').val() || 1);
             if (!$('#pagoMxnCuentaSelect').val()) {
                 showToast('Selecciona una cuenta de pago', 'error');
                 return;
             }
-            if (monto <= 0) {
+            if (montoInput <= 0) {
                 showToast('Ingresa un monto a pagar', 'error');
+                return;
+            }
+            // Siempre en MXN como en proveedores.php (el input ya es MXN)
+            var monto = montoInput;
+            if (paridad <= 0) {
+                showToast('Paridad inválida', 'error');
                 return;
             }
 
@@ -1875,8 +2117,8 @@ $serviciosDivisas = [
                 proveedor_id:   $('#pagoMxnProveedorId').val(),
                 cuenta_pago_id: $('#pagoMxnCuentaSelect').val(),
                 monto:          monto,
-                paridad:        1,
-                moneda:         'MXN',
+                paridad:        paridad,
+                moneda:         moneda,
                 fecha:          fechaElegida + ' ' + horaActual
             };
 
@@ -1914,6 +2156,7 @@ $serviciosDivisas = [
 
             $.getJSON('api/proveedores.php?id=' + id, function (data) {
                 proveedor = data;
+                window.proveedor = data; window._proveedorActual = data;
                 $modal.find('#proveedorModalNombre').text(proveedor.nombre || 'Proveedor');
                 cargarHistorial();
             }).fail(function() {
@@ -1979,15 +2222,15 @@ $serviciosDivisas = [
                 html += '<div class="d-flex gap-2">';
 
                 if (saldoMxn > 0.001) {
-                    html += '<button class="btn btn-warning btn-sm" onclick="abrirModalPagoMxn(proveedor, ' + saldoMxn + ');">';
+                    html += '<button class="btn btn-warning btn-sm" onclick="window.abrirModalPagoProveedor(window.proveedor, \'MXN\');">';
                     html += '<i class="ti ti-cash"></i> Pagar MXN</button>';
                 }
                 if (proveedor.acepta_usd && saldoUsd > 0.001) {
-                    html += '<button class="btn btn-primary btn-sm" onclick="pagarProveedorDesdeModal(' + proveedor.id + ', \'USD\', ' + saldoUsd + ');">';
+                    html += '<button class="btn btn-primary btn-sm" onclick="window.abrirModalPagoProveedor(window.proveedor, \'USD\');">';
                     html += '<i class="ti ti-cash"></i> Pagar en USD</button>';
                 }
                 if (proveedor.acepta_usdt && saldoUsdt > 0.001) {
-                    html += '<button class="btn btn-info btn-sm" onclick="pagarProveedorDesdeModal(' + proveedor.id + ', \'USDT\', ' + saldoUsdt + ');">';
+                    html += '<button class="btn btn-info btn-sm" onclick="window.abrirModalPagoProveedor(window.proveedor, \'USDT\');">';
                     html += '<i class="ti ti-cash"></i> Pagar en USDT</button>';
                 }
 
@@ -2020,22 +2263,99 @@ $serviciosDivisas = [
 
 
 
+        // Legacy: ahora delega al modal unificado de pago (no abre Nuevo Movimiento)
         window.pagarProveedorDesdeModal = function(proveedorId, moneda, saldoPendiente) {
-            $('#modalProveedor').modal('hide');
-
-            var servicioNombre = moneda === 'USD' ? 'Compra de Dólares' : 'Compra de USDT';
-
-            $('#servicioSelect').val(servicioNombre).trigger('change');
-
-            setTimeout(function () {
-                $('#proveedorSelect').val(proveedorId).trigger('change');
-                $('#modalFlujo').modal('show');
-            }, 300);
+            moneda = (moneda || 'USD').toUpperCase();
+            // Intentar usar objeto proveedor ya cargado en el modal si coincide
+            try {
+                // Si proveedor global existe en el closure, usarlo
+                $.getJSON('api/proveedores.php?id=' + proveedorId, function(p) {
+                    window.abrirModalPagoProveedor(p, moneda);
+                }).fail(function(){
+                    // Fallback antiguo: abrir Nuevo Movimiento solo si falla el nuevo flujo
+                    $('#modalProveedor').modal('hide');
+                    var servicioNombre = moneda === 'USD' ? 'Compra de Dólares' : 'Compra de USDT';
+                    $('#servicioSelect').val(servicioNombre).trigger('change');
+                    setTimeout(function () {
+                        $('#proveedorSelect').val(proveedorId).trigger('change');
+                        $('#modalFlujo').modal('show');
+                    }, 300);
+                });
+            } catch(e) {
+                $.getJSON('api/proveedores.php?id=' + proveedorId, function(p) { window.abrirModalPagoProveedor(p, moneda); });
+            }
         }
 
 
 
-        // ─── Modal Deudor ───────────────────────────────────────────────────
+        // ─── Cobro Deudor Directo (igual que Proveedores: pago en MXN sin historial) ─
+        window.abrirCobroDeudorDirecto = function(nombreEncoded) {
+            var nombre = decodeURIComponent(nombreEncoded);
+            if (!nombre) return;
+            var $modal = $('#modalCobroDeudor');
+            $modal.find('#cobroDeudorNombreDisplay').text(nombre);
+            $modal.find('#cobroDeudorInfoPendiente').html('<i class="ti ti-loader ti-spin"></i> Cargando...');
+            $modal.modal('show');
+
+            $.getJSON('api/prestamos-otorgados.php?persona_nombre=' + encodeURIComponent(nombre), function(prestamos) {
+                prestamos = prestamos || [];
+                var totalCapital = 0, totalConInteres = 0, totalInteres = 0, totalPagado = 0;
+                prestamos.forEach(function(p){
+                    totalCapital += parseFloat(p.monto_total || 0);
+                    totalConInteres += parseFloat(p.monto_total_con_interes || p.monto_total || 0);
+                    totalInteres += parseFloat(p.monto_interes || 0);
+                    totalPagado += parseFloat(p.monto_pagado || 0);
+                });
+                var totalPendiente = totalConInteres - totalPagado;
+                if (totalPendiente < 0.01) { showToast('Sin pendiente por cobrar','warning'); $modal.modal('hide'); return; }
+
+                $('#cobroDeudorNombre').val(nombre);
+                $('#cobroDeudorNombreDisplay').text(nombre);
+                $('#cobroDeudorInfoPendiente').text('$' + formatMXN(totalPendiente) + ' MXN');
+                $('#cobroDeudorInfoCobrado').text('cobrado $' + formatMXN(totalPagado));
+                $('#cobroDeudorInfoTotal').text('$' + formatMXN(totalConInteres) + ' MXN');
+                if (totalInteres > 0.01) $('#cobroDeudorInfoInteres').text('Int $' + formatMXN(totalInteres)).show(); else $('#cobroDeudorInfoInteres').hide();
+                $modal.data('prestamos', prestamos).data('nombre', nombre);
+                $('#cobroDeudorFecha').val(new Date().toISOString().slice(0,10));
+                $('#cobroDeudorMonto').val(''); $('#cobroDeudorMontoLabel').text(''); $('#cobroDeudorGrupoMonto').hide(); $('#btnCobroLiquidar').hide(); $('#cobroDeudorAlerta').hide(); $('#btnCobroProcesar').hide(); $('#cobroDeudorInfoSaldo').text('');
+                $.getJSON('api/cuentas.php?tipo_moneda=MXN&es_caja_empresa=1', function(cuentas){
+                    var opts = '<option value="">-- Selecciona --</option>';
+                    cuentas.forEach(function(c){ opts += '<option value="' + c.id + '">' + c.nombre + ' ($' + formatMXN(c.saldo_actual) + ')</option>'; });
+                    $('#cobroDeudorCuenta').html(opts);
+                    $('#cobroDeudorGrupoMonto').show(); // mostrar ya para que el change lo active
+                });
+            }).fail(function(){ showToast('Error al cargar deudor','error'); $modal.modal('hide'); });
+        };
+        $(document).on('change', '#cobroDeudorCuenta', function(){
+            if (!$(this).val()) { $('#cobroDeudorGrupoMonto').hide(); $('#btnCobroProcesar').hide(); return; }
+            $('#cobroDeudorGrupoMonto').show(); $('#btnCobroProcesar').show();
+            var pendiente = parseFloat(($('#cobroDeudorInfoPendiente').text().replace(/[^0-9.-]/g,'') || 0));
+            // recalcular pendiente real desde data
+            var prestamos = $('#modalCobroDeudor').data('prestamos') || [];
+            var totalPend = 0; prestamos.forEach(function(p){ totalPend += parseFloat(p.monto_total_con_interes || p.monto_total || 0) - parseFloat(p.monto_pagado || 0); });
+            $('#cobroDeudorMonto').val('').attr('max', totalPend.toFixed(2));
+            if (totalPend > 0.01) $('#btnCobroLiquidar').show(); else $('#btnCobroLiquidar').hide();
+        });
+        $(document).on('click', '#btnCobroLiquidar', function(){
+            var prestamos = $('#modalCobroDeudor').data('prestamos') || [];
+            var totalPend = 0; prestamos.forEach(function(p){ totalPend += parseFloat(p.monto_total_con_interes || p.monto_total || 0) - parseFloat(p.monto_pagado || 0); });
+            $('#cobroDeudorMonto').val(totalPend.toFixed(2)).trigger('input');
+        });
+        $(document).on('input', '#cobroDeudorMonto', function(){
+            var val = parseFloat($(this).val()) || 0;
+            var prestamos = $('#modalCobroDeudor').data('prestamos') || [];
+            var totalPend = 0; prestamos.forEach(function(p){ totalPend += parseFloat(p.monto_total_con_interes || p.monto_total || 0) - parseFloat(p.monto_pagado || 0); });
+            if (val > 0) $('#cobroDeudorMontoLabel').text('$' + formatMXN(val) + ' MXN'); else $('#cobroDeudorMontoLabel').text('');
+            if (val > totalPend + 0.001) { $('#cobroDeudorAlerta').show(); $('#btnCobroProcesar').prop('disabled', true); } else { $('#cobroDeudorAlerta').hide(); $('#btnCobroProcesar').prop('disabled', false); }
+        });
+        $(document).on('submit', '#formCobroDeudorDirecto', function(e){
+            e.preventDefault();
+            var nombre = $('#modalCobroDeudor').data('nombre');
+            var prestamos = $('#modalCobroDeudor').data('prestamos') || [];
+            guardarCobroDeudorModal(nombre, prestamos, true);
+        });
+
+        // ─── Modal Deudor (historial completo) ──────────────────────────────────
 
         window.abrirDeudorModal = function(nombreEncoded) {
             var nombre = decodeURIComponent(nombreEncoded);
@@ -2067,46 +2387,60 @@ $serviciosDivisas = [
             }
 
             function renderizarDeudor() {
-                var totalPrestado = 0, totalPagado = 0;
+                var totalCapital = 0, totalConInteres = 0, totalInteres = 0, totalPagado = 0;
                 prestamos.forEach(function (p) {
-                    totalPrestado += parseFloat(p.monto_total || 0);
+                    totalCapital += parseFloat(p.monto_total || 0);
+                    totalConInteres += parseFloat(p.monto_total_con_interes || p.monto_total || 0);
+                    totalInteres += parseFloat(p.monto_interes || 0);
                     totalPagado += parseFloat(p.monto_pagado || 0);
                 });
-                var totalPendiente = totalPrestado - totalPagado;
+                var totalPendiente = totalConInteres - totalPagado;
 
                 var html = '';
 
-                // Cards de resumen
+                // Cards de resumen con interés
                 html += '<div class="row mb-4">';
-                html += '<div class="col-md-4"><div class="card border-warning"><div class="card-body text-center">';
-                html += '<p class="text-muted mb-1" style="font-size:0.75rem;">TOTAL PRESTADO</p>';
-                html += '<h4 class="mb-0 text-warning fw-bold">$' + formatMXN(totalPrestado) + '</h4>';
+                html += '<div class="col-md-3"><div class="card border-warning"><div class="card-body text-center">';
+                html += '<p class="text-muted mb-1" style="font-size:0.70rem;">CAPITAL PRESTADO</p>';
+                html += '<h5 class="mb-0 text-warning fw-bold">$' + formatMXN(totalCapital) + '</h5>';
                 html += '</div></div></div>';
-                html += '<div class="col-md-4"><div class="card border-success"><div class="card-body text-center">';
-                html += '<p class="text-muted mb-1" style="font-size:0.75rem;">TOTAL COBRADO</p>';
-                html += '<h4 class="mb-0 text-success fw-bold">$' + formatMXN(totalPagado) + '</h4>';
+                html += '<div class="col-md-3"><div class="card border-info"><div class="card-body text-center">';
+                html += '<p class="text-muted mb-1" style="font-size:0.70rem;">INTERÉS</p>';
+                html += '<h5 class="mb-0 text-info fw-bold">$' + formatMXN(totalInteres) + '</h5>';
                 html += '</div></div></div>';
-                html += '<div class="col-md-4"><div class="card border-danger"><div class="card-body text-center">';
-                html += '<p class="text-muted mb-1" style="font-size:0.75rem;">PENDIENTE</p>';
-                html += '<h4 class="mb-0 text-danger fw-bold">$' + formatMXN(totalPendiente) + '</h4>';
+                html += '<div class="col-md-3"><div class="card border-primary"><div class="card-body text-center">';
+                html += '<p class="text-muted mb-1" style="font-size:0.70rem;">TOTAL A COBRAR</p>';
+                html += '<h5 class="mb-0 text-primary fw-bold">$' + formatMXN(totalConInteres) + '</h5>';
+                html += '</div></div></div>';
+                html += '<div class="col-md-3"><div class="card border-danger"><div class="card-body text-center">';
+                html += '<p class="text-muted mb-1" style="font-size:0.70rem;">PENDIENTE</p>';
+                html += '<h5 class="mb-0 text-danger fw-bold">$' + formatMXN(totalPendiente) + '</h5>';
+                html += '<small class="text-muted">cobrado $' + formatMXN(totalPagado) + '</small>';
                 html += '</div></div></div>';
                 html += '</div>';
 
-                // Tabla de prestamos
+                // Tabla de prestamos con desglose
                 html += '<h6 class="mb-2"><i class="ti ti-list-details"></i> Prestamos</h6>';
                 if (prestamos.length > 0) {
                     html += '<div class="table-responsive mb-4"><table class="table table-sm table-hover">';
-                    html += '<thead><tr><th>Fecha</th><th>Total</th><th>Pagado</th><th>Pendiente</th><th>Estado</th><th>Cuenta</th></tr></thead><tbody>';
+                    html += '<thead><tr><th>Fecha</th><th>Capital</th><th>Interés</th><th>Total</th><th>Pagado</th><th>Pendiente</th><th>Tasa/Plazo</th><th>Estado</th><th>Cuenta</th></tr></thead><tbody>';
                     prestamos.forEach(function (p) {
-                        var pendiente = parseFloat(p.monto_total || 0) - parseFloat(p.monto_pagado || 0);
+                        var total = parseFloat(p.monto_total_con_interes || p.monto_total || 0);
+                        var pendiente = total - parseFloat(p.monto_pagado || 0);
                         var badge = p.estado === 'pagado' ? 'success' : (p.estado === 'parcial' ? 'warning' : 'danger');
                         var partes = (p.fecha_prestamo || '').split('-');
                         var fechaFmt = partes.length === 3 ? partes[2] + '/' + partes[1] + '/' + partes[0] : p.fecha_prestamo;
+                        var tasaTxt = (p.tasa_porcentaje && parseFloat(p.tasa_porcentaje)>0) ? parseFloat(p.tasa_porcentaje).toFixed(2)+'% '+ (p.tasa_periodo||'') : '-';
+                        var plazoTxt = p.plazo_valor ? p.plazo_valor+' '+ (p.plazo_unidad||'') : '-';
+                        var interes = parseFloat(p.monto_interes||0);
                         html += '<tr>';
                         html += '<td>' + fechaFmt + '</td>';
-                        html += '<td class="fw-bold">$' + formatMXN(p.monto_total) + '</td>';
+                        html += '<td>$' + formatMXN(p.monto_total) + '</td>';
+                        html += '<td class="text-info">$' + formatMXN(interes) + '</td>';
+                        html += '<td class="fw-bold">$' + formatMXN(total) + '</td>';
                         html += '<td class="text-success">$' + formatMXN(p.monto_pagado) + '</td>';
                         html += '<td class="text-danger fw-bold">$' + formatMXN(pendiente) + '</td>';
+                        html += '<td><small>' + tasaTxt + '<br>' + plazoTxt + '</small></td>';
                         html += '<td><span class="badge bg-' + badge + ' bg-opacity-10 text-' + badge + ' border-0">' + (p.estado || '-') + '</span></td>';
                         html += '<td>' + (p.cuenta_nombre || 'N/A') + '</td>';
                         html += '</tr>';
@@ -2185,21 +2519,23 @@ $serviciosDivisas = [
 
         // ─── Guardar cobro de deudor desde modal ────────────────────────────
 
-        function guardarCobroDeudorModal(personaNombre, prestamos) {
-            var monto = parseFloat($('#montoCobroDeudor').val());
-            var cuentaId = $('#cuentaDestinoDeudor').val();
-            var fecha = $('#fechaCobroDeudor').val();
+        function guardarCobroDeudorModal(personaNombre, prestamos, esDirecto) {
+            var isDirect = !!esDirecto || $('#modalCobroDeudor').hasClass('show');
+            var monto = parseFloat(isDirect ? $('#cobroDeudorMonto').val() : $('#montoCobroDeudor').val());
+            var cuentaId = isDirect ? $('#cobroDeudorCuenta').val() : $('#cuentaDestinoDeudor').val();
+            var fecha = isDirect ? $('#cobroDeudorFecha').val() : $('#fechaCobroDeudor').val();
 
             if (!monto || monto <= 0) { showToast('Ingresa un monto válido', 'error'); return; }
             if (!cuentaId) { showToast('Selecciona una cuenta destino', 'error'); return; }
 
-            // Distribucion en cascada: pagar el prestamo mas antiguo primero
+            // Distribucion en cascada: pagar el prestamo mas antiguo primero — sobre total con interés
             var pagos = [];
             var restante = monto;
             prestamos.forEach(function (p) {
                 if (restante <= 0.01) return;
-                var pendiente = parseFloat(p.monto_total || 0) - parseFloat(p.monto_pagado || 0);
-                if (pendiente > 0.01 && p.persona_nombre === personaNombre) {
+                var total = parseFloat(p.monto_total_con_interes || p.monto_total || 0);
+                var pendiente = total - parseFloat(p.monto_pagado || 0);
+                if (pendiente > 0.01 && (p.deudor_nombre === personaNombre || p.persona_nombre === personaNombre)) {
                     var abono = Math.min(pendiente, restante);
                     if (abono > 0.01) {
                         pagos.push({ id: p.id, abono: parseFloat(abono.toFixed(2)) });
@@ -2226,6 +2562,7 @@ $serviciosDivisas = [
                     if (res.success) {
                         showToast('Cobro registrado correctamente', 'success');
                         $('#modalDeudor').modal('hide');
+                        $('#modalCobroDeudor').modal('hide');
                         cargarObligaciones();
                         cargarDiferencia();
                     } else {
@@ -2343,15 +2680,28 @@ $serviciosDivisas = [
 
         function cargarCuentasMXN(soloBancarias) {
 
-            let url = 'api/cuentas.php?tipo_moneda=MXN';
+            let url = soloBancarias
+                ? 'api/cuentas.php?solo_gastos=1&tipo_moneda=MXN'
+                : 'api/cuentas.php?tipo_moneda=MXN';
 
             $.getJSON(url, function (data) {
 
                 let html = '<option value="">-- Selecciona una cuenta --</option>';
 
-                data.forEach(function (c) {
+                let lista = soloBancarias
+                    ? (data || []).filter(function (c) {
+                        let t = parseInt(c.tipo_cuenta);
+                        return t === 1 || t === 2;
+                    })
+                    : (data || []).filter(function (c) {
+                        return parseInt(c.tipo_cuenta) !== 3 && parseInt(c.tipo_cuenta) !== 7;
+                    });
 
-                    if ((!soloBancarias || parseInt(c.tipo_cuenta) === 1) && parseInt(c.tipo_cuenta) !== 3 && parseInt(c.tipo_cuenta) !== 7) {
+                if (!lista.length) {
+                    html += '<option value="" disabled>No hay cuentas MXN disponibles</option>';
+                }
+
+                lista.forEach(function (c) {
 
                         let nombreCuenta = c.nombre;
 
@@ -2362,8 +2712,6 @@ $serviciosDivisas = [
                         }
 
                         html += `<option value="${c.id}">${nombreCuenta} (MXN ${formatMXN(c.saldo_actual)})</option>`;
-
-                    }
 
                 });
 
@@ -2711,7 +3059,9 @@ $serviciosDivisas = [
 
                         cargarClientesMXN();
 
-                        cargarCuentasMXN(false);
+                        cargarCuentasMXN(true);
+
+                        $('#cuentaLabel').text('Cuenta bancaria destino (MXN)');
 
                         $campos.html(`
 
@@ -2789,17 +3139,9 @@ $serviciosDivisas = [
 
                         cargarProveedoresMXN(true);
 
-                        $.getJSON('api/cuentas.php?tipo_moneda=MXN', function (data) {
-                            let html = '<option value="">-- Selecciona la cuenta --</option>';
-                            data.forEach(function (c) {
-                                let nombreCuenta = c.nombre;
-                                if (c.banco && c.banco.trim()) {
-                                    nombreCuenta += ' (' + c.banco + ')';
-                                }
-                                html += `<option value="${c.id}">${nombreCuenta} (MXN ${formatMXN(c.saldo_actual)})</option>`;
-                            });
-                            $('#cuentaSelect').html(html);
-                        });
+                        cargarCuentasMXN(true);
+
+                        $('#cuentaLabel').text('Cuenta bancaria de cobro (MXN)');
 
                         $campos.html(`
 

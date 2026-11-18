@@ -1,9 +1,13 @@
 <?php
 require_once __DIR__ . '/src/config/session.php';
 
-// Si ya está logueado, redirigir al dashboard
+// Si ya está logueado, redirigir según rol
 if (isset($_SESSION['usuario_id'])) {
-  header('Location: index.php');
+  if (($_SESSION['usuario_rol'] ?? '') === 'promotor') {
+    header('Location: mi-cuenta.php');
+  } else {
+    header('Location: index.php');
+  }
   exit;
 }
 
@@ -40,11 +44,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $pdo = getPDO();
 
         // Buscar usuario por email
-        $stmt = $pdo->prepare("SELECT id, nombre, email, password, rol, two_fa_enabled FROM usuarios WHERE email = ? AND activo = 1");
+        $stmt = $pdo->prepare("SELECT id, nombre, email, password, rol, two_fa_enabled, promotor_id FROM usuarios WHERE email = ? AND activo = 1");
         $stmt->execute([$email]);
         $usuario = $stmt->fetch();
 
         if ($usuario && password_verify($password, $usuario['password'])) {
+          // Si es promotor, validar que su registro de promotor siga activo y resolver vínculo
+          $promotorId = isset($usuario['promotor_id']) && $usuario['promotor_id'] ? (int)$usuario['promotor_id'] : null;
+          if (($usuario['rol'] ?? '') === 'promotor') {
+            if (!$promotorId) {
+              $error = 'Tu cuenta de promotor no está vinculada. Contacta al administrador.';
+              Logger::warning('login_failed_unlinked_promotor', ['email' => $email, 'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown']);
+            } else {
+              $stmtP = $pdo->prepare("SELECT id, activo FROM promotores WHERE id = ?");
+              $stmtP->execute([$promotorId]);
+              $prom = $stmtP->fetch();
+              if (!$prom || (int)($prom['activo'] ?? 0) !== 1) {
+                $error = 'Tu cuenta de promotor está inactiva. Contacta al administrador.';
+                Logger::warning('login_failed_inactive_promotor', ['email' => $email, 'ip' => $_SERVER['REMOTE_ADDR'] ?? 'unknown']);
+              }
+            }
+          }
+          if (!$error) {
           // Login exitoso - Limpiar rate limit
           RateLimiter::clear($rateLimitKey);
 
@@ -96,6 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['temp_usuario_nombre'] = $usuario['nombre'];
             $_SESSION['temp_usuario_email'] = $usuario['email'];
             $_SESSION['temp_usuario_rol'] = $usuario['rol'];
+            $_SESSION['temp_promotor_id'] = $promotorId;
             $_SESSION['2fa_pending'] = true;
             $_SESSION['2fa_start_time'] = time();
 
@@ -108,13 +130,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $_SESSION['usuario_nombre'] = $usuario['nombre'];
           $_SESSION['usuario_rol'] = $usuario['rol'];
           $_SESSION['usuario_email'] = $usuario['email'];
+          if ($promotorId) {
+            $_SESSION['promotor_id'] = $promotorId;
+          } else {
+            unset($_SESSION['promotor_id']);
+          }
           $_SESSION['LAST_ACTIVITY'] = time();
 
           // Registrar auditoría de login
           registrarLogin($pdo, $usuario['id'], $usuario['nombre']);
 
-          header('Location: index.php');
+          if (($usuario['rol'] ?? '') === 'promotor') {
+            header('Location: mi-cuenta.php');
+          } else {
+            header('Location: index.php');
+          }
           exit;
+          }
         } else {
           // Login fallido - Incrementar contador
           RateLimiter::hit($rateLimitKey);

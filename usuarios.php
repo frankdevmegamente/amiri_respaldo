@@ -234,24 +234,37 @@ $currentUserId = (int)($_SESSION['usuario_id'] ?? 0);
                             <input type="hidden" id="id" name="id">
                             <div class="mb-3">
                                 <label class="form-label"><i class="ti ti-id-badge"></i> Nombre</label>
-                                <input type="text" class="form-control" name="nombre" required>
+                                <input type="text" class="form-control" name="nombre" id="inputNombre" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label"><i class="ti ti-mail"></i> Email</label>
-                                <input type="email" class="form-control" name="email" required>
+                                <input type="email" class="form-control" name="email" id="inputEmail" required>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label" id="labelPassword"><i class="ti ti-lock"></i> Contraseña</label>
-                                <input type="password" class="form-control" name="password" id="inputPassword" placeholder="Contraseña (requerida)">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" name="password" id="inputPassword" placeholder="Contraseña (requerida)">
+                                    <button type="button" class="btn btn-outline-secondary" id="btnGenPass" title="Generar contraseña fácil"><i class="ti ti-refresh"></i></button>
+                                    <button type="button" class="btn btn-outline-secondary" id="btnTogglePass" title="Mostrar/ocultar"><i class="ti ti-eye"></i></button>
+                                </div>
+                                <small class="text-muted" id="passHint">Se muestra visible para poder dictársela al promotor.</small>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label"><i class="ti ti-shield"></i> Rol</label>
-                                <select class="form-select" name="rol" required>
+                                <select class="form-select" name="rol" id="selectRol" required>
                                     <option value="" selected disabled>Selecciona una opción</option>
                                     <option value="admin">Admin</option>
                                     <option value="prestamista">Prestamista</option>
                                     <option value="usuario">Usuario</option>
+                                    <option value="promotor">Promotor</option>
                                 </select>
+                            </div>
+                            <div class="mb-3" id="groupPromotor" style="display:none;">
+                                <label class="form-label"><i class="ti ti-user-plus"></i> Promotor vinculado</label>
+                                <select class="form-select" name="promotor_id" id="selectPromotor">
+                                    <option value="">Selecciona promotor...</option>
+                                </select>
+                                <small class="text-muted">El usuario entrará con su email y solo verá su propia cuenta.</small>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -291,17 +304,76 @@ $currentUserId = (int)($_SESSION['usuario_id'] ?? 0);
                     $('#kpiTotal').text(data.total);
                     $('#kpiAdmins').text(data.admins);
                     $('#kpiPrestamistas').text(data.prestamistas);
-                    $('#kpiUsuarios').text(data.usuarios);
+                    $('#kpiUsuarios').text((data.usuarios || 0) + (data.promotores || 0));
                 }).fail(function() {
                     $('#kpiTotal').text('Error');
                 });
             }
 
+            let promotoresCache = [];
+
+            function passFacil(nombre) {
+                let base = (nombre || 'Amiri').split(' ')[0] || 'Amiri';
+                base = base.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z]/g, '');
+                if (!base) base = 'Amiri';
+                base = base.charAt(0).toUpperCase() + base.slice(1).toLowerCase();
+                return base + '123*';
+            }
+
+            function cargarPromotores(selectedId) {
+                $.get('api/promotores.php', function(data) {
+                    promotoresCache = (data || []).filter(function(p) { return p.nombre !== 'AMIRI DIRECTO'; });
+                    const sel = $('#selectPromotor');
+                    sel.empty().append('<option value="">Selecciona promotor...</option>');
+                    promotoresCache.forEach(function(p) {
+                        sel.append('<option value="' + p.id + '" data-email="' + (p.email || '') + '" data-nombre="' + (p.nombre || '').replace(/"/g, '&quot;') + '">' + p.nombre + ' (' + (p.email || 'sin email') + ')</option>');
+                    });
+                    if (selectedId) sel.val(String(selectedId));
+                });
+            }
+
+            // Al elegir promotor: autocompletar nombre + correo y sugerir contraseña fácil
+            $('#selectPromotor').on('change', function() {
+                const opt = $(this).find('option:selected');
+                const email = opt.data('email') || '';
+                const nombre = opt.data('nombre') || '';
+                const esNuevo = !$('#id').val();
+                if (nombre && ($('#inputNombre').val().trim() === '' || esNuevo)) {
+                    $('#inputNombre').val(nombre);
+                }
+                if (email) {
+                    $('#inputEmail').val(email);
+                }
+                if (esNuevo && $('#inputPassword').val().trim() === '') {
+                    $('#inputPassword').val(passFacil(nombre));
+                }
+            });
+
+            $('#btnGenPass').on('click', function() {
+                const nombre = $('#inputNombre').val() || $('#selectPromotor option:selected').data('nombre') || 'Amiri';
+                $('#inputPassword').val(passFacil(nombre)).attr('type', 'text');
+                $('#btnTogglePass').html('<i class="ti ti-eye-off"></i>');
+            });
+
+            $('#btnTogglePass').on('click', function() {
+                const inp = $('#inputPassword');
+                const show = inp.attr('type') === 'password';
+                inp.attr('type', show ? 'text' : 'password');
+                $(this).html(show ? '<i class="ti ti-eye-off"></i>' : '<i class="ti ti-eye"></i>');
+            });
+
+            $('#selectRol').on('change', function() {
+                const esProm = $(this).val() === 'promotor';
+                $('#groupPromotor').toggle(esProm);
+                if (esProm) cargarPromotores($('#selectPromotor').val());
+            });
+
             // ─── DataTable ───────────────────────────────
             const badgeRol = {
                 'admin': '<span class="badge bg-danger bg-opacity-10 text-danger border-0">Admin</span>',
                 'prestamista': '<span class="badge bg-warning bg-opacity-10 text-warning border-0">Prestamista</span>',
-                'usuario': '<span class="badge bg-info bg-opacity-10 text-info border-0">Usuario</span>'
+                'usuario': '<span class="badge bg-info bg-opacity-10 text-info border-0">Usuario</span>',
+                'promotor': '<span class="badge bg-success bg-opacity-10 text-success border-0">Promotor</span>'
             };
 
             const tabla = $('#tablaUsuarios').DataTable({
@@ -357,6 +429,8 @@ $currentUserId = (int)($_SESSION['usuario_id'] ?? 0);
             $('button[data-bs-target="#modalUsuario"]').on('click', function() {
                 $('#formUsuario')[0].reset();
                 $('#id').val('');
+                $('#groupPromotor').hide();
+                $('#selectPromotor').empty().append('<option value="">Selecciona promotor...</option>');
                 $('#modalTitle').html('<i class="ti ti-user-plus"></i> Nuevo Usuario');
                 $('#labelPassword').text('Contraseña');
                 $('#inputPassword').prop('required', true).attr('placeholder', 'Contraseña (requerida)');
@@ -365,6 +439,9 @@ $currentUserId = (int)($_SESSION['usuario_id'] ?? 0);
             $('#formUsuario').on('submit', function(e) {
                 e.preventDefault();
                 const formData = new FormData(this);
+                const esNuevoPromotor = !$('#id').val() && $('#selectRol').val() === 'promotor';
+                const credEmail = $('#inputEmail').val();
+                const credPass = $('#inputPassword').val();
                 $.ajax({
                     url: 'api/usuarios.php',
                     method: 'POST',
@@ -375,7 +452,11 @@ $currentUserId = (int)($_SESSION['usuario_id'] ?? 0);
                         $('#modalUsuario').modal('hide');
                         tabla.ajax.reload();
                         cargarResumen();
-                        showToast('Usuario guardado correctamente', 'success');
+                        if (esNuevoPromotor && credPass) {
+                            showToast('Acceso creado. Email: ' + credEmail + ' | Contraseña: ' + credPass, 'success');
+                        } else {
+                            showToast('Usuario guardado correctamente', 'success');
+                        }
                     },
                     error: function(xhr) {
                         let message = 'Error al guardar el usuario';
@@ -393,6 +474,12 @@ $currentUserId = (int)($_SESSION['usuario_id'] ?? 0);
                     $('input[name="nombre"]').val(data.nombre);
                     $('input[name="email"]').val(data.email);
                     $('select[name="rol"]').val(data.rol);
+                    if (data.rol === 'promotor') {
+                        $('#groupPromotor').show();
+                        cargarPromotores(data.promotor_id);
+                    } else {
+                        $('#groupPromotor').hide();
+                    }
                     $('#modalTitle').html('<i class="ti ti-pencil"></i> Editando Usuario');
                     $('#labelPassword').text('Nueva contraseña');
                     $('#inputPassword').prop('required', false).attr('placeholder', 'Dejar vacío para no cambiar');

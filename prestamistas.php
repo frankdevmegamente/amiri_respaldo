@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/src/config/session.php';
-if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_rol'] !== 'admin') { header('Location: login.php'); exit; }
+if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_rol'] ?? '', ['admin','usuario'])) { header('Location: login.php'); exit; }
 $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 ?>
 <!DOCTYPE html>

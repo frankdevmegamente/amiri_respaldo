@@ -2,9 +2,15 @@
 
 require_once __DIR__ . '/../src/config/session.php';
 
+require_once __DIR__ . '/../src/config/api-middleware.php';
+
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_rol'] !== 'admin') {
+$esAdmin = (($_SESSION['usuario_rol'] ?? '') === 'admin');
+$esPromotor = (($_SESSION['usuario_rol'] ?? '') === 'promotor');
+$esUsuario = (($_SESSION['usuario_rol'] ?? '') === 'usuario');
+
+if (!isset($_SESSION['usuario_id']) || (!$esAdmin && !$esPromotor && !$esUsuario)) {
 
     http_response_code(401);
 
@@ -12,6 +18,19 @@ if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_rol'] !== 'admin') {
 
     exit;
 
+}
+
+if ($esUsuario && ($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
+    http_response_code(403);
+    echo json_encode(['error' => 'Solo lectura']);
+    exit;
+}
+
+$ownPromotorId = $esPromotor ? currentPromotorId() : null;
+if ($esPromotor && !$ownPromotorId) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Cuenta de promotor no vinculada']);
+    exit;
 }
 
 
@@ -35,6 +54,11 @@ $pdo = getPDO();
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     if (isset($_GET['resumen'])) {
+        if ($esPromotor) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Acceso denegado']);
+            exit;
+        }
         $stmt = $pdo->query("
             SELECT
                 COUNT(*) AS total,
@@ -55,6 +79,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     if (isset($_GET['id'])) {
 
+        // Un promotor solo puede ver su propio registro
+        if ($esPromotor && (int)$_GET['id'] !== (int)$ownPromotorId) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Acceso denegado']);
+            exit;
+        }
+
         $stmt = $pdo->prepare("
 
             SELECT p.*, c.nombre AS cuenta_nombre, c.saldo_actual 
@@ -72,6 +103,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         echo json_encode($stmt->fetch());
 
     } else {
+
+        // Un promotor no puede listar a otros promotores
+        if ($esPromotor) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Acceso denegado']);
+            exit;
+        }
 
         // Si se solicita solo activos
 
@@ -115,9 +153,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 }
 
-// POST: Crear, actualizar o eliminar
+// POST: Crear, actualizar o eliminar (solo admin)
 
 elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    if (!$esAdmin) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Solo el administrador puede modificar promotores']);
+        exit;
+    }
 
     // Detectar si es una solicitud DELETE simulada (viene como JSON)
 
@@ -230,6 +274,18 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("UPDATE promotores SET nombre=?, telefono=?, email=?, activo=? WHERE id=?");
 
             $stmt->execute([$nombre, $telefono, $email, $activo, $id]);
+            $promotor_id = $id;
+
+            // Vincular usuario existente si se indicó
+            $vincular_usuario_id = filter_var($_POST['vincular_usuario_id'] ?? null, FILTER_VALIDATE_INT);
+            if ($vincular_usuario_id) {
+                $chk = $pdo->prepare("SELECT id, promotor_id FROM usuarios WHERE id = ? AND activo = 1");
+                $chk->execute([$vincular_usuario_id]);
+                $u = $chk->fetch();
+                if ($u && empty($u['promotor_id'])) {
+                    $pdo->prepare("UPDATE usuarios SET promotor_id = ?, rol = 'promotor' WHERE id = ?")->execute([$promotor_id, $vincular_usuario_id]);
+                }
+            }
 
         } else {
 
@@ -269,7 +325,24 @@ elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         }
 
-        echo json_encode(['success' => true]);
+        // Crear acceso de usuario para el promotor (opcional, solo admin)
+        $crear_usuario = !empty($_POST['crear_usuario']);
+        $usuario_email = trim($_POST['usuario_email'] ?? '');
+        $usuario_password = $_POST['usuario_password'] ?? '';
+        if ($crear_usuario && $usuario_email !== '' && $usuario_password !== '') {
+            $chk = $pdo->prepare("SELECT id FROM usuarios WHERE email = ? AND activo = 1");
+            $chk->execute([$usuario_email]);
+            if (!$chk->fetch()) {
+                $chk2 = $pdo->prepare("SELECT id FROM usuarios WHERE promotor_id = ? AND activo = 1");
+                $chk2->execute([$promotor_id]);
+                if (!$chk2->fetch()) {
+                    $pdo->prepare("INSERT INTO usuarios (nombre, email, password, rol, promotor_id) VALUES (?, ?, ?, 'promotor', ?)")
+                        ->execute([$nombre, $usuario_email, password_hash($usuario_password, PASSWORD_BCRYPT), $promotor_id]);
+                }
+            }
+        }
+
+        echo json_encode(['success' => true, 'promotor_id' => $promotor_id ?? null]);
 
     }
 

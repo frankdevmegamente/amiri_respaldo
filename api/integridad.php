@@ -237,7 +237,7 @@ function testEcuacionContable($pdo) {
     $check = $pdo->query("SHOW TABLES LIKE 'prestamos_otorgados'")->fetchColumn();
     $actPrestOtor = 0;
     if ($check) {
-        $actPrestOtor = (float)$pdo->query("SELECT COALESCE(SUM(monto_total - monto_pagado),0) FROM prestamos_otorgados WHERE estado IN ('pendiente','parcial') AND activo = 1")->fetchColumn();
+        $actPrestOtor = (float)$pdo->query("SELECT COALESCE(SUM(COALESCE(monto_total_con_interes, monto_total) - monto_pagado),0) FROM prestamos_otorgados WHERE estado IN ('pendiente','parcial') AND activo = 1")->fetchColumn();
     }
     $totalActivos = $actMxn + $actDiv + $actPrestOtor;
     $capCuentas = (float)$pdo->query("SELECT COALESCE(SUM(saldo_actual),0) FROM cuentas WHERE activo=1 AND tipo_cuenta = 3")->fetchColumn();
@@ -364,6 +364,50 @@ function testMovimientosAnomalos($pdo) {
     return $res;
 }
 
+function testConsumosHuerfanos($pdo) {
+    $res = ['num' => 10, 'nombre' => 'Consumos FIFO vs ventas vigentes y saldos', 'status' => 'ok', 'detalles' => [], 'msg' => ''];
+    // 1. Consumos atados a ventas que ya no están vigentes. Desde el parche de anulación
+    // (restaurarConsumosFIFO) ya no deben generarse nuevos; los históricos se listan
+    // como advertencia para revisión (la mayoría están compensados y no tocan la ecuación).
+    $huerfanos = $pdo->query("
+        SELECT c.id, c.movimiento_id, c.inventario_id, c.cantidad_consumida, m.grupo_id, m.estado, m.activo, m.descripcion
+        FROM consumos_inventario c
+        LEFT JOIN movimientos m ON m.id = c.movimiento_id
+        WHERE m.id IS NULL OR m.estado <> 'activo' OR m.activo <> 1
+        ORDER BY c.id DESC LIMIT 20
+    ")->fetchAll();
+    foreach ($huerfanos as $h) {
+        $res['detalles'][] = ['error' => "Consumo histórico #{$h['id']} ({$h['cantidad_consumida']} del lote #{$h['inventario_id']}) atado a venta #{$h['movimiento_id']} no vigente (grupo #{$h['grupo_id']}, estado=" . ($h['estado'] ?? 'N/A') . "): " . ($h['descripcion'] ?? ''), 'tipo' => 'warning'];
+    }
+    // 2. Brecha saldo vs inventario por cuenta de divisas: detector directo del faltante
+    // en Flujo (ej. grupo anulaado #1790197398287 → -$242,672.22 en cuenta #51). Esto sí es error.
+    $cuentas = $pdo->query("
+        SELECT c.id, c.nombre, c.tipo_moneda, c.saldo_actual,
+               COALESCE((SELECT SUM(cantidad_restante) FROM inventario_monedas im WHERE im.cuenta_id = c.id AND im.activo = 1), 0) AS inv_cant
+        FROM cuentas c
+        WHERE c.activo = 1 AND c.tipo_cuenta IN (1,2) AND c.tipo_moneda IN ('USD','USDT')
+    ")->fetchAll();
+    $brechas = 0;
+    foreach ($cuentas as $c) {
+        $brecha = round((float)$c['saldo_actual'] - (float)$c['inv_cant'], 2);
+        if (abs($brecha) > 0.01) {
+            $brechas++;
+            $res['detalles'][] = ['error' => "Cuenta #{$c['id']} ({$c['nombre']}, {$c['tipo_moneda']}): saldo=" . number_format((float)$c['saldo_actual'], 2) . " vs inventario=" . number_format((float)$c['inv_cant'], 2) . " → brecha=" . number_format($brecha, 2)];
+        }
+    }
+    if ($brechas > 0) {
+        $res['status'] = 'error';
+        $res['msg'] = "$brechas cuenta(s) con brecha saldo-vs-inventario (posible faltante en Flujo)";
+    } elseif (!empty($huerfanos)) {
+        $totalHuerfanos = (int)$pdo->query("SELECT COUNT(*) FROM consumos_inventario c LEFT JOIN movimientos m ON m.id = c.movimiento_id WHERE m.id IS NULL OR m.estado <> 'activo' OR m.activo <> 1")->fetchColumn();
+        $res['status'] = 'warning';
+        $res['msg'] = $totalHuerfanos . ' consumo(s) históricos huérfanos (compensados, solo revisión)';
+    } else {
+        $res['msg'] = 'Sin consumos huérfanos y saldos cuadran con inventario';
+    }
+    return $res;
+}
+
 try {
     $tests = [
         testBalanceCuentas($pdo),
@@ -375,6 +419,7 @@ try {
         testEcuacionContable($pdo),
         testIntegridadReferencial($pdo),
         testMovimientosAnomalos($pdo),
+        testConsumosHuerfanos($pdo),
     ];
 
     $errores = 0;

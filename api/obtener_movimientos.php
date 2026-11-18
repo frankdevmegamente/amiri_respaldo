@@ -2,11 +2,24 @@
 require_once __DIR__ . '/../src/config/api-middleware.php'; // Usa el de dashboard.php
 require_once __DIR__ . '/../src/config/db.php';
 
+if (!in_array($_SESSION['usuario_rol'] ?? '', ['admin','promotor','usuario'])) { jsonError('Acceso denegado', 403); }
+
 if (ob_get_length()) ob_clean(); // Limpia cualquier espacio en blanco accidental
 header('Content-Type: application/json; charset=utf-8');
 
 $tipo = $_GET['tipo'] ?? '';
 $id = $_GET['id'] ?? '';
+
+// Un promotor solo puede ver sus propios movimientos de promotor
+if (($_SESSION['usuario_rol'] ?? '') === 'promotor') {
+    $own = currentPromotorId();
+    if (!$own) {
+        echo json_encode([]);
+        exit;
+    }
+    $tipo = 'promotor';
+    $id = $own;
+}
 
 $columnas = ['promotor' => 'promotor_id', 'cliente' => 'cliente_id', 'proveedor' => 'proveedor_id', 'prestamista' => 'prestamista_id'];
 

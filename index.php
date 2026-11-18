@@ -10,6 +10,15 @@ if (!isset($_SESSION['usuario_id'])) {
 
 }
 
+// Los promotores entran directo a su cuenta
+if (($_SESSION['usuario_rol'] ?? '') === 'promotor') {
+
+  header('Location: mi-cuenta.php');
+
+  exit;
+
+}
+
 $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
 ?>

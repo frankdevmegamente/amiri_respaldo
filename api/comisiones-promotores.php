@@ -1,7 +1,21 @@
 <?php
+require_once __DIR__ . '/../src/config/session.php';
+require_once __DIR__ . '/../src/config/api-middleware.php';
 header('Content-Type: application/json');
 require_once __DIR__ . '/../src/config/db.php';
 require_once __DIR__ . '/../src/config/auditoria.php';
+
+// Solo admin o promotor autenticado (solo lectura para promotor)
+if (!in_array($_SESSION['usuario_rol'] ?? '', ['admin','promotor','usuario'])) { jsonError('Acceso denegado', 403); }
+
+if (($_SESSION['usuario_rol'] ?? '') === 'usuario' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
+    jsonError('Solo lectura', 403);
+}
+$esPromotor = (($_SESSION['usuario_rol'] ?? '') === 'promotor');
+$ownPromotorId = $esPromotor ? currentPromotorId() : null;
+if ($esPromotor && !$ownPromotorId) {
+    jsonError('Cuenta de promotor no vinculada', 403);
+}
 
 /**
  * Genera un PDF con el historial de comisiones del promotor
@@ -172,6 +186,11 @@ try {
     if ($method === 'GET') {
         $promotor_id = filter_var($_GET['promotor_id'] ?? null, FILTER_VALIDATE_INT);
 
+        // Un promotor solo puede consultar su propia cuenta (ignorar id ajeno)
+        if ($esPromotor) {
+            $promotor_id = $ownPromotorId;
+        }
+
         if (!$promotor_id) {
             http_response_code(400); echo json_encode(['error' => 'ID de promotor requerido']); exit;
         }
@@ -269,8 +288,11 @@ try {
         exit;
     }
 
-    // --- PUT: REGISTRAR PAGO ---
+    // --- PUT: REGISTRAR PAGO (solo admin) ---
     if ($method === 'PUT') {
+        if ($esPromotor) {
+            http_response_code(403); echo json_encode(['error' => 'No tienes permiso para registrar pagos']); exit;
+        }
         $input = json_decode(file_get_contents('php://input'), true) ?: [];
         $promotor_id = (int) ($input['promotor_id'] ?? 0);
         $monto = (float) ($input['monto_a_pagar'] ?? 0);

@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/src/config/session.php';
 
-if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_rol'] !== 'admin') {
+if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_rol'] ?? '', ['admin','usuario'])) {
 
     header('Location: login.php');
 
@@ -381,6 +381,27 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
                             </div>
 
+                            <hr>
+                            <div class="form-check mb-2">
+                                <input type="checkbox" class="form-check-input" id="crear_usuario" name="crear_usuario" value="1">
+                                <label class="form-check-label fw-semibold" for="crear_usuario">Crear acceso al sistema (rol promotor)</label>
+                            </div>
+                            <div id="accesoPromotorFields" style="display:none;">
+                                <div class="mb-3">
+                                    <label class="form-label">Email de acceso</label>
+                                    <input type="email" class="form-control no-capitalize" name="usuario_email" id="usuario_email" placeholder="promotor@email.com">
+                                    <small class="text-muted">El promotor entrará en el mismo login con este email.</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Contraseña temporal</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="usuario_password" id="usuario_password" placeholder="Mínimo 6 caracteres">
+                                        <button type="button" class="btn btn-outline-secondary" id="btnGenPassProm" title="Generar contraseña fácil"><i class="ti ti-refresh"></i></button>
+                                    </div>
+                                    <small class="text-muted">Fácil de dictar, ej. Nombre123*. Se muestra visible para copiarla.</small>
+                                </div>
+                            </div>
+
                         </div>
 
                         <div class="modal-footer">
@@ -677,11 +698,34 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                     // Asegurar checkbox activo por defecto
 
                     $('#activo').prop('checked', true);
+                    $('#accesoPromotorFields').hide();
 
                 }
 
                 // Si está editando, no limpiar nada
 
+            });
+
+            $('#crear_usuario').on('change', function() {
+                $('#accesoPromotorFields').toggle($(this).is(':checked'));
+                if ($(this).is(':checked') && !$('input[name="usuario_email"]').val()) {
+                    $('input[name="usuario_email"]').val($('input[name="email"]').val());
+                }
+                if ($(this).is(':checked') && !$('input[name="usuario_password"]').val()) {
+                    const n = $('input[name="nombre"]').val().split(' ')[0] || 'Amiri';
+                    const base = n.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z]/g, '') || 'Amiri';
+                    $('input[name="usuario_password"]').val(base.charAt(0).toUpperCase() + base.slice(1).toLowerCase() + '123*');
+                }
+            });
+            $('#btnGenPassProm').on('click', function() {
+                const n = $('input[name="nombre"]').val().split(' ')[0] || 'Amiri';
+                const base = n.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z]/g, '') || 'Amiri';
+                $('input[name="usuario_password"]').val(base.charAt(0).toUpperCase() + base.slice(1).toLowerCase() + '123*');
+            });
+            $('input[name="email"]').on('input', function() {
+                if ($('#crear_usuario').is(':checked') && !$('input[name="usuario_email"]').val()) {
+                    $('input[name="usuario_email"]').val($(this).val());
+                }
             });
 
 

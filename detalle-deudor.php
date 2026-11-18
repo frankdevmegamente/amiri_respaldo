@@ -2,7 +2,7 @@
 require_once __DIR__ . '/src/config/session.php';
 require_once __DIR__ . '/src/config/db.php';
 
-if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_rol'] !== 'admin') {
+if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_rol'] ?? '', ['admin','usuario'])) {
     header('Location: login.php');
     exit;
 }
@@ -16,23 +16,27 @@ if (!$nombre) {
 }
 
 $stmt = $pdo->prepare("
-    SELECT p.*, c.nombre as cuenta_nombre 
+    SELECT p.*, c.nombre as cuenta_nombre, COALESCE(p.monto_total_con_interes, p.monto_total,0) as total_con_interes_calc
     FROM prestamos_otorgados p 
     LEFT JOIN cuentas c ON p.cuenta_id = c.id 
-    WHERE p.persona_nombre = ? AND p.activo = 1 
+    LEFT JOIN deudores d ON d.id = p.deudor_id
+    WHERE (p.persona_nombre = ? OR d.nombre = ?) AND p.activo = 1 
     ORDER BY p.fecha_prestamo DESC
 ");
-$stmt->execute([$nombre]);
+$stmt->execute([$nombre, $nombre]);
 $prestamos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $total_prestado = 0;
+$total_con_interes = 0;
 $total_pagado = 0;
 $total_pendiente = 0;
 foreach ($prestamos as $p) {
-    $total_prestado += $p['monto_total'];
-    $total_pagado += $p['monto_pagado'];
+    $total = floatval($p['monto_total_con_interes'] ?: $p['monto_total']);
+    $total_prestado += floatval($p['monto_total']);
+    $total_con_interes += $total;
+    $total_pagado += floatval($p['monto_pagado']);
 }
-$total_pendiente = $total_prestado - $total_pagado;
+$total_pendiente = $total_con_interes - $total_pagado;
 
 $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 ?>
@@ -87,7 +91,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                         <div>
                                             <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Total Prestado</p>
                                             <h3 class="mb-0 text-warning fw-bold">$<?= number_format($total_prestado, 2) ?></h3>
-                                            <small class="text-muted">MXN</small>
+                                            <small class="text-muted">+ $<?= number_format($total_con_interes - $total_prestado, 2) ?> interés → $<?= number_format($total_con_interes, 2) ?> MXN</small>
                                         </div>
                                     </div>
                                 </div>
@@ -152,6 +156,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                                 <thead>
                                                     <tr>
                                                         <th>Fecha</th>
+                                                        <th>Concepto</th>
                                                         <th>Monto Total</th>
                                                         <th>Pagado</th>
                                                         <th>Pendiente</th>
@@ -162,19 +167,21 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                                 </thead>
                                                 <tbody>
                                                     <?php foreach ($prestamos as $p): 
-                                                        $pendiente = $p['monto_total'] - $p['monto_pagado'];
+                                                        $total = floatval($p['monto_total_con_interes'] ?: $p['monto_total']);
+                                                        $pendiente = $total - floatval($p['monto_pagado']);
                                                         $badge = $p['estado'] === 'pagado' ? 'success' : ($p['estado'] === 'parcial' ? 'warning' : 'danger');
                                                     ?>
                                                         <tr>
-                                                            <td><?= date('d/m/Y', strtotime($p['fecha_prestamo'])) ?></td>
-                                                            <td class="fw-bold">$<?= number_format($p['monto_total'], 2) ?></td>
+                                                            <td><?= date('d/m/Y', strtotime($p['fecha_prestamo'])) ?><?= $p['fecha_vencimiento'] ? '<br><small class="text-muted">Vence '.date('d/m/Y', strtotime($p['fecha_vencimiento'])).'</small>' : '' ?><?= $p['tasa_porcentaje']>0 ? '<br><small class="text-primary">'.$p['tasa_porcentaje'].'% '.$p['tasa_periodo'].'</small>' : '' ?></td>
+                                                            <td><?= !empty($p['concepto']) ? htmlspecialchars($p['concepto']) : '<span class="text-muted">Sin concepto</span>' ?></td>
+                                                            <td class="fw-bold">$<?= number_format($p['monto_total'], 2) ?><br><small class="text-primary">+$<?= number_format(floatval($p['monto_interes']),2) ?> → $<?= number_format($total,2) ?></small></td>
                                                             <td class="text-success">$<?= number_format($p['monto_pagado'], 2) ?></td>
                                                             <td class="text-danger fw-bold">$<?= number_format($pendiente, 2) ?></td>
                                                             <td><span class="badge bg-<?= $badge ?> bg-opacity-10 text-<?= $badge ?> border-0"><?= ucfirst($p['estado']) ?></span></td>
                                                             <td><?= htmlspecialchars($p['cuenta_nombre'] ?? 'N/A') ?></td>
                                                             <td>
                                                                 <?php if ($p['estado'] !== 'pagado'): ?>
-                                                                    <button class="btn btn-sm btn-success btn-cobrar" data-id="<?= $p['id'] ?>" data-nombre="<?= htmlspecialchars($nombre) ?>" data-pendiente="<?= $pendiente ?>">
+                                                                    <button class="btn btn-sm btn-success btn-cobrar" data-id="<?= $p['id'] ?>" data-nombre="<?= htmlspecialchars($nombre) ?>" data-pendiente="<?= $pendiente ?>" data-total="<?= $total ?>">
                                                                         <i class="ti ti-cash"></i> Cobrar
                                                                     </button>
                                                                 <?php else: ?>
@@ -295,8 +302,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 let restante = monto;
 
                 prestamos.forEach(function(p) {
-                    if (p.persona_nombre === persona && p.estado !== 'pagado') {
-                        let pendiente = p.monto_total - p.monto_pagado;
+                    const nom = p.deudor_nombre || p.persona_nombre;
+                    if (nom === persona && p.estado !== 'pagado') {
+                        const total = parseFloat(p.monto_total_con_interes || p.monto_total);
+                        let pendiente = total - parseFloat(p.monto_pagado);
                         let abono = Math.min(pendiente, restante);
                         if (abono > 0) {
                             pagos.push({ id: p.id, abono: abono });

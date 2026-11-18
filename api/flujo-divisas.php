@@ -706,142 +706,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 
 
-/* ===== DELETE (Reversión con trazabilidad) ===== */
-
+/* ===== DELETE (delegado a servicio genérico) ===== */
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-
     parse_str(file_get_contents('php://input'), $data);
-
-    $grupo_id = $data['grupo_id'] ?? null;
-
+    // Soporta JSON también
+    $raw = file_get_contents('php://input');
+    $j = json_decode($raw, true);
+    if (is_array($j) && isset($j['grupo_id'])) $data['grupo_id'] = $j['grupo_id'];
+    $grupo_id = $data['grupo_id'] ?? $_GET['grupo_id'] ?? null;
     if (!$grupo_id) {
         http_response_code(400);
         echo json_encode(['error' => 'grupo_id es requerido']);
         exit;
     }
-
     try {
-        $pdo->beginTransaction();
-
-        // Obtener movimientos del grupo para revertir saldos
-        $stmt = $pdo->prepare("SELECT * FROM movimientos WHERE grupo_id = ? AND activo = 1");
-        $stmt->execute([$grupo_id]);
-        $movimientos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        if (empty($movimientos)) {
-            throw new Exception('No se encontraron movimientos activos para este grupo');
+        require_once __DIR__ . '/../src/services/MovimientoCorreccionService.php';
+        // validarGrupoNoCerrado lo hace el servicio, pero pre-validamos para mensaje claro
+        $svc = new MovimientoCorreccionService($pdo);
+        $res = $svc->anularPorGrupo((int)$grupo_id, $data['motivo'] ?? "Anulación divisas grupo #$grupo_id", $_SESSION['usuario_id'] ?? 1);
+        if (!$res['success']) {
+            http_response_code(400);
+            echo json_encode(['error' => $res['error']]);
+            exit;
         }
-
-        // Crear nuevo grupo para los movimientos reverso
-        $stmtMax = $pdo->query("SELECT COALESCE(MAX(grupo_id), 0) + 1 FROM movimientos");
-        $nuevo_grupo = intval($stmtMax->fetchColumn());
-        $reversos_creados = 0;
-
-        $primerMov = $movimientos[0];
-        $esCompra = in_array($primerMov['servicio_id'], [5, 6]); // 5=Compra USD, 6=Compra USDT
-
-        foreach ($movimientos as $mov) {
-            $monto_reverso = abs($mov['monto']);
-            $descripcion_reverso = 'REVERSO: ' . ($mov['descripcion'] ?? 'Movimiento #' . $mov['id']);
-
-            // 1. Crear movimiento reverso con cuentas invertidas y es_reverso=1
-            $stmtRev = $pdo->prepare("
-                INSERT INTO movimientos
-                (grupo_id, fecha, servicio_id, tipo, moneda, monto,
-                 cuenta_origen_id, cuenta_destino_id, cliente_id, promotor_id,
-                 proveedor_id, prestamista_id, paridad, descripcion,
-                 es_reverso, movimiento_original_id, estado, activo)
-                VALUES (?, CURDATE(), ?, 'ajuste', ?, ?,
-                        ?, ?, ?, ?,
-                        ?, ?, ?, ?,
-                        1, ?, 'activo', 1)
-            ");
-            $stmtRev->execute([
-                $nuevo_grupo, $mov['servicio_id'], $mov['moneda'], $monto_reverso,
-                $mov['cuenta_destino_id'], $mov['cuenta_origen_id'],
-                $mov['cliente_id'], $mov['promotor_id'],
-                $mov['proveedor_id'], $mov['prestamista_id'],
-                $mov['paridad'], $descripcion_reverso,
-                $mov['id']
-            ]);
-            $reverso_id = $pdo->lastInsertId();
-            $reversos_creados++;
-
-            // 2. Revertir saldos usando actualizarSaldoCuenta (respeta trigger)
-            $tipo = $mov['tipo'];
-            $moneda = $mov['moneda'];
-
-            // ── COMPRA (servicio 5/6) ──────────────────────────────────
-            // Caso 1: Entrada USD/USDT a wallet
-            if ($esCompra && $tipo === 'entrada' && $mov['cuenta_destino_id'] && in_array($moneda, ['USD', 'USDT'])) {
-                actualizarSaldoCuenta($pdo, $mov['cuenta_destino_id'], $monto_reverso, 'salida', $reverso_id, $descripcion_reverso);
-                // Desactivar lote FIFO creado por esta compra
-                $pdo->prepare("UPDATE inventario_monedas SET activo = 0 WHERE movimiento_id = ?")->execute([$mov['id']]);
-            }
-
-            // Caso 2: Salida USD/USDT a proveedor (compra a crédito)
-            if ($esCompra && $tipo === 'salida' && in_array($moneda, ['USD', 'USDT']) && $mov['cuenta_destino_id'] && $mov['proveedor_id']) {
-                actualizarSaldoCuenta($pdo, $mov['cuenta_destino_id'], $monto_reverso, 'salida', $reverso_id, $descripcion_reverso);
-                // Revertir valor_mxn adicional (no cubierto por actualizarSaldoCuenta)
-                $valorMxn = round($mov['monto'] * $mov['paridad'], 2);
-                $pdo->prepare("UPDATE cuentas SET valor_mxn = GREATEST(0, valor_mxn - ?) WHERE id = ?")
-                    ->execute([$valorMxn, $mov['cuenta_destino_id']]);
-            }
-
-            // Caso 3: Salida MXN por pago de contado (Compra)
-            if ($esCompra && $tipo === 'salida' && $moneda === 'MXN' && $mov['cuenta_origen_id']) {
-                actualizarSaldoCuenta($pdo, $mov['cuenta_origen_id'], $monto_reverso, 'entrada', $reverso_id, $descripcion_reverso);
-            }
-
-            // ── VENTA (servicio 2/3) ───────────────────────────────────
-            // Caso 4: Entrada MXN a cuenta empresa + restaurar FIFO
-            if (!$esCompra && $tipo === 'entrada' && $moneda === 'MXN' && $mov['cuenta_destino_id']) {
-                actualizarSaldoCuenta($pdo, $mov['cuenta_destino_id'], $monto_reverso, 'salida', $reverso_id, $descripcion_reverso);
-                // Restaurar inventario FIFO (consumos ligados a este movimiento MXN)
-                $stmtConsumos = $pdo->prepare("
-                    SELECT ci.inventario_id, ci.cantidad_consumida
-                    FROM consumos_inventario ci WHERE ci.movimiento_id = ?
-                ");
-                $stmtConsumos->execute([$mov['id']]);
-                foreach ($stmtConsumos->fetchAll(PDO::FETCH_ASSOC) as $consumo) {
-                    $pdo->prepare("UPDATE inventario_monedas SET cantidad_restante = cantidad_restante + ? WHERE id = ?")
-                        ->execute([$consumo['cantidad_consumida'], $consumo['inventario_id']]);
-                }
-                // Backward compat: cancelar deudas_clientes (modelo anterior)
-                $pdo->prepare("UPDATE deudas_clientes SET activo = 0 WHERE movimiento_venta_id = ? AND estado = 'pendiente'")
-                    ->execute([$mov['id']]);
-            }
-
-            // Caso 5: Salida USD/USDT de wallet
-            if (!$esCompra && $tipo === 'salida' && in_array($moneda, ['USD', 'USDT']) && $mov['cuenta_origen_id']) {
-                actualizarSaldoCuenta($pdo, $mov['cuenta_origen_id'], $monto_reverso, 'entrada', $reverso_id, $descripcion_reverso);
-            }
-
-            // Caso 6: Comisión (entrada a cuenta destino — Utilidad o Promotor)
-            if (!$esCompra && $tipo === 'comision' && $mov['cuenta_destino_id']) {
-                actualizarSaldoCuenta($pdo, $mov['cuenta_destino_id'], $monto_reverso, 'salida', $reverso_id, $descripcion_reverso);
-            }
-
-            // 3. Marcar movimiento original como anulado
-            $pdo->prepare("UPDATE movimientos SET estado = 'anulado', activo = 0 WHERE id = ?")->execute([$mov['id']]);
-        }
-
-        // Registrar auditoría
-        registrarAuditoria($pdo, [
-            'accion' => 'DELETE',
-            'modulo' => 'flujo_divisas',
-            'tabla' => 'movimientos',
-            'registro_id' => $grupo_id,
-            'descripcion' => "Reversión del grupo #$grupo_id ($reversos_creados movimientos)"
-        ]);
-
-        $pdo->commit();
-        echo json_encode(['success' => true, 'message' => "Grupo revertido correctamente ($reversos_creados reversos)"]);
-
+        echo json_encode(['success' => true, 'message' => $res['message'] ?? "Grupo #$grupo_id anulado", 'grupo_reverso' => $res['grupo_reverso'] ?? null]);
     } catch (Exception $e) {
-        if ($pdo->inTransaction()) {
-            $pdo->rollBack();
-        }
         http_response_code(500);
         echo json_encode(['error' => $e->getMessage()]);
     }

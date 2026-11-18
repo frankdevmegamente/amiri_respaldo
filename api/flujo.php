@@ -11,7 +11,11 @@ require_once __DIR__ . '/../src/config/helpers.php';
 
 initApi();
 
-requireAdmin();
+requireAuth(['admin', 'usuario']);
+
+if (($_SESSION['usuario_rol'] ?? '') === 'usuario' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
+    jsonError('Solo lectura', 403);
+}
 
 $pdo = getPDO();
 
@@ -394,9 +398,11 @@ try {
 
         ]);
 
-        actualizarSaldoCuenta($pdo, $origen_id, $monto, 'salida');
+        $movId = $pdo->lastInsertId();
 
-        actualizarSaldoCuenta($pdo, $destino_id, $monto, 'entrada');
+        actualizarSaldoCuenta($pdo, $origen_id, $monto, 'salida', $movId, 'Cambio de flujo - transferencia entre cuentas');
+
+        actualizarSaldoCuenta($pdo, $destino_id, $monto, 'entrada', $movId, 'Cambio de flujo - transferencia entre cuentas');
 
     } else if ($servicio === 'Retiro de Efectivo') {
 
@@ -458,9 +464,11 @@ try {
 
         ]);
 
-        actualizarSaldoCuenta($pdo, $cuenta_bancaria_id, $monto, 'salida');
+        $movId = $pdo->lastInsertId();
 
-        actualizarSaldoCuenta($pdo, $caja_efectivo_id, $monto, 'entrada');
+        actualizarSaldoCuenta($pdo, $cuenta_bancaria_id, $monto, 'salida', $movId, $descripcion);
+
+        actualizarSaldoCuenta($pdo, $caja_efectivo_id, $monto, 'entrada', $movId, $descripcion);
 
     } else {
 

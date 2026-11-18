@@ -2,7 +2,7 @@
 require_once __DIR__ . '/src/config/session.php';
 require_once __DIR__ . '/src/config/db.php';
 
-if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_rol'] !== 'admin') {
+if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_rol'] ?? '', ['admin','usuario'])) {
     header('Location: login.php');
     exit;
 }
@@ -30,7 +30,8 @@ if (!$prestamo) {
     die("Error: Préstamo no encontrado.");
 }
 
-$pendiente = $prestamo['monto_total'] - $prestamo['monto_pagado'];
+$total_con_interes = floatval($prestamo['monto_total_con_interes'] ?: $prestamo['monto_total']);
+$pendiente = $total_con_interes - floatval($prestamo['monto_pagado']);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -85,6 +86,8 @@ $pendiente = $prestamo['monto_total'] - $prestamo['monto_pagado'];
                                 <div class="card-body">
                                     <h6 class="text-muted mb-1">Monto Total</h6>
                                     <h3 class="mb-0 text-warning">$<?= number_format($prestamo['monto_total'], 2) ?> MXN</h3>
+                                    <small class="text-primary">+ $<?= number_format(floatval($prestamo['monto_interes']),2) ?> interés → $<?= number_format($total_con_interes,2) ?></small>
+                                    <?php if($prestamo['tasa_porcentaje']>0): ?><br><small class="text-muted"><?= $prestamo['tasa_porcentaje'] ?>% <?= $prestamo['tasa_periodo'] ?> x <?= $prestamo['plazo_valor'] ?> <?= $prestamo['plazo_unidad'] ?><?= $prestamo['fecha_vencimiento'] ? ' vence '.date('d/m/Y', strtotime($prestamo['fecha_vencimiento'])):'' ?></small><?php endif; ?>
                                 </div>
                             </div>
                         </div>

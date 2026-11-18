@@ -79,6 +79,67 @@ function requireAdmin() {
 
 
 /**
+ * Permite admin o promotor autenticado
+ *
+ * @return bool true si tiene acceso
+ */
+
+function requireAdminOrPromotor() {
+
+    return requireAuth(['admin', 'promotor']);
+
+}
+
+
+
+/**
+ * ID del promotor vinculado a la sesión actual (null si no es promotor)
+ */
+
+function currentPromotorId() {
+
+    if (($_SESSION['usuario_rol'] ?? '') !== 'promotor') {
+
+        return null;
+
+    }
+
+    $id = $_SESSION['promotor_id'] ?? null;
+
+    return $id ? (int)$id : null;
+
+}
+
+
+
+/**
+ * Valida que un promotor solo acceda a su propio registro.
+ * Admin pasa siempre. Promotor debe coincidir con su promotor_id.
+ */
+
+function requirePromotorSelf($requestedId) {
+
+    if (($_SESSION['usuario_rol'] ?? '') === 'admin') {
+
+        return true;
+
+    }
+
+    $own = currentPromotorId();
+
+    if (!$own || (int)$requestedId !== $own) {
+
+        jsonError('Acceso denegado: solo puedes ver tu propia cuenta', 403);
+
+    }
+
+    return true;
+
+}
+
+
+
+/**
 
  * Envía una respuesta JSON exitosa
 

@@ -24,6 +24,8 @@ require_once __DIR__ . '/../src/config/db.php';
 
 require_once __DIR__ . '/../src/config/auditoria.php';
 
+require_once __DIR__ . '/../src/config/helpers.php';
+
 require_once __DIR__ . '/../src/services/MovimientoCorreccionService.php';
 
 
@@ -310,9 +312,16 @@ try {
                         $cuentasMap[$cid]['ajuste'] += $tipoRev === 'entrada' ? $montoAbs : -$montoAbs;
                     }
 
-                    // Efecto en cuenta destino
+                    // Efecto en cuenta destino (adeudo proveedor s5/s6 a cuenta
+                    // tipo 6 se revierte con 'salida', ver MovimientoCorreccionService)
                     if (!empty($mov['cuenta_destino_id'])) {
-                        $tipoRev = ($mov['tipo'] === 'entrada' || $mov['tipo'] === 'traspaso' || $mov['tipo'] === 'comision') ? 'salida' : 'entrada';
+                        $esAdeudoProv = (($mov['tipo'] ?? '') === 'salida' && in_array((int)($mov['servicio_id'] ?? 0), [5, 6], true));
+                        if ($esAdeudoProv) {
+                            $sT = $pdo->prepare("SELECT tipo_cuenta FROM cuentas WHERE id = ?");
+                            $sT->execute([$mov['cuenta_destino_id']]);
+                            $esAdeudoProv = ((int)$sT->fetchColumn() === 6);
+                        }
+                        $tipoRev = ($esAdeudoProv || ($mov['tipo'] === 'entrada' || $mov['tipo'] === 'traspaso' || $mov['tipo'] === 'comision')) ? 'salida' : 'entrada';
                         $cid = $mov['cuenta_destino_id'];
                         if (!isset($cuentasMap[$cid])) {
                             $sC = $pdo->prepare("SELECT nombre, saldo_actual FROM cuentas WHERE id = ?");
@@ -424,51 +433,8 @@ try {
                         $pdo = getPDO();
                     }
 
-                    // --- [EL CANDADO DE SEGURIDAD] ---
-                    $stmtCheck = $pdo->prepare("
-                        SELECT servicio_id, referencia_id, prestamista_id 
-                        FROM movimientos 
-                        WHERE grupo_id = ? AND estado = 'activo'
-                    ");
-                    $stmtCheck->execute([$grupo_id]);
-                    $movsEnGrupo = $stmtCheck->fetchAll(PDO::FETCH_ASSOC);
-
-                    foreach ($movsEnGrupo as $m) {
-                        $s_id = (int)$m['servicio_id'];
-                        $ref_id = $m['referencia_id'] ?? null;
-
-                        // Candado 1: Préstamos Recibidos
-                        if ($s_id === 10) {
-                            if ($ref_id) {
-                                $check = $pdo->prepare("SELECT COUNT(*) FROM movimientos WHERE referencia_id = ? AND servicio_id = 14 AND estado = 'activo'");
-                                $check->execute([$ref_id]);
-                                if ($check->fetchColumn() > 0) throw new Exception("🚨 No puedes anular este préstamo porque tiene pagos registrados. Anula los pagos primero.");
-                            } else {
-                                $check = $pdo->prepare("SELECT COUNT(*) FROM movimientos WHERE prestamista_id = ? AND servicio_id = 14 AND estado = 'activo'");
-                                $check->execute([$m['prestamista_id']]);
-                                if ($check->fetchColumn() > 0) throw new Exception("🚨 No puedes anular este préstamo porque el prestamista tiene pagos registrados.");
-                            }
-                        }
-
-                        // Candado 2: Préstamos Otorgados
-                        if ($s_id === 16 && $ref_id) {
-                            $check = $pdo->prepare("SELECT COUNT(*) FROM movimientos WHERE referencia_id = ? AND servicio_id = 17 AND estado = 'activo'");
-                            $check->execute([$ref_id]);
-                            if ($check->fetchColumn() > 0) throw new Exception("🚨 No puedes anular este préstamo porque ya le hiciste cobros. Anula los cobros primero.");
-                        }
-                    }
-
-                    // --- [CANDADO MES CERRADO] ---
-                    $stmtFechas = $pdo->prepare("SELECT DISTINCT DATE_FORMAT(fecha, '%Y-%m') as mes FROM movimientos WHERE grupo_id = ? AND estado = 'activo'");
-                    $stmtFechas->execute([$grupo_id]);
-                    $mesesAfectados = $stmtFechas->fetchAll(PDO::FETCH_COLUMN);
-                    foreach ($mesesAfectados as $mes) {
-                        $stmtC = $pdo->prepare("SELECT id FROM cierres_mensuales WHERE mes = ?");
-                        $stmtC->execute([$mes]);
-                        if ($stmtC->fetch()) {
-                            throw new Exception("No puedes anular movimientos del mes $mes porque ya está cerrado.");
-                        }
-                    }
+                    // Validación centralizada (mes cerrado + candados préstamos)
+                    validarGrupoNoCerrado($pdo, $grupo_id);
 
                     // --- [EJECUCIÓN CENTRALIZADA] ---
                     // El Service ahora hará todo el trabajo matemático una sola vez.

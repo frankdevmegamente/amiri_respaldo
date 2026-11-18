@@ -198,6 +198,10 @@ class MovimientoCorreccionService {
 
                 $this->anularMovimientosRelacionados($original['grupo_id'], $movimiento_id, $motivo, $usuario_id, $nuevo_grupo);
 
+                // Restaurar inventario FIFO consumido por el grupo (ventas anuladas).
+                // Sin esto quedaban consumos huérfanos y la ecuación mostraba faltante.
+                $fifoRestaurado = $this->restaurarConsumosFIFO($original['grupo_id']);
+
             }
 
             
@@ -214,11 +218,11 @@ class MovimientoCorreccionService {
 
                 'registro_id' => $movimiento_id,
 
-                'descripcion' => "Anuló movimiento #$movimiento_id: $motivo",
+                'descripcion' => "Anuló movimiento #$movimiento_id: $motivo" . (!empty($fifoRestaurado) ? ". FIFO restaurado: " . json_encode($fifoRestaurado, JSON_UNESCAPED_UNICODE) : ""),
 
                 'datos_anteriores' => $original,
 
-                'datos_nuevos' => ['reverso_id' => $reverso_id, 'motivo' => $motivo]
+                'datos_nuevos' => ['reverso_id' => $reverso_id, 'motivo' => $motivo, 'fifo_restaurado' => $fifoRestaurado ?? []]
 
             ]);
 
@@ -306,6 +310,19 @@ class MovimientoCorreccionService {
 
                 throw new Exception("Solo se pueden corregir movimientos activos");
 
+            }
+
+            // Candado FIFO: corregir monto/cuentas de una pata de compra/venta de divisas
+            // rompería el inventario (el reemplazo no consume/produce lotes). Esos casos
+            // van por anular grupo + registrar la operación de nuevo.
+            $sidCorr = (int)($original['servicio_id'] ?? 0);
+            if (in_array($sidCorr, [2, 3, 5, 6], true)) {
+                $cambiaMonto = array_key_exists('monto', $datos_corregidos) && (float)$datos_corregidos['monto'] !== (float)$original['monto'];
+                $cambiaOrigen = array_key_exists('cuenta_origen_id', $datos_corregidos) && (int)$datos_corregidos['cuenta_origen_id'] !== (int)$original['cuenta_origen_id'];
+                $cambiaDestino = array_key_exists('cuenta_destino_id', $datos_corregidos) && (int)$datos_corregidos['cuenta_destino_id'] !== (int)$original['cuenta_destino_id'];
+                if ($cambiaMonto || $cambiaOrigen || $cambiaDestino) {
+                    throw new Exception("No se puede corregir monto/cuentas de una compra/venta de divisas (mov #$movimiento_id). Anula el grupo #{$original['grupo_id']} y registra la operación de nuevo.");
+                }
             }
 
             
@@ -514,7 +531,12 @@ class MovimientoCorreccionService {
 
             $stmt->execute([$motivo, $usuario_id, $movimiento_id]);
 
-            
+            // 3b. Si era parte de una venta de divisas, restaurar sus consumos FIFO
+            // (misma protección que en anulación; evita consumos huérfanos).
+            $fifoRestaurado = [];
+            if (!empty($original['grupo_id'])) {
+                $fifoRestaurado = $this->restaurarConsumosFIFO($original['grupo_id']);
+            }
 
             // Registrar auditoría
 
@@ -528,7 +550,7 @@ class MovimientoCorreccionService {
 
                 'registro_id' => $movimiento_id,
 
-                'descripcion' => "Corrigió movimiento #$movimiento_id: $motivo",
+                'descripcion' => "Corrigió movimiento #$movimiento_id: $motivo" . (!empty($fifoRestaurado) ? ". FIFO restaurado: " . json_encode($fifoRestaurado, JSON_UNESCAPED_UNICODE) : ""),
 
                 'datos_anteriores' => $original,
 
@@ -536,7 +558,9 @@ class MovimientoCorreccionService {
 
                     'reverso_id' => $reverso_id,
 
-                    'nuevo_id' => $nuevo_id
+                    'nuevo_id' => $nuevo_id,
+
+                    'fifo_restaurado' => $fifoRestaurado
 
                 ])
 
@@ -641,34 +665,13 @@ class MovimientoCorreccionService {
             }
 
             // ═══════════════════════════════════════════════════════════════════
-            // CANDADO DE TITANIO (Anti-Paradojas)
+            // CANDADO DE TITANIO + Validación mes cerrado (centralizado)
             // ═══════════════════════════════════════════════════════════════════
-            foreach ($movimientos as $m) {
-                $s_id = (int)$m['servicio_id'];
-                $ref_id = $m['referencia_id'] ?? null;
-                
-                if ($s_id === 10) { // Préstamo de Prestamista
-                    if ($ref_id) {
-                        $check = $this->pdo->prepare("SELECT COUNT(*) FROM movimientos WHERE referencia_id = ? AND servicio_id = 14 AND estado = 'activo'");
-                        $check->execute([$ref_id]);
-                        if ($check->fetchColumn() > 0) throw new Exception("🚨 No puedes anular este préstamo porque tiene pagos registrados. Anula los pagos primero.");
-                    } else {
-                        $check = $this->pdo->prepare("SELECT COUNT(*) FROM movimientos WHERE prestamista_id = ? AND servicio_id = 14 AND estado = 'activo'");
-                        $check->execute([$m['prestamista_id']]);
-                        if ($check->fetchColumn() > 0) throw new Exception("🚨 No puedes anular este préstamo porque el prestamista tiene pagos registrados. Anula los pagos primero.");
-                    }
-                }
-
-                if ($s_id === 16 && $ref_id) { // Préstamo Otorgado a Tercero
-                    $check = $this->pdo->prepare("SELECT COUNT(*) FROM movimientos WHERE referencia_id = ? AND servicio_id = 17 AND estado = 'activo'");
-                    $check->execute([$ref_id]);
-                    if ($check->fetchColumn() > 0) throw new Exception("🚨 No puedes anular este préstamo porque ya le hiciste cobros. Anula los cobros primero.");
-                }
-            }
+            require_once __DIR__ . '/../config/helpers.php';
+            validarGrupoNoCerrado($this->pdo, $grupo_id);
             
-            // Crear nuevo grupo para los reversos
-            $stmt = $this->pdo->query("SELECT COALESCE(MAX(grupo_id), 0) + 1 FROM movimientos");
-            $nuevo_grupo = $stmt->fetchColumn();
+            // Crear nuevo grupo para los reversos (centralizado)
+            $nuevo_grupo = generarGrupoId($this->pdo);
             
             $reversos = [];
             
@@ -880,6 +883,34 @@ class MovimientoCorreccionService {
                 }
             }
 
+            // Servicios 5,6 — Compra de divisas: candado + desactivar lote.
+            // CANDADO: no anular una compra cuyo lote ya fue consumido por ventas VIGENTES
+            // (de otro grupo). Anularla dejaría esos consumos sin respaldo y descuadraría
+            // la ecuación (faltante fantasma). Anula primero esas ventas.
+            foreach ($movimientos as $mov) {
+                $sid = (int)$mov['servicio_id'];
+                if (in_array($sid, [5, 6], true)) {
+                    $stmtL = $this->pdo->prepare("SELECT id, cantidad_original, cantidad_restante FROM inventario_monedas WHERE movimiento_id = ? AND activo = 1");
+                    $stmtL->execute([$mov['id']]);
+                    foreach ($stmtL->fetchAll(PDO::FETCH_ASSOC) as $lote) {
+                        if ((float)$lote['cantidad_original'] - (float)$lote['cantidad_restante'] > 0.00000001) {
+                            $stmtV = $this->pdo->prepare("SELECT COUNT(*) FROM consumos_inventario c INNER JOIN movimientos m ON m.id = c.movimiento_id WHERE c.inventario_id = ? AND m.estado = 'activo' AND m.activo = 1 AND m.grupo_id <> ?");
+                            $stmtV->execute([$lote['id'], $grupo_id]);
+                            if ((int)$stmtV->fetchColumn() > 0) {
+                                throw new Exception("No se puede anular la compra (mov #{$mov['id']}): el lote #{$lote['id']} ya fue consumido parcialmente por ventas vigentes. Anula primero esas ventas.");
+                            }
+                        }
+                    }
+                    // Compra: el lote FIFO fue creado con cantidad_restante = monto. Al anular, desactivarlo (no sumarlo).
+                    $this->pdo->prepare("UPDATE inventario_monedas SET activo = 0, cantidad_restante = 0 WHERE movimiento_id = ? AND activo = 1")->execute([$mov['id']]);
+                }
+            }
+
+            // Servicios 2,3 — Venta de divisas: restaurar al inventario lo consumido por este grupo.
+            // Sin esto, anular una venta dejaba consumos huérfanos y la ecuación mostraba
+            // faltante (ej. grupo #1790197398287: -$242,672.22 por 14,027.3 USDT no restaurados).
+            $fifoRestaurado = $this->restaurarConsumosFIFO($grupo_id);
+
             // Servicio 18 — Retiro de Capital (también captura retiros legacy con servicio=12)
             foreach ($movimientos as $mov) {
                 $esRetiro = (int)$mov['servicio_id'] === 18 ||
@@ -902,9 +933,9 @@ class MovimientoCorreccionService {
                 'modulo' => 'flujo',
                 'tabla' => 'movimientos',
                 'registro_id' => $grupo_id,
-                'descripcion' => "Anuló grupo de movimientos #$grupo_id ($motivo). " . count($movimientos) . " movimientos anulados.",
+                'descripcion' => "Anuló grupo de movimientos #$grupo_id ($motivo). " . count($movimientos) . " movimientos anulados." . (!empty($fifoRestaurado) ? " FIFO restaurado: " . json_encode($fifoRestaurado, JSON_UNESCAPED_UNICODE) : ""),
                 'datos_anteriores' => ['grupo_id' => $grupo_id, 'movimientos' => count($movimientos)],
-                'datos_nuevos' => ['nuevo_grupo' => $nuevo_grupo, 'reversos' => $reversos]
+                'datos_nuevos' => ['nuevo_grupo' => $nuevo_grupo, 'reversos' => $reversos, 'fifo_restaurado' => $fifoRestaurado ?? []]
             ]);
             
             $this->pdo->commit();
@@ -1015,9 +1046,32 @@ class MovimientoCorreccionService {
 
         if (!empty($movimiento['cuenta_destino_id'])) {
 
-            // entrada/traspaso/comision incrementaron destino → reverso los decrementa
+            // Detectar adeudo a proveedor por compra a crédito (servicios 5/6):
+            // la creación (api/flujo-divisas.php) registra el movimiento como
+            // tipo='salida' pero ACREDITA el saldo con actualizarSaldoCuenta(..., 'entrada')
+            // y suma valor_mxn += cantidad*TC. El genérico de abajo haría 'entrada'
+            // (duplicaría la deuda, como pasó el 2026-09-18 con $-989,630.70).
+            // La reversión correcta es 'salida' + restar valor_mxn.
+            $esAdeudoProveedor = (
+                ($movimiento['tipo'] ?? '') === 'salida'
+                && in_array((int)($movimiento['servicio_id'] ?? 0), [5, 6], true)
+            );
+            if ($esAdeudoProveedor) {
+                try {
+                    $stmtTipo = $this->pdo->prepare("SELECT tipo_cuenta FROM cuentas WHERE id = ?");
+                    $stmtTipo->execute([$movimiento['cuenta_destino_id']]);
+                    $esAdeudoProveedor = ((int)$stmtTipo->fetchColumn() === 6);
+                } catch (Exception $e) {
+                    $esAdeudoProveedor = false;
+                }
+            }
 
-            $tipo = ($movimiento['tipo'] === 'entrada' || $movimiento['tipo'] === 'traspaso' || $movimiento['tipo'] === 'comision') ? 'salida' : 'entrada';
+            if ($esAdeudoProveedor) {
+                // entrada/traspaso/comision incrementaron destino → reverso los decrementa
+                $tipo = 'salida';
+            } else {
+                $tipo = ($movimiento['tipo'] === 'entrada' || $movimiento['tipo'] === 'traspaso' || $movimiento['tipo'] === 'comision') ? 'salida' : 'entrada';
+            }
 
             actualizarSaldoCuenta(
 
@@ -1034,6 +1088,16 @@ class MovimientoCorreccionService {
                 $descripcion
 
             );
+
+            // Revertir el valor_mxn del adeudo (inverso exacto de flujo-divisas.php:315)
+            if ($esAdeudoProveedor) {
+                $valorReverso = round(abs($movimiento['monto']) * (float)($movimiento['paridad'] ?? 0), 2);
+                if ($valorReverso > 0) {
+                    $this->pdo->exec("SET @hyperion_saldo_auth = 1");
+                    $stmtV = $this->pdo->prepare("UPDATE cuentas SET valor_mxn = COALESCE(valor_mxn, 0) - ? WHERE id = ?");
+                    $stmtV->execute([$valorReverso, $movimiento['cuenta_destino_id']]);
+                }
+            }
 
         }
 
@@ -1080,10 +1144,11 @@ class MovimientoCorreccionService {
         
 
         // Aplicar a cuenta destino (entrada)
+        // NOTA: 'comision' también acredita destino (ver flujo-divisas.php:488,499)
 
         if (!empty($movimiento['cuenta_destino_id'])) {
 
-            $tipo = ($movimiento['tipo'] === 'entrada' || $movimiento['tipo'] === 'traspaso') ? 'entrada' : 'salida';
+            $tipo = ($movimiento['tipo'] === 'entrada' || $movimiento['tipo'] === 'traspaso' || $movimiento['tipo'] === 'comision') ? 'entrada' : 'salida';
 
             actualizarSaldoCuenta(
 
@@ -1242,6 +1307,44 @@ class MovimientoCorreccionService {
     }
 
     
+
+    /**
+     * Devuelve al inventario FIFO las cantidades consumidas por los movimientos de un grupo
+     * y elimina esos registros de consumo (la venta queda anulada por completo: sus costos
+     * no deben seguir en el inventario ni en reportes de utilidad).
+     *
+     * Esquema real: consumos_inventario(movimiento_id, inventario_id, cantidad_consumida).
+     * El lote recupera su restante con tope en cantidad_original. La historia queda en
+     * auditoría (ANULAR_GRUPO con fifo_restaurado) + movimientos anulados + reversos.
+     * Debe llamarse dentro de la misma transacción de la anulación.
+     *
+     * @param int|string $grupo_id
+     * @return array Lista [['lote_id'=>int,'cantidad'=>float], ...] para auditoría
+     */
+    private function restaurarConsumosFIFO($grupo_id) {
+        $restaurado = [];
+        $stmt = $this->pdo->prepare("
+            SELECT c.inventario_id, COALESCE(SUM(c.cantidad_consumida), 0) AS total
+            FROM consumos_inventario c
+            INNER JOIN movimientos m ON m.id = c.movimiento_id
+            WHERE m.grupo_id = ?
+            GROUP BY c.inventario_id
+        ");
+        $stmt->execute([$grupo_id]);
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $c) {
+            $total = (float)$c['total'];
+            if ($total <= 0) continue;
+            $stmtR = $this->pdo->prepare("UPDATE inventario_monedas SET cantidad_restante = LEAST(cantidad_original, cantidad_restante + ?), activo = 1 WHERE id = ?");
+            $stmtR->execute([$total, $c['inventario_id']]);
+            $restaurado[] = ['lote_id' => (int)$c['inventario_id'], 'cantidad' => $total];
+        }
+        if (!empty($restaurado)) {
+            $stmtD = $this->pdo->prepare("DELETE c FROM consumos_inventario c INNER JOIN movimientos m ON m.id = c.movimiento_id WHERE m.grupo_id = ?");
+            $stmtD->execute([$grupo_id]);
+        }
+        return $restaurado;
+    }
+
 
     /**
 

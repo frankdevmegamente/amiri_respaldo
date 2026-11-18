@@ -14,7 +14,11 @@ require_once __DIR__ . '/../src/config/logger.php';
 
 initApi();
 
-requireAdmin();
+requireAuth(['admin', 'usuario']);
+
+if (($_SESSION['usuario_rol'] ?? '') === 'usuario' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
+    jsonError('Solo lectura', 403);
+}
 
 $pdo = getPDO();
 

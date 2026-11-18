@@ -105,7 +105,7 @@ echo "\n=== VERIFICACIÓN FINAL ===\n";
 // Run exact formula from verificar_diferencia.php
 $totalSaldosMxn = (float)$pdo->query("SELECT COALESCE(SUM(saldo_actual),0) FROM cuentas WHERE activo=1 AND tipo_cuenta IN(1,2) AND tipo_moneda='MXN'")->fetchColumn();
 $totalSaldosDiv = (float)$pdo->query("SELECT COALESCE(ROUND(SUM(im.cantidad_restante * im.paridad),2),0) FROM inventario_monedas im INNER JOIN cuentas c ON im.cuenta_id=c.id WHERE c.activo=1 AND c.tipo_cuenta IN(1,2) AND im.activo=1")->fetchColumn();
-$totalPrestOtorg = (float)$pdo->query("SELECT COALESCE(SUM(monto_total-monto_pagado),0) FROM prestamos_otorgados WHERE estado IN('pendiente','parcial') AND activo=1")->fetchColumn();
+$totalPrestOtorg = (float)$pdo->query("SELECT COALESCE(SUM(COALESCE(monto_total_con_interes, monto_total)-monto_pagado),0) FROM prestamos_otorgados WHERE estado IN('pendiente','parcial') AND activo=1")->fetchColumn();
 $totalGastosSinCap = 0; // Simplified - not calculating this component
 $totalSaldos = round($totalSaldosMxn + $totalSaldosDiv + $totalPrestOtorg, 2);
 

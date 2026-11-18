@@ -232,7 +232,7 @@ $twoFAEnabled = $user2FA['two_fa_enabled'] ?? false;
 
                       </button>
 
-                      <a href="index.php" class="btn btn-secondary">
+                      <a href="<?= (($_SESSION['usuario_rol'] ?? '') === 'promotor') ? 'mi-cuenta.php' : 'index.php' ?>" class="btn btn-secondary">
 
                         <i class="ti ti-arrow-left"></i> Volver
 

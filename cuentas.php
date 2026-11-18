@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/src/config/session.php';
 
-if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_rol'] !== 'admin') {
+if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_rol'] ?? '', ['admin','usuario'])) {
 
     header('Location: login.php');
 
@@ -204,7 +204,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         }
 
         /* ─── Page Header ─────────────────────────────── */
-        .cuentas-header { position: relative; overflow: hidden; border-radius: 16px !important; }
+        .cuentas-header { position: relative; overflow: visible; border-radius: 16px !important; }
         .cuentas-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(93, 135, 255, 0.08); pointer-events: none; }
         .cuentas-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(19, 222, 185, 0.06); pointer-events: none; }
         .cuentas-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
@@ -474,7 +474,11 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                                     <option value="BANREGIO">BANREGIO</option>
 
-                                    <option value="BANBAJIO">BANBAJIO</option>
+                                     <option value="BANBAJIO">BANBAJIO</option>
+
+                                     <option value="MERCADO PAGO">MERCADO PAGO</option>
+
+                                     <option value="BANCO PLATA">BANCO PLATA</option>
 
                                 </select>
 
@@ -990,7 +994,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     </button>`;
                 }
                 return `
-                <div class="d-flex align-items-center">
+                <div class="d-flex align-items-center flex-wrap gap-1">
+                    <a class="badge bg-primary bg-opacity-10 text-primary border-0 me-2 text-decoration-none" style="cursor: pointer; font-size: 0.75rem;" href="movimientos.php?cuenta_id=${id}" title="Ver estado de cuenta: entradas, salidas y saldo remanente">
+                        <i class="ti ti-arrows-transfer"></i> Movimientos
+                    </a>
                     ${btnCompartir}
                     <button class="badge bg-warning bg-opacity-10 text-warning border-0 me-2" style="cursor: pointer; font-size: 0.75rem;" onclick="editarCuenta(${id},${tipo})" title="Editar">
                         <i class="ti ti-pencil"></i> Editar

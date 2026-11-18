@@ -12,7 +12,11 @@ require_once __DIR__ . '/../src/config/logger.php';
 
 initApi();
 
-requireAdmin();
+requireAuth(['admin', 'usuario']);
+
+if (($_SESSION['usuario_rol'] ?? '') === 'usuario' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
+    jsonError('Solo lectura', 403);
+}
 
 $pdo = getPDO();
 
@@ -264,6 +268,7 @@ try {
 
             -- Suma total para pagos/cobros múltiples
             CASE 
+                WHEN MAX(fm.servicio_id) = 16 AND MAX(po.monto_total_con_interes) > 0 THEN MAX(po.monto_total_con_interes)
                 WHEN COUNT(*) > 1 AND MAX(fm.servicio_id) IN (13, 14, 17) THEN SUM(fm.monto)
                 ELSE GREATEST(
                     MAX(CASE WHEN fm.tipo = 'entrada' THEN fm.monto ELSE 0 END),
@@ -271,6 +276,15 @@ try {
                     MAX(CASE WHEN fm.tipo = 'traspaso' THEN fm.monto ELSE 0 END)
                 )
             END as monto_principal,
+            -- Desglose para préstamos otorgados (capital/interés/total)
+            MAX(po.monto_total) as po_capital,
+            MAX(po.monto_interes) as po_interes,
+            MAX(po.monto_total_con_interes) as po_total,
+            MAX(po.tasa_porcentaje) as po_tasa,
+            MAX(po.tasa_periodo) as po_tasa_periodo,
+            MAX(po.plazo_valor) as po_plazo_valor,
+            MAX(po.plazo_unidad) as po_plazo_unidad,
+            MAX(po.fecha_vencimiento) as po_vencimiento,
 
             GROUP_CONCAT(DISTINCT NULLIF(co.nombre, '') SEPARATOR ' | ') as cuentas_origen,
             GROUP_CONCAT(DISTINCT NULLIF(cd.nombre, '') SEPARATOR ' | ') as cuentas_destino,
@@ -307,6 +321,7 @@ try {
         LEFT JOIN proveedores p ON fm.proveedor_id = p.id
         LEFT JOIN promotores pr ON fm.promotor_id = pr.id
         LEFT JOIN prestamistas pres ON fm.prestamista_id = pres.id -- UNIÃ“N VITAL
+        LEFT JOIN prestamos_otorgados po ON po.id = fm.referencia_id AND fm.servicio_id = 16
         WHERE $whereClause
         GROUP BY fm.grupo_id, s.nombre, fm.moneda
     ";

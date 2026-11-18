@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/src/config/session.php';
 
-if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_rol'] !== 'admin') {
+if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_rol'] ?? '', ['admin','usuario'])) {
     header('Location: login.php');
     exit;
 }
@@ -79,6 +79,28 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         tr.fila-anulada { opacity: 0.55; }
         tr.fila-anulada td { text-decoration: line-through; }
+
+        .tipo-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tipo-pill { cursor: pointer; border: 1px solid #dee2e6; background: #fff; color: #495057;
+            border-radius: 999px; padding: 6px 14px; font-size: 0.82rem; font-weight: 600;
+            display: inline-flex; align-items: center; gap: 6px; transition: all .15s ease; }
+        .tipo-pill:hover { border-color: #5D87FF; color: #5D87FF; }
+        .tipo-pill.active { background: #5D87FF; border-color: #5D87FF; color: #fff; }
+        .tipo-pill .count { background: rgba(0,0,0,.08); border-radius: 999px; padding: 0 8px; font-size: 0.75rem; }
+        .tipo-pill.active .count { background: rgba(255,255,255,.25); }
+        [data-bs-theme="dark"] .tipo-pill { background: #1e293b; border-color: #2c344c; color: #8c9ea8; }
+        [data-bs-theme="dark"] .tipo-pill:hover { border-color: #5D87FF; color: #5D87FF; }
+        [data-bs-theme="dark"] .tipo-pill.active { background: #5D87FF; border-color: #5D87FF; color: #fff; }
+
+        /* Estado de cuenta por cuenta (tipo banco) */
+        #resumenCuenta { border-left: 4px solid #5D87FF; }
+        #resumenCuenta .rc-monto { font-size: 1.35rem; font-weight: 800; line-height: 1.1; }
+        #resumenCuenta .rc-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #8c9ea8; }
+        .monto-entrada { color: #0ca678; font-weight: 700; }
+        .monto-salida { color: #e03131; font-weight: 700; }
+        .saldo-cta { font-weight: 800; }
+        [data-bs-theme="dark"] .monto-entrada { color: #13DEB9 !important; }
+        [data-bs-theme="dark"] .monto-salida { color: #FA896B !important; }
     </style>
 </head>
 <body>
@@ -121,7 +143,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                     <!-- KPI CARDS -->
                     <div class="row g-3 mb-4">
-                        <div class="col-xl-3 col-md-6">
+                        <div class="col-xl-2 col-md-4">
                             <div class="card metric-card border-0 shadow-sm h-100">
                                 <div class="metric-accent bg-primary"></div>
                                 <div class="card-body p-3">
@@ -134,7 +156,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                 </div>
                             </div>
                         </div>
-                        <div class="col-xl-3 col-md-6">
+                        <div class="col-xl-2 col-md-4">
                             <div class="card metric-card border-0 shadow-sm h-100">
                                 <div class="metric-accent bg-success"></div>
                                 <div class="card-body p-3">
@@ -147,7 +169,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                 </div>
                             </div>
                         </div>
-                        <div class="col-xl-3 col-md-6">
+                        <div class="col-xl-2 col-md-4">
                             <div class="card metric-card border-0 shadow-sm h-100">
                                 <div class="metric-accent bg-danger"></div>
                                 <div class="card-body p-3">
@@ -160,7 +182,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                 </div>
                             </div>
                         </div>
-                        <div class="col-xl-3 col-md-6">
+                        <div class="col-xl-2 col-md-4">
                             <div class="card metric-card border-0 shadow-sm h-100">
                                 <div class="metric-accent bg-info"></div>
                                 <div class="card-body p-3">
@@ -171,6 +193,88 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                     <div class="metric-value text-info" id="kpiTraspasos">0</div>
                                     <div class="metric-footer">Entre cuentas</div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-md-4">
+                            <div class="card metric-card border-0 shadow-sm h-100">
+                                <div class="metric-accent bg-warning"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Comisiones</span>
+                                        <div class="metric-icon bg-warning bg-opacity-10 text-warning"><i class="ti ti-percentage"></i></div>
+                                    </div>
+                                    <div class="metric-value text-warning" id="kpiComisiones">0</div>
+                                    <div class="metric-footer">Tipo comisi&oacute;n</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-2 col-md-4">
+                            <div class="card metric-card border-0 shadow-sm h-100">
+                                <div class="metric-accent bg-secondary"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Movimientos revertidos</span>
+                                        <div class="metric-icon bg-secondary bg-opacity-10 text-secondary"><i class="ti ti-rotate-ccw"></i></div>
+                                    </div>
+                                    <div class="metric-value text-secondary" id="kpiRevertidos">0</div>
+                                    <div class="metric-footer">Tipo ajuste</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RESUMEN ESTADO DE CUENTA (visible al elegir una cuenta) -->
+                    <div class="card shadow-sm border-0 mb-3" id="resumenCuenta" style="display:none;">
+                        <div class="card-body p-3">
+                            <div class="row align-items-center g-3">
+                                <div class="col-md-4">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="d-flex align-items-center justify-content-center rounded-3"
+                                             style="width:42px;height:42px;background:rgba(93,135,255,0.12);">
+                                            <i class="ti ti-building-bank text-primary" style="font-size:1.4rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold" id="rcNombre">Cuenta</div>
+                                            <small class="text-muted" id="rcDetalle">-</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="row text-center g-2">
+                                        <div class="col-6 col-lg-3">
+                                            <div class="rc-label">Saldo inicial periodo</div>
+                                            <div class="rc-monto" id="rcSaldoInicial">-</div>
+                                        </div>
+                                        <div class="col-6 col-lg-3">
+                                            <div class="rc-label">Entradas</div>
+                                            <div class="rc-monto monto-entrada" id="rcEntradas">-</div>
+                                        </div>
+                                        <div class="col-6 col-lg-3">
+                                            <div class="rc-label">Salidas</div>
+                                            <div class="rc-monto monto-salida" id="rcSalidas">-</div>
+                                        </div>
+                                        <div class="col-6 col-lg-3">
+                                            <div class="rc-label">Saldo actual total</div>
+                                            <div class="rc-monto text-primary" id="rcSaldoActual">-</div>
+                                            <small class="text-muted" id="rcNumMovs" style="font-size:0.72rem;"></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <small class="text-muted" style="font-size:0.72rem;">Listado ordenado de nuevo a viejo (lo m&aacute;s reciente primero). El saldo remanente de cada fila es el saldo de la cuenta justo despu&eacute;s de ese movimiento. Si filtras por fechas, el saldo inicial corresponde al inicio del periodo filtrado.</small>
+                        </div>
+                    </div>
+
+                    <!-- FILTROS RÁPIDOS POR TIPO -->
+                    <div class="card shadow-sm border-0 mb-3">
+                        <div class="card-body py-3">
+                            <div class="tipo-pills" id="tipoPills">
+                                <button type="button" class="tipo-pill active" data-tipo=""><i class="ti ti-list"></i> Todos <span class="count" id="countTodos">0</span></button>
+                                <button type="button" class="tipo-pill" data-tipo="entrada"><i class="ti ti-arrow-down-left"></i> Entradas <span class="count" id="countEntradas">0</span></button>
+                                <button type="button" class="tipo-pill" data-tipo="salida"><i class="ti ti-arrow-up-right"></i> Salidas <span class="count" id="countSalidas">0</span></button>
+                                <button type="button" class="tipo-pill" data-tipo="traspaso"><i class="ti ti-arrows-double-ne-sw"></i> Traspasos <span class="count" id="countTraspasos">0</span></button>
+                                <button type="button" class="tipo-pill" data-tipo="comision"><i class="ti ti-percentage"></i> Comisiones <span class="count" id="countComisiones">0</span></button>
+                                <button type="button" class="tipo-pill" data-tipo="ajuste"><i class="ti ti-rotate-ccw"></i> Revertidos <span class="count" id="countAjustes">0</span></button>
                             </div>
                         </div>
                     </div>
@@ -214,8 +318,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                             </div>
                             <div class="col-xl-2 col-md-4 d-flex align-items-end gap-3">
                                 <div class="form-check mt-2">
-                                    <input class="form-check-input" type="checkbox" id="filtroAnulados">
-                                    <label class="form-check-label" for="filtroAnulados" style="font-size:0.85rem;">Anulados</label>
+                                    <input class="form-check-input" type="checkbox" id="filtroAnulados" checked>
+                                    <label class="form-check-label" for="filtroAnulados" style="font-size:0.85rem;" title="Sin marcar: solo vigentes. Marcado: incluye anulados/corregidos/inactivos.">Incluir anulados</label>
                                 </div>
                                 <button class="btn btn-primary btn-sm" onclick="aplicarFiltros()">
                                     <i class="ti ti-search"></i> Buscar
@@ -224,13 +328,18 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                     <i class="ti ti-x"></i>
                                 </button>
                             </div>
+                            <div class="col-xl-4 col-md-8">
+                                <label class="form-label">B&uacute;squeda libre</label>
+                                <input type="text" class="form-control" id="filtroTexto" placeholder="Descripci&oacute;n, folio, cuenta, cliente... (Enter para buscar)">
+                            </div>
                         </div>
                         <div class="row g-3 align-items-end mt-2">
                             <div class="col-xl-2 col-md-4">
-                                <label class="form-label">Cuenta</label>
+                                <label class="form-label" title="Al elegir una cuenta se muestra la columna Saldo remanente y se ordena de viejo a nuevo, como estado de cuenta">Cuenta</label>
                                 <select class="form-select" id="filtroCuenta">
                                     <option value="">Todas</option>
                                 </select>
+                                <small class="text-muted" style="font-size:0.72rem;">Elige una cuenta para ver saldo remanente</small>
                             </div>
                             <div class="col-xl-2 col-md-4">
                                 <label class="form-label">Cliente</label>
@@ -251,7 +360,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                 </select>
                             </div>
                             <div class="col-xl-2 col-md-4">
-                                <label class="form-label">Promotor</label>
+                                <label class="form-label" title="Incluye movimientos directos del promotor + movimientos de sus clientes asociados">Promotor (+ clientes)</label>
                                 <select class="form-select" id="filtroPromotor">
                                     <option value="">Todos</option>
                                 </select>
@@ -271,7 +380,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                                 <th>Servicio</th>
                                                 <th>Tipo</th>
                                                 <th>Monto</th>
+                                                <th>Entrada</th>
+                                                <th>Salida</th>
                                                 <th>Moneda</th>
+                                                <th>Saldo remanente</th>
                                                 <th>Cta. Origen</th>
                                                 <th>Cta. Destino</th>
                                                 <th>Cliente</th>
@@ -321,18 +433,22 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             const proveedor = $('#filtroProveedor').val();
             const prestamista = $('#filtroPrestamista').val();
             const promotor = $('#filtroPromotor').val();
+            const texto = $('#filtroTexto').val().trim();
 
-            if (fi) params.push('fecha_inicio=' + fi);
-            if (ff) params.push('fecha_fin=' + ff);
-            if (tipo) params.push('tipo=' + tipo);
-            if (servicio) params.push('servicio_id=' + servicio);
-            if (moneda) params.push('moneda=' + moneda);
-            if (cuenta) params.push('cuenta_id=' + cuenta);
-            if (cliente) params.push('cliente_id=' + cliente);
-            if (proveedor) params.push('proveedor_id=' + proveedor);
-            if (prestamista) params.push('prestamista_id=' + prestamista);
-            if (promotor) params.push('promotor_id=' + promotor);
+            if (fi) params.push('fecha_inicio=' + encodeURIComponent(fi));
+            if (ff) params.push('fecha_fin=' + encodeURIComponent(ff));
+            if (tipo) params.push('tipo=' + encodeURIComponent(tipo));
+            if (servicio) params.push('servicio_id=' + encodeURIComponent(servicio));
+            if (moneda) params.push('moneda=' + encodeURIComponent(moneda));
+            if (cuenta) params.push('cuenta_id=' + encodeURIComponent(cuenta));
+            if (cliente) params.push('cliente_id=' + encodeURIComponent(cliente));
+            if (proveedor) params.push('proveedor_id=' + encodeURIComponent(proveedor));
+            if (prestamista) params.push('prestamista_id=' + encodeURIComponent(prestamista));
+            if (promotor) params.push('promotor_id=' + encodeURIComponent(promotor));
+            if (texto) params.push('q=' + encodeURIComponent(texto));
             if (anulados) params.push('incluir_anulados=1');
+            // Siempre lo más reciente primero
+            params.push('orden=desc');
 
             return url + params.join('&');
         }
@@ -365,9 +481,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             return '<span class="fw-bold text-capitalize">' + d + '</span>';
         }
 
-        function formatFecha(data) {
-            if (!data) return 'N/A';
-            const partes = data.split(' ')[0].split('-');
+        function formatFecha(data, type) {
+            if (!data) return type === 'sort' ? '' : 'N/A';
+            const iso = data.split(' ')[0];
+            if (type === 'sort' || type === 'type') return iso;
+            const partes = iso.split('-');
+            if (partes.length !== 3) return data;
             return partes[2] + '/' + partes[1] + '/' + partes[0];
         }
 
@@ -375,22 +494,277 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             return val || '<span class="text-muted">-</span>';
         }
 
-        function calcularKPIs(data) {
-            let total = data.length;
-            let entradas = 0, salidas = 0, traspasos = 0;
+        // ===== Lógica tipo banco por cuenta =====
+        let cuentaInfo = null;          // {saldo_actual, nombre, banco, ...} de la cuenta filtrada
+        let cuentaLista = false;        // true cuando ya llegó api/cuentas.php (evita flash con bal=0)
+        let saldosCorridos = {};        // movimiento_id -> saldo después del movimiento
+        let resumenCuenta = { entradas: 0, salidas: 0, inicial: null, actual: null, n: 0 };
 
-            data.forEach(function(m) {
-                if (m.estado === 'anulado') return;
+        function cuentaFiltroId() {
+            return String($('#filtroCuenta').val() || '');
+        }
+        function hayFiltroCuenta() {
+            return !!cuentaFiltroId();
+        }
+        function ladoCuenta(m) {
+            // Devuelve 'entrada' si la cuenta filtrada recibe, 'salida' si entrega.
+            const f = cuentaFiltroId();
+            if (!f) return '';
+            const origenId = (m.cuenta_origen_id !== null && m.cuenta_origen_id !== undefined) ? String(m.cuenta_origen_id) : '';
+            const destinoId = (m.cuenta_destino_id !== null && m.cuenta_destino_id !== undefined) ? String(m.cuenta_destino_id) : '';
+            if (destinoId === f && origenId === f) {
+                // Mismo origen y destino (raro): decide por tipo
+                const t = (m.tipo || '').toLowerCase();
+                return (t === 'salida') ? 'salida' : 'entrada';
+            }
+            if (destinoId === f) return 'entrada';
+            if (origenId === f) return 'salida';
+            return '';
+        }
+        function esEntradaCuenta(m) { return ladoCuenta(m) === 'entrada'; }
+        function esSalidaCuenta(m) { return ladoCuenta(m) === 'salida'; }
+
+        function esVigente(m) {
+            // Solo los vigentes alimentan neto y corrido (anulado/corregido/inactivo quedan fuera).
+            if (!m) return false;
+            if (m.activo !== undefined && m.activo !== null && String(m.activo) !== '1') return false;
+            const e = (m.estado || '').toLowerCase();
+            return e === 'activo';
+        }
+        function montoAbs(m) { return Math.abs(parseFloat(m.monto) || 0); }
+
+        // Saldo remanente: 1) historial_saldos del lado de la cuenta filtrada (si es sano),
+        // 2) saldo corrido calculado solo con vigentes, 3) mejor dato disponible.
+        function histLado(m) {
+            const f = cuentaFiltroId();
+            const origenId = (m.cuenta_origen_id !== null && m.cuenta_origen_id !== undefined) ? String(m.cuenta_origen_id) : '';
+            const destinoId = (m.cuenta_destino_id !== null && m.cuenta_destino_id !== undefined) ? String(m.cuenta_destino_id) : '';
+            if (f && destinoId === f && m.saldo_destino_nuevo !== null && m.saldo_destino_nuevo !== undefined && m.saldo_destino_nuevo !== '') {
+                return { nuevo: parseFloat(m.saldo_destino_nuevo), anterior: parseFloat(m.saldo_destino_anterior) };
+            }
+            if (f && origenId === f && m.saldo_origen_nuevo !== null && m.saldo_origen_nuevo !== undefined && m.saldo_origen_nuevo !== '') {
+                return { nuevo: parseFloat(m.saldo_origen_nuevo), anterior: parseFloat(m.saldo_origen_anterior) };
+            }
+            return null;
+        }
+        function histSano(h) {
+            if (!h || h.nuevo === null || isNaN(h.nuevo)) return false;
+            // Un saldo bancario negativo es imposible: historial corrupto (reversos con signo).
+            if (h.nuevo < 0) return false;
+            if (h.anterior !== null && !isNaN(h.anterior) && h.anterior < 0) return false;
+            return true;
+        }
+        function getSaldoRemanente(m) {
+            if (!m) return { nuevo: null, anterior: null };
+            const h = histLado(m);
+            if (histSano(h)) return h;
+            if (m.id !== undefined && m.id !== null && saldosCorridos[m.id] !== undefined) {
+                const v = saldosCorridos[m.id];
+                return { nuevo: v.nuevo, anterior: v.anterior };
+            }
+            if (m.saldo_destino_nuevo !== null && m.saldo_destino_nuevo !== undefined) {
+                const c = { nuevo: parseFloat(m.saldo_destino_nuevo), anterior: parseFloat(m.saldo_destino_anterior) };
+                if (histSano(c)) return c;
+            }
+            if (m.saldo_origen_nuevo !== null && m.saldo_origen_nuevo !== undefined) {
+                const c = { nuevo: parseFloat(m.saldo_origen_nuevo), anterior: parseFloat(m.saldo_origen_anterior) };
+                if (histSano(c)) return c;
+            }
+            return { nuevo: null, anterior: null };
+        }
+
+        function renderSaldoRemanente(m) {
+            const s = getSaldoRemanente(m);
+            if (s.nuevo === null || isNaN(s.nuevo)) {
+                return '<span class="text-muted" title="Sin historial de saldo para este movimiento">-</span>';
+            }
+            let flecha = '';
+            if (s.anterior !== null && !isNaN(s.anterior)) {
+                if (s.nuevo > s.anterior) flecha = ' <i class="ti ti-arrow-up-right text-success"></i>';
+                else if (s.nuevo < s.anterior) flecha = ' <i class="ti ti-arrow-down-right text-danger"></i>';
+            }
+            const titulo = (s.anterior !== null && !isNaN(s.anterior))
+                ? ('Saldo anterior: ' + formatMonto(s.anterior, m.moneda))
+                : 'Saldo después del movimiento';
+            return '<span class="saldo-cta" title="' + titulo + '">' + formatMonto(s.nuevo, m.moneda) + '</span>' + flecha;
+        }
+
+        function renderEntrada(m) {
+            if (!esEntradaCuenta(m)) return '<span class="text-muted">-</span>';
+            return '<span class="monto-entrada">+' + formatMonto(montoAbs(m), m.moneda) + '</span>';
+        }
+        function renderSalida(m) {
+            if (!esSalidaCuenta(m)) return '<span class="text-muted">-</span>';
+            return '<span class="monto-salida">-' + formatMonto(montoAbs(m), m.moneda) + '</span>';
+        }
+
+        function sincronizarColumnaSaldo() {
+            if (!tabla) return;
+            const esCuenta = hayFiltroCuenta();
+            // Índices: 0 Fecha, 1 Servicio, 2 Tipo, 3 Monto, 4 Entrada, 5 Salida, 6 Moneda, 7 Saldo
+            tabla.column(3).visible(!esCuenta, false);
+            tabla.column(4).visible(esCuenta, false);
+            tabla.column(5).visible(esCuenta, false);
+            tabla.column(7).visible(esCuenta, false);
+            tabla.columns.adjust();
+            $('#resumenCuenta').toggle(esCuenta);
+        }
+
+        // Calcula totales y saldo corrido fila por fila (viejo -> nuevo), SOLO con vigentes.
+        // El corrido solo se pinta cuando cuentaInfo ya llegó (bandera cuentaLista);
+        // antes de eso se deja N/D para no mostrar el flash neto-desde-cero (-$10k).
+        // saldoInicial = saldoActual - (entradas - salidas) del listado actual.
+        function calcularResumenCuenta(rows) {
+            saldosCorridos = {};
+            resumenCuenta = { entradas: 0, salidas: 0, inicial: null, actual: null, n: 0 };
+            if (!hayFiltroCuenta() || !Array.isArray(rows)) { pintarResumenCuenta(); return; }
+            const vigentes = rows.filter(esVigente);
+            let entradas = 0, salidas = 0;
+            vigentes.forEach(function(m) {
+                const v = montoAbs(m);
+                if (esEntradaCuenta(m)) entradas += v;
+                else if (esSalidaCuenta(m)) salidas += v;
+                else {
+                    // Sin lado claro (p.ej. traspaso donde la cuenta no coincide): usa tipo
+                    const t = (m.tipo || '').toLowerCase();
+                    if (t === 'entrada') entradas += v;
+                    else if (t === 'salida' || t === 'comision' || t === 'comisión') salidas += v;
+                }
+            });
+            const neto = entradas - salidas;
+            const actual = cuentaInfo ? parseFloat(cuentaInfo.saldo_actual) : null;
+            const inicial = (actual !== null && !isNaN(actual)) ? (actual - neto) : null;
+            if (!cuentaLista || inicial === null) {
+                // Cuenta aún cargando o sin saldo: no inventar corrido desde 0.
+                resumenCuenta = { entradas: entradas, salidas: salidas, inicial: inicial, actual: actual, n: rows.length };
+                pintarResumenCuenta();
+                return;
+            }
+            // Recorre en orden cronológico (viejo -> nuevo) para el cálculo, aunque se muestre lo reciente primero
+            const orden = vigentes.slice().sort(function(a, b) {
+                if (a.fecha < b.fecha) return -1;
+                if (a.fecha > b.fecha) return 1;
+                return (a.id || 0) - (b.id || 0);
+            });
+            let bal = inicial;
+            orden.forEach(function(m) {
+                const v = montoAbs(m);
+                const ant = bal;
+                if (esEntradaCuenta(m)) bal += v;
+                else if (esSalidaCuenta(m)) bal -= v;
+                else {
+                    const t = (m.tipo || '').toLowerCase();
+                    if (t === 'entrada') bal += v;
+                    else if (t === 'salida' || t === 'comision' || t === 'comisión') bal -= v;
+                }
+                saldosCorridos[m.id] = { nuevo: bal, anterior: ant };
+            });
+            resumenCuenta = { entradas: entradas, salidas: salidas, inicial: inicial, actual: actual, n: rows.length };
+            pintarResumenCuenta();
+        }
+
+        function pintarResumenCuenta() {
+            if (!hayFiltroCuenta()) return;
+            const moneda = (cuentaInfo && cuentaInfo.tipo_moneda) ? cuentaInfo.tipo_moneda : ($('#filtroMoneda').val() || 'MXN');
+            const nombre = cuentaInfo ? cuentaInfo.nombre : ($('#filtroCuenta option:selected').text() || 'Cuenta');
+            const det = cuentaInfo
+                ? ((cuentaInfo.banco ? cuentaInfo.banco + ' · ' : '') + (cuentaInfo.numero_cuenta || '') + ' · ' + (cuentaInfo.tipo_moneda || '')).trim()
+                : '';
+            $('#rcNombre').text(nombre);
+            $('#rcDetalle').text(det || '-');
+            $('#rcEntradas').text(formatMonto(resumenCuenta.entradas, moneda));
+            $('#rcSalidas').text(formatMonto(resumenCuenta.salidas, moneda));
+            $('#rcSaldoInicial').text(resumenCuenta.inicial === null ? 'N/D' : formatMonto(resumenCuenta.inicial, moneda));
+            $('#rcSaldoActual').text(resumenCuenta.actual === null ? 'N/D' : formatMonto(resumenCuenta.actual, moneda));
+            $('#rcNumMovs').text(resumenCuenta.n + ' movimientos en el filtro');
+        }
+
+        function cargarResumenCuenta() {
+            const id = cuentaFiltroId();
+            if (!id) { cuentaInfo = null; cuentaLista = true; calcularResumenCuenta(datosCompletos); sincronizarColumnaSaldo(); return; }
+            cuentaLista = false;
+            // Limpia el corrido previo para no pintar valores rancios mientras llega la cuenta
+            saldosCorridos = {};
+            $.getJSON('api/cuentas.php?id=' + encodeURIComponent(id))
+                .done(function(c) { cuentaInfo = c || null; })
+                .fail(function() { cuentaInfo = null; })
+                .always(function() {
+                    cuentaLista = true;
+                    calcularResumenCuenta(datosCompletos);
+                    sincronizarColumnaSaldo();
+                    // Re-pinta la tabla con el saldo corrido ya calculado (cuadra con saldo actual)
+                    if (tabla) tabla.draw(false);
+                });
+        }
+
+        function calcularKPIs(data) {
+            let entradas = 0, salidas = 0, traspasos = 0, comisiones = 0, revertidos = 0;
+
+            (Array.isArray(data) ? data : []).forEach(function(m) {
                 const t = (m.tipo || '').toLowerCase();
                 if (t === 'entrada') entradas++;
                 else if (t === 'salida') salidas++;
                 else if (t === 'traspaso') traspasos++;
+                else if (t === 'comision' || t === 'comisión') comisiones++;
+                else if (t === 'ajuste') revertidos++;
             });
 
-            $('#kpiTotal').text(total.toLocaleString('es-MX'));
+            // Tarjetas = registros actualmente en pantalla (respetan todos los filtros)
+            $('#kpiTotal').text((Array.isArray(data) ? data.length : 0).toLocaleString('es-MX'));
             $('#kpiEntradas').text(entradas.toLocaleString('es-MX'));
             $('#kpiSalidas').text(salidas.toLocaleString('es-MX'));
             $('#kpiTraspasos').text(traspasos.toLocaleString('es-MX'));
+            $('#kpiComisiones').text(comisiones.toLocaleString('es-MX'));
+            $('#kpiRevertidos').text(revertidos.toLocaleString('es-MX'));
+        }
+
+        // Pills: desglose real bajo los demás filtros, IGNORANDO el tipo seleccionado.
+        // Usa petición aparte sin `tipo` para que los números nunca se pongan en 0.
+        let pillsSeq = 0;
+        function construirURLSinTipo() {
+            const url = construirURL().replace(/([?&])tipo=[^&]*&?/, function(m, sep) { return sep === '?' ? '?' : ''; });
+            return url.replace(/[?&]$/, '');
+        }
+        function actualizarPillsConteo() {
+            const seq = ++pillsSeq;
+            const url = construirURLSinTipo();
+            $('.tipo-pill .count').text('…');
+            $.getJSON(url)
+                .done(function(data) {
+                    if (seq !== pillsSeq || !Array.isArray(data)) return;
+                    let entradas = 0, salidas = 0, traspasos = 0, comisiones = 0, ajustes = 0;
+                    data.forEach(function(m) {
+                        const t = (m.tipo || '').toLowerCase();
+                        if (t === 'entrada') entradas++;
+                        else if (t === 'salida') salidas++;
+                        else if (t === 'traspaso') traspasos++;
+                        else if (t === 'comision' || t === 'comisión') comisiones++;
+                        else if (t === 'ajuste') ajustes++;
+                    });
+                    const fmt = function(n) { return n.toLocaleString('es-MX'); };
+                    $('#countTodos').text(fmt(data.length));
+                    $('#countEntradas').text(fmt(entradas));
+                    $('#countSalidas').text(fmt(salidas));
+                    $('#countTraspasos').text(fmt(traspasos));
+                    $('#countComisiones').text(fmt(comisiones));
+                    $('#countAjustes').text(fmt(ajustes));
+                })
+                .fail(function() {
+                    if (seq !== pillsSeq) return;
+                    $('.tipo-pill .count').text('0');
+                });
+        }
+
+        function setTipoFiltro(tipo) {
+            $('#filtroTipo').val(tipo);
+            marcarPillActivo(tipo);
+            aplicarFiltros();
+        }
+
+        function marcarPillActivo(tipo) {
+            $('#tipoPills .tipo-pill').each(function() {
+                $(this).toggleClass('active', ($(this).data('tipo') || '') === (tipo || ''));
+            });
         }
 
         function cargarServicios() {
@@ -404,10 +778,13 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         }
 
         function aplicarFiltros() {
-            tabla.ajax.url(construirURL());
-            tabla.ajax.reload(function() {
-                calcularKPIs(datosCompletos);
+            if (!tabla) return;
+            // Siempre lo más reciente primero
+            tabla.order([[0, 'desc']]);
+            tabla.ajax.url(construirURL()).load(function() {
+                cargarResumenCuenta();
             });
+            actualizarPillsConteo();
         }
 
         function limpiarFiltros() {
@@ -422,16 +799,27 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             $('#filtroProveedor').val('');
             $('#filtroPrestamista').val('');
             $('#filtroPromotor').val('');
+            $('#filtroTexto').val('');
+            marcarPillActivo('');
             aplicarFiltros();
         }
 
         function cargarEntidades() {
+            const params = new URLSearchParams(window.location.search);
+            const cuentaParam = params.get('cuenta_id') || '';
             $.getJSON('api/cuentas.php', function(data) {
                 if (Array.isArray(data)) {
                     data.forEach(function(c) {
                         const label = c.nombre + (c.banco ? ' (' + c.banco + ')' : '') + ' [' + c.tipo_moneda + ']';
                         $('#filtroCuenta').append('<option value="' + c.id + '">' + label + '</option>');
                     });
+                    // Preselección desde cuentas.php? "Ver movimientos"
+                    if (cuentaParam && $('#filtroCuenta option[value="' + cuentaParam + '"]').length) {
+                        $('#filtroCuenta').val(cuentaParam);
+                        aplicarFiltros();
+                    } else {
+                        sincronizarColumnaSaldo();
+                    }
                 }
             });
             $.getJSON('api/clientes.php', function(data) {
@@ -464,42 +852,72 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             });
         }
 
-        const entidadSelects = ['#filtroCuenta', '#filtroCliente', '#filtroProveedor', '#filtroPrestamista', '#filtroPromotor'];
-        entidadSelects.forEach(function(sel) {
-            $(sel).on('change', function() {
-                if ($(this).val()) {
-                    entidadSelects.forEach(function(other) {
-                        if (other !== sel) $(other).val('');
-                    });
-                }
-            });
-        });
+        // NOTA: los filtros de entidad se combinan con AND en el servidor.
+        // No se limpian entre sí: el usuario puede combinar Cuenta + Cliente + fechas, etc.
 
         function exportarCSV() {
-            const rows = [['Fecha','Servicio','Tipo','Monto','Moneda','Cta Origen','Cta Destino','Cliente','Proveedor','Prestamista','Promotor','Descripcion','Estado','Registro']];
-            datosCompletos.forEach(function(m) {
-                rows.push([
-                    formatFecha(m.fecha),
-                    m.servicio_nombre || '',
-                    m.tipo || '',
-                    m.monto || 0,
-                    m.moneda || '',
-                    m.cuenta_origen_nombre || '',
-                    m.cuenta_destino_nombre || '',
-                    m.cliente_nombre || '',
-                    m.proveedor_nombre || '',
-                    m.prestamista_nombre || '',
-                    m.promotor_nombre || '',
-                    (m.descripcion || '').replace(/,/g, ';'),
-                    m.estado || '',
-                    m.usuario_nombre || ''
-                ]);
-            });
-            const csv = rows.map(function(r) { return r.join(','); }).join('\n');
+            const esc = function(v) {
+                v = (v === null || v === undefined) ? '' : String(v);
+                if (/[",\n\r]/.test(v)) return '"' + v.replace(/"/g, '""') + '"';
+                return v;
+            };
+            const esCuenta = hayFiltroCuenta();
+            let headers, rows;
+            if (esCuenta) {
+                headers = ['Fecha','Servicio','Tipo','Entrada','Salida','Saldo_Remanente','Moneda'];
+                rows = [headers];
+                datosCompletos.forEach(function(m) {
+                    const s = getSaldoRemanente(m);
+                    rows.push([
+                        formatFecha(m.fecha, 'display'),
+                        m.servicio_nombre || '',
+                        m.tipo || '',
+                        esEntradaCuenta(m) ? (m.monto || 0) : '',
+                        esSalidaCuenta(m) ? (m.monto || 0) : '',
+                        (s.nuevo === null || isNaN(s.nuevo)) ? '' : s.nuevo,
+                        m.moneda || ''
+                    ].concat([
+                        m.cuenta_origen_nombre || '',
+                        m.cuenta_destino_nombre || '',
+                        m.cliente_nombre || '',
+                        m.proveedor_nombre || '',
+                        m.prestamista_nombre || '',
+                        m.promotor_nombre || '',
+                        m.descripcion || '',
+                        m.estado || '',
+                        m.usuario_nombre || ''
+                    ]));
+                });
+                rows[0] = headers.concat(['Cta Origen','Cta Destino','Cliente','Proveedor','Prestamista','Promotor','Descripcion','Estado','Registro']);
+            } else {
+                headers = ['Fecha','Servicio','Tipo','Monto','Moneda'];
+                rows = [headers];
+                datosCompletos.forEach(function(m) {
+                    rows.push([
+                        formatFecha(m.fecha, 'display'),
+                        m.servicio_nombre || '',
+                        m.tipo || '',
+                        m.monto || 0,
+                        m.moneda || '',
+                        m.cuenta_origen_nombre || '',
+                        m.cuenta_destino_nombre || '',
+                        m.cliente_nombre || '',
+                        m.proveedor_nombre || '',
+                        m.prestamista_nombre || '',
+                        m.promotor_nombre || '',
+                        m.descripcion || '',
+                        m.estado || '',
+                        m.usuario_nombre || ''
+                    ]);
+                });
+                rows[0] = headers.concat(['Cta Origen','Cta Destino','Cliente','Proveedor','Prestamista','Promotor','Descripcion','Estado','Registro']);
+            }
+            const csv = rows.map(function(r) { return r.map(esc).join(','); }).join('\r\n');
             const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'movimientos_' + new Date().toISOString().slice(0,10) + '.csv';
+            const sufijo = esCuenta ? '_cuenta_' + cuentaFiltroId() : '';
+            link.download = 'movimientos' + sufijo + '_' + new Date().toISOString().slice(0,10) + '.csv';
             link.click();
         }
 
@@ -507,19 +925,36 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             cargarServicios();
             cargarEntidades();
 
+            // Enter en búsqueda libre dispara el filtro del servidor
+            $('#filtroTexto').on('keydown', function(e) {
+                if (e.key === 'Enter') { e.preventDefault(); aplicarFiltros(); }
+            });
+            // Cambiar cualquier filtro recarga (excepto texto, que usa Enter)
+            $('#filtroFechaInicio, #filtroFechaFin, #filtroTipo, #filtroServicio, #filtroMoneda, #filtroCuenta, #filtroCliente, #filtroProveedor, #filtroPrestamista, #filtroPromotor, #filtroAnulados').on('change', function() {
+                if (this.id === 'filtroTipo') marcarPillActivo($(this).val());
+                aplicarFiltros();
+            });
+            // Pills rápidos de tipo <-> select sincronizados
+            $('#tipoPills').on('click', '.tipo-pill', function() {
+                setTipoFiltro($(this).data('tipo') || '');
+            });
+
             tabla = $('#tablaMovimientos').DataTable({
                 ajax: {
                     url: construirURL(),
                     dataSrc: function(json) {
-                        datosCompletos = json;
-                        calcularKPIs(json);
-                        return json;
+                        const rows = Array.isArray(json) ? json : (Array.isArray(json.data) ? json.data : []);
+                        datosCompletos = rows;
+                        calcularKPIs(rows);
+                        calcularResumenCuenta(rows);
+                        sincronizarColumnaSaldo();
+                        return rows;
                     }
                 },
                 columns: [
                     {
                         data: 'fecha',
-                        render: function(data) { return formatFecha(data); }
+                        render: function(data, type) { return formatFecha(data, type); }
                     },
                     { data: 'servicio_nombre', defaultContent: '<span class="text-muted">N/A</span>' },
                     {
@@ -533,12 +968,36 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         }
                     },
                     {
+                        data: null,
+                        visible: false,
+                        orderable: false,
+                        render: function(d, type, row) { return renderEntrada(row); }
+                    },
+                    {
+                        data: null,
+                        visible: false,
+                        orderable: false,
+                        render: function(d, type, row) { return renderSalida(row); }
+                    },
+                    {
                         data: 'moneda',
                         render: function(d) {
                             if (!d) return '';
                             const colors = { 'MXN': 'primary', 'USD': 'success', 'USDT': 'info' };
                             const cls = colors[d] || 'secondary';
                             return '<span class="badge bg-' + cls + ' bg-opacity-10 text-' + cls + ' border-0">' + d + '</span>';
+                        }
+                    },
+                    {
+                        data: null,
+                        visible: false,
+                        orderable: false,
+                        render: function(d, type, row) {
+                            if (type === 'sort' || type === 'type') {
+                                const s = getSaldoRemanente(row);
+                                return (s.nuevo === null || isNaN(s.nuevo)) ? -999999999 : s.nuevo;
+                            }
+                            return renderSaldoRemanente(row);
                         }
                     },
                     { data: 'cuenta_origen_nombre', render: function(d) { return textCell(d); } },
@@ -570,8 +1029,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'Todos']],
                 language: {
                     url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                initComplete: function() {
+                    sincronizarColumnaSaldo();
                 }
             });
+            actualizarPillsConteo();
         });
     </script>
 </body>

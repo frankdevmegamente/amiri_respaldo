@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/src/config/session.php';
 
-if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_rol'] !== 'admin') {
+if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_rol'] ?? '', ['admin','usuario'])) {
 
     header('Location: login.php');
 
@@ -288,7 +288,9 @@ try {
                         <div class="col-12">
                             <div class="page-breadcrumb d-flex align-items-center mb-3 mt-2">
                                 <h3 class="mb-0"><i class="ti ti-user"></i> <?= htmlspecialchars($cliente['nombre']) ?></h3>
-                                <a href="flujo.php" class="btn btn-secondary ms-auto"><i class="ti ti-arrow-left"></i> Volver a Flujo</a>
+                                <a href="api/exportar-reporte.php?formato=pdf&reporte=estado_cuenta_cliente&cliente_id=<?= (int)$cliente_id ?>" class="btn btn-danger ms-auto"><i class="ti ti-file-type-pdf"></i> Estado de cuenta (PDF)</a>
+                                <button type="button" class="btn btn-outline-danger ms-2" data-bs-toggle="modal" data-bs-target="#modalReporteFiltrado"><i class="ti ti-filter"></i> Reporte por fechas</button>
+                                <a href="flujo.php" class="btn btn-secondary ms-2"><i class="ti ti-arrow-left"></i> Volver a Flujo</a>
                             </div>
                         </div>
                     </div>
@@ -454,6 +456,94 @@ try {
             </div>
         </div>
 
+
+        <!-- Modal Reporte por fechas -->
+
+        <div class="modal fade" id="modalReporteFiltrado" tabindex="-1">
+
+            <div class="modal-dialog">
+
+                <div class="modal-content">
+
+                    <div class="modal-header">
+
+                        <h5 class="modal-title">Reporte por fechas (PDF)</h5>
+
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="row g-3">
+
+                            <div class="col-6">
+
+                                <label class="form-label">Desde</label>
+
+                                <input type="date" class="form-control" id="repFechaInicio">
+
+                            </div>
+
+                            <div class="col-6">
+
+                                <label class="form-label">Hasta</label>
+
+                                <input type="date" class="form-control" id="repFechaFin" value="<?= date('Y-m-d') ?>">
+
+                            </div>
+
+                            <div class="col-12">
+
+                                <label class="form-label">Incluir</label>
+
+                                <select class="form-select" id="repSeccion">
+
+                                    <option value="ambos">Ventas y pagos</option>
+
+                                    <option value="ventas">Solo ventas</option>
+
+                                    <option value="pagos">Solo pagos</option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <small class="text-muted d-block mt-2">Vacío = historial completo.</small>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+
+                        <button type="button" class="btn btn-danger" id="btnGenerarReporteFiltrado"><i class="ti ti-file-type-pdf"></i> Generar PDF</button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <script>
+            document.getElementById('btnGenerarReporteFiltrado').addEventListener('click', function() {
+                const params = new URLSearchParams({
+                    formato: 'pdf',
+                    reporte: 'estado_cuenta_cliente',
+                    cliente_id: '<?= (int)$cliente_id ?>',
+                    seccion: document.getElementById('repSeccion').value
+                });
+                const fi = document.getElementById('repFechaInicio').value;
+                const ff = document.getElementById('repFechaFin').value;
+                if (fi) params.set('fecha_inicio', fi);
+                if (ff) params.set('fecha_fin', ff);
+                window.location.href = 'api/exportar-reporte.php?' + params.toString();
+            });
+        </script>
 
         <!-- Bot�n flotante para pagos m�ltiples -->
         <div id="btnPagarMultipleContainer" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1050;">

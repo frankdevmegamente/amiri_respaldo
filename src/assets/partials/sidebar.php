@@ -66,7 +66,7 @@ if (!isset($pagina_actual)) {
 
         </li>
 
-        <?php if ($_SESSION['usuario_rol'] === 'admin'): ?>
+        <?php if (in_array($_SESSION['usuario_rol'] ?? '', ['admin', 'usuario'])): ?>
 
           <li class="nav-small-cap">
 
@@ -230,6 +230,8 @@ if (!isset($pagina_actual)) {
             </ul>
           </li>
 
+<?php if (($_SESSION['usuario_rol'] ?? '') === 'admin'): ?>
+
           <li class="nav-small-cap">
 
             <span class="hide-menu">Herramientas</span>
@@ -325,6 +327,26 @@ if (!isset($pagina_actual)) {
 
           </li>
 
+        <?php endif; ?>
+
+        <?php endif; ?>
+
+        <?php if (($_SESSION['usuario_rol'] ?? '') === 'promotor'): ?>
+          <li class="nav-small-cap">
+            <span class="hide-menu">Mi Espacio</span>
+          </li>
+          <li class="sidebar-item <?= in_array($pagina_actual, ['mi-cuenta.php']) ? 'active' : '' ?>">
+            <a class="sidebar-link" href="mi-cuenta.php" aria-expanded="false">
+              <i class="ti ti-user-circle"></i>
+              <span class="hide-menu">Mi Cuenta</span>
+            </a>
+          </li>
+          <li class="sidebar-item <?= in_array($pagina_actual, ['editar-perfil.php']) ? 'active' : '' ?>">
+            <a class="sidebar-link" href="editar-perfil.php" aria-expanded="false">
+              <i class="ti ti-settings"></i>
+              <span class="hide-menu">Editar Perfil</span>
+            </a>
+          </li>
         <?php endif; ?>
 
         <hr>

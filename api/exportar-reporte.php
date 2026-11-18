@@ -455,6 +455,133 @@ switch ($reporte) {
         $columnas = ['Concepto', 'Valor'];
         break;
 
+    case 'estado_cuenta_cliente':
+        $clienteId = filter_var($_GET['cliente_id'] ?? null, FILTER_VALIDATE_INT);
+        if (!$clienteId) {
+            http_response_code(400);
+            die('Falta el parámetro cliente_id');
+        }
+
+        $stmtCli = $pdo->prepare("
+            SELECT c.*, p.nombre AS promotor_nombre, cu.nombre AS cuenta_nombre
+            FROM clientes c
+            LEFT JOIN promotores p ON c.promotor_id = p.id
+            LEFT JOIN cuentas cu ON c.cuenta_id = cu.id
+            WHERE c.id = ?
+        ");
+        $stmtCli->execute([$clienteId]);
+        $cliInfo = $stmtCli->fetch(PDO::FETCH_ASSOC);
+        if (!$cliInfo) {
+            http_response_code(404);
+            die('Cliente no encontrado');
+        }
+
+        $titulo = 'Estado de Cuenta - ' . $cliInfo['nombre'];
+
+        // Filtros opcionales: rango de fechas y sección (ventas/pagos/ambos).
+        // Sin parámetros = historial completo (comportamiento original).
+        $ctaSeccion = strtolower($_GET['seccion'] ?? 'ambos');
+        if (!in_array($ctaSeccion, ['ventas', 'pagos', 'ambos'], true)) {
+            $ctaSeccion = 'ambos';
+        }
+        $ctaFini = $_GET['fecha_inicio'] ?? null;
+        $ctaFfin = $_GET['fecha_fin'] ?? null;
+        if ($ctaFini !== null && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $ctaFini)) {
+            $ctaFini = null;
+        }
+        if ($ctaFfin !== null && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $ctaFfin)) {
+            $ctaFfin = null;
+        }
+        $ctaPeriodoTxt = ($ctaFini || $ctaFfin)
+            ? ('Del ' . ($ctaFini ?: 'inicio') . ' al ' . ($ctaFfin ?: 'hoy'))
+            : 'Historial completo';
+
+        // Todas las ventas del cliente (historial completo o rango)
+        $sqlV = "SELECT id, fecha, monto_total, comision_amiri, comision_promotor,
+                   monto_neto_cliente, monto_pagado,
+                   (monto_neto_cliente - monto_pagado) AS pendiente,
+                   estado, moneda
+            FROM deudas_clientes
+            WHERE cliente_id = ? AND activo = 1";
+        $paramsV = [$clienteId];
+        if ($ctaFini) {
+            $sqlV .= " AND fecha >= ?";
+            $paramsV[] = $ctaFini;
+        }
+        if ($ctaFfin) {
+            $sqlV .= " AND fecha <= ?";
+            $paramsV[] = $ctaFfin;
+        }
+        $sqlV .= " ORDER BY fecha ASC, id ASC";
+        $stmtV = $pdo->prepare($sqlV);
+        $stmtV->execute($paramsV);
+        $ventasCta = ($ctaSeccion === 'pagos') ? [] : $stmtV->fetchAll(PDO::FETCH_ASSOC);
+
+        // Pagos aplicados al cliente (servicio 13, activos, sin reversos internos)
+        $sqlP = "SELECT m.fecha, m.monto, m.moneda, m.descripcion,
+                   COALESCE(cu.nombre, '-') AS cuenta_pago
+            FROM movimientos m
+            LEFT JOIN cuentas cu ON m.cuenta_origen_id = cu.id
+            WHERE m.cliente_id = ? AND m.servicio_id = 13
+              AND m.estado = 'activo' AND m.activo = 1
+              AND (m.es_reverso = 0 OR m.es_reverso IS NULL)";
+        $paramsP = [$clienteId];
+        if ($ctaFini) {
+            $sqlP .= " AND m.fecha >= ?";
+            $paramsP[] = $ctaFini;
+        }
+        if ($ctaFfin) {
+            $sqlP .= " AND m.fecha <= ?";
+            $paramsP[] = $ctaFfin;
+        }
+        $sqlP .= " ORDER BY m.fecha ASC, m.id ASC";
+        $stmtP = $pdo->prepare($sqlP);
+        $stmtP->execute($paramsP);
+        $pagosCta = ($ctaSeccion === 'ventas') ? [] : $stmtP->fetchAll(PDO::FETCH_ASSOC);
+
+        // Resumen (adeudo = solo pendientes/parciales)
+        $resumenCta = [
+            'total_vendido' => 0, 'total_neto' => 0, 'total_pagado' => 0,
+            'pendiente' => 0, 'n_ventas' => count($ventasCta),
+            'n_pendientes' => 0, 'n_pagos' => count($pagosCta),
+            'total_pagos_mov' => 0, 'pend_por_moneda' => [],
+        ];
+        foreach ($ventasCta as $v) {
+            $resumenCta['total_vendido'] += (float)$v['monto_total'];
+            $resumenCta['total_neto'] += (float)$v['monto_neto_cliente'];
+            $resumenCta['total_pagado'] += (float)$v['monto_pagado'];
+            if (in_array($v['estado'], ['pendiente', 'parcial'], true)) {
+                $pend = (float)$v['monto_neto_cliente'] - (float)$v['monto_pagado'];
+                $resumenCta['pendiente'] += $pend;
+                $resumenCta['n_pendientes']++;
+                $mon = $v['moneda'] ?: 'MXN';
+                if (!isset($resumenCta['pend_por_moneda'][$mon])) {
+                    $resumenCta['pend_por_moneda'][$mon] = 0;
+                }
+                $resumenCta['pend_por_moneda'][$mon] += $pend;
+            }
+        }
+        foreach ($pagosCta as $pg) {
+            $resumenCta['total_pagos_mov'] += (float)$pg['monto'];
+        }
+
+        // Fallback para Excel/CSV: tabla de ventas
+        $columnas = ['Fecha', 'Venta #', 'Monto Total', 'Neto Cliente', 'Pagado', 'Pendiente', 'Estado', 'Moneda'];
+        $datos = [];
+        foreach ($ventasCta as $v) {
+            $datos[] = [
+                'fecha' => $v['fecha'],
+                'venta' => $v['id'],
+                'monto_total' => (float)$v['monto_total'],
+                'neto' => (float)$v['monto_neto_cliente'],
+                'pagado' => (float)$v['monto_pagado'],
+                'pendiente' => (float)$v['pendiente'],
+                'estado' => $v['estado'],
+                'moneda' => $v['moneda'] ?: 'MXN',
+            ];
+        }
+        break;
+
 }
  
  
@@ -751,6 +878,126 @@ switch ($formato) {
                     <tr><td>Cantidad de Ventas</td><td align="right" style="font-weight:600;">' . $ventas['cantidad'] . '</td></tr>
                 </table>
             </div>';
+        } elseif ($reporte === 'estado_cuenta_cliente') {
+            $fmt = function($n) { return '$' . number_format((float)$n, 2); };
+            $r = $resumenCta;
+            $pendMonedas = '';
+            foreach ($r['pend_por_moneda'] as $mon => $tot) {
+                $pendMonedas .= '<tr><td class="lbl">Pendiente ' . htmlspecialchars($mon) . '</td><td align="right" class="val r">' . $fmt($tot) . '</td></tr>';
+            }
+            $filasVentas = '';
+            foreach ($ventasCta as $v) {
+                $pend = (float)$v['monto_neto_cliente'] - (float)$v['monto_pagado'];
+                $filasVentas .= '<tr>'
+                    . '<td>' . htmlspecialchars($v['fecha']) . '</td>'
+                    . '<td align="center">#' . (int)$v['id'] . '</td>'
+                    . '<td align="right">' . $fmt($v['monto_total']) . '</td>'
+                    . '<td align="right">' . $fmt($v['monto_neto_cliente']) . '</td>'
+                    . '<td align="right">' . $fmt($v['monto_pagado']) . '</td>'
+                    . '<td align="right" style="font-weight:bold;">' . $fmt($pend) . '</td>'
+                    . '<td align="center">' . htmlspecialchars($v['estado']) . '</td>'
+                    . '<td align="center">' . htmlspecialchars($v['moneda'] ?: 'MXN') . '</td>'
+                    . '</tr>';
+            }
+            $filasPagos = '';
+            foreach ($pagosCta as $pg) {
+                $filasPagos .= '<tr>'
+                    . '<td>' . htmlspecialchars($pg['fecha']) . '</td>'
+                    . '<td align="right">' . $fmt($pg['monto']) . '</td>'
+                    . '<td align="center">' . htmlspecialchars($pg['moneda']) . '</td>'
+                    . '<td>' . htmlspecialchars($pg['cuenta_pago']) . '</td>'
+                    . '<td>' . htmlspecialchars(mb_substr($pg['descripcion'] ?? '', 0, 60)) . '</td>'
+                    . '</tr>';
+            }
+            if ($filasPagos === '') {
+                $filasPagos = '<tr><td colspan="5" align="center" style="color:#999;">Sin pagos registrados</td></tr>';
+            }
+            $html .= '
+            <div class="header">
+                <h1>Estado de Cuenta</h1>
+                <p>' . htmlspecialchars($cliInfo['nombre']) . ' &mdash; ' . htmlspecialchars($ctaPeriodoTxt) . ' &mdash; Corte al ' . date('d/m/Y') . '</p>
+            </div>
+
+            <div class="section">
+                <div class="s-title b">Datos del Cliente</div>
+                <table class="info">
+                    <tr><td class="lbl">Cliente</td><td align="right" class="val d">' . htmlspecialchars($cliInfo['nombre']) . '</td></tr>
+                    <tr><td class="lbl">Promotor</td><td align="right" class="val d">' . htmlspecialchars($cliInfo['promotor_nombre'] ?? 'N/A') . '</td></tr>
+                    <tr><td class="lbl">Comisión AMIRI / Promotor</td><td align="right" class="val d">' . htmlspecialchars($cliInfo['porcentaje_amiri'] ?? 0) . '% / ' . htmlspecialchars($cliInfo['porcentaje_promotor'] ?? 0) . '%</td></tr>
+                    <tr><td class="lbl">Cuenta vinculada</td><td align="right" class="val d">' . htmlspecialchars($cliInfo['cuenta_nombre'] ?? 'N/A') . '</td></tr>
+                </table>
+            </div>
+
+            <table style="width:100%;border-collapse:collapse;margin-bottom:12px;" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td style="width:33%;padding:6px;border:1px solid #dee2e6;border-left:4px solid #007bff;text-align:center;">
+                        <div style="font-size:10px;color:#007bff;font-weight:600;">Total Vendido (' . (int)$r['n_ventas'] . ' ops)</div>
+                        <div style="font-size:15px;font-weight:bold;color:#007bff;margin-top:3px;">' . $fmt($r['total_vendido']) . '</div>
+                    </td>
+                    <td style="width:33%;padding:6px;border:1px solid #dee2e6;border-left:4px solid #28a745;text-align:center;">
+                        <div style="font-size:10px;color:#28a745;font-weight:600;">Total Pagado</div>
+                        <div style="font-size:15px;font-weight:bold;color:#28a745;margin-top:3px;">' . $fmt($r['total_pagado']) . '</div>
+                    </td>
+                    <td style="width:34%;padding:6px;border:1px solid #dee2e6;border-left:4px solid #dc3545;text-align:center;">
+                        <div style="font-size:10px;color:#dc3545;font-weight:600;">Saldo Pendiente (' . (int)$r['n_pendientes'] . ' ops)</div>
+                        <div style="font-size:15px;font-weight:bold;color:#dc3545;margin-top:3px;">' . $fmt($r['pendiente']) . '</div>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="section">
+                <div class="s-title r">Pendiente por Moneda</div>
+                <table class="info">' . $pendMonedas . '</table>
+            </div>';
+
+            if ($ctaSeccion !== 'pagos') {
+            $html .= '
+            <div class="section">
+                <div class="s-title b">Detalle de Ventas (' . (int)$r['n_ventas'] . ')</div>
+                <table class="detail">
+                    <tr style="background:#4472C4;color:white;">
+                        <th style="padding:6px;text-align:left;">Fecha</th>
+                        <th style="padding:6px;">Venta</th>
+                        <th style="padding:6px;text-align:right;">Total</th>
+                        <th style="padding:6px;text-align:right;">Neto</th>
+                        <th style="padding:6px;text-align:right;">Pagado</th>
+                        <th style="padding:6px;text-align:right;">Pendiente</th>
+                        <th style="padding:6px;">Estado</th>
+                        <th style="padding:6px;">Mon</th>
+                    </tr>
+                    ' . $filasVentas . '
+                    <tr style="background:#E2EFDA;font-weight:bold;">
+                        <td colspan="2" style="padding:7px;">TOTALES</td>
+                        <td align="right" style="padding:7px;">' . $fmt($r['total_vendido']) . '</td>
+                        <td align="right" style="padding:7px;">' . $fmt($r['total_neto']) . '</td>
+                        <td align="right" style="padding:7px;">' . $fmt($r['total_pagado']) . '</td>
+                        <td align="right" style="padding:7px;">' . $fmt($r['pendiente']) . '</td>
+                        <td colspan="2"></td>
+                    </tr>
+                </table>
+            </div>';
+            }
+            if ($ctaSeccion !== 'ventas') {
+            $html .= '
+            <div class="section">
+                <div class="s-title g">Pagos Aplicados (' . (int)$r['n_pagos'] . ')</div>
+                <table class="detail">
+                    <tr style="background:#28a745;color:white;">
+                        <th style="padding:6px;text-align:left;">Fecha</th>
+                        <th style="padding:6px;text-align:right;">Monto</th>
+                        <th style="padding:6px;">Mon</th>
+                        <th style="padding:6px;text-align:left;">Cuenta</th>
+                        <th style="padding:6px;text-align:left;">Descripción</th>
+                    </tr>
+                    ' . $filasPagos . '
+                    <tr style="background:#E2EFDA;font-weight:bold;">
+                        <td style="padding:7px;">TOTAL PAGOS</td>
+                        <td align="right" style="padding:7px;">' . $fmt($r['total_pagos_mov']) . '</td>
+                        <td colspan="3"></td>
+                    </tr>
+                </table>
+            </div>';
+            }
         } else {
             $html .= '
             <div class="header">

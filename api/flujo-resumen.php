@@ -8,7 +8,11 @@ require_once __DIR__ . '/../src/config/db.php';
 
 initApi();
 
-requireAdmin();
+requireAuth(['admin', 'usuario']);
+
+if (($_SESSION['usuario_rol'] ?? '') === 'usuario' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
+    jsonError('Solo lectura', 403);
+}
 
 $pdo = getPDO();
 
@@ -60,7 +64,7 @@ try {
 
             $totalSaldos = $totalSaldosMxn + $totalSaldosDiv;
 
-            // Sumar préstamos otorgados pendientes al activo (dinero prestado que NOS deben)
+            // Sumar préstamos otorgados pendientes al activo (capital prestado que NOS deben) — interés NO se suma para no generar sobrante (es derecho futuro)
             $stmtPrestOtorg = $pdo->query("SELECT COALESCE(SUM(monto_total - monto_pagado), 0) AS total FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1");
             $totalPrestamosOtorgados = (float)$stmtPrestOtorg->fetch(PDO::FETCH_ASSOC)['total'];
             $totalSaldos += $totalPrestamosOtorgados;
@@ -92,6 +96,10 @@ try {
             $stmtProm = $pdo->query("SELECT COALESCE(SUM(c.saldo_actual),0) AS total FROM promotores p INNER JOIN cuentas c ON p.cuenta_id=c.id WHERE p.activo=1 AND p.es_interno=0 AND c.saldo_actual>0.01");
 
             $totalCapital += (float)$stmtProm->fetch(PDO::FETCH_ASSOC)['total'];
+
+            // Interés cobrado de préstamos otorgados (ganancia realizada) → suma a Capital para que no genere sobrante
+            $stmtIntCobrado = $pdo->query("SELECT COALESCE(SUM(CASE WHEN monto_pagado > monto_total THEN LEAST(monto_pagado - monto_total, monto_interes) ELSE 0 END),0) FROM prestamos_otorgados WHERE activo=1 AND monto_interes>0");
+            $totalCapital += (float)$stmtIntCobrado->fetchColumn();
 
 
 
@@ -146,18 +154,33 @@ try {
             $explicacion = [];
             $componentes = [];
             if ($totalPrestamosOtorgados > 0) {
-                $stmtDet = $pdo->query("SELECT persona_nombre, (monto_total - monto_pagado) AS pendiente FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1 ORDER BY persona_nombre");
+                $stmtDet = $pdo->query("SELECT persona_nombre, COALESCE(monto_total,0) as cap, COALESCE(monto_interes,0) as interes, COALESCE(monto_total_con_interes, monto_total) as total, (monto_total - monto_pagado) AS pendiente_cap, (COALESCE(monto_total_con_interes, monto_total) - monto_pagado) AS pendiente_total FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1 ORDER BY persona_nombre");
                 $detalles = [];
                 foreach ($stmtDet as $r) {
-                    $detalles[] = $r['persona_nombre'] . ': $' . number_format($r['pendiente'], 2);
+                    if ((float)$r['interes'] > 0.01) {
+                        $detalles[] = $r['persona_nombre'] . ': $' . number_format($r['pendiente_cap'], 2) . ' (cap $' . number_format($r['cap'],2) . ' + int $' . number_format($r['interes'],2) . ' = $' . number_format($r['pendiente_total'],2) . ')';
+                    } else {
+                        $detalles[] = $r['persona_nombre'] . ': $' . number_format($r['pendiente_cap'], 2);
+                    }
                 }
                 $explicacion[] = [
                     'tipo' => 'prestamos_otorgados',
-                    'concepto' => 'Préstamos otorgados pendientes',
+                    'concepto' => 'Préstamos otorgados pendientes (capital)',
                     'monto' => $totalPrestamosOtorgados,
                     'detalle' => implode(', ', $detalles)
                 ];
                 $componentes[] = 'Préstamos otorgados: $' . number_format($totalPrestamosOtorgados, 2);
+            }
+            // Interés por cobrar — informativo, NO sumado a totalSaldos para no generar sobrante
+            $stmtInteres = $pdo->query("SELECT COALESCE(SUM(monto_interes),0) as total FROM prestamos_otorgados WHERE activo=1 AND estado IN ('pendiente','parcial') AND monto_interes>0");
+            $totalInteres = (float)$stmtInteres->fetchColumn();
+            if ($totalInteres > 0.01) {
+                $explicacion[] = [
+                    'tipo' => 'interes_por_cobrar',
+                    'concepto' => 'Interés por cobrar (no sumado a saldos)',
+                    'monto' => $totalInteres,
+                    'detalle' => 'Interés compuesto pendiente — ver desglose en cada préstamo (ej. Francisco +$36.36)'
+                ];
             }
             $diferenciaBase = round($diferencia, 2);
             if (abs($diferenciaBase) > 0.05) {
@@ -392,7 +415,7 @@ try {
 
         $totalSaldos = (float)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-        // Sumar préstamos otorgados pendientes al activo
+        // Sumar préstamos otorgados pendientes al activo — solo capital (interés es derecho futuro, no contado para no generar sobrante)
         $totalPrestamosOtorgados = 0;
         if ($moneda === 'MXN' || $moneda === 'TODAS') {
             $stmtPrestOtorg = $pdo->query("SELECT COALESCE(SUM(monto_total - monto_pagado), 0) AS total FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1");
@@ -433,6 +456,12 @@ try {
         }
 
         $totalCapital = (float)$stmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+        // Interés cobrado de préstamos (MXN) → suma a Capital (solo si TODAS/MXN)
+        if ($moneda === 'MXN' || $moneda === 'TODAS') {
+            $stmtIntCobrado2 = $pdo->query("SELECT COALESCE(SUM(CASE WHEN monto_pagado > monto_total THEN LEAST(monto_pagado - monto_total, monto_interes) ELSE 0 END),0) FROM prestamos_otorgados WHERE activo=1 AND monto_interes>0");
+            $totalCapital += (float)$stmtIntCobrado2->fetchColumn();
+        }
 
         
 
@@ -521,7 +550,7 @@ try {
 
         
 
-        // Query préstamos otorgados pendientes para explicación
+        // Query préstamos otorgados pendientes para explicación — capital para ecuación, desglose con interés
         $totalPrestamosOtorgados = 0;
         if ($moneda === 'MXN' || $moneda === 'TODAS') {
             $stmtPO = $pdo->query("SELECT COALESCE(SUM(monto_total - monto_pagado), 0) AS total FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1");
@@ -544,18 +573,28 @@ try {
         $explicacion = [];
         $componentes = [];
         if ($totalPrestamosOtorgados > 0) {
-            $stmtDet = $pdo->query("SELECT persona_nombre, (monto_total - monto_pagado) AS pendiente FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1 ORDER BY persona_nombre");
+            $stmtDet = $pdo->query("SELECT persona_nombre, COALESCE(monto_total,0) as cap, COALESCE(monto_interes,0) as interes, COALESCE(monto_total_con_interes, monto_total) as total, (monto_total - monto_pagado) AS pendiente_cap, (COALESCE(monto_total_con_interes, monto_total) - monto_pagado) AS pendiente_total FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1 ORDER BY persona_nombre");
             $detalles = [];
             foreach ($stmtDet as $r) {
-                $detalles[] = $r['persona_nombre'] . ': $' . number_format($r['pendiente'], 2);
+                if ((float)$r['interes'] > 0.01) {
+                    $detalles[] = $r['persona_nombre'] . ': $' . number_format($r['pendiente_cap'], 2) . ' (cap $' . number_format($r['cap'],2) . ' + int $' . number_format($r['interes'],2) . ' = $' . number_format($r['pendiente_total'],2) . ')';
+                } else {
+                    $detalles[] = $r['persona_nombre'] . ': $' . number_format($r['pendiente_cap'], 2);
+                }
             }
             $explicacion[] = [
                 'tipo' => 'prestamos_otorgados',
-                'concepto' => 'Préstamos otorgados pendientes',
+                'concepto' => 'Préstamos otorgados pendientes (capital)',
                 'monto' => $totalPrestamosOtorgados,
                 'detalle' => implode(', ', $detalles)
             ];
             $componentes[] = 'Préstamos otorgados: $' . number_format($totalPrestamosOtorgados, 2);
+        }
+        // Interés por cobrar — informativo, NO sumado para no generar sobrante
+        $stmtInteres = $pdo->query("SELECT COALESCE(SUM(monto_interes),0) FROM prestamos_otorgados WHERE activo=1 AND estado IN ('pendiente','parcial') AND monto_interes>0");
+        $totalInteresInfo = (float)$stmtInteres->fetchColumn();
+        if ($totalInteresInfo > 0.01) {
+            $explicacion[] = ['tipo'=>'interes_por_cobrar','concepto'=>'Interés por cobrar (no sumado)','monto'=>$totalInteresInfo,'detalle'=>'Interés compuesto pendiente — ver total en cada préstamo'];
         }
         $diferenciaBase = round($diferencia, 2);
         if (abs($diferenciaBase) > 0.05) {

@@ -10,7 +10,17 @@ require_once __DIR__ . '/../src/config/auditoria.php';
 
 initApi();
 
-requireAdmin();
+requireAuth(['admin', 'usuario']);
+
+if (($_SESSION['usuario_rol'] ?? '') === 'usuario' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
+    jsonError('Solo lectura', 403);
+}
+
+// Liberar lock de sesión para permitir requests concurrentes (resumen + chart + tabla)
+// Si no se libera, los 3 $.getJSON paralelos de gastos.php se bloquean entre sí
+if (session_status() === PHP_SESSION_ACTIVE) {
+    session_write_close();
+}
 
 $pdo = getPDO();
 
@@ -389,6 +399,84 @@ try {
 
     }
 
+    if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        // Soporta ?id=190 y body id=190 (parse_str o JSON)
+        $raw = file_get_contents('php://input');
+        $data = [];
+        if ($raw) {
+            $json = json_decode($raw, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($json)) {
+                $data = $json;
+            } else {
+                parse_str($raw, $data);
+            }
+        }
+        $id = $_GET['id'] ?? $data['id'] ?? null;
+        $id = filter_var($id, FILTER_VALIDATE_INT);
+        if (!$id) {
+            http_response_code(400);
+            echo json_encode(['error' => 'ID inválido']);
+            exit;
+        }
+
+        // Obtener gasto y validar
+        $stmt = $pdo->prepare("SELECT * FROM gastos WHERE id = ?");
+        $stmt->execute([$id]);
+        $gasto = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$gasto) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Gasto no encontrado']);
+            exit;
+        }
+        if ((int)$gasto['activo'] === 0) {
+            http_response_code(400);
+            echo json_encode(['error' => 'El gasto ya está anulado']);
+            exit;
+        }
+
+        // Validar mes no cerrado (como en POST)
+        validarMesNoCerrado($pdo, $gasto['fecha']);
+
+        // Buscar grupo_id asociado (si existe)
+        $stmt = $pdo->prepare("SELECT grupo_id FROM movimientos WHERE gasto_id = ? AND servicio_id = 12 AND estado = 'activo' LIMIT 1");
+        $stmt->execute([$id]);
+        $grupo_id = $stmt->fetchColumn();
+
+        // Si tiene movimientos, usar servicio central (reversión contable completa)
+        if ($grupo_id) {
+            require_once __DIR__ . '/../src/services/MovimientoCorreccionService.php';
+            $svc = new MovimientoCorreccionService($pdo);
+            // Necesitamos reabrir sesión brevemente para obtener usuario_id si se cerró
+            // $_SESSION sigue en memoria tras session_write_close(), así que usamos el valor ya cargado
+            $usuario_id = $_SESSION['usuario_id'] ?? 1;
+            $motivo = $data['motivo'] ?? "Anulación gasto #$id - " . ($gasto['concepto'] ?: 'sin concepto');
+            $res = $svc->anularPorGrupo((int)$grupo_id, $motivo, (int)$usuario_id);
+            if (!$res['success']) {
+                http_response_code(500);
+                echo json_encode(['error' => $res['error'] ?? 'Error al anular']);
+                exit;
+            }
+            // El servicio ya hizo UPDATE gastos activo=0, revertir saldos y auditoría
+            echo json_encode(['success' => true, 'message' => 'Gasto anulado correctamente', 'grupo_anulado' => $grupo_id, 'reverso' => $res['grupo_reverso'] ?? null]);
+            exit;
+        }
+
+        // Fallback sin movimientos (gasto huérfano): soft-delete simple
+        $pdo->prepare("UPDATE gastos SET activo = 0 WHERE id = ?")->execute([$id]);
+        registrarAuditoria($pdo, [
+            'accion' => 'DELETE',
+            'modulo' => 'gastos',
+            'tabla' => 'gastos',
+            'registro_id' => $id,
+            'descripcion' => "Anuló gasto #$id: $" . number_format($gasto['monto'], 2) . " - " . ($gasto['concepto'] ?: 'sin concepto'),
+            'datos_anteriores' => $gasto
+        ]);
+        echo json_encode(['success' => true, 'message' => 'Gasto anulado (sin movimientos)']);
+        exit;
+    }
+
+    http_response_code(405);
+    echo json_encode(['error' => 'Método no permitido']);
 
 
 } catch (Exception $e) {

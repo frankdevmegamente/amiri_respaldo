@@ -1,0 +1,62 @@
+PENDIENTE SUBIR A PRODUCCION (2026-10-20) - Concepto en prestamos + Generadores
+===============================================================================
+
+1) SQL en produccion (phpMyAdmin > SQL, una vez, en la BD de produccion):
+
+   ALTER TABLE prestamos_otorgados
+     ADD COLUMN concepto VARCHAR(255) NULL DEFAULT NULL AFTER persona_nombre;
+
+   (o sube el archivo 011_add_concepto_prestamos_otorgados.sql y ejecutalo)
+
+   Verificar: SHOW COLUMNS FROM prestamos_otorgados LIKE 'concepto';
+
+   IMPORTANTE: sin este ALTER los prestamos NO guardan el concepto (la API lo
+   omite en el INSERT) y la tabla hijita / detalle-deudor muestran "Sin concepto".
+
+2) Subir por FTP (renombrar al destino indicado):
+
+   prestamos-otorgados.php        ->  prestamos-otorgados.php
+   detalle-deudor.php             ->  detalle-deudor.php
+   generador-depositos.php        ->  generador-depositos.php
+   generador-transferencias.php   ->  generador-transferencias.php
+   api-prestamos-otorgados.php    ->  api/prestamos-otorgados.php
+   api-deudores.php               ->  api/deudores.php              (NUEVO)
+   api-directorio-depositos.php   ->  api/directorio-depositos.php  (NUEVO)
+   src/assets/js/anular.js        ->  src/assets/js/anular.js       (NUEVO)
+   src/assets/partials/modal-anular.php -> src/assets/partials/modal-anular.php (NUEVO)
+
+   NO subir nada mas (tu copia local tiene ~35 archivos modificados de otros temas).
+
+3) Probar en produccion:
+
+   GENERADORES
+   - Generador de Depositos: la tabla ya NO muestra la columna CLABE.
+     El ticket imprime "CUENTA: <cuenta> - <BANCO>".
+   - Generador de Transferencias: la tabla ya NO muestra la columna Cuenta,
+     solo CLABE. El ticket imprime "CLABE: <clabe> - <BANCO>".
+
+   PRESTAMOS
+   - Crear prestamo CON concepto -> sale en la tabla hija (columna Concepto),
+     en detalle-deudor.php y en Flujo ("Prestamo a X - concepto").
+   - Crear prestamo SIN concepto -> muestra "Sin concepto" (correcto).
+   - Prestamos viejos -> "Sin concepto" (es NULL, se espera).
+
+   CATALOGO DEUDORES
+   - Boton "Catalogo Deudores" abre la gestion (alta/edicion/borrar).
+   - Boton "Anular por Grupo" abre el modal de anulacion por grupo.
+
+4) Opcional: backfill del historico (si quieres recuperar conceptos ya escritos)
+
+   UPDATE prestamos_otorgados p
+   JOIN (SELECT referencia_id,
+                TRIM(SUBSTRING_INDEX(descripcion, ' - ', -1)) c
+         FROM movimientos
+         WHERE servicio_id = 16 AND descripcion LIKE 'Prestamo a % - %') m
+     ON m.referencia_id = p.id
+   SET p.concepto = m.c
+   WHERE (p.concepto IS NULL OR p.concepto = '')
+     AND p.descripcion LIKE CONCAT('Prestamo a ', p.persona_nombre, ' - %');
+
+   En local solo aplico a 1 prestamo (id 67, "Prestamo Para Arquitecto").
+   OJO: en produccion las descripciones pueden tener acentos distintos; prueba
+   primero con un SELECT antes del UPDATE.

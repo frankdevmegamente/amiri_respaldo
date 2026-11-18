@@ -191,3 +191,55 @@ if (!function_exists('validarMesNoMayorQueSesion')) {
     }
 
 }
+
+if (!function_exists('validarGrupoNoCerrado')) {
+    function validarGrupoNoCerrado($pdo, $grupo_id, $mensajeExtra = '') {
+        $stmt = $pdo->prepare("SELECT DISTINCT DATE_FORMAT(fecha, '%Y-%m') as mes FROM movimientos WHERE grupo_id = ?");
+        $stmt->execute([$grupo_id]);
+        $meses = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        foreach ($meses as $mes) {
+            if (!$mes) continue;
+            $chk = $pdo->prepare("SELECT id FROM cierres_mensuales WHERE mes = ?");
+            $chk->execute([$mes]);
+            if ($chk->fetch()) {
+                $msg = "No puedes anular el grupo #$grupo_id porque el mes $mes ya está cerrado.";
+                if ($mensajeExtra) $msg .= ' ' . $mensajeExtra;
+                throw new Exception($msg);
+            }
+        }
+        // Candados de préstamos con pagos/cobros
+        $stmt = $pdo->prepare("SELECT servicio_id, referencia_id, prestamista_id, beneficiario FROM movimientos WHERE grupo_id = ?");
+        $stmt->execute([$grupo_id]);
+        $movs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($movs as $m) {
+            $s_id = (int)($m['servicio_id'] ?? 0);
+            $ref = $m['referencia_id'] ?? null;
+            if ($s_id === 10) {
+                if ($ref) {
+                    $c = $pdo->prepare("SELECT COUNT(*) FROM movimientos WHERE referencia_id = ? AND servicio_id = 14 AND estado = 'activo'");
+                    $c->execute([$ref]);
+                    if ($c->fetchColumn() > 0) throw new Exception("No puedes anular este préstamo (servicio 10) porque tiene pagos registrados. Anula los pagos primero.");
+                } else if (!empty($m['prestamista_id'])) {
+                    $c = $pdo->prepare("SELECT COUNT(*) FROM movimientos WHERE prestamista_id = ? AND servicio_id = 14 AND estado = 'activo'");
+                    $c->execute([$m['prestamista_id']]);
+                    if ($c->fetchColumn() > 0) throw new Exception("No puedes anular este préstamo porque el prestamista tiene pagos registrados.");
+                }
+            }
+            if ($s_id === 16 && $ref) {
+                $c = $pdo->prepare("SELECT COUNT(*) FROM movimientos WHERE referencia_id = ? AND servicio_id = 17 AND estado = 'activo'");
+                $c->execute([$ref]);
+                if ($c->fetchColumn() > 0) throw new Exception("No puedes anular este préstamo otorgado porque ya tiene cobros. Anula los cobros primero.");
+            }
+        }
+    }
+}
+
+if (!function_exists('generarGrupoId')) {
+    function generarGrupoId($pdo) {
+        // Genera grupo_id único de forma transaccional (MAX+1) - centralizado para evitar colisión microtime
+        $stmt = $pdo->query("SELECT COALESCE(MAX(grupo_id), 0) + 1 FROM movimientos FOR UPDATE");
+        // Si FOR UPDATE no soportado sin transacción, fallback a query simple
+        if (!$stmt) $stmt = $pdo->query("SELECT COALESCE(MAX(grupo_id), 0) + 1 FROM movimientos");
+        return (int)$stmt->fetchColumn();
+    }
+}

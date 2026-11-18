@@ -10,7 +10,15 @@ require_once __DIR__ . '/../src/config/cache.php';
 
 initApi();
 
-requireAdmin();
+requireAuth(['admin', 'usuario']);
+
+if (($_SESSION['usuario_rol'] ?? '') === 'usuario' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
+    jsonError('Solo lectura', 403);
+}
+
+if (session_status() === PHP_SESSION_ACTIVE) {
+    session_write_close();
+}
 
 $pdo = getPDO();
 

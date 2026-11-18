@@ -1,7 +1,7 @@
 <?php
 date_default_timezone_set('America/Mexico_City');
 require_once __DIR__ . '/src/config/session.php';
-if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_rol'] !== 'admin') {
+if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_rol'] ?? '', ['admin','usuario'])) {
     header('Location: login.php');
     exit;
 }
@@ -151,9 +151,9 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                 <div class="col-md-auto">
                                     <div class="d-flex align-items-center gap-2">
                                         <select class="form-select form-select-sm" id="selectPeriodo" style="min-width:130px;">
-                                            <option value="mes" selected>Este Mes</option>
-                                            <option value="mes_pasado">Mes Pasado</option>
-                                            <option value="anio">Este Año</option>
+                                            <option value="mes">Este Mes (Sep 2026)</option>
+                                            <option value="mes_pasado">Mes Pasado (Ago 2026)</option>
+                                            <option value="anio" selected>Este Año</option>
                                             <option value="rango">Fecha Personalizada</option>
                                         </select>
                                         <div id="fechaInicioGroup" style="display:none;min-width:120px;">
@@ -165,13 +165,16 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                         <button class="btn btn-primary btn-sm" id="btnFiltrar">
                                             <i class="ti ti-filter"></i> Aplicar
                                         </button>
-                                        <span class="badge bg-primary bg-opacity-10 text-primary border-0 py-1 px-2" id="rangoFechas"><i class="ti ti-calendar me-1"></i>Este Mes</span>
+                                        <span class="badge bg-primary bg-opacity-10 text-primary border-0 py-1 px-2" id="rangoFechas"><i class="ti ti-calendar me-1"></i>Este Año</span>
                                         <div class="vr mx-1"></div>
                                         <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modalGasto">
                                             <i class="ti ti-plus"></i> Nuevo Gasto
                                         </button>
                                         <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modalAgregarTipo">
                                             <i class="ti ti-tag"></i> Tipo
+                                        </button>
+                                        <button class="btn btn-warning btn-sm" id="btnAnularGenericoGastos" title="Anular cualquier grupo (venta, gasto, préstamo, divisa)">
+                                            <i class="ti ti-eraser"></i> Anular por Grupo
                                         </button>
                                     </div>
                                 </div>
@@ -287,6 +290,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                         <th>Clasificación</th>
                                         <th>Monto</th>
                                         <th>Concepto</th>
+                                        <th class="text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
@@ -385,6 +389,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             </div>
         </div>
 
+        <?php include 'src/assets/partials/modal-anular.php'; ?>
         <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;"></div>
 
         <script src="src/assets/libs/jquery/dist/jquery.min.js"></script>
@@ -395,6 +400,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         <script src="src/assets/js/dark-mode.js"></script>
         <script src="src/assets/js/pantalla-completa.js"></script>
         <script src="src/assets/js/utils.js"></script>
+        <script src="src/assets/js/anular.js"></script>
 
         <script>
             // ─── Helpers ────────────────────────────────
@@ -418,7 +424,11 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     return 'periodo=rango&fecha_inicio=' + anio + '-' + mes + '-01&fecha_fin=' + anio + '-' + mes + '-' + String(dias).padStart(2, '0');
                 }
                 if (periodo === 'rango') {
-                    return 'periodo=rango&fecha_inicio=' + $('#fechaInicio').val() + '&fecha_fin=' + $('#fechaFin').val();
+                    const fi = ($('#fechaInicio').val() || '').trim();
+                    const ff = ($('#fechaFin').val() || '').trim();
+                    // Si rango sin fechas completas, fallback a mes actual para no pedir BETWEEN '' AND ''
+                    if (!fi || !ff) return 'periodo=mes';
+                    return 'periodo=rango&fecha_inicio=' + fi + '&fecha_fin=' + ff;
                 }
                 return 'periodo=' + periodo;
             }
@@ -441,7 +451,11 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 var periodoTexto = { 'mes': 'Este Mes', 'mes_pasado': 'Mes Pasado', 'anio': 'Este Año', 'rango': 'Fecha Personalizada' };
                 var label = periodoTexto[$('#selectPeriodo').val()] || 'Este Mes';
                 $('#rangoFechas').html('<i class="ti ti-calendar me-1"></i>' + label);
-                $.getJSON('api/gastos.php?resumen=1&' + getParams(), function(data) {
+                var urlResumen = 'api/gastos.php?resumen=1&' + getParams();
+                console.log('[gastos] cargarResumen url:', urlResumen);
+                $.getJSON(urlResumen, function(data) {
+                    console.log('[gastos] resumen data:', data);
+                    $('#mesLabel').text(label);
                     $('#kpiTotal').text(formatoMoneda(data.total_monto));
                     $('#kpiPromedio').text(formatoMoneda(data.promedio_monto));
                     $('#kpiCantidad').text(data.total_gastos);
@@ -452,8 +466,14 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     $('#kpiPromedioFooter').html('<i class="ti ti-calendar"></i> ' + subtxt);
                     $('#kpiCantidadFooter').html('<i class="ti ti-calendar"></i> ' + subtxt);
                     $('#kpiMaximoFooter').html('<i class="ti ti-tag"></i> ' + (data.max_concepto || '—'));
-                }).fail(function() {
+                }).fail(function(xhr, textStatus, errorThrown) {
+                    console.error('[gastos] resumen fail:', textStatus, errorThrown, xhr.responseText);
                     $('#kpiTotal').text('Error');
+                    $('#kpiPromedio').text('Error');
+                    $('#kpiCantidad').text('—');
+                    $('#kpiMaximo').text('Error');
+                    $('#mesLabel').text(label + ' (error)');
+                    showToast('Error cargando resumen: ' + (xhr.responseJSON?.error || textStatus), 'error');
                 });
             }
 
@@ -470,7 +490,9 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 container.innerHTML = '';
 
                 if (!datos || datos.length === 0 || datos.every(d => parseFloat(d.total) === 0)) {
-                    container.innerHTML = '<div class="text-muted text-center py-4"><i class="ti ti-circle-off" style="font-size:1.5rem"></i><br>Sin gastos en este mes</div>';
+                    var periodoSel = $('#selectPeriodo').val();
+                    var hint = periodoSel === 'mes' ? 'Sin gastos en septiembre 2026. Cambia a <a href="#" onclick="$(\'#selectPeriodo\').val(\'anio\');actualizarDashboard();return false;">Este Año</a> o <a href="#" onclick="$(\'#selectPeriodo\').val(\'mes_pasado\');actualizarDashboard();return false;">Mes Pasado</a> para ver tus 177 gastos.' : 'Sin gastos en este periodo.';
+                    container.innerHTML = '<div class="text-muted text-center py-4"><i class="ti ti-circle-off" style="font-size:1.5rem"></i><br>' + hint + '</div>';
                     $('#desgloseLegend').text('');
                     return;
                 }
@@ -518,10 +540,15 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             }
 
             function cargarDesglose() {
-                $.getJSON('api/gastos.php?chart=1&' + getParams(), function(data) {
+                var urlChart = 'api/gastos.php?chart=1&' + getParams();
+                console.log('[gastos] cargarDesglose url:', urlChart);
+                $.getJSON(urlChart, function(data) {
+                    console.log('[gastos] desglose data:', data);
                     renderDesglose(data);
-                }).fail(function() {
+                }).fail(function(xhr, textStatus, errorThrown) {
+                    console.error('[gastos] desglose fail:', textStatus, errorThrown, xhr.responseText);
                     renderDesglose([]);
+                    showToast('Error cargando desglose: ' + (xhr.responseJSON?.error || textStatus), 'error');
                 });
             }
 
@@ -568,12 +595,30 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             // ─── DataTable ───────────────────────────────
             function cargarTabla() {
                 let url = 'api/gastos.php?' + getParams();
+                console.log('[gastos] cargarTabla url:', url);
 
                 if (tabla) {
-                    tabla.ajax.url(url).load();
+                    tabla.ajax.url(url).load(function(json) {
+                        console.log('[gastos] tabla reload ok', json);
+                    }, false);
                 } else {
+                    // Capturar errores globales de DataTables para que no quede "Procesando..." infinito sin mensaje
+                    $.fn.dataTable.ext.errMode = 'none';
+                    $('#tablaGastos').on('error.dt', function(e, settings, techNote, message) {
+                        console.error('[gastos] DataTable error:', message, techNote);
+                        showToast('Error cargando tabla: ' + message, 'error');
+                    });
                     tabla = $('#tablaGastos').DataTable({
-                        ajax: { url: url, dataSrc: '' },
+                        ajax: {
+                            url: url,
+                            dataSrc: '',
+                            error: function(xhr, error, thrown) {
+                                console.error('[gastos] tabla ajax error:', error, thrown, xhr.responseText);
+                                showToast('Error cargando gastos: ' + (xhr.responseJSON?.error || error), 'error');
+                                // Fuerza mensaje en tbody si falla
+                                $('#tablaGastos tbody').html('<tr><td colspan="7" class="text-center text-danger py-4">Error cargando datos: ' + (xhr.responseJSON?.error || thrown || error) + '</td></tr>');
+                            }
+                        },
                         columns: [
                             {
                                 data: 'fecha',
@@ -592,10 +637,11 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                     return '<span class="fw-bold">' + fechaOp + '</span>' + infoExtra;
                                 }
                             },
-                            { data: 'cuenta_nombre' },
-                            { data: 'tipo_gasto_nombre' },
+                            { data: 'cuenta_nombre', defaultContent: '—' },
+                            { data: 'tipo_gasto_nombre', defaultContent: '—' },
                             {
                                 data: 'clasificacion',
+                                defaultContent: '—',
                                 render: function(data) {
                                     if (data === 'fijo') return '<span class="badge bg-primary bg-opacity-10 text-primary border-0">Fijo</span>';
                                     if (data === 'variable') return '<span class="badge bg-warning bg-opacity-10 text-warning border-0">Variable</span>';
@@ -609,14 +655,55 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                     return '<strong class="text-danger">$' + monto.toLocaleString('es-MX', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</strong>';
                                 }
                             },
-                            { data: 'concepto' }
+                            { data: 'concepto', defaultContent: '—' },
+                            {
+                                data: null,
+                                title: 'Acciones',
+                                orderable: false,
+                                searchable: false,
+                                className: 'text-center',
+                                render: function(data, type, row) {
+                                    return '<button class="btn btn-sm btn-outline-danger border-0 btn-eliminar-gasto" data-id="'+ row.id +'" data-concepto="'+ (row.concepto||row.tipo_gasto_nombre||'').replace(/"/g,'&quot;') +'" data-monto="'+ row.monto +'" title="Anular gasto"><i class="ti ti-trash"></i></button>';
+                                }
+                            }
                         ],
                         scrollX: true,
                         order: [[0, 'desc']],
-                        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' }
+                        language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json', emptyTable: 'Sin gastos en este periodo', zeroRecords: 'Sin coincidencias' }
                     });
                 }
             }
+
+            // Delegación: anular gasto (opción B - activo=0 + reverso)
+            $(document).on('click', '.btn-eliminar-gasto', function() {
+                const id = $(this).data('id');
+                const concepto = $(this).data('concepto') || '';
+                const monto = parseFloat($(this).data('monto')) || 0;
+                const montoFmt = formatoMoneda(monto);
+                if (!confirm('¿Anular gasto #' + id + ' (' + montoFmt + ' - ' + concepto + ')?\n\nSe revertirán $' + monto.toLocaleString('es-MX') + ' a la cuenta origen y a Utilidades AMIRI. El gasto desaparecerá de reportes (activo=0).')) return;
+                const $btn = $(this);
+                $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
+                $.ajax({
+                    url: 'api/gastos.php?id=' + id,
+                    method: 'DELETE',
+                    success: function(res) {
+                        showToast(res.message || 'Gasto anulado', 'success');
+                        actualizarDashboard();
+                    },
+                    error: function(xhr) {
+                        let msg = 'Error al anular';
+                        try { msg = JSON.parse(xhr.responseText).error || msg; } catch(e) { msg = xhr.responseText || msg; }
+                        showToast(msg, 'error');
+                        $btn.prop('disabled', false).html('<i class="ti ti-trash"></i>');
+                    }
+                });
+            });
+
+            // Genérico: anular por grupo_id (cualquier servicio: venta, gasto, préstamo, divisa)
+            $(document).on('click', '#btnAnularGenericoGastos', function(){
+                const g = prompt('Grupo ID a anular (lo ves en Flujo → Ver detalle → Grupo #):');
+                if (g && g.trim()) abrirAnularGenerico(g.trim());
+            });
 
             // ─── Dashboard completo ──────────────────────
             function actualizarDashboard() {

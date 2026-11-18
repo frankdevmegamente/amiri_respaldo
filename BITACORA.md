@@ -376,3 +376,115 @@ Se aplicó un fix completo en la BD local (documentado y verificado), con respal
 1. **Aplicar en producción** la migración 010: `ALTER TABLE retiros_capital ADD COLUMN cuenta_id INT(11) DEFAULT NULL`.
 2. Si `api/flujo-resumen.php` falla en producción, aplicar también la migración 009 (columnas + cuentas MXN de proveedores).
 3. Verificar en producción: tabla `tablaRetiros` en `capital-amiri.php` y `api/flujo-resumen.php?tipo=diferencia|proveedor&moneda=TODAS`.
+
+---
+
+## 2026-10-08 — Bug historial_saldos en Cambio de Flujo / Retiro + auditoría Santas 226
+
+### Bug encontrado
+- `api/flujo.php` (Cambio de Flujo y Retiro de Efectivo) insertaba 1 `movimientos` que mueve 2 cuentas, pero llamaba `actualizarSaldoCuenta()` **sin `movimiento_id`** → actualizaba `cuentas.saldo_actual` pero **no registraba `historial_saldos`**.
+- Efecto: tarjeta SALDOS BANCARIOS (lee `saldo_actual` directo) vs columna Saldo remanente en `movimientos.php` (lee `historial_saldos` + recálculo JS) no cuadraban.
+
+### Fix aplicado (código)
+- `api/flujo.php` Cambio de Flujo (~línea 391): `$movId = $pdo->lastInsertId()` y se pasa a ambas cuentas (origen `salida`, destino `entrada`).
+- `api/flujo.php` Retiro de Efectivo (~línea 455): igual para `cuenta_bancaria_id` y `caja_efectivo_id`.
+- `flujo.php` input cuentas Venta/Compra Efectivo: `cargarCuentasMXN(true)` ahora pide `solo_gastos=1` y filtra tipos 1+2 (bancarias + cajas empresa); labels aclarados.
+
+### Auditoría Santas (id 226, tipo 2, MXN, creada 2026-08-12)
+- `saldo_actual = $13,482.44`. 91 movs (89 activos: 36 entradas $3,764,405.44 − 53 salidas $3,762,923.00 = neto +$1,482.44) + 2 anulados 09-07 (264k/276k, excluidos).
+- `historial_saldos`: estaba en 10/89 (79 faltantes + 3 corruptos: movs 3684/3696/3697). **Reconstruido a 89/89**: inicial $12,000 → final $13,482.44 OK.
+- **Origen de los $12,000**: saldo inicial cargado a mano al crear la cuenta (12/08), sin movimiento de entrada. Evidencia: primer historial `saldo_anterior=12000`, no existe entrada de $12,000 (único mov de $12,000 es salida 4412 del 01/10), auditoría solo tiene el INSERT de la cuenta, sin UPDATEs.
+- Primeros movs: 2952/2954 (12/08, 37→226, $4,264 + $62,500), 2975 (226→2 Retiro $62,500)...
+
+### PENDIENTE corroborar con banco real (decide el cierre)
+- Si banco dice ~$13,482 → Opción 1: crear movimiento de apertura (entrada $12,000 a Santas, fecha 12/08/2026) + historial. Cierra el caso.
+- Si banco dice ~$1,482 → Opción 2: ajuste auditado −$12,000 (Santas → cuenta de correcciones por definir, fecha por definir). Saldo queda $1,482.44.
+- Pendiente que el usuario confirme número del banco + (opción 2) cuenta destino y fecha.
+- También pendiente: `movimientos.php:528-550` prioriza `saldosCorridos` (recalculado) sobre `historial_saldos`; con filtro de fechas el remanente se desplaza. Evaluar invertir prioridad a historial primero.
+
+---
+
+## 2026-10-08 (cont.) — Origen real de los $12k Santas 226: reversos corruptos 3696/3697
+
+### Hipótesis anterior (descartada)
+- Se había anotado "saldo inicial cargado a mano el 12/08". Investigación completa demuestra que NO fue eso.
+
+### Evidencia (solo lectura, BD local `amiri_reparada`, sin modificar nada)
+- `cuentas.226` creada 12/08/2026 12:53:48 (`auditoria.id=1179`, usuario 2). `datos_nuevos` sin campo de saldo → default `0.00`. Único registro de Santas en auditoría (1 INSERT, 0 UPDATEs sobre 226).
+- IDs `movimientos` 2948–2990 continuos (sin borrados físicos). Ninguna descripción de "saldo inicial / apertura / ajuste de saldo". Ninguna entrada de $12,000 a Santas; único mov de $12,000 es salida 4412 (01/10, 226→37).
+- Par anulado del 09-07 (origen ya descuadrado entre sí por $12,000):
+  - `movs.3694`: 37→226, +$264,000, `anulado`.
+  - `movs.3695`: 226→2, +$276,000, `anulado`.
+- Reversos generados corruptos con montos negativos (estado `activo`, sí suman):
+  - `movs.3696`: 2→226, **−$276,000** (REVERSO anulación grupo ...628801).
+  - `movs.3697`: 226→37, **−$264,000** (REVERSO anulación grupo ...015126).
+
+### Matemática que prueba el origen
+- Efecto neto de 3696+3697 sobre Santas: entrada −$276,000 y salida −$264,000 → **−$276,000 − (−$264,000) = −$12,000**.
+- Sumas actuales Santas (activos): entradas $3,764,405.44 − salidas $3,762,923.00 = **+$1,482.44**. Sin esos 2 reversos el neto sería $1,482.44 + $276,000 − $264,000 = **$13,482.44** = `saldo_actual` actual.
+- Conclusión: `saldo_actual ($13,482.44)` conservó el valor como si la anulación no hubiera restado, pero la suma de movimientos sí absorbió los −$12k. Saldo real conciliado con banco: **$1,482.44**.
+
+### Decisión del usuario
+- NO registrar ningún ajuste ni movimiento de corrección (el dinero nunca existió, no debe quedar rastro de salida). Estado queda tal cual: `saldo_actual=13482.44` (falso) vs real $1,482.44, causa identificada.
+- Cierre futuro (solo si el usuario lo autoriza): corrección quirúrgica sobre reversos 3696/3697 (anular/monto cero + recalibrar `saldo_actual` a $1,482.44 con su `historial_saldos` de corrección). Sin fecha definida.
+
+---
+
+## 2026-10-08 (cont. 2) — Anulados por defecto + bug remanente en movimientos.php
+
+### Cambio aplicado (único, a petición del usuario)
+- `movimientos.php:321`: checkbox `#filtroAnulados` ahora nace con `checked` → al cargar pide `incluir_anulados=1` y muestra anulados/corregidos. Nada más tocado.
+
+### Bug reportado por el usuario (3 capturas, cuenta Santas 226)
+- Img 1 (con anulados, recién cargado): primera fila (07/10 Retiro −$200k) con remanente **−$10,517.56**.
+- Img 2 (sin anulados): misma fila con **$13,482.44**.
+- Img 3 (re-marca anulados): sigue en **$13,482.44** (ya no −$10k). Img 1 e img 3 deberían coincidir y no lo hacen → condición de carrera, no datos.
+
+### Causa raíz (doble, `movimientos.php`)
+1. **Carrera async (`:906-916` dataSrc + `:649-661` cargarResumenCuenta):** `dataSrc` corre `calcularResumenCuenta(rows)` inmediato con `cuentaInfo=null` → `actual=null` → `inicial=null` (`:608-609`) → `bal=0` (`:616`) → corrido neto-puro-desde-cero. Medido en BD: neto con anulados = **−$10,517.56** (coincide exacto con img 1). Al terminar `.load()` llega `cuentaInfo` (`api/cuentas.php?id=226`), recalcula con `inicial = 13482.44 − neto` y repinta → final anclado a `saldo_actual` por fórmula (`inicial+neto=actual`, tautología). Img 3 ya tenía `cuentaInfo` cacheado → por eso "se queda" en $13k.
+2. **Neto contaminado (`:596-604`):** con anulados conviven original anulado (+$264k 3694 / +$276k 3695) + reverso (−$276k 3696 / −$264k 3697, signo negativo + swap = doble inversión). Suma `parseFloat(monto)` con signo → neto activos **+$1,482.44** (inicial fantasma $12,000) vs neto con anulados **−$10,517.56** (inicial $23,999). El final siempre "cuadra" por construcción; los intermedios no.
+- Evidencia extra: `historial_saldos` 3696/226 `entrada −$276,000` → nuevo **−$90,872.56** (saldo negativo imposible); 3697/226 `salida −$264,000` → nuevo $173,127.44.
+
+### Blast radius medido (solo lectura, `saldo_actual` vs neto movs activos, tipos 1+2)
+- Tarpen 34: −$3,276,359 | Caja 2: −$850,073 | Albo 198: +$526,661 | Hernández 229: −$312,122 | Makalan 32: +$276,693 | Azules 197: +$236,440 | Tornero 230: −$181,622 | Mantela 37: +$62,200 | Scotias/Banregios/Banamex/Bajios: ±$12k–$32k | **Santas 226: +$12,000** | Rojas 52: −$10,643. Nota: `neto_movs` ingenuo (arrastra reversos negativos; en deuda/proveedor la semántica difiere), pero en bancarias/cajas el dif debería ser ~$0. Problema sistémico, no solo Santas.
+- Por qué la contabilidad les cuadra igual: todo flujo (`flujo-resumen.php:51`, dashboard, tarjetas) suma `saldo_actual` en todos lados → autoconsistente flujo-contra-flujo aunque no contra bancos. Restricción del usuario: NO tocar saldos existentes para no descuadrarles lo que tienen.
+
+### Plan acordado para mañana (nada ejecutado)
+- **Opción B (cero-riesgo, recomendada):** no actualizar ningún `saldo_actual` (ni Santas). Solo código hacia adelante: (1) reversos con `abs()` en `MovimientoCorreccionService.php` (~121/~340/~680/~1201); (2) migración 012 `CHECK(monto>=0)`; (3) anulación atómica por `grupo_id`; (4) remanente: priorizar `historial_saldos`, `abs(monto)`, excluir no-activos del neto, `inicial` contra historial completo + bandera `cuentaLista` (no pintar hasta tener cuenta+dato, adiós al −$10k de primera carga). (5) `integridad.php` solo reporta, no corrige.
+- **Opción A (solo si autorizan Santas):** B + quirúrgico 226 (monto `ABS` en 3696/3697, corregir sus 4 historiales, `saldo_actual`→$1,482.44 + historial de corrección, transacción + auditoría). Toca solo 226 (+37/+2 en esos historiales); resto de cuentas intactas; agregado tipo 1+2 baja $8,096,511.59→$8,084,511.59 (−$12k = fantasma removido).
+- Pendiente decisión del usuario: A vs B. Pendiente también: qué debe hacer el botón Limpiar de movimientos (¿mantener anulados marcados?).
+
+---
+
+## 2026-10-20 - Concepto en prestamos (BD nueva de produccion) + ajustes en Generadores
+
+### Contexto
+- El usuario importo el dump nuevo de PRODUCCION como BD local (`amiri_reparada`), por tener registros nuevos.
+- Ese dump traia el esquema viejo: `prestamos_otorgados` SIN columna `concepto`.
+- Sintoma: el modal de "Nuevo Prestamo" si tiene el campo Concepto, pero al guardar no aparecia ni en la tabla hija, ni en `detalle-deudor.php`, ni en Flujo (salia "Sin concepto").
+
+### Causa raiz
+- `api/prestamos-otorgados.php` arma el INSERT dinamicamente con `SHOW COLUMNS` + `$has('concepto')`. Sin la columna, el INSERT la omite en silencio -> el concepto NUNCA se guardaba.
+- El GET usa `SELECT p.*`, asi que sin columna el JSON tampoco la traia -> UI caia al fallback "Sin concepto".
+- El codigo PHP estaba bien; faltaba la columna en la BD. La migracion `src/migrations/011_add_concepto_prestamos_otorgados.sql` ya existia pero nunca se aplico en local.
+
+### Fix aplicado (local `amiri_reparada`)
+1. `ALTER TABLE prestamos_otorgados ADD COLUMN concepto VARCHAR(255) NULL DEFAULT NULL AFTER persona_nombre;` (aplicada 2 veces: antes y despues del import del dump).
+2. Backfill del historico: 1 solo prestamo con concepto recuperable (id 67, "Prestamo Para Arquitecto") extraido de `prestamos_otorgados.descripcion` (`Prestamo a <nombre> - <concepto>`). Los otros 62 prestamos tienen `descripcion` vacia -> no hay de donde recuperar.
+3. Verificado: `SELECT p.*` ya devuelve `concepto`; INSERT de prueba con concepto OK (rollback, 0 filas basura).
+
+### Ajustes en los Generadores (frontend, sin cambios de BD)
+- `generador-depositos.php`: oculta la columna CLABE de la tabla; el ticket imprime `CUENTA: <cuenta> - <BANCO>`. El campo CLABE sigue en el modal (no se borra).
+- `generador-transferencias.php`: oculta la columna Cuenta (queda solo CLABE); el campo Cuenta del modal pasa a `hidden` para no perder el valor al editar; CLABE ahora es `required`; el ticket imprime `CLABE: <clabe> - <BANCO>`.
+- Sin cambios en `api/directorio-depositos.php` (la tabla `directorio_depositos` ya existe con `estado`).
+
+### Estado de la BD nueva (verificado)
+- `directorio_depositos`: 113 filas (13 activo / 100 inactivo), 109 con CLABE, 113 con cuenta.
+- `prestamos_otorgados`: 67 filas, todas con `deudor_id`; `deudores`: 24 filas.
+- ESTADO DE PRESTAMOS: pendiente activo=1: 17 | pendiente activo=0: 4 | parcial: 2 | pagado: 44.
+
+### Pendiente: PRODUCCION (no se ha subido nada)
+Paquete listo en `deploy-pendiente-2026-10-20-concepto-y-generadores/` (con `LEEME_SUBIR.txt`):
+- SQL: `ALTER TABLE prestamos_otorgados ADD COLUMN concepto VARCHAR(255) NULL DEFAULT NULL AFTER persona_nombre;`
+- FTP: `prestamos-otorgados.php`, `detalle-deudor.php`, `generador-depositos.php`, `generador-transferencias.php`, `api/prestamos-otorgados.php`, `api/deudores.php` (nuevo), `api/directorio-depositos.php` (nuevo), `src/assets/js/anular.js` (nuevo), `src/assets/partials/modal-anular.php` (nuevo).
+- Ojo: `directorio_depositos` en produccion debe existir (el dump viene de ahi); si no, las paginas la crean solas (CREATE TABLE IF NOT EXISTS).

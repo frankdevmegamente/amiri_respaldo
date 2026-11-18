@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reporte Comisiones — Ana Maria - Maestros Joyeros — Diseño Ejecutivo</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<style>
+  body{ background:#eef2f7; font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; }
+  .hero{ background:linear-gradient(135deg,#5D87FF 0%, #6f42c1 100%); color:#fff; border-radius:16px; }
+  .kpi{ border-radius:14px; border-top:4px solid; box-shadow:0 4px 18px rgba(0,0,0,.06); background:#fff; }
+  .kpi-1{ border-color:#198754; } .kpi-2{ border-color:#5D87FF; } .kpi-3{ border-color:#dc3545; } .kpi-4{ border-color:#6c757d; }
+  /* — KPIs en horizontal — */
+  .kpi-bar{ display:flex; gap:16px; overflow-x:auto; padding-bottom:4px; scrollbar-width:thin; }
+  .kpi-bar .kpi{ flex:1 1 0; min-width:240px; display:flex; align-items:center; gap:14px; }
+  .kpi-bar .kpi .card-body{ display:flex; align-items:center; gap:14px; width:100%; padding:14px 16px; }
+  .kpi-icon{ width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0; }
+  .kpi-icon.success{ background:rgba(25,135,84,.12); color:#198754; }
+  .kpi-icon.primary{ background:rgba(93,135,255,.12); color:#5D87FF; }
+  .kpi-icon.danger{ background:rgba(220,53,69,.12); color:#dc3545; }
+  .kpi-icon.secondary{ background:rgba(108,117,125,.12); color:#6c757d; }
+  .kpi-text{ flex:1; min-width:0; }
+  .kpi-text .label{ font-size:.7rem; letter-spacing:.5px; text-transform:uppercase; }
+  .kpi-text .value{ font-size:1.45rem; line-height:1.1; }
+  @media (max-width:992px){ .kpi-bar{ flex-wrap:wrap; } .kpi-bar .kpi{ min-width:calc(50% - 8px); } }
+  @media (max-width:576px){ .kpi-bar .kpi{ min-width:100%; } }
+  .table thead th{ background:#1a2234; color:#fff; font-size:.78rem; text-transform:uppercase; letter-spacing:.4px; }
+  .table tfoot th{ background:#1a2234; color:#fff; }
+  .badge-comision{ background:#d1e7dd; color:#0f5132; }
+  .badge-pago{ background:#f8d7da; color:#842029; }
+  @media print{
+    @page{ size:A4 landscape; margin:10mm; }
+    body{ background:#fff !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .no-print{ display:none !important; }
+    .container-fluid{ max-width:none !important; padding:0 !important; }
+    .card{ box-shadow:none !important; border:1px solid #dee2e6 !important; break-inside:auto; }
+    .kpi-bar{ gap:10px !important; }
+    .kpi-bar .kpi{ min-width:0 !important; flex:1 1 0 !important; }
+    .kpi-bar .kpi .card-body{ padding:10px 12px !important; }
+    .kpi-icon{ width:36px !important; height:36px !important; font-size:1.1rem !important; }
+    .table-responsive{ overflow:visible !important; max-height:none !important; }
+    .table{ font-size:.72rem; }
+    .table thead th{ position:static !important; background:#1a2234 !important; color:#fff !important; }
+    .table tbody tr, .table tfoot tr{ break-inside:avoid; page-break-inside:avoid; }
+    .hero{ background:#5D87FF !important; -webkit-print-color-adjust:exact; }
+  }
+</style>
+</head>
+<body>
+<div class="container-fluid px-4 py-4" style="max-width:1180px; margin:auto">
+  <!-- Header -->
+  <div class="card hero border-0 shadow-sm mb-4">
+    <div class="card-body p-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+      <div>
+        <div class="small opacity-75" style="letter-spacing:.6px">AMIRI · REPORTE DE COMISIONES · CONFIDENCIAL</div>
+        <h2 class="mb-1 fw-bold"><i class="bi bi-gem"></i> Ana Maria — Maestros Joyeros</h2>
+        <div class="opacity-75 small">Promotor ID <strong>8</strong> · Cuenta <strong>53</strong> · Cliente <strong>Maestros Joyeros (133)</strong> · <span id="fechaGen"></span></div>
+        <div class="opacity-75 small">DB <code class="bg-white bg-opacity-25 px-1 rounded">amiri_reparada</code> · 30 comisiones + 1 pago · Periodo 2026-04-30 → 2026-09-03</div>
+      </div>
+      <div class="d-flex flex-wrap gap-2 no-print">
+        <button class="btn btn-light" onclick="descargarCSV()"><i class="bi bi-filetype-csv"></i> Descargar CSV</button>
+        <button class="btn btn-warning" onclick="imprimirPDF()"><i class="bi bi-printer"></i> Imprimir / PDF</button>
+        <a href="detalle-promotor.php?id=8" class="btn btn-dark"><i class="bi bi-box-arrow-up-right"></i> Ver en sistema</a>
+      </div>
+      <div class="text-end small opacity-75 d-none d-print-block">amiri.local · Verificación: cuentas:53 $29,901.52</div>
+    </div>
+  </div>
+
+  <!-- Tabla -->
+  <div class="card shadow-sm border-0" id="cardTabla">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+      <strong><i class="bi bi-table"></i> Detalle completo — 31 filas (orden descendente)</strong>
+      <span class="badge bg-dark">30 comisiones + 1 pago</span>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive" id="wrapTabla">
+        <table class="table table-sm table-hover align-middle mb-0">
+          <thead><tr><th>#</th><th>Fecha</th><th>Creado en</th><th>Tipo</th><th>Servicio</th><th class="text-end">Monto MXN</th><th>Descripción</th><th>ID</th></tr></thead>
+          <tbody id="tbody"></tbody>
+          <tfoot><tr><th colspan="5" class="text-end">TOTAL COMISIONES</th><th class="text-end">+$32,768.83</th><th colspan="2"></th></tr><tr><th colspan="5" class="text-end">PAGADO</th><th class="text-end">-$2,867.31</th><th colspan="2"></th></tr><tr><th colspan="5" class="text-end">PENDIENTE</th><th class="text-end">$29,901.52</th><th colspan="2"></th></tr></tfoot>
+        </table>
+      </div>
+    </div>
+    <div class="card-footer small text-muted">Método: <code>SELECT ... WHERE (promotor_id=8 OR cuenta_destino_id=53) AND tipo='comision' AND activo=1</code> · Coincide con <code>api/comisiones-promotores.php:227</code> · Verificado contra <code>SELECT saldo_actual FROM cuentas WHERE id=53</code></div>
+  </div>
+
+  <!-- Resultados — solo al final -->
+  <div class="kpi-bar mt-4" id="resultados">
+    <div class="card kpi kpi-1">
+      <div class="card-body">
+        <div class="kpi-icon success"><i class="bi bi-cash-stack"></i></div>
+        <div class="kpi-text">
+          <div class="label small text-muted fw-bold">TOTAL COMISIONES</div>
+          <div class="value fw-bold text-success">$32,768.83</div>
+          <div class="small text-muted">30 movimientos · prom $1,092</div>
+        </div>
+      </div>
+    </div>
+    <div class="card kpi kpi-2">
+      <div class="card-body">
+        <div class="kpi-icon primary"><i class="bi bi-check-circle"></i></div>
+        <div class="kpi-text">
+          <div class="label small text-muted fw-bold">TOTAL PAGADO</div>
+          <div class="value fw-bold text-primary">$2,867.31</div>
+          <div class="small text-muted">1 pago · 2026-05-18</div>
+        </div>
+      </div>
+    </div>
+    <div class="card kpi kpi-3">
+      <div class="card-body">
+        <div class="kpi-icon danger"><i class="bi bi-clock-history"></i></div>
+        <div class="kpi-text">
+          <div class="label small text-muted fw-bold">SALDO PENDIENTE</div>
+          <div class="value fw-bold text-danger">$29,901.52</div>
+          <div class="small text-muted">Cuenta 53 · 91.3% pendiente</div>
+        </div>
+      </div>
+    </div>
+    <div class="card kpi kpi-4">
+      <div class="card-body">
+        <div class="kpi-icon secondary"><i class="bi bi-person-badge"></i></div>
+        <div class="kpi-text">
+          <div class="label small text-muted fw-bold">PROMOTOR</div>
+          <div class="value fw-bold" style="font-size:1.1rem">Ana Maria</div>
+          <div class="small text-muted">anamaria@gmail.com<br>Activa 2026-04-23</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="text-center small text-muted mt-2">Resultados al cierre — totales verificados contra <code>cuentas:53</code></div>
+
+  <div class="text-center small text-muted mt-4 d-print-none">Los 3 diseños siguen disponibles en <a href="reporte-ana-maria-3-disenos.html">reporte-ana-maria-3-disenos.html</a> para comparar.</div>
+</div>
+
+<script>
+const comisiones = [
+  {id:3618, fecha:"2026-09-03", creado:"2026-09-03 10:51:39", usdt:55865.85, monto:2413.01},
+  {id:3493, fecha:"2026-08-28", creado:"2026-08-28 11:23:05", usdt:32006.86, monto:1388.17},
+  {id:3337, fecha:"2026-08-24", creado:"2026-08-24 15:11:23", usdt:6513.23, monto:281.16},
+  {id:3186, fecha:"2026-08-19", creado:"2026-08-19 18:07:58", usdt:30850.34, monto:1332.51},
+  {id:3079, fecha:"2026-08-17", creado:"2026-08-17 13:08:37", usdt:30578.45, monto:1325.44},
+  {id:3036, fecha:"2026-08-14", creado:"2026-08-14 18:24:23", usdt:5000, monto:216.85},
+  {id:2876, fecha:"2026-08-10", creado:"2026-08-10 19:30:23", usdt:8898.94, monto:387.99},
+  {id:2738, fecha:"2026-08-04", creado:"2026-08-04 17:38:18", usdt:55865.85, monto:2457.06},
+  {id:2715, fecha:"2026-08-04", creado:"2026-08-04 14:24:48", usdt:5726.07, monto:252.71},
+  {id:2585, fecha:"2026-07-29", creado:"2026-07-29 13:23:34", usdt:30334.21, monto:1352.66},
+  {id:2365, fecha:"2026-07-20", creado:"2026-07-20 14:09:24", usdt:28611.53, monto:1269.20},
+  {id:2255, fecha:"2026-07-15", creado:"2026-07-15 15:15:52", usdt:30578.45, monto:1353.44},
+  {id:2212, fecha:"2026-07-13", creado:"2026-07-13 18:20:27", usdt:4574.78, monto:204.00},
+  {id:2171, fecha:"2026-07-10", creado:"2026-07-10 15:44:55", usdt:5000, monto:222.32},
+  {id:2061, fecha:"2026-07-06", creado:"2026-07-06 13:33:27", usdt:55865.85, monto:2478.38},
+  {id:1948, fecha:"2026-07-02", creado:"2026-07-02 15:58:43", usdt:3726.14, monto:165.78},
+  {id:1825, fecha:"2026-06-29", creado:"2026-06-29 14:00:58", usdt:36483.73, monto:1624.10},
+  {id:1685, fecha:"2026-06-25", creado:"2026-06-25 18:20:45", usdt:7456.6, monto:332.50},
+  {id:1610, fecha:"2026-06-22", creado:"2026-06-22 14:05:18", usdt:55000, monto:2427.37},
+  {id:1605, fecha:"2026-06-22", creado:"2026-06-22 14:04:37", usdt:28609.47, monto:1261.20},
+  {id:1432, fecha:"2026-06-15", creado:"2026-06-15 15:38:32", usdt:30578.45, monto:1338.66},
+  {id:1395, fecha:"2026-06-12", creado:"2026-06-12 14:38:04", usdt:9949.49, monto:439.11},
+  {id:1348, fecha:"2026-06-10", creado:"2026-06-10 13:44:49", usdt:6157.38, monto:272.53},
+  {id:1220, fecha:"2026-06-05", creado:"2026-06-05 10:57:18", usdt:10000, monto:440.67},
+  {id:1051, fecha:"2026-06-02", creado:"2026-06-02 13:29:30", usdt:34060.35, monto:1498.89},
+  {id:981, fecha:"2026-05-29", creado:"2026-05-29 19:12:32", usdt:10687.9, monto:471.70},
+  {id:817, fecha:"2026-05-26", creado:"2026-05-26 12:28:25", usdt:61149.52, monto:2694.11},
+  {id:545, fecha:"2026-05-15", creado:"2026-05-15 10:49:44", usdt:30578.45, monto:1350.33},
+  {id:272, fecha:"2026-05-04", creado:"2026-05-04 10:39:04", usdt:3725.13, monto:165.08},
+  {id:238, fecha:"2026-04-30", creado:"2026-04-30 16:36:54", usdt:30334.32, monto:1351.90},
+];
+const pagos=[{id:626, fecha:"2026-05-18", creado:"2026-05-18 17:46:13", monto:2867.31}];
+function fmt(n){ return new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(n); }
+(function(){
+  const tb=document.getElementById('tbody');
+  const todos=[...comisiones.map(c=>({...c,tipo:'comision', servicio:'Venta de USDT', desc:`Comisión por ${c.usdt.toLocaleString('es-MX')} USDT`})), ...pagos.map(p=>({...p,tipo:'pago', servicio:'Pago de Comisiones', desc:'Desde Caja de Efectivo'}))].sort((a,b)=> b.fecha.localeCompare(a.fecha) || b.id - a.id);
+  todos.forEach((r,i)=>{
+    const badge = r.tipo==='comision' ? '<span class="badge badge-comision">Comisión</span>' : '<span class="badge badge-pago">Pago</span>';
+    const monto = (r.tipo==='comision'?'+':'-')+fmt(r.monto);
+    const cls = r.tipo==='comision' ? 'text-success' : 'text-danger';
+    tb.innerHTML+=`<tr><td>${r.tipo==='pago'?'—':i}</td><td class="fw-bold">${r.fecha}</td><td class="small text-muted">${r.creado}</td><td>${badge}</td><td>${r.servicio}</td><td class="text-end fw-bold ${cls}">${monto}</td><td class="small">${r.desc}</td><td class="small text-muted">${r.id}</td></tr>`;
+  });
+  document.getElementById('fechaGen').textContent=new Date().toLocaleString('es-MX');
+})();
+function descargarCSV(){
+  let csv="ID,Fecha,Creado_en,Servicio,Tipo,Monto_MXN,USDT,Descripcion\n";
+  comisiones.forEach(r=> csv+=`${r.id},${r.fecha},${r.creado},Venta de USDT,comision,${r.monto},${r.usdt},"Comisión por venta de ${r.usdt} USDT"\n`);
+  pagos.forEach(r=> csv+=`${r.id},${r.fecha},${r.creado},Pago de Comisiones,pago,${r.monto},0,"Pago a Ana Maria"\n`);
+  const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8;"}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=`comisiones-ana-maria-${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url);
+}
+function imprimirPDF(){
+  const wrap=document.getElementById('wrapTabla');
+  const prevH=wrap.style.maxHeight; wrap.style.maxHeight='none'; wrap.style.overflow='visible';
+  setTimeout(()=>{ window.print(); setTimeout(()=>{ wrap.style.maxHeight=prevH; wrap.style.overflow=''; },500); },100);
+}
+</script>
+</body>
+</html>

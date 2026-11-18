@@ -112,6 +112,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     $_SESSION['usuario_rol'] = $_SESSION['temp_usuario_rol'];
 
+                    if (isset($_SESSION['temp_promotor_id']) && $_SESSION['temp_promotor_id']) {
+
+                        $_SESSION['promotor_id'] = (int)$_SESSION['temp_promotor_id'];
+
+                    }
+
                     $_SESSION['LAST_ACTIVITY'] = time();
 
                     $_SESSION['2fa_verified'] = true;
@@ -166,6 +172,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     unset($_SESSION['temp_usuario_rol']);
 
+                    unset($_SESSION['temp_promotor_id']);
+
                     unset($_SESSION['2fa_pending']);
 
                     unset($_SESSION['2fa_start_time']);
@@ -192,7 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 
-                    header('Location: index.php');
+                    header('Location: ' . (($_SESSION['usuario_rol'] ?? '') === 'promotor' ? 'mi-cuenta.php' : 'index.php'));
 
                     exit;
 

@@ -10,7 +10,15 @@ require_once __DIR__ . '/../src/config/auditoria.php';
 
 initApi();
 
-requireAdmin();
+requireAuth(['admin', 'usuario']);
+
+if (($_SESSION['usuario_rol'] ?? '') === 'usuario' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'GET') {
+    jsonError('Solo lectura', 403);
+}
+
+if (session_status() === PHP_SESSION_ACTIVE) {
+    session_write_close();
+}
 
 $pdo = getPDO();
 
@@ -505,6 +513,15 @@ try {
 
             // EDITAR
 
+            // Verificar que no exista nombre+banco duplicado en otra cuenta
+            $chk = $pdo->prepare("SELECT id FROM cuentas WHERE LOWER(nombre)=LOWER(?) AND banco=? AND id<>?");
+            $chk->execute([$nombre, $banco, $id]);
+            if ($chk->fetch()) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Ya existe una cuenta con ese nombre y banco']);
+                exit;
+            }
+
             if ($documentoPath) {
 
                 // Obtener datos anteriores
@@ -704,6 +721,15 @@ try {
         } else {
 
             // CREAR (saldo = 0 SIEMPRE)
+
+            // Verificar que no exista nombre+banco duplicado
+            $chk = $pdo->prepare("SELECT id FROM cuentas WHERE LOWER(nombre)=LOWER(?) AND banco=? AND id<>COALESCE(?,0)");
+            $chk->execute([$nombre, $banco, $id ?: 0]);
+            if ($chk->fetch()) {
+                http_response_code(400);
+                echo json_encode(['error' => 'Ya existe una cuenta con ese nombre y banco']);
+                exit;
+            }
 
             $stmt = $pdo->prepare("
 

@@ -1,0 +1,18 @@
+PENDIENTE SUBIR MANANA (2026-10-08) - Concepto opcional en prestamos
+===============================================================
+
+1) SQL en produccion (phpMyAdmin > SQL, una vez):
+   ALTER TABLE prestamos_otorgados ADD COLUMN concepto VARCHAR(255) NULL DEFAULT NULL AFTER persona_nombre;
+   Verificar: SHOW COLUMNS FROM prestamos_otorgados LIKE 'concepto';
+
+2) Subir por FTP (renombrar al destino indicado):
+   api-prestamos-otorgados.php  ->  api/prestamos-otorgados.php
+   prestamos-otorgados.php      ->  prestamos-otorgados.php
+   detalle-deudor.php           ->  detalle-deudor.php
+
+   NO subir nada mas (tu copia local tiene ~35 archivos modificados de otros temas).
+
+3) Probar en produccion:
+   - Crear prestamo CON concepto -> ver en tabla hija, cobro, detalle-deudor y Flujo ("Prestamo a X - concepto").
+   - Crear prestamo SIN concepto -> OK.
+   - Prestamo viejo -> muestra "—".

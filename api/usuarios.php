@@ -12,7 +12,16 @@ require_once __DIR__ . '/../src/config/validator.php';
 
 initApi();
 
-requireAdmin();
+$esAdminUsuarios = (($_SESSION['usuario_rol'] ?? '') === 'admin');
+$esPromotorUsuarios = (($_SESSION['usuario_rol'] ?? '') === 'promotor');
+
+// Promotor solo puede consultar su propio registro; resto requiere admin
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && $esPromotorUsuarios && isset($_GET['id']) && (int)$_GET['id'] === (int)($_SESSION['usuario_id'] ?? 0)) {
+    // permitido, continuar sin requireAdmin
+} else {
+    requireAdmin();
+    $esAdminUsuarios = true;
+}
 
 $pdo = getPDO();
 
@@ -28,7 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 COUNT(*) AS total,
                 SUM(CASE WHEN rol = 'admin' THEN 1 ELSE 0 END) AS admins,
                 SUM(CASE WHEN rol = 'prestamista' THEN 1 ELSE 0 END) AS prestamistas,
-                SUM(CASE WHEN rol = 'usuario' THEN 1 ELSE 0 END) AS usuarios
+                SUM(CASE WHEN rol = 'usuario' THEN 1 ELSE 0 END) AS usuarios,
+                SUM(CASE WHEN rol = 'promotor' THEN 1 ELSE 0 END) AS promotores
             FROM usuarios
             WHERE activo = 1
         ");
@@ -37,13 +47,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $r['admins'] = (int)$r['admins'];
         $r['prestamistas'] = (int)$r['prestamistas'];
         $r['usuarios'] = (int)$r['usuarios'];
+        $r['promotores'] = (int)($r['promotores'] ?? 0);
         echo json_encode($r);
         exit;
     }
 
     if (isset($_GET['id'])) {
 
-        $stmt = $pdo->prepare("SELECT id, nombre, email, rol, creado_en FROM usuarios WHERE id = ? AND activo = 1");
+        $stmt = $pdo->prepare("SELECT id, nombre, email, rol, promotor_id, creado_en FROM usuarios WHERE id = ? AND activo = 1");
 
         $stmt->execute([$_GET['id']]);
 
@@ -55,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
 
 
-    $stmt = $pdo->query("SELECT id, nombre, email, rol, creado_en FROM usuarios WHERE activo = 1 ORDER BY creado_en DESC");
+    $stmt = $pdo->query("SELECT id, nombre, email, rol, promotor_id, creado_en FROM usuarios WHERE activo = 1 ORDER BY creado_en DESC");
 
     echo json_encode($stmt->fetchAll());
 
@@ -79,6 +90,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $rol = $_POST['rol'] ?? 'usuario';
 
+    $promotor_id = filter_var($_POST['promotor_id'] ?? null, FILTER_VALIDATE_INT) ?: null;
+
 
 
     // Validar datos de entrada con Validator
@@ -93,7 +106,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $validator->email($email);
 
-        $validator->enum($rol, ['admin', 'prestamista', 'usuario']);
+        $validator->enum($rol, ['admin', 'prestamista', 'usuario', 'promotor']);
+
+        // Si es promotor, exigir vínculo válido
+        if ($rol === 'promotor') {
+            if (!$promotor_id) {
+                throw new ValidationException('Debes vincular un promotor', ['promotor_id' => 'Selecciona el promotor']);
+            }
+            $chk = $pdo->prepare("SELECT id FROM promotores WHERE id = ? AND activo = 1");
+            $chk->execute([$promotor_id]);
+            if (!$chk->fetch()) {
+                throw new ValidationException('Promotor no válido', ['promotor_id' => 'Promotor inexistente o inactivo']);
+            }
+            $dup = $pdo->prepare("SELECT id FROM usuarios WHERE promotor_id = ? AND activo = 1" . ($id ? " AND id != ?" : ""));
+            $dup->execute($id ? [$promotor_id, $id] : [$promotor_id]);
+            if ($dup->fetch()) {
+                throw new ValidationException('Ese promotor ya tiene usuario', ['promotor_id' => 'Ya vinculado']);
+            }
+        } else {
+            $promotor_id = null;
+        }
 
         
 
@@ -147,9 +179,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $hashed = password_hash($password, PASSWORD_BCRYPT);
 
-            $stmt = $pdo->prepare("UPDATE usuarios SET nombre=?, email=?, password=?, rol=? WHERE id=?");
+            $stmt = $pdo->prepare("UPDATE usuarios SET nombre=?, email=?, password=?, rol=?, promotor_id=? WHERE id=?");
 
-            $stmt->execute([$nombre, $email, $hashed, $rol, $id]);
+            $stmt->execute([$nombre, $email, $hashed, $rol, $promotor_id, $id]);
 
             
 
@@ -183,9 +215,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         } else {
 
-            $stmt = $pdo->prepare("UPDATE usuarios SET nombre=?, email=?, rol=? WHERE id=?");
+            $stmt = $pdo->prepare("UPDATE usuarios SET nombre=?, email=?, rol=?, promotor_id=? WHERE id=?");
 
-            $stmt->execute([$nombre, $email, $rol, $id]);
+            $stmt->execute([$nombre, $email, $rol, $promotor_id, $id]);
 
             
 
@@ -233,9 +265,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $hashed = password_hash($password, PASSWORD_BCRYPT);
 
-        $stmt = $pdo->prepare("INSERT INTO usuarios (nombre, email, password, rol) VALUES (?, ?, ?, ?)");
+        $stmt = $pdo->prepare("INSERT INTO usuarios (nombre, email, password, rol, promotor_id) VALUES (?, ?, ?, ?, ?)");
 
-        $stmt->execute([$nombre, $email, $hashed, $rol]);
+        $stmt->execute([$nombre, $email, $hashed, $rol, $promotor_id]);
 
         $id = $pdo->lastInsertId();
 
@@ -271,7 +303,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 
-    $stmt = $pdo->prepare("SELECT id, nombre, email, rol, creado_en FROM usuarios WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT id, nombre, email, rol, promotor_id, creado_en FROM usuarios WHERE id = ?");
 
     $stmt->execute([$id]);
 

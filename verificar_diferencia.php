@@ -14,7 +14,7 @@ $totalSaldosMxn = $stmtMxn->fetchColumn();
 $stmtDiv = $pdo->query("SELECT COALESCE(SUM(im.cantidad_restante * im.paridad),0) AS total FROM inventario_monedas im INNER JOIN cuentas c ON im.cuenta_id=c.id WHERE c.activo=1 AND c.tipo_cuenta IN(1,2) AND im.activo=1");
 $totalSaldosDiv = $stmtDiv->fetchColumn();
 
-$stmtPrestOtorgados = $pdo->query("SELECT COALESCE(SUM(monto_total - monto_pagado),0) AS total FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1");
+$stmtPrestOtorgados = $pdo->query("SELECT COALESCE(SUM(COALESCE(monto_total_con_interes, monto_total) - monto_pagado),0) AS total FROM prestamos_otorgados WHERE estado IN ('pendiente', 'parcial') AND activo = 1");
 $totalPrestamosOtorgados = $stmtPrestOtorgados->fetchColumn();
 
 $totalSaldos = $totalSaldosMxn + $totalSaldosDiv + $totalPrestamosOtorgados;

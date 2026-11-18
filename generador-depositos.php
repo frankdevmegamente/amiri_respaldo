@@ -1,16 +1,20 @@
 <?php
 require_once __DIR__ . '/src/config/session.php';
-require_once __DIR__ . '/src/config/db.php'; // Necesario para la BD
+require_once __DIR__ . '/src/config/db.php';
+
+// Prevenir cache del navegador
+header('Cache-Control: no-cache, no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
 
 if (!isset($_SESSION['usuario_id']) || $_SESSION['usuario_rol'] !== 'admin') {
     header('Location: login.php');
     exit;
 }
 $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
-
 $pdo = getPDO();
 
-// 1. AUTO-CREAR LA TABLA SI NO EXISTE
+// Auto-crear tabla
 $pdo->exec("CREATE TABLE IF NOT EXISTS directorio_depositos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(255) NOT NULL,
@@ -20,94 +24,13 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS directorio_depositos (
     estado VARCHAR(20) DEFAULT 'activo',
     creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )");
+try { $pdo->exec("ALTER TABLE directorio_depositos ADD COLUMN estado VARCHAR(20) DEFAULT 'activo'"); } catch (PDOException $e) {}
 
-// Parche de seguridad por si falta la columna estado
-try {
-    $pdo->exec("ALTER TABLE directorio_depositos ADD COLUMN estado VARCHAR(20) DEFAULT 'activo'");
-} catch (PDOException $e) {}
-
-$mensaje = '';
-
-// 2. PROCESAR SUBIDA DEL MACHOTE (CSV) - AHORA CON FILTRO ANTI-DUPLICADOS
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['archivo_csv'])) {
-    $file = $_FILES['archivo_csv'];
-    if ($file['error'] === UPLOAD_ERR_OK) {
-        $handle = fopen($file['tmp_name'], "r");
-        $row = 0;
-        
-        $insertados = 0;
-        $reactivados = 0;
-        $duplicados = 0;
-        
-        // Consultas preparadas
-        $checkStmt = $pdo->prepare("SELECT id, estado FROM directorio_depositos WHERE nombre = ? AND cuenta = ? AND banco = ? LIMIT 1");
-        $insertStmt = $pdo->prepare("INSERT INTO directorio_depositos (nombre, banco, cuenta, clabe, estado) VALUES (?, ?, ?, ?, 'activo')");
-        $updateStmt = $pdo->prepare("UPDATE directorio_depositos SET estado = 'activo', clabe = ? WHERE id = ?");
-        
-        while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-            $row++;
-            if ($row === 1) continue; // Saltar encabezados
-            
-            $nombre = trim($data[0] ?? '');
-            if (empty($nombre)) continue; // Evitar filas vacías
-            
-            $banco = trim($data[1] ?? '');
-            $cuenta = trim($data[2] ?? '');
-            $clabe = trim($data[3] ?? '');
-            
-            // VERIFICAR SI YA EXISTE ESE CLIENTE CON ESA CUENTA EN ESE BANCO
-            $checkStmt->execute([$nombre, $cuenta, $banco]);
-            $clienteExistente = $checkStmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($clienteExistente) {
-                if ($clienteExistente['estado'] === 'inactivo') {
-                    // Si estaba "eliminado", lo revivimos (Soft Undelete)
-                    $updateStmt->execute([$clabe, $clienteExistente['id']]);
-                    $reactivados++;
-                } else {
-                    // Ya existe y está activo, lo ignoramos
-                    $duplicados++;
-                }
-            } else {
-                // Es un cliente 100% nuevo, lo insertamos
-                $insertStmt->execute([$nombre, $banco, $cuenta, $clabe]);
-                $insertados++;
-            }
-        }
-        fclose($handle);
-        
-        $mensaje = "<div class='alert alert-success alert-dismissible fade show' role='alert'>
-                        <i class='ti ti-check me-2'></i> <strong>Archivo procesado:</strong> $insertados nuevos, $reactivados reactivados y se omitieron $duplicados duplicados.
-                        <button type='button' class='btn-close' data-bs-dismiss='alert' aria-label='Close'></button>
-                    </div>";
-    } else {
-        $mensaje = "<div class='alert alert-danger'>Error al subir el archivo.</div>";
-    }
-}
-
-// 3. ELIMINAR CLIENTE DEL DIRECTORIO (SOFT DELETE)
-if (isset($_GET['delete_id'])) {
-    $stmt = $pdo->prepare("UPDATE directorio_depositos SET estado = 'inactivo' WHERE id = ?");
-    $stmt->execute([$_GET['delete_id']]);
-    header("Location: generador-depositos.php");
-    exit;
-}
-
-// 4. OBTENER CLIENTES PARA LA TABLA Y EL SELECTOR (SOLO LOS ACTIVOS)
-$stmt = $pdo->query("SELECT * FROM directorio_depositos WHERE estado = 'activo' ORDER BY nombre ASC");
-$clientes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Extraer lista de bancos únicos para el filtro
-$bancos_unicos = [];
-foreach($clientes as $c) {
-    $b = trim($c['banco'] ?? '');
-    if($b !== '' && !in_array($b, $bancos_unicos)) {
-        $bancos_unicos[] = $b;
-    }
-}
-sort($bancos_unicos);
+// KPIs
+$total = $pdo->query("SELECT COUNT(*) FROM directorio_depositos WHERE estado='activo'")->fetchColumn();
+$inactivos = $pdo->query("SELECT COUNT(*) FROM directorio_depositos WHERE estado='inactivo'")->fetchColumn();
+$bancos = $pdo->query("SELECT COUNT(DISTINCT banco) FROM directorio_depositos WHERE estado='activo'")->fetchColumn();
 ?>
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -117,794 +40,613 @@ sort($bancos_unicos);
     <link rel="shortcut icon" type="image/png" href="src/assets/images/logos/favicon.ico" />
     <link rel="stylesheet" href="src/assets/css/styles.min.css" />
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
     <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
     <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
-    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
     <style>
-                .body-wrapper {
-            /* Aumentamos esto para librar completamente la altura del header azul */
-            padding-top: 100px !important; 
-        }
-        
-        .body-wrapper-inner, 
-        .body-wrapper .container-fluid {
-            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
-            padding-top: 15px !important;
-            margin-top: 0 !important;
-        }
-        .ticket-wrapper {
-            background-color: #f4f6f9;
-            padding: 40px;
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .ticket-card {
-            background: #ffffff;
-            width: 100%;
-            max-width: 580px;
-            border-radius: 0; /* ✨ AQUÍ QUITAMOS LAS ESQUINAS REDONDAS ✨ */
-            padding: 35px;
-            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05);
-            color: #2A3547;
-            font-family: 'Manrope', sans-serif;
-            border: 1px solid #ebf1f6;
-        }
-
-        .ticket-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #6c5ce7;
-        }
-
-        .ticket-title {
-            font-size: 17px; /* Le bajamos un puntito para que encaje mejor */
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: #6c5ce7;
-            text-transform: uppercase;
-            white-space: normal; /* 🔥 ESTA ES LA CLAVE: Permite que respete el borde */
-            text-align: right;
-            line-height: 1.2;
-            word-wrap: break-word;
-        }
-
-        .client-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px dashed #ebf1f6;
-        }
-
-        .client-info { display: flex; flex-direction: column; gap: 4px; }
-        .client-name { font-size: 15px; font-weight: 700; color: #2A3547; }
-        .client-account { font-size: 12px; color: #7c8fac; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        .client-amount {
-            background-color: rgba(93, 135, 255, 0.1);
-            color: #6c5ce7;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 700;
-            text-align: right;
-            min-width: 130px;
-        }
-
-        .ticket-row.total-row {
-            background: rgba(93, 135, 255, 0.04);
-            border: none;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .text-muted-custom { color: #7c8fac; font-size: 13px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px;}
-        .text-success-custom { color: #36c76c; }
-        
-        /* Estilos para la tabla corregidos */
-        .table-directorio thead th { 
-            font-weight: 700; 
-            color: #2A3547; 
-            background-color: #ffffff !important; /* Fondo blanco forzado */
-            position: sticky;
-            top: 0;
-            z-index: 10; /* Lo mantiene por encima de las filas al hacer scroll */
-            box-shadow: 0 1px 0px #ebf1f6; /* Una pequeña línea separadora abajo */
-        }
-        .table-directorio td { vertical-align: middle; }
-
-        .select2-container--default .select2-selection--single {
-            height: 40px;
-            border: 1px solid #ebf1f6;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-        }
-        .select2-container--default .select2-selection--single .select2-selection__arrow {
-            height: 38px;
-        }
-
-         [data-bs-theme="dark"] .logo-modo-claro,
-        .dark-mode .logo-modo-claro {
-            display: none !important;
-        }
-
-        [data-bs-theme="dark"] .logo-modo-oscuro,
-        .dark-mode .logo-modo-oscuro {
-            display: block !important;
-        }
-        /* =========================================
-           📱 AJUSTES EXCLUSIVOS PARA MÓVIL
-           ========================================= */
-        @media (max-width: 768px) {
-            /* 1. Ajuste del encabezado y logo en móvil */
-            .logo-container-ticket {
-                max-width: 75% !important; /* Le damos más espacio al logo en pantallas pequeñas */
-            }
-            .logo-container-ticket img {
-                height: 35px !important; /* Logo un poco más pequeño para que no se amontone */
-                width: auto !important;
-            }
-            .ticket-title {
-                font-size: 14px !important;
-                white-space: normal !important;
-                text-align: right;
-            }
-
-            /* 2. Ajuste de márgenes del ticket */
-            .ticket-wrapper { padding: 15px 10px !important; }
-            .ticket-card { padding: 20px 15px !important; }
-            
-            .client-amount {
-                min-width: auto !important;
-                font-size: 14px !important;
-                padding: 6px 10px !important;
-            }
-            .client-name { font-size: 13px !important; }
-            .client-account { font-size: 11px !important; }
-            
-            .client-row { padding-right: 30px !important; }
-            .btn-quitar-item {
-                transform: translateY(-50%) !important;
-                top: 50% !important;
-                right: 0 !important;
-            }
-        }
+        .body-wrapper { padding-top: 100px !important; }
+        .body-wrapper-inner, .body-wrapper .container-fluid { padding-top: 15px !important; margin-top: 0 !important; }
+        [data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
+        [data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
+        [data-bs-theme="dark"] h3, [data-bs-theme="dark"] .page-breadcrumb h3 { color: #e9ecef !important; }
+        [data-bs-theme="dark"] .card { background: #1a2234; border-color: #2c344c; }
+        [data-bs-theme="dark"] .table>thead>tr>th { background-color: #1a2234 !important; color: #e9ecef !important; border-bottom-color: #2c344c !important; }
+        [data-bs-theme="dark"] .table>tbody>tr>td { color: #e9ecef !important; border-color: #2c344c !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_length, [data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter, [data-bs-theme="dark"] .dataTables_wrapper .dataTables_info, [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate { color: #8c9ea8 !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button { color: #8c9ea8 !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current, [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover { background: #252f43 !important; border-color: #2c344c !important; color: #e9ecef !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper select, [data-bs-theme="dark"] .dataTables_wrapper input { background-color: #252f43; border: 1px solid #2c344c; color: #e9ecef; }
+        [data-bs-theme="dark"] .modal-content { background-color: #1a2234; border-color: #2c344c; }
+        [data-bs-theme="dark"] .modal-header { border-bottom-color: #2c344c; }
+        [data-bs-theme="dark"] .modal-footer { border-top-color: #2c344c; }
+        [data-bs-theme="dark"] .modal-title { color: #e9ecef; }
+        [data-bs-theme="dark"] .form-label { color: #e9ecef; }
+        [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select { background-color: #252f43; border-color: #2c344c; color: #e9ecef; }
+        [data-bs-theme="dark"] .form-control::placeholder { color: #8c9ea8; }
+        [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
+        .metric-card { position: relative; border-radius: 12px !important; transition: transform 0.2s ease, box-shadow 0.2s ease; cursor: pointer; }
+        .metric-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important; }
+        .metric-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 12px 12px 0 0; }
+        .metric-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #8c9ea8; }
+        .metric-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
+        .metric-value { font-size: 1.75rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.25rem; }
+        .metric-footer { font-size: 0.8rem; color: #8c9ea8; }
+        .directorio-header { position: relative; overflow: hidden; border-radius: 16px !important; }
+        .directorio-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(93, 135, 255, 0.08); pointer-events: none; }
+        .directorio-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(19, 222, 185, 0.06); pointer-events: none; }
+        .directorio-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .directorio-header .sub-badge { font-size: 1rem; color: #8c9ea8; }
+        .badge-soft-primary { background: rgba(93,135,255,0.1); color: #5D87FF; border: none; }
+        .badge-soft-danger { background: rgba(220,53,69,0.1); color: #dc3545; border: none; }
+        .badge-soft-success { background: rgba(25,135,84,0.1); color: #198754; border: none; }
+        /* ─── Ticket ─────────────────────────────────── */
+        .ticket-wrapper { background-color: #f4f6f9; padding: 20px; border-radius: 12px; display: flex; justify-content: center; }
+        .ticket-card { background: #ffffff; width: 100%; max-width: 580px; border-radius: 0; padding: 35px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); color: #2A3547; position: relative; overflow: hidden; }
+        .ticket-deco { position: absolute; border-radius: 50%; pointer-events: none; }
+        .ticket-deco-1 { top: -60px; right: -60px; width: 180px; height: 180px; background: #5D87FF; opacity: 0.08; }
+        .ticket-deco-2 { bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; }
+        .ticket-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid #6c5ce7; position: relative; z-index: 1; }
+        .ticket-logo { max-width: 50%; overflow: hidden; }
+        .ticket-logo img { height: 45px; max-width: 100%; object-fit: contain; }
+        .ticket-title { font-size: 18px; font-weight: 700; letter-spacing: 1.5px; color: #6c5ce7; text-transform: uppercase; white-space: nowrap; margin-left: 15px; }
+        .ticket-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed #ebf1f6; position: relative; }
+        .ticket-item-nombre { font-size: 15px; font-weight: 700; color: #2A3547; }
+        .ticket-item-cuenta { font-size: 12px; color: #7c8fac; text-transform: uppercase; letter-spacing: 0.5px; }
+        .ticket-item-monto { background: rgba(93,135,255,0.1); color: #6c5ce7; padding: 8px 16px; border-radius: 6px; font-size: 16px; font-weight: 700; text-align: right; min-width: 130px; }
+        .ticket-quitar { position: absolute; right: 0; top: 50%; transform: translate(120%, -50%); }
+        .ticket-total { background: rgba(93,135,255,0.04); border-radius: 8px; padding: 20px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; }
+        .ticket-total-label { color: #7c8fac; font-size: 13px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+        .ticket-total-value { color: #36c76c; font-weight: 800; font-size: 26px; }
+        [data-bs-theme="dark"] .ticket-wrapper { background-color: transparent !important; }
+        [data-bs-theme="dark"] .ticket-card { background: #1a2234; border: 1px solid #2c344c; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        [data-bs-theme="dark"] .ticket-header { border-bottom-color: #2c344c; }
+        [data-bs-theme="dark"] .ticket-item { border-bottom-color: #2c344c; }
+        [data-bs-theme="dark"] .ticket-item-nombre { color: #e9ecef; }
+        [data-bs-theme="dark"] .ticket-item-cuenta { color: #8c9ea8; }
+        [data-bs-theme="dark"] .ticket-item-monto { background: rgba(93,135,255,0.15); color: #799dfb; }
+        [data-bs-theme="dark"] .ticket-total { background-color: #252f43 !important; }
+        [data-bs-theme="dark"] #placeholderTicket { color: #8c9ea8 !important; }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
-<style>
-    /* =========================================
-   🌙 REGLAS PARA MODO OSCURO (Generador Depósitos)
-   ========================================= */
-
-/* 1. Ticket y Fondo */
-[data-bs-theme="dark"] .ticket-wrapper {
-    background-color: transparent !important;
-}
-
-[data-bs-theme="dark"] .ticket-card {
-    background: #1a2234; /* Fondo oscuro del dashboard */
-    border-color: #2c344c;
-    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-[data-bs-theme="dark"] .ticket-header {
-    border-bottom-color: #2c344c;
-}
-
-[data-bs-theme="dark"] .client-name {
-    color: #e9ecef;
-}
-
-[data-bs-theme="dark"] .client-account {
-    color: #8c9ea8;
-}
-
-[data-bs-theme="dark"] .client-row {
-    border-bottom-color: #2c344c;
-}
-
-[data-bs-theme="dark"] .client-amount {
-    background-color: rgba(93, 135, 255, 0.15);
-    color: #799dfb; 
-}
-
-[data-bs-theme="dark"] #placeholderTicket,
-[data-bs-theme="dark"] .text-muted-custom {
-    color: #8c9ea8 !important;
-}
-
-/* 2. Buscador Select2 (Para quitar el recuadro blanco) */
-[data-bs-theme="dark"] .select2-container--default .select2-selection--single {
-    background-color: #1a2234;
-    border-color: #2c344c;
-}
-
-[data-bs-theme="dark"] .select2-container--default .select2-selection--single .select2-selection__rendered {
-    color: #e9ecef;
-}
-
-[data-bs-theme="dark"] .select2-dropdown {
-    background-color: #1a2234;
-    border-color: #2c344c;
-}
-
-[data-bs-theme="dark"] .select2-container--default .select2-search--dropdown .select2-search__field {
-    background-color: #252f43;
-    border-color: #2c344c;
-    color: #e9ecef;
-}
-
-[data-bs-theme="dark"] .select2-container--default .select2-results__option[aria-selected=true] {
-    background-color: #252f43;
-    color: #e9ecef;
-}
-
-[data-bs-theme="dark"] .select2-container--default .select2-results__option--highlighted[aria-selected] {
-    background-color: #6c5ce7;
-    color: #ffffff;
-}
-
-/* 3. Tabla del Directorio */
-[data-bs-theme="dark"] .table-directorio thead th {
-    background-color: #1a2234 !important;
-    color: #e9ecef !important;
-    border-bottom-color: #2c344c !important;
-    box-shadow: 0 1px 0px #2c344c;
-}
-
-[data-bs-theme="dark"] .table-directorio td {
-    color: #e9ecef;
-    border-color: #2c344c;
-}
-</style>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
         <?php include 'src/assets/partials/header.php'; ?>
         <?php include 'src/assets/partials/sidebar.php'; ?>
-
         <div class="body-wrapper">
             <div class="body-wrapper-inner">
-                <div class="container-fluid" style="max-width: 1400px; margin: 0 auto;">
-                    
-                    <div class="d-flex align-items-center justify-content-between mb-4 mt-2">
-                        <h3 class="mb-0"><i class="ti ti-cash"></i> Generador Depositos</h3>
-                    </div>
-
-                    <?= $mensaje ?>
-
-                    <div class="card shadow-sm border-0 rounded-4 mb-4">
-                        <div class="card-body">
-                            <div class="row align-items-center mb-3">
-                                <div class="col-12 col-md-auto mb-3 mb-md-0">
-                                    <h5 class="card-title fw-semibold mb-0"><i class="ti ti-users"></i> Directorio de Clientes</h5>
+                <div class="container-fluid px-4" style="max-width: 100%;">
+                    <!-- PAGE HEADER -->
+                    <div class="card directorio-header shadow-sm border-0 rounded-4 mb-4">
+                        <div class="bg-pattern"></div>
+                        <div class="bg-pattern-2"></div>
+                        <div class="card-body p-4">
+                            <div class="row align-items-center g-3">
+                                <div class="col-md">
+                                    <div class="d-flex align-items-center gap-3 mb-1">
+                                        <div class="d-flex align-items-center justify-content-center rounded-3" style="width:48px;height:48px;background:rgba(19,222,185,0.12);">
+                                            <i class="ti ti-cash text-success" style="font-size:1.6rem;"></i>
+                                        </div>
+                                        <div>
+                                            <h2 class="mb-0">Generador de Depósitos</h2>
+                                            <span class="sub-badge"><i class="ti ti-circle"></i> Gestiona el directorio y arma tus tickets de depósito</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                
-                                <div class="col-12 col-md-auto ms-md-auto">
-                                    <div class="d-flex flex-column flex-md-row gap-2">
-                                        <a href="src/assets/machote_clientes.xlsx" download class="btn btn-sm btn-outline-secondary px-3 py-2 text-nowrap d-flex justify-content-center align-items-center">
-                                            <i class="ti ti-download me-1"></i> Descargar Machote
+                                <div class="col-md-auto">
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCliente" id="btnNuevo">
+                                            <i class="ti ti-plus"></i> Nuevo Cliente
+                                        </button>
+                                        <a href="src/assets/machote_clientes.xlsx" download class="btn btn-outline-secondary">
+                                            <i class="ti ti-download"></i> Machote
                                         </a>
-                                        
-                                        <button class="btn btn-sm btn-primary px-3 py-2 text-nowrap d-flex justify-content-center align-items-center" data-bs-toggle="modal" data-bs-target="#modalUpload">
-                                            <i class="ti ti-upload me-1"></i> Subir Excel (XLSX)
+                                        <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#modalUpload">
+                                            <i class="ti ti-upload"></i> Subir Excel
+                                        </button>
+                                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalTicket" id="btnVerTicket">
+                                            <i class="ti ti-receipt"></i> Ticket
+                                            <span class="badge bg-white text-success ms-1" id="ticketCount">0</span>
+                                            <span class="ms-2" id="ticketTotalBadge">$0.00</span>
                                         </button>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="input-group mb-3">
-                                <span class="input-group-text bg-light text-muted border-end-0"><i class="ti ti-search"></i></span>
-                                <input type="text" id="buscadorDirectorio" class="form-control border-start-0 ps-0" placeholder="Buscar cliente por nombre, banco, cuenta o CLABE...">
-                            </div>
-
-                            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
-                                <table class="table table-hover table-bordered table-directorio mb-0">
-                                    <thead>
-    <tr>
-        <th style="position: sticky; top: 0; z-index: 10;">Nombre Completo</th>
-        <th style="position: sticky; top: 0; z-index: 10;">Banco</th>
-        <th style="position: sticky; top: 0; z-index: 10;">Cuenta</th>
-        <th class="text-center" style="position: sticky; top: 0; z-index: 10;">Acción</th>
-    </tr>
-</thead>
-                                    <tbody id="cuerpoDirectorio">
-                                        <?php if(empty($clientes)): ?>
-                                            <tr><td colspan="5" class="text-center text-muted py-4">No hay clientes en el directorio. Descarga el machote y sube tu archivo.</td></tr>
-                                        <?php else: ?>
-                                            <?php foreach($clientes as $c): ?>
-<tr>
-    <td class="fw-bold"><?= htmlspecialchars($c['nombre']) ?></td>
-    
-    <td><span class="badge bg-primary bg-opacity-10 text-primary border-0 py-1 px-2" style="font-size: 0.8rem;"><?= htmlspecialchars($c['banco']) ?></span></td>
-    
-    <td><?= htmlspecialchars($c['cuenta']) ?></td>
-    <td class="text-center">
-    <button class="badge bg-primary bg-opacity-10 text-primary border-0 me-1 btn-editar-cliente" 
-            style="padding: 8px 12px; cursor: pointer;"
-            data-id="<?= $c['id'] ?>"
-            data-nombre="<?= htmlspecialchars($c['nombre']) ?>"
-            data-banco="<?= htmlspecialchars($c['banco']) ?>"
-            data-cuenta="<?= htmlspecialchars($c['cuenta']) ?>"
-            data-clabe="<?= htmlspecialchars($c['clabe']) ?>">
-        <i class="ti ti-edit"></i>
-    </button>
-    <a href="?delete_id=<?= $c['id'] ?>" class="badge bg-danger bg-opacity-10 text-danger border-0" style="padding: 8px 12px; text-decoration: none; font-size: 0.85rem;" onclick="return confirm('¿Eliminar cliente?')">
-            <i class="ti ti-trash"></i>
-        </a>
-</td>
-    
-    <!-- <td class="text-center">
-        <a href="?delete_id=<?= $c['id'] ?>" class="badge bg-danger bg-opacity-10 text-danger border-0" style="padding: 8px 12px; text-decoration: none; font-size: 0.85rem;" onclick="return confirm('¿Eliminar cliente?')">
-            <i class="ti ti-trash"></i>
-        </a>
-    </td> -->
-</tr>
-<?php endforeach; ?>
-                                        <?php endif; ?>
-                                    </tbody>
-                                </table>
-                            </div>
                         </div>
                     </div>
-
-                    <div class="row">
-                        <div class="col-lg-5 col-md-5 mb-4">
-                            <div class="card shadow-sm border-0 rounded-4">
-                                <div class="card-body p-4">
-                                    <h5 class="card-title fw-semibold mb-4">Armar Ticket</h5>
-                                    
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold text-primary">1. Filtrar por Banco (Opcional)</label>
-                                        <select class="form-select" id="filtroBanco">
-                                            <option value="">-- Todos los bancos --</option>
-                                            <?php foreach($bancos_unicos as $b): ?>
-                                                <option value="<?= htmlspecialchars($b) ?>"><?= htmlspecialchars($b) ?></option>
-                                            <?php endforeach; ?>
-                                        </select>
+                    <!-- KPI CARDS -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card metric-card border-0 shadow-sm h-100">
+                                <div class="metric-accent bg-primary"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Total Activos</span>
+                                        <div class="metric-icon bg-primary bg-opacity-10 text-primary"><i class="ti ti-users"></i></div>
                                     </div>
-
-                                    <div class="mb-3">
-                                        <label class="form-label fw-semibold">2. Buscar Cliente (Escribe el nombre)</label>
-                                        <select class="form-control" id="selectCliente" style="width: 100%;">
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-4">
-                                        <label class="form-label fw-semibold">3. Monto a Depositar</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text bg-light">$</span>
-                                            <input type="text" step="0.01" class="form-control" id="inputMonto" placeholder="Ej. 15000.00">
-                                        </div>
-                                    </div>
-
-                                    <button class="btn btn-success w-100 mb-3" id="btnAgregarTicket">
-                                        <i class="ti ti-plus"></i> Agregar al Ticket
-                                    </button>
-
-                                    <button class="btn btn-primary w-100 py-2 fw-semibold shadow-sm" id="btnDescargar">
-                                        <i class="ti ti-download me-2"></i> Descargar Ticket
-                                    </button>
+                                    <div class="metric-value text-primary"><?= $total ?></div>
+                                    <div class="metric-footer">En el directorio</div>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="col-lg-7 col-md-7">
-                            <div class="ticket-wrapper">
-                                <div class="ticket-card" id="vistaPreviaTicket" style="position: relative; overflow: hidden;">
-                                    
-                                    <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #5D87FF; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-                                    <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-
-                                   <div class="ticket-header" style="position: relative; z-index: 1;">
-    <div class="d-flex align-items-center logo-container-ticket" style="max-width: 50%;">
-        <img src="src/assets/images/logos/logo2.png" alt="Logo Amiri" class="logo-modo-claro" style="height: 45px; width: auto;" />
-        <img src="src/assets/images/logos/logo2-blanco-sin-fondo.png" alt="Logo Amiri" class="logo-modo-oscuro" style="height: 45px; width: auto; display: none;" />
-    </div>
-    <div class="text-end" style="margin-left: 15px;">
-        <div class="ticket-title">DEPÓSITOS EN EFECTIVO</div>
-    </div>
-</div>
-
-                                    <div class="client-list" id="ticketItemsContainer">
-                                        <div class="text-center text-muted py-4" id="placeholderTicket">
-                                            <i class="ti ti-receipt fs-1 text-light"></i><br>
-                                            El ticket está vacío. Agrega clientes desde el panel izquierdo.
-                                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card metric-card border-0 shadow-sm h-100">
+                                <div class="metric-accent bg-success"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Bancos</span>
+                                        <div class="metric-icon bg-success bg-opacity-10 text-success"><i class="ti ti-building-bank"></i></div>
                                     </div>
-
-                                    <!-- <div class="text-center mt-4">
-                                        <span class="text-muted-custom" style="font-size: 10px;">Generado el: <span id="outFechaHoy"></span></span>
-                                    </div> -->
-
+                                    <div class="metric-value text-success"><?= $bancos ?></div>
+                                    <div class="metric-footer">Diferentes</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card metric-card border-0 shadow-sm h-100">
+                                <div class="metric-accent bg-warning"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Inactivos</span>
+                                        <div class="metric-icon bg-warning bg-opacity-10 text-warning"><i class="ti ti-user-off"></i></div>
+                                    </div>
+                                    <div class="metric-value text-warning"><?= $inactivos ?></div>
+                                    <div class="metric-footer">Eliminados (soft)</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card metric-card border-0 shadow-sm h-100">
+                                <div class="metric-accent bg-info"></div>
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <span class="metric-label">Total</span>
+                                        <div class="metric-icon bg-info bg-opacity-10 text-info"><i class="ti ti-database"></i></div>
+                                    </div>
+                                    <div class="metric-value text-info"><?= $total + $inactivos ?></div>
+                                    <div class="metric-footer">Registrados</div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
+                    <!-- TABLA -->
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-body p-4 table-responsive">
+                            <table id="tablaDirectorio" class="table table-hover align-middle w-100">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Banco</th>
+                                        <th>Cuenta</th>
+                                        <th style="width:150px;">Monto a transferir</th>
+                                        <th class="text-center" style="width:190px;">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-
+    <!-- MODAL -->
+    <div class="modal fade" id="modalCliente" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitulo"><i class="ti ti-user-plus"></i> Nuevo Cliente</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="formCliente">
+                    <div class="modal-body">
+                        <input type="hidden" name="id" id="cuenta_id">
+                        <div class="mb-3">
+                            <label class="form-label">Nombre Completo *</label>
+                            <input type="text" class="form-control" name="nombre" id="nombre" required placeholder="Ej. Juan Perez">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Banco</label>
+                            <input type="text" class="form-control" name="banco" id="banco" placeholder="Ej. BBVA">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Cuenta</label>
+                            <input type="text" class="form-control" name="cuenta" id="cuenta" placeholder="Ej. 1234567890">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">CLABE</label>
+                            <input type="text" class="form-control" name="clabe" id="clabe" placeholder="Ej. 012345678901234567">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999;"></div>
+    <!-- Modal Ticket (vista previa) -->
+    <div class="modal fade" id="modalTicket" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="ti ti-receipt"></i> Ticket de Transferencias</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="ticket-wrapper">
+                        <div class="ticket-card" id="vistaPreviaTicket">
+                            <div class="ticket-deco ticket-deco-1"></div>
+                            <div class="ticket-deco ticket-deco-2"></div>
+                            <div class="ticket-header">
+                                <div class="ticket-logo">
+                                    <img src="src/assets/images/logos/logo2.png" alt="Logo Amiri" class="logo-modo-claro" />
+                                    <img src="src/assets/images/logos/logo2-blanco-sin-fondo.png" alt="Logo Amiri" class="logo-modo-oscuro" style="display:none;" />
+                                </div>
+                                <div class="ticket-title">TRANSFERENCIAS</div>
+                            </div>
+                            <div id="ticketItemsContainer">
+                                <div class="text-center text-muted py-4" id="placeholderTicket">
+                                    <i class="ti ti-receipt" style="font-size:3rem;opacity:0.3;"></i><br>
+                                    El ticket está vacío. Agrega montos y pulsa <strong>➕ Ticket</strong> en la tabla.
+                                </div>
+                            </div>
+                            <div class="ticket-total" id="contenedorTotal" style="display:none;">
+                                <div class="ticket-total-label">TOTAL TRANSFERENCIAS</div>
+                                <div class="ticket-total-value" id="outTotal">$0.00 MXN</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger me-auto" id="btnLimpiarTicket">
+                        <i class="ti ti-trash"></i> Limpiar Ticket
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-success" id="btnDescargar">
+                        <i class="ti ti-download"></i> Descargar Ticket
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Upload Excel -->
     <div class="modal fade" id="modalUpload" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form id="formSubirExcel">
-    <div class="modal-body">
-        <p class="text-muted small">Sube tu archivo de Excel llenado <strong>(.xlsx)</strong>.</p>
-        <input class="form-control" type="file" id="archivo_excel" accept=".xlsx" required>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-        <button type="submit" class="btn btn-primary" id="btnProcesarExcel">Subir y Guardar</button>
-    </div>
-</form>
+                    <div class="modal-header">
+                        <h5 class="modal-title">Subir Machote de Clientes</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted small">Sube tu archivo de Excel llenado <strong>(.xlsx)</strong>.</p>
+                        <input class="form-control" type="file" id="archivo_excel" accept=".xlsx" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" id="btnProcesarExcel">Subir y Guardar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-
-    <div class="modal fade" id="modalEditarCliente" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form id="formEditarCliente">
-                <div class="modal-header">
-                    <h5 class="modal-title">Editar Cliente</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" name="id" id="edit_id">
-                    <div class="mb-3">
-                        <label class="form-label">Nombre Completo</label>
-                        <input type="text" class="form-control" name="nombre" id="edit_nombre" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Banco</label>
-                        <input type="text" class="form-control" name="banco" id="edit_banco">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Cuenta</label>
-                        <input type="text" class="form-control" name="cuenta" id="edit_cuenta">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">CLABE</label>
-                        <input type="text" class="form-control" name="clabe" id="edit_clabe">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <script src="src/assets/libs/jquery/dist/jquery.min.js"></script>
     <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="src/assets/js/sidebarmenu.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="src/assets/js/dark-mode.js"></script>
     <script src="src/assets/js/utils.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
     <script>
-        // Al hacer clic en el botón editar de la tabla
-$(document).on('click', '.btn-editar-cliente', function() {
-    const d = $(this).data();
-    $('#edit_id').val(d.id);
-    $('#edit_nombre').val(d.nombre);
-    $('#edit_banco').val(d.banco);
-    $('#edit_cuenta').val(d.cuenta);
-    $('#edit_clabe').val(d.clabe);
-    $('#modalEditarCliente').modal('show');
-});
-
-// Enviar el formulario de edición
-$('#formEditarCliente').on('submit', function(e) {
-    e.preventDefault();
-    const btn = $(this).find('button[type="submit"]');
-    btn.prop('disabled', true).html('<i class="ti ti-loader ti-spin"></i> Guardando...');
-
-    $.ajax({
-        url: 'api/editar-cliente-directorio.php',
-        method: 'POST',
-        data: $(this).serialize(),
-        dataType: 'json', // 🔥 ESTO ES CLAVE: Obligamos a leerlo como JSON
-        success: function(res) {
-            if (res && res.success) {
-                // Cerramos el modal por elegancia y recargamos la página al instante
-                $('#modalEditarCliente').modal('hide');
-                location.reload();
-            } else {
-                alert('Error al guardar: ' + (res.error || 'Respuesta inválida'));
-                btn.prop('disabled', false).text('Guardar Cambios');
-            }
-        },
-        error: function(xhr, status, error) {
-            // 🔥 Si el servidor manda basura o falla, lo atrapamos aquí para que no se quede trabado
-            console.error("Error del servidor: ", xhr.responseText);
-            alert('El cliente se guardó, pero hubo un detalle de conexión. Recargando...');
-            location.reload(); 
-        }
-    });
-});
-document.getElementById('formSubirExcel').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    let file = document.getElementById('archivo_excel').files[0];
-    if (!file) return;
-
-    let btn = document.getElementById('btnProcesarExcel');
-    btn.innerHTML = '<i class="ti ti-loader ti-spin"></i> Procesando...';
-    btn.disabled = true;
-
-    let reader = new FileReader();
-    reader.onload = function(e) {
-        let data = new Uint8Array(e.target.result);
-        let workbook = XLSX.read(data, {type: 'array'});
-        
-        // Agarramos la primera hoja del Excel
-        let primeraHoja = workbook.SheetNames[0];
-        // Convertimos el Excel a un arreglo de objetos JSON (saltando la primera fila de títulos)
-        let filas = XLSX.utils.sheet_to_json(workbook.Sheets[primeraHoja], {header: 1});
-        filas.shift(); // Quitamos los encabezados
-        
-        // Enviamos los datos limpios a PHP
-        $.ajax({
-            url: 'api/procesar-excel-depositos.php', // Necesitaremos crear este archivito
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(filas),
-            success: function(response) {
-                if(response.success) {
-                    location.reload(); // Recargamos para ver los cambios
-                } else {
-                    alert("Error: " + response.error);
-                    btn.innerHTML = 'Subir y Guardar';
-                    btn.disabled = false;
-                }
-            }
-        });
-    };
-    reader.readAsArrayBuffer(file);
-});
-
-        function descargarMachote() {
-            let csvContent = "data:text/csv;charset=utf-8,Nombre,Banco,Cuenta,Clabe\n";
-            var encodedUri = encodeURI(csvContent);
-            var link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "machote_clientes_depositos.csv");
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-        }
-
-        // Lógica de colores por banco (Diccionario extendido para México)
-        function getColorBanco(bancoNombre) {
-            const b = (bancoNombre || '').toLowerCase().trim();
-            
-            // 1. Bancos Tradicionales
-            if (b.includes('bbva') || b.includes('bancomer')) return '#004481'; // Azul BBVA
-            if (b.includes('santander')) return '#ec0000'; // Rojo Santander
-            if (b.includes('banorte')) return '#eb0029'; // Rojo Banorte
-            if (b.includes('hsbc')) return '#db0011'; // Rojo HSBC
-            if (b.includes('banamex') || b.includes('citi')) return '#056dae'; // Azul Banamex
-            if (b.includes('scotia')) return '#ed1b24'; // Rojo Scotia
-            if (b.includes('inbursa')) return '#00508c'; // Azul Inbursa
-            if (b.includes('azteca')) return '#00a22d'; // Verde Azteca
-            if (b.includes('coppel') || b.includes('bancoppel')) return '#005da3'; // Azul Coppel
-            if (b.includes('bajio') || b.includes('banbajio')) return '#fbb700'; // Amarillo Bajío
-            if (b.includes('afirme')) return '#00973a'; // Verde Afirme
-            if (b.includes('banregio')) return '#eb6f00'; // Naranja Banregio
-            if (b.includes('mifel')) return '#005a8c'; // Azul Mifel
-            if (b.includes('invex')) return '#002f6c'; // Azul Marino Invex
-            if (b.includes('multiva')) return '#003865'; // Azul Multiva
-            if (b.includes('banjercito')) return '#12322b'; // Verde militar Banjercito
-            if (b.includes('bienestar') || b.includes('bansefi')) return '#611232'; // Guinda Gobierno
-
-            // 2. Fintechs, Neobancos y Wallets
-            if (b.includes('nu') || b.includes('nubank')) return '#8a05be'; // Morado Nu
-            if (b.includes('plata')) return '#1a1a1a'; // Negro/Gris muy oscuro Plata Card
-            if (b.includes('mercado') || b.includes('mercadopago')) return '#009ee3'; // Azul claro MercadoLibre
-            if (b.includes('spin') || b.includes('oxxo')) return '#ff6e00'; // Naranja Spin by Oxxo
-            if (b.includes('hey') || b.includes('heybanco')) return '#000000'; // Negro Hey Banco
-            if (b.includes('stori')) return '#00c08b'; // Verde Teal Stori
-            if (b.includes('klar')) return '#000000'; // Negro Klar
-            if (b.includes('uala') || b.includes('ualá')) return '#f2385a'; // Rosa Ualá
-            if (b.includes('fondeadora')) return '#121212'; // Negro Fondeadora
-            if (b.includes('albo')) return '#002f87'; // Azul Albo
-            if (b.includes('broxel')) return '#00a2d3'; // Celeste Broxel
-            if (b.includes('rappi') || b.includes('rappipay')) return '#ff4600'; // Naranja Rappi
-            if (b.includes('bineo')) return '#ff0066'; // Rosa Bineo
-            if (b.includes('cetes')) return '#104a3e'; // Verde oscuro CetesDirecto
-            
-            // 3. Color por defecto (Si de plano es uno que no está en la lista)
-            return '#6c5ce7'; // Azul/Morado Amiri
-        }
-
+        let tablaDirectorio;
+        const montosTicket = {};   // { idCliente: monto }
         $(document).ready(function() {
-            
-            // LÓGICA DEL BUSCADOR EN LA TABLA DEL DIRECTORIO
-            $('#buscadorDirectorio').on('keyup', function() {
-                let value = $(this).val().toLowerCase();
-                $('#cuerpoDirectorio tr').filter(function() {
-                    // Ignorar la fila de "No hay clientes" si existe
-                    if ($(this).find('td').length === 1) return;
-                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-                });
+            tablaDirectorio = $('#tablaDirectorio').DataTable({
+                ajax: { url: 'api/directorio-depositos.php', dataSrc: '' },
+                columns: [
+                    { data: 'id', render: d => '<span class="badge bg-secondary bg-opacity-10 text-secondary">#'+d+'</span>' },
+                    { data: 'nombre', render: d => '<strong>'+d+'</strong>' },
+                    { data: 'banco', render: d => d ? '<span class="badge bg-primary bg-opacity-10 text-primary border-0">'+d+'</span>' : '<span class="text-muted">—</span>' },
+                    { data: 'cuenta', render: d => d ? '<span class="no-capitalize">'+d+'</span>' : '<span class="text-muted">—</span>' },
+                    {
+                        data: null, orderable: false, searchable: false,
+                        render: d => '<div class="input-group input-group-sm">' +
+                                    '<span class="input-group-text">$</span>' +
+                                    '<input type="number" step="0.01" min="0" class="form-control input-monto-ticket" ' +
+                                    'placeholder="0.00" data-id="' + d.id + '">' +
+                                    '</div>'
+                    },
+                    { data: null, orderable: false, searchable: false, className: 'text-center', render: d => `
+                        <button class="btn btn-sm btn-success me-1 btn-agregar-ticket" data-id="${d.id}" title="Agregar al ticket"><i class="ti ti-plus"></i></button>
+                        <button class="btn btn-sm btn-outline-primary me-1 btn-editar" data-id="${d.id}" title="Editar"><i class="ti ti-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-danger btn-eliminar" data-id="${d.id}" title="Eliminar"><i class="ti ti-trash"></i></button>
+                    ` }
+                ],
+                order: [[1, 'asc']],
+                createdRow: function(row, data) {
+                    $(row).attr('data-id', data.id).attr('data-nombre', data.nombre);
+                },
+                language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' }
             });
-
-            const ahora = new Date();
-            const fechaOpciones = { year: 'numeric', month: 'long', day: 'numeric' };
-            const horaOpciones = { hour: '2-digit', minute: '2-digit', hour12: true };
-            const fechaTxt = ahora.toLocaleDateString('es-MX', fechaOpciones).toUpperCase();
-            const horaTxt = ahora.toLocaleTimeString('es-MX', horaOpciones).toUpperCase();
-            $('#outFechaHoy').text(fechaTxt + ' A LAS ' + horaTxt);
-
-            const formatoMoneda = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
-            let totalMxn = 0;
-            let itemsEnTicket = 0;
-
-            const todosLosClientes = <?php echo json_encode($clientes); ?>;
-
-            function cargarBuscadorClientes(filtroBanco = '') {
-                const select = $('#selectCliente');
-                if (select.hasClass("select2-hidden-accessible")) {
-                    select.select2('destroy');
-                }
-                select.empty();
-                select.append('<option value="">-- Escribe el nombre o selecciona --</option>');
-                
-                todosLosClientes.forEach(c => {
-                    const bancoDelCliente = c.banco ? c.banco.trim() : '';
-                    if (filtroBanco === '' || bancoDelCliente === filtroBanco) {
-                        const cuentaStr = c.cuenta ? c.cuenta : c.clabe;
-                        select.append(`<option value="${c.id}" data-nombre="${c.nombre}" data-banco="${bancoDelCliente}" data-cuenta="${cuentaStr}">${c.nombre} - ${bancoDelCliente}</option>`);
+            // Al redibujar la tabla (paginación, búsqueda, recarga) restaurar los montos capturados
+            // y refrescar el ticket
+            $('#tablaDirectorio').on('draw', function() {
+                $('#tablaDirectorio tbody tr').each(function() {
+                    const id = $(this).attr('data-id');
+                    if (id && montosTicket[id] != null) {
+                        $(this).find('.input-monto-ticket').val(montosTicket[id]);
                     }
                 });
-
-                select.select2({
-                    width: '100%',
-                    language: { noResults: () => "No se encontraron clientes" }
-                });
-            }
-
-            cargarBuscadorClientes('');
-
-            $('#filtroBanco').on('change', function() {
-                cargarBuscadorClientes($(this).val());
-            });
-
-            $('#btnAgregarTicket').on('click', function() {
-                const select = $('#selectCliente').find(':selected');
-                const montoRaw = $('#inputMonto').val();
-                const monto = parseFloat(montoRaw);
-
-                if (select.val() === "" || !select.val()) {
-                    showToast('Por favor, selecciona un cliente del directorio.', 'error');
-                    return;
-                }
-
-                if (isNaN(monto) || monto <= 0) {
-                    showToast('Por favor, ingresa un monto válido.', 'error');
-                    return;
-                }
-
-                const nombre = select.data('nombre');
-                const banco = select.data('banco');
-                const cuenta = select.data('cuenta');
-                const colorBanco = getColorBanco(banco);
-
-                if (itemsEnTicket === 0) {
-                    $('#placeholderTicket').hide();
-                }
-
-                const uniqueId = 'item_' + Date.now();
-
-                let itemHtml = `
-                    <div class="client-row position-relative" id="${uniqueId}">
-                        <div class="client-info">
-                            <div class="client-name">${nombre.toUpperCase()}</div>
-                            <div class="client-account">Cuenta: ${cuenta} - <span class="fw-bolder" style="color: ${colorBanco};">${banco.toUpperCase()}</span></div>
-                        </div>
-                        <div class="client-amount">${formatoMoneda.format(monto)}</div>
-                        <button class="btn btn-sm text-danger position-absolute end-0 top-0 btn-quitar-item" data-id="${uniqueId}" data-monto="${monto}" style="transform: translateX(120%);" title="Quitar del ticket">
-                            <i class="ti ti-x"></i>
-                        </button>
-                    </div>
-                `;
-
-                $('#ticketItemsContainer').append(itemHtml);
-                
-                totalMxn += monto;
-                itemsEnTicket++;
-                $('#selectCliente').val('').trigger('change');
-                $('#inputMonto').val('');
-                showToast('Agregado al ticket', 'success');
-            });
-
-            $('#ticketItemsContainer').on('click', '.btn-quitar-item', function() {
-                const id = $(this).data('id');
-                const montoRestar = parseFloat($(this).data('monto'));
-
-                $(`#${id}`).remove();
-                totalMxn -= montoRestar;
-                itemsEnTicket--;
-
-                if (itemsEnTicket === 0) {
-                    $('#placeholderTicket').show();
-                }
-            });
-
-            $('#btnDescargar').on('click', function() {
-                if (itemsEnTicket === 0) {
-                    showToast('Agrega al menos un cliente al ticket antes de descargar.', 'error');
-                    return;
-                }
-
-                const ticket = document.getElementById('vistaPreviaTicket');
-                const btn = $(this);
-                const textoOriginal = btn.html();
-                
-                $('.btn-quitar-item').hide();
-                btn.html('<i class="ti ti-loader ti-spin me-2"></i> Generando...');
-                btn.prop('disabled', true);
-
-                // --- 🚀 PASO 1: "Desplegar" el ticket para la captura ---
-                // Eliminamos max-width y forzamos un ancho perfecto para que html2canvas lo "vea" bien.
-                const originalMaxWidth = ticket.style.maxWidth;
-                const originalWidth = ticket.style.width;
-                ticket.style.maxWidth = 'none'; // Quitamos la restricción
-                ticket.style.width = '580px';    // Forzamos el ancho óptimo que definiste en CSS
-
-                // --- PASO 2: Generar la captura ---
-                html2canvas(ticket, {
-                    backgroundColor: null, // Mantenemos la transparencia que querías
-                    scale: 3,             // Alta resolución
-                    logging: false
-                }).then(canvas => {
-                    const enlace = document.createElement('a');
-                    const fechaTxt = new Date().toISOString().slice(0,10);
-                    enlace.download = `Deposito_Masivo_Amiri_${fechaTxt}.png`;
-                    enlace.href = canvas.toDataURL("image/png");
-                    enlace.click();
-
-                    // --- 🔄 PASO 3: Restaurar el estado original ---
-                    ticket.style.maxWidth = originalMaxWidth;
-                    ticket.style.width = originalWidth;
-
-                    $('.btn-quitar-item').show();
-                    btn.html(textoOriginal).prop('disabled', false);
-                    showToast('¡Ticket generado con éxito!', 'success');
-                }).catch(err => {
-                    console.error(err);
-                    
-                    // Aseguramos restaurar el estado incluso si hay error
-                    ticket.style.maxWidth = originalMaxWidth;
-                    ticket.style.width = originalWidth;
-
-                    $('.btn-quitar-item').show();
-                    showToast('Hubo un error al generar la imagen', 'error');
-                    btn.html(textoOriginal).prop('disabled', false);
-                });
+                refrescarTicket();
             });
         });
+        // Nuevo
+        $('#btnNuevo').on('click', function() {
+            $('#formCliente')[0].reset();
+            $('#cuenta_id').val('');
+            $('#modalTitulo').html('<i class="ti ti-user-plus"></i> Nuevo Cliente');
+        });
+        // Editar
+        $(document).on('click', '.btn-editar', function() {
+            const id = $(this).data('id');
+            $.get('api/directorio-depositos.php?id=' + id, function(d) {
+                $('#cuenta_id').val(d.id);
+                $('#nombre').val(d.nombre);
+                $('#banco').val(d.banco);
+                $('#cuenta').val(d.cuenta);
+                $('#clabe').val(d.clabe);
+                $('#modalTitulo').html('<i class="ti ti-pencil"></i> Editar Cliente');
+                $('#modalCliente').modal('show');
+            });
+        });
+        // Guardar
+        $('#formCliente').submit(function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: 'api/directorio-depositos.php',
+                method: 'POST',
+                data: $(this).serialize(),
+                dataType: 'json',
+                success: function(res) {
+                    if (res.success) {
+                        $('#modalCliente').modal('hide');
+                        tablaDirectorio.ajax.reload();
+                        showToast('Cliente guardado', 'success');
+                    } else {
+                        showToast(res.error || 'Error', 'error');
+                    }
+                },
+                error: function(xhr) {
+                    showToast(xhr.responseJSON?.error || 'Error', 'error');
+                }
+            });
+        });
+        // Eliminar
+        $(document).on('click', '.btn-eliminar', function() {
+            const id = $(this).data('id');
+            const nombre = $(this).closest('tr').attr('data-nombre') || '';
+            if (!confirm('¿Eliminar "' + nombre + '"?')) return;
+            $.ajax({
+                url: 'api/directorio-depositos.php?id=' + id,
+                method: 'DELETE',
+                success: function(res) {
+                    if (res.success) {
+                        tablaDirectorio.ajax.reload();
+                        showToast('Eliminado', 'success');
+                    } else {
+                        showToast(res.error || 'Error', 'error');
+                    }
+                },
+                error: function(xhr) {
+                    showToast(xhr.responseJSON?.error || 'Error', 'error');
+                }
+            });
+        });
+        // ═══════════════════════════════════════════════
+        //  TICKET INTEGRADO EN LA TABLA CRUD
+        //  - Columna "Monto a transferir" con input por fila
+        //  - Botón ➕ por fila que agrega ese cliente al ticket
+        //  - Vista previa en modal
+        // ═══════════════════════════════════════════════
+        const itemsTicket = [];   // { id, nombre, banco, cuenta, monto }
+        const formatoMoneda = new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' });
+
+        function totalTicket() {
+            return itemsTicket.reduce((sum, it) => sum + it.monto, 0);
+        }
+        function refrescarTicket() {
+            // Badge del botón en el header
+            $('#ticketCount').text(itemsTicket.length);
+            $('#ticketTotalBadge').text(formatoMoneda.format(totalTicket()));
+            // Vista previa dentro del modal
+            const cont = $('#ticketItemsContainer');
+            cont.empty();
+            if (!itemsTicket.length) {
+                cont.append(
+                    $('<div>', { class: 'text-center text-muted py-4', id: 'placeholderTicket' })
+                        .append($('<i>', { class: 'ti ti-receipt', style: 'font-size:3rem;opacity:0.3;' }))
+                        .append($('<br>'))
+                        .append(document.createTextNode('El ticket está vacío. Agrega montos y pulsa ➕ Ticket en la tabla.'))
+                );
+                $('#contenedorTotal').hide();
+                return;
+            }
+            itemsTicket.forEach(it => {
+                const colorBanco = getColorBanco(it.banco);
+                const $item = $('<div>', { class: 'ticket-item', 'data-id': it.id });
+                $('<div>').append(
+                    $('<div>', { class: 'ticket-item-nombre', text: it.nombre.toUpperCase() }),
+                    $('<div>', { class: 'ticket-item-cuenta' }).append(
+                        document.createTextNode('CUENTA: ' + (it.cuenta || 'SIN CUENTA REGISTRADA') + ' - '),
+                        $('<span>', { style: 'font-weight:700;color:' + colorBanco, text: (it.banco || '').toUpperCase() })
+                    )
+                ).appendTo($item);
+                $('<div>', { class: 'ticket-item-monto', text: formatoMoneda.format(it.monto) }).appendTo($item);
+                $('<button>', { class: 'btn btn-sm text-danger ticket-quitar btn-quitar-item', 'data-id': it.id, title: 'Quitar del ticket' })
+                    .append($('<i>', { class: 'ti ti-x' })).appendTo($item);
+                cont.append($item);
+            });
+            $('#contenedorTotal').show();
+            $('#outTotal').text(formatoMoneda.format(totalTicket()) + ' MXN');
+        }
+        // Capturar el monto escrito en la fila
+        $('#tablaDirectorio').on('input', '.input-monto-ticket', function() {
+            const id = $(this).data('id');
+            const v = parseFloat($(this).val());
+            if (v > 0) montosTicket[id] = v;
+            else delete montosTicket[id];
+        });
+        // Agregar al ticket desde la fila
+        $(document).on('click', '.btn-agregar-ticket', function() {
+            const id = String($(this).data('id'));
+            const $fila = $(this).closest('tr');
+            const input = $fila.find('.input-monto-ticket');
+            const monto = parseFloat(input.val());
+            if (!monto || monto <= 0) {
+                showToast('Escribe el monto a transferir en la fila.', 'error');
+                input.trigger('focus');
+                return;
+            }
+            const cliente = tablaDirectorio.rows().data().toArray().find(c => String(c.id) === id);
+            if (!cliente) { showToast('No se encontró el cliente.', 'error'); return; }
+            const item = {
+                id: id,
+                nombre: cliente.nombre,
+                banco: cliente.banco || '',
+                cuenta: cliente.cuenta || '',
+                monto: monto
+            };
+            const existente = itemsTicket.findIndex(it => it.id === id);
+            if (existente >= 0) itemsTicket[existente] = item;
+            else itemsTicket.push(item);
+            montosTicket[id] = monto;
+            refrescarTicket();
+            showToast((existente >= 0 ? 'Actualizado' : 'Agregado') + ': ' + cliente.nombre, 'success');
+        });
+        // Quitar del ticket
+        $('#ticketItemsContainer').on('click', '.btn-quitar-item', function() {
+            const id = String($(this).data('id'));
+            const idx = itemsTicket.findIndex(it => it.id === id);
+            if (idx >= 0) itemsTicket.splice(idx, 1);
+            refrescarTicket();
+        });
+        // Limpiar ticket
+        $('#btnLimpiarTicket').on('click', function() {
+            if (!itemsTicket.length) { showToast('El ticket ya está vacío.', 'warning'); return; }
+            if (!confirm('¿Limpiar el ticket? Se quitarán todos los clientes agregados.')) return;
+            itemsTicket.length = 0;
+            Object.keys(montosTicket).forEach(k => delete montosTicket[k]);
+            $('#tablaDirectorio tbody .input-monto-ticket').val('');
+            refrescarTicket();
+            showToast('Ticket limpiado', 'success');
+        });
+        // Descargar ticket (PNG)
+        $('#btnDescargar').on('click', function() {
+            if (!itemsTicket.length) { showToast('Agrega al menos un cliente al ticket antes de descargar.', 'error'); return; }
+            const ticket = document.getElementById('vistaPreviaTicket');
+            const btn = $(this);
+            const textoOriginal = btn.html();
+            $('.ticket-quitar').hide();
+            btn.html('<i class="ti ti-loader ti-spin"></i> Generando...');
+            btn.prop('disabled', true);
+            const originalMaxWidth = ticket.style.maxWidth;
+            const originalWidth = ticket.style.width;
+            ticket.style.maxWidth = 'none';
+            ticket.style.width = '580px';
+            html2canvas(ticket, { backgroundColor: null, scale: 3, logging: false }).then(canvas => {
+                const enlace = document.createElement('a');
+                enlace.download = 'Deposito_Masivo_Amiri_' + new Date().toISOString().slice(0,10) + '.png';
+                enlace.href = canvas.toDataURL('image/png');
+                enlace.click();
+                ticket.style.maxWidth = originalMaxWidth;
+                ticket.style.width = originalWidth;
+                $('.ticket-quitar').show();
+                btn.html(textoOriginal).prop('disabled', false);
+                showToast('¡Ticket generado con éxito!', 'success');
+            }).catch(err => {
+                console.error(err);
+                ticket.style.maxWidth = originalMaxWidth;
+                ticket.style.width = originalWidth;
+                $('.ticket-quitar').show();
+                btn.html(textoOriginal).prop('disabled', false);
+                showToast('Hubo un error al generar la imagen', 'error');
+            });
+        });
+        // Subir Excel (importación masiva)
+        document.getElementById('formSubirExcel').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const file = document.getElementById('archivo_excel').files[0];
+            if (!file) return;
+            const btn = document.getElementById('btnProcesarExcel');
+            btn.innerHTML = '<i class="ti ti-loader ti-spin"></i> Procesando...';
+            btn.disabled = true;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const filas = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });
+                filas.shift();
+                $.ajax({
+                    url: 'api/procesar-excel-depositos.php',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(filas),
+                    success: function(response) {
+                        if (response.success) { location.reload(); }
+                        else { showToast('Error: ' + response.error, 'error'); btn.innerHTML = 'Subir y Guardar'; btn.disabled = false; }
+                    },
+                    error: function() {
+                        showToast('Error al procesar el archivo', 'error');
+                        btn.innerHTML = 'Subir y Guardar';
+                        btn.disabled = false;
+                    }
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        });
+        // Color por banco
+        function getColorBanco(bancoNombre) {
+            const b = (bancoNombre || '').toLowerCase().trim();
+            if (b.includes('bbva') || b.includes('bancomer')) return '#004481';
+            if (b.includes('santander')) return '#ec0000';
+            if (b.includes('banorte')) return '#eb0029';
+            if (b.includes('hsbc')) return '#db0011';
+            if (b.includes('banamex') || b.includes('citi')) return '#056dae';
+            if (b.includes('scotia')) return '#ed1b24';
+            if (b.includes('inbursa')) return '#00508c';
+            if (b.includes('azteca')) return '#00a22d';
+            if (b.includes('coppel') || b.includes('bancoppel')) return '#005da3';
+            if (b.includes('bajio') || b.includes('banbajio')) return '#fbb700';
+            if (b.includes('afirme')) return '#00973a';
+            if (b.includes('banregio')) return '#eb6f00';
+            if (b.includes('mifel')) return '#005a8c';
+            if (b.includes('invex')) return '#002f6c';
+            if (b.includes('multiva')) return '#003865';
+            if (b.includes('banjercito')) return '#12322b';
+            if (b.includes('bienestar') || b.includes('bansefi')) return '#611232';
+            if (b.includes('nu') || b.includes('nubank')) return '#8a05be';
+            if (b.includes('plata')) return '#1a1a1a';
+            if (b.includes('mercado') || b.includes('mercadopago')) return '#009ee3';
+            if (b.includes('spin') || b.includes('oxxo')) return '#ff6e00';
+            if (b.includes('hey') || b.includes('heybanco')) return '#000000';
+            if (b.includes('stori')) return '#00c08b';
+            if (b.includes('klar')) return '#000000';
+            if (b.includes('uala')) return '#f2385a';
+            if (b.includes('fondeadora')) return '#121212';
+            if (b.includes('albo')) return '#002f87';
+            if (b.includes('broxel')) return '#00a2d3';
+            if (b.includes('rappi') || b.includes('rappipay')) return '#ff4600';
+            if (b.includes('bineo')) return '#ff0066';
+            if (b.includes('cetes')) return '#104a3e';
+            return '#6c5ce7';
+        }
     </script>
 </body>
 </html>
