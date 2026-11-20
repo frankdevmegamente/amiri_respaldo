@@ -1243,3 +1243,168 @@
 [data-bs-theme="dark"] #desgloseBody .text-end {
   color: #ffffff !important;
 }
+
+/* Badges Abierto/Cerrado - evitar solapamiento en modo oscuro */
+
+[data-bs-theme="dark"] .badge.bg-success,
+[data-bs-theme="dark"] .badge.bg-danger {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  margin-right: 0.5rem !important;
+  white-space: nowrap !important;
+}
+
+/* Estados de meses - evitar solapamiento (ambos modos) */
+
+#selectorMesActivo .dropdown-header .float-end {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  float: none !important;
+  margin-left: auto !important;
+}
+
+#selectorMesActivo .dropdown-header .float-end > span {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+  margin-right: 0.5rem !important;
+  white-space: nowrap !important;
+}
+
+/* Estados de meses - modo oscuro: fondo y contraste */
+
+[data-bs-theme="dark"] #selectorMesActivo .dropdown-header {
+  background-color: #1e2638 !important;
+  color: #e9ecef !important;
+}
+
+[data-bs-theme="dark"] #selectorMesActivo .dropdown-header .float-end > span {
+  color: #e9ecef !important;
+}
+
+[data-bs-theme="dark"] #selectorMesActivo .dropdown-header .float-end > span.text-success {
+  color: #198754 !important;
+}
+
+[data-bs-theme="dark"] #selectorMesActivo .dropdown-header .float-end > span.text-danger {
+  color: #dc3545 !important;
+}
+
+/* Filtros - forzar que no se salgan del recuadro en cualquier resolución */
+
+.filtros-bar .row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.filtros-bar .col-xl-2,
+.filtros-bar .col-xl-4,
+.filtros-bar .col-md-4 {
+  flex: 0 0 auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding-left: 0.75rem !important;
+  padding-right: 0.75rem !important;
+}
+
+.filtros-bar .form-control,
+.filtros-bar .form-select {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+.filtros-bar .d-flex.align-items-end {
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 0.5rem !important;
+  width: 100% !important;
+}
+
+.filtros-bar .d-flex.align-items-end .btn.btn-sm,
+.filtros-bar .d-flex.align-items-end .form-check {
+  width: 100% !important;
+  margin: 0.25rem 0 !important;
+  flex-shrink: 0 !important;
+}
+
+.filtros-bar .d-flex.align-items-end .btn.btn-sm {
+  width: auto !important;
+  max-width: 100% !important;
+}
+
+/* En pantallas ≥ 992px, permitir 2 columnas para los filtros de fecha/tipo/etc */
+@media (min-width: 992px) {
+  .filtros-bar .col-xl-2 {
+    width: 50% !important;
+    max-width: 50% !important;
+  }
+  .filtros-bar .col-xl-4 {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* Switch del logo según el tema (modo claro / oscuro) */
+
+[data-bs-theme="dark"] .logo-modo-claro {
+  display: none !important;
+}
+
+[data-bs-theme="dark"] .logo-modo-oscuro {
+  display: block !important;
+}
+
+[data-bs-theme="light"] .logo-modo-oscuro {
+  display: none !important;
+}
+
+[data-bs-theme="light"] .logo-modo-claro {
+  display: block !important;
+}
+
+/* Botón para abrir sidebar - visible en resoluciones donde el sidebar se esconde, sin moverlo de su lugar */
+
+@media (max-width: 1199.98px) {
+  #headerCollapse.sidebartoggler,
+  .brand-logo .sidebartoggler,
+  .left-sidebar .sidebartoggler,
+  .sidebar-overlay.sidebartoggler {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: auto !important;
+    cursor: pointer !important;
+  }
+
+  #headerCollapse.sidebartoggler i,
+  .brand-logo .sidebartoggler i,
+  .left-sidebar .sidebartoggler i {
+    color: #fff !important;
+    font-size: 1.25rem !important;
+  }
+}
+
+/* Sidebar - mantener fondo oscuro en modo oscuro */
+
+[data-bs-theme="dark"] .left-sidebar {
+  background-color: #0f1420 !important;
+}
+
+/* Evitar solapamiento de elementos dentro de celdas de tabla */
+
+table td .d-inline-flex {
+  flex-wrap: nowrap !important;
+  gap: 0.5rem !important;
+  min-width: 0 !important;
+}
+
+table td .d-inline-flex .ti {
+  flex-shrink: 0 !important;
+  margin-right: 0.25rem !important;
+}
