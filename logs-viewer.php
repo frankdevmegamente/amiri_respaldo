@@ -72,10 +72,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css">
 
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css">
-
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css">
-
     <link rel="stylesheet" href="src/assets/css/layout-custom.css">
 
     <style>
@@ -124,7 +120,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         .log-ERROR {
 
-            border-left-color: #fa896b;
+            border-left-color: var(--nx-danger);
 
             background: rgba(250, 137, 107, 0.1);
 
@@ -132,7 +128,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         .log-WARNING {
 
-            border-left-color: #ffae1f;
+            border-left-color: var(--nx-warning);
 
             background: rgba(255, 174, 31, 0.1);
 
@@ -140,7 +136,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         .log-INFO {
 
-            border-left-color: #13deb9;
+            border-left-color: var(--nx-success);
 
             background: rgba(19, 222, 185, 0.05);
 
@@ -176,7 +172,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         .level-ERROR { 
 
-            background: #fa896b; 
+            background: var(--nx-danger); 
 
             color: white; 
 
@@ -184,7 +180,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         .level-WARNING { 
 
-            background: #ffae1f; 
+            background: var(--nx-warning); 
 
             color: #000; 
 
@@ -192,7 +188,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         .level-INFO { 
 
-            background: #13deb9; 
+            background: var(--nx-success); 
 
             color: #000; 
 
@@ -516,8 +512,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <script src="src/assets/js/sidebarmenu.js"></script>
 
     <script src="src/assets/libs/simplebar/dist/simplebar.js"></script>
-
-    <script src="src/assets/js/dark-mode.js"></script>
 
     <script src="src/assets/js/pantalla-completa.js"></script>
 

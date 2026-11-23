@@ -134,9 +134,6 @@ try {
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css      " />
 
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
-
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
     <style>
@@ -207,7 +204,7 @@ try {
 
         [data-bs-theme="dark"] .nav-tabs .nav-link.active {
             color: #ffffff !important;
-            border-bottom-color: #6c5ce7 !important;
+            border-bottom-color: #c58fb8 !important;
         }
 
         [data-bs-theme="dark"] .bg-light {
@@ -264,8 +261,8 @@ try {
                         <div class="col-md-4">
                             <div class="card shadow-sm border-0 rounded-4 h-100" style="position: relative; overflow: hidden;">
                                 
-                                <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #5D87FF; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-                                <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                                <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: var(--nx-primary); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                                <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: var(--nx-success); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
 
                                 <div class="card-body p-4" style="position: relative; z-index: 1;">
                                     <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
@@ -673,8 +670,6 @@ try {
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js      "></script>
 
         <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js      "></script>
-
-        <script src="src/assets/js/dark-mode.js"></script>
 
         <script src="src/assets/js/pantalla-completa.js"></script>
 

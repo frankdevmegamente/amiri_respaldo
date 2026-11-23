@@ -18,8 +18,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <link rel="stylesheet" href="src/assets/css/styles.min.css" />
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
     <style>
@@ -29,42 +27,42 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .logo-modo-claro { display: none !important; }
         [data-bs-theme="dark"] .logo-modo-oscuro { display: block !important; }
 
-        [data-bs-theme="dark"] h3, [data-bs-theme="dark"] .page-breadcrumb h3 { color: #e9ecef !important; }
-        [data-bs-theme="dark"] .card { background: #1a2234; border-color: #2c344c; }
-        [data-bs-theme="dark"] .table>thead>tr>th { background-color: #1a2234 !important; color: #e9ecef !important; border-bottom-color: #2c344c !important; }
-        [data-bs-theme="dark"] .table>tbody>tr>td { color: #e9ecef !important; border-color: #2c344c !important; }
+        [data-bs-theme="dark"] h3, [data-bs-theme="dark"] .page-breadcrumb h3 { color: #f5f2f4 !important; }
+        [data-bs-theme="dark"] .card { /* Helios handles card bg */ }
+        [data-bs-theme="dark"] .table>thead>tr>th { background-color: var(--nx-surface) !important; color: #f5f2f4 !important; border-bottom-color: rgba(255,255,255,0.12) !important; }
+        [data-bs-theme="dark"] .table>tbody>tr>td { color: #f5f2f4 !important; border-color: rgba(255,255,255,0.12) !important; }
         [data-bs-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd)>* { box-shadow: inset 0 0 0 9999px rgba(255,255,255,0.02); }
         [data-bs-theme="dark"] .table-hover>tbody>tr:hover>* { box-shadow: inset 0 0 0 9999px rgba(255,255,255,0.05); }
 
         [data-bs-theme="dark"] .dataTables_wrapper .dataTables_length,
         [data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter,
         [data-bs-theme="dark"] .dataTables_wrapper .dataTables_info,
-        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate { color: #8c9ea8 !important; }
-        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button { color: #8c9ea8 !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate { color: #9a9096 !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button { color: #9a9096 !important; }
         [data-bs-theme="dark"] .dataTables_wrapper select,
-        [data-bs-theme="dark"] .dataTables_wrapper input { background-color: #252f43; border: 1px solid #2c344c; color: #e9ecef; }
+        [data-bs-theme="dark"] .dataTables_wrapper input { background-color: #1a181c; border: 1px solid rgba(255,255,255,0.12); color: #f5f2f4; }
 
-        [data-bs-theme="dark"] .badge.bg-success { background-color: rgba(19,222,185,0.15) !important; color: #13DEB9 !important; }
-        [data-bs-theme="dark"] .badge.bg-danger { background-color: rgba(250,137,107,0.15) !important; color: #FA896B !important; }
-        [data-bs-theme="dark"] .badge.bg-info { background-color: rgba(93,135,255,0.15) !important; color: #5D87FF !important; }
-        [data-bs-theme="dark"] .badge.bg-secondary { background-color: rgba(140,158,168,0.15) !important; color: #8c9ea8 !important; }
-        [data-bs-theme="dark"] .badge.bg-warning { background-color: rgba(255,174,31,0.15) !important; color: #FFAE1F !important; }
+        [data-bs-theme="dark"] .badge.bg-success { background-color: rgba(19,222,185,0.15) !important; color: var(--nx-success) !important; }
+        [data-bs-theme="dark"] .badge.bg-danger { background-color: rgba(250,137,107,0.15) !important; color: var(--nx-danger) !important; }
+        [data-bs-theme="dark"] .badge.bg-info { background-color: rgba(93,135,255,0.15) !important; color: var(--nx-primary) !important; }
+        [data-bs-theme="dark"] .badge.bg-secondary { background-color: rgba(140,158,168,0.15) !important; color: #9a9096 !important; }
+        [data-bs-theme="dark"] .badge.bg-warning { background-color: rgba(255,174,31,0.15) !important; color: var(--nx-warning) !important; }
 
         .mov-header { position: relative; overflow: hidden; border-radius: 16px !important; }
         .mov-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(93,135,255,0.08); pointer-events: none; }
         .mov-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(19,222,185,0.06); pointer-events: none; }
         .mov-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
-        .mov-header .sub-badge { font-size: 1rem; color: #8c9ea8; }
+        .mov-header .sub-badge { font-size: 1rem; color: #9a9096; }
 
         .metric-card { position: relative; border-radius: 12px !important; transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .metric-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important; }
         .metric-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 12px 12px 0 0; }
-        .metric-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #8c9ea8; }
+        .metric-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #9a9096; }
         .metric-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
         .metric-value { font-size: 1.75rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.25rem; }
-        .metric-footer { font-size: 0.8rem; color: #8c9ea8; }
+        .metric-footer { font-size: 0.8rem; color: #9a9096; }
 
-        [data-bs-theme="dark"] .mov-header .sub-badge { color: #8c9ea8 !important; }
+        [data-bs-theme="dark"] .mov-header .sub-badge { color: #9a9096 !important; }
         [data-bs-theme="dark"] .bg-primary.bg-opacity-10 { background-color: rgba(93,135,255,0.12) !important; }
         [data-bs-theme="dark"] .bg-success.bg-opacity-10 { background-color: rgba(19,222,185,0.12) !important; }
         [data-bs-theme="dark"] .bg-warning.bg-opacity-10 { background-color: rgba(255,174,31,0.12) !important; }
@@ -74,33 +72,33 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         .filtros-bar { background: #f8f9fa; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; }
         [data-bs-theme="dark"] .filtros-bar { background: #1e293b; }
-        .filtros-bar .form-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #8c9ea8; margin-bottom: 4px; }
+        .filtros-bar .form-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #9a9096; margin-bottom: 4px; }
         .filtros-bar .form-control, .filtros-bar .form-select { font-size: 0.85rem; }
 
         tr.fila-anulada { opacity: 0.55; }
         tr.fila-anulada td { text-decoration: line-through; }
 
         .tipo-pills { display: flex; flex-wrap: wrap; gap: 8px; }
-        .tipo-pill { cursor: pointer; border: 1px solid #dee2e6; background: #fff; color: #495057;
+        .tipo-pill { cursor: pointer; border: 1px solid #dee2e6; background: var(--nx-surface); color: #495057;
             border-radius: 999px; padding: 6px 14px; font-size: 0.82rem; font-weight: 600;
             display: inline-flex; align-items: center; gap: 6px; transition: all .15s ease; }
-        .tipo-pill:hover { border-color: #5D87FF; color: #5D87FF; }
-        .tipo-pill.active { background: #5D87FF; border-color: #5D87FF; color: #fff; }
+        .tipo-pill:hover { border-color: var(--nx-primary); color: var(--nx-primary); }
+        .tipo-pill.active { background: var(--nx-primary); border-color: var(--nx-primary); color: #fff; }
         .tipo-pill .count { background: rgba(0,0,0,.08); border-radius: 999px; padding: 0 8px; font-size: 0.75rem; }
         .tipo-pill.active .count { background: rgba(255,255,255,.25); }
-        [data-bs-theme="dark"] .tipo-pill { background: #1e293b; border-color: #2c344c; color: #8c9ea8; }
-        [data-bs-theme="dark"] .tipo-pill:hover { border-color: #5D87FF; color: #5D87FF; }
-        [data-bs-theme="dark"] .tipo-pill.active { background: #5D87FF; border-color: #5D87FF; color: #fff; }
+        [data-bs-theme="dark"] .tipo-pill { background: #1e293b; border-color: rgba(255,255,255,0.12); color: #9a9096; }
+        [data-bs-theme="dark"] .tipo-pill:hover { border-color: var(--nx-primary); color: var(--nx-primary); }
+        [data-bs-theme="dark"] .tipo-pill.active { background: var(--nx-primary); border-color: var(--nx-primary); color: #fff; }
 
         /* Estado de cuenta por cuenta (tipo banco) */
-        #resumenCuenta { border-left: 4px solid #5D87FF; }
+        #resumenCuenta { border-left: 4px solid var(--nx-primary); }
         #resumenCuenta .rc-monto { font-size: 1.35rem; font-weight: 800; line-height: 1.1; }
-        #resumenCuenta .rc-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #8c9ea8; }
+        #resumenCuenta .rc-label { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #9a9096; }
         .monto-entrada { color: #0ca678; font-weight: 700; }
         .monto-salida { color: #e03131; font-weight: 700; }
         .saldo-cta { font-weight: 800; }
-        [data-bs-theme="dark"] .monto-entrada { color: #13DEB9 !important; }
-        [data-bs-theme="dark"] .monto-salida { color: #FA896B !important; }
+        [data-bs-theme="dark"] .monto-entrada { color: var(--nx-success) !important; }
+        [data-bs-theme="dark"] .monto-salida { color: var(--nx-danger) !important; }
     </style>
 </head>
 <body>
@@ -411,7 +409,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <script src="src/assets/js/sidebarmenu.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="src/assets/js/dark-mode.js"></script>
     <script src="src/assets/js/utils.js"></script>
 
     <script>

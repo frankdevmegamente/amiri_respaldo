@@ -4,7 +4,7 @@ if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_rol'] ?? '',
 $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 ?>
 <!DOCTYPE html>
-<html lang="es" data-bs-theme="light">
+<html lang="es">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,8 +13,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <link rel="stylesheet" href="src/assets/css/styles.min.css" />
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
     <style>
         .body-wrapper { padding-top: 100px !important; }
@@ -27,39 +25,39 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .loans-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(93, 135, 255, 0.08); pointer-events: none; }
         .loans-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(19, 222, 185, 0.06); pointer-events: none; }
         .loans-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
-        .loans-header .sub-badge { font-size: 1rem; color: #8c9ea8; }
+        .loans-header .sub-badge { font-size: 1rem; color: #9a9096; }
 
         /* ─── Metric Cards ────────────────────────────── */
         .metric-card { position: relative; border-radius: 12px !important; transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .metric-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important; }
         .metric-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 12px 12px 0 0; }
-        .metric-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #8c9ea8; }
+        .metric-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #9a9096; }
         .metric-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
         .metric-value { font-size: 1.75rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.25rem; }
-        .metric-footer { font-size: 0.8rem; color: #8c9ea8; }
+        .metric-footer { font-size: 0.8rem; color: #9a9096; }
 
         /* ─── Dark mode ───────────────────────────────── */
-        [data-bs-theme="dark"] h3, [data-bs-theme="dark"] .page-breadcrumb h3 { color: #e9ecef !important; }
-        [data-bs-theme="dark"] .card { background: #1a2234; border-color: #2c344c; }
-        [data-bs-theme="dark"] .table>thead>tr>th { background-color: #1a2234 !important; color: #e9ecef !important; border-bottom-color: #2c344c !important; }
-        [data-bs-theme="dark"] .table>tbody>tr>td { color: #e9ecef !important; border-color: #2c344c !important; }
+        [data-bs-theme="dark"] h3, [data-bs-theme="dark"] .page-breadcrumb h3 { color: #f5f2f4 !important; }
+        [data-bs-theme="dark"] .card { background: var(--nx-surface) !important; border-color: rgba(255,255,255,0.12); }
+        [data-bs-theme="dark"] .table>thead>tr>th { background-color: var(--nx-surface) !important; color: #f5f2f4 !important; border-bottom-color: rgba(255,255,255,0.12) !important; }
+        [data-bs-theme="dark"] .table>tbody>tr>td { color: #f5f2f4 !important; border-color: rgba(255,255,255,0.12) !important; }
         [data-bs-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd)>* { box-shadow: inset 0 0 0 9999px rgba(255, 255, 255, 0.02); }
         [data-bs-theme="dark"] .table-hover>tbody>tr:hover>* { box-shadow: inset 0 0 0 9999px rgba(255, 255, 255, 0.05); }
         [data-bs-theme="dark"] .dataTables_wrapper .dataTables_length,
         [data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter,
         [data-bs-theme="dark"] .dataTables_wrapper .dataTables_info,
-        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate { color: #8c9ea8 !important; }
-        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button { color: #8c9ea8 !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate { color: #9a9096 !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button { color: #9a9096 !important; }
         [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current,
-        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover { background: #252f43 !important; border-color: #2c344c !important; color: #e9ecef !important; }
-        [data-bs-theme="dark"] .dataTables_wrapper select, [data-bs-theme="dark"] .dataTables_wrapper input { background-color: #252f43; border: 1px solid #2c344c; color: #e9ecef; }
-        [data-bs-theme="dark"] .modal-content { background-color: #1a2234; border-color: #2c344c; }
-        [data-bs-theme="dark"] .modal-header { border-bottom-color: #2c344c; }
-        [data-bs-theme="dark"] .modal-footer { border-top-color: #2c344c; }
-        [data-bs-theme="dark"] .modal-title { color: #e9ecef; }
-        [data-bs-theme="dark"] .form-label { color: #e9ecef; }
-        [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select, [data-bs-theme="dark"] .input-group-text { background-color: #252f43; border-color: #2c344c; color: #e9ecef; }
-        [data-bs-theme="dark"] .form-control::placeholder { color: #8c9ea8; }
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover { background: #1a181c !important; border-color: rgba(255,255,255,0.12) !important; color: #f5f2f4 !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper select, [data-bs-theme="dark"] .dataTables_wrapper input { background-color: #1a181c; border: 1px solid rgba(255,255,255,0.12); color: #f5f2f4; }
+        [data-bs-theme="dark"] .modal-content { background: var(--nx-surface) !important; color: var(--nx-text) !important; border-color: var(--nx-border) !important; }
+        [data-bs-theme="dark"] .modal-header { border-bottom-color: rgba(255,255,255,0.12); }
+        [data-bs-theme="dark"] .modal-footer { border-top-color: rgba(255,255,255,0.12); }
+        [data-bs-theme="dark"] .modal-title { color: #f5f2f4; }
+        [data-bs-theme="dark"] .form-label { color: #f5f2f4; }
+        [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select, [data-bs-theme="dark"] .input-group-text { background-color: #1a181c; border-color: rgba(255,255,255,0.12); color: #f5f2f4; }
+        [data-bs-theme="dark"] .form-control::placeholder { color: #9a9096; }
         [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
         [data-bs-theme="dark"] .bg-primary.bg-opacity-10 { background-color: rgba(93, 135, 255, 0.12) !important; }
         [data-bs-theme="dark"] .bg-success.bg-opacity-10 { background-color: rgba(25, 135, 84, 0.12) !important; }
@@ -247,7 +245,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         <script src="src/assets/libs/jquery/dist/jquery.min.js"></script>
         <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
         <script src="src/assets/js/sidebarmenu.js"></script>
-        <script src="src/assets/js/dark-mode.js"></script>
         <script src="src/assets/js/pantalla-completa.js"></script>
         <script src="src/assets/js/utils.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -259,9 +256,9 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             };
 
             // ─── Avatar helper ───────────────────────────
-            const avatarColors = ['#5D87FF', '#13DEB9', '#FA896B', '#FFAE1F', '#539BFF', '#6F42C1', '#E83E8C', '#20C997'];
+            const avatarColors = ['var(--nx-primary)', 'var(--nx-success)', 'var(--nx-danger)', 'var(--nx-warning)', '#539BFF', '#6F42C1', '#E83E8C', '#20C997'];
             function getAvatarColor(name) {
-                if (!name) return '#8c9ea8';
+                if (!name) return '#9a9096';
                 let hash = 0;
                 for (let i = 0; i < name.length; i++) { hash = name.charCodeAt(i) + ((hash << 5) - hash); }
                 return avatarColors[Math.abs(hash) % avatarColors.length];
@@ -317,7 +314,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         data: 'saldo_total',
                         render: function(d) {
                             var val = parseFloat(d) || 0;
-                            return '<strong style="color:#ffae1f;">$' + fmt(val) + '</strong>';
+                            return '<strong style="color:var(--nx-warning);">$' + fmt(val) + '</strong>';
                         }
                     },
                     {

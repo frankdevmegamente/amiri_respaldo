@@ -51,13 +51,11 @@ $total_mxn = floatval($proveedor['valor_mxn_usd'] ?? 0) + floatval($proveedor['v
     <link rel="stylesheet" href="src/assets/css/styles.min.css">
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css">
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css">
     <link rel="stylesheet" href="src/assets/css/layout-custom.css">
     <style>
-        [data-bs-theme="dark"] .card { background: #1a2234; border-color: #2c344c; }
-        [data-bs-theme="dark"] .table { color: #e9ecef; }
-        [data-bs-theme="dark"] .table thead th { background-color: #1a2234 !important; color: #e9ecef; }
+        [data-bs-theme="dark"] .card { background: var(--nx-surface) !important; border-color: rgba(255,255,255,0.12); }
+        [data-bs-theme="dark"] .table { color: #f5f2f4; }
+        [data-bs-theme="dark"] .table thead th { background-color: var(--nx-surface) !important; color: #f5f2f4; }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
@@ -250,7 +248,6 @@ $total_mxn = floatval($proveedor['valor_mxn_usd'] ?? 0) + floatval($proveedor['v
     <script src="src/assets/libs/jquery/dist/jquery.min.js"></script>
     <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="src/assets/js/sidebarmenu.js"></script>
-    <script src="src/assets/js/dark-mode.js"></script>
     <script src="src/assets/js/utils.js"></script>
     <script>
     const PROVEEDOR = <?= json_encode($proveedor, JSON_UNESCAPED_UNICODE) ?>;

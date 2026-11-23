@@ -17,8 +17,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css">
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css">
     <link rel="stylesheet" href="src/assets/css/layout-custom.css">
     <style>
         .body-wrapper { padding-top: 100px !important; }
@@ -29,18 +27,18 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .servicios-header .bg-pattern { position:absolute; top:-50%; right:-10%; width:400px; height:400px; border-radius:50%; background:rgba(108,92,231,0.08); pointer-events:none; }
         .servicios-header .bg-pattern-2 { position:absolute; bottom:-30%; left:20%; width:250px; height:250px; border-radius:50%; background:rgba(19,222,185,0.06); pointer-events:none; }
         .servicios-header h2 { font-size:1.75rem; font-weight:700; margin-bottom:0.25rem; }
-        .servicios-header .subtitle { font-size:0.85rem; color:#8c9ea8; }
+        .servicios-header .subtitle { font-size:0.85rem; color:#9a9096; }
 
         /* ─── Metric Cards ─── */
         .metric-card { border-radius:12px; overflow:hidden; transition:all 0.2s ease; position:relative; cursor:pointer; }
         .metric-card:hover { transform:translateY(-3px); box-shadow:0 8px 25px rgba(0,0,0,0.08) !important; }
         .metric-card .metric-accent { position:absolute; top:0; left:0; right:0; height:3px; }
         .metric-card .card-body { padding:1rem 1.1rem; }
-        .metric-card .metric-label { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.3px; color:#8c9ea8; font-weight:600; }
+        .metric-card .metric-label { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.3px; color:#9a9096; font-weight:600; }
         .metric-card .metric-icon { width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:8px; font-size:14px; flex-shrink:0; }
-        .metric-card .metric-value { font-size:1.25rem; font-weight:700; color:#2A3547; line-height:1.2; margin-top:2px; }
-        .metric-card .metric-footer { font-size:0.68rem; color:#8c9ea8; margin-top:6px; }
-        .metric-card.selected { outline:2px solid #6c5ce7; outline-offset:-2px; box-shadow:0 4px 16px rgba(108,92,231,0.2)!important; }
+        .metric-card .metric-value { font-size:1.25rem; font-weight:700; color: var(--nx-text); line-height:1.2; margin-top:2px; }
+        .metric-card .metric-footer { font-size:0.68rem; color:#9a9096; margin-top:6px; }
+        .metric-card.selected { outline:2px solid #c58fb8; outline-offset:-2px; box-shadow:0 4px 16px rgba(108,92,231,0.2)!important; }
         .metric-card.selected .metric-accent { height:4px; }
 
         /* ─── Chart / Table Cards ─── */
@@ -53,11 +51,11 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         /* ─── Dark Mode ─── */
         [data-bs-theme="dark"] .metric-card .metric-value { color:#e8ecf0; }
         [data-bs-theme="dark"] .metric-card { background:#1e293b !important; }
-        [data-bs-theme="dark"] .metric-card .metric-label { color:#8c9ea8; }
+        [data-bs-theme="dark"] .metric-card .metric-label { color:#9a9096; }
         [data-bs-theme="dark"] .metric-card .metric-footer { color:#6b7a90; }
         [data-bs-theme="dark"] .section-card { background:#1e293b !important; }
         [data-bs-theme="dark"] .section-card .card-header { border-bottom-color:rgba(255,255,255,0.04); }
-        [data-bs-theme="dark"] .servicios-header .subtitle { color:#8c9ea8; }
+        [data-bs-theme="dark"] .servicios-header .subtitle { color:#9a9096; }
 
         [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro { display: none !important; }
@@ -223,7 +221,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
-<script src="src/assets/js/dark-mode.js"></script>
 <script src="src/assets/js/utils.js"></script>
 <script src="src/assets/js/pantalla-completa.js"></script>
 <script>

@@ -54,8 +54,6 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
     <link rel="stylesheet" href="src/assets/css/styles.min.css" />
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
     <style>
         .body-wrapper { padding-top: 100px !important; }
@@ -66,7 +64,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
         [data-bs-theme="dark"] .table, [data-bs-theme="dark"] .table thead th, [data-bs-theme="dark"] .table tbody td { background-color: #1f2535 !important; color: #e6ecff !important; border-color: #2b3350 !important; }
         [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select { background-color: #232b3c !important; color: #e6ecff !important; border-color: #2b3350 !important; }
         [data-bs-theme="dark"] .modal-content { background-color: #1f2535 !important; border-color: #2b3350 !important; color: #e6ecff !important; }
-        .perfil-avatar { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; background: rgba(93,135,255,.12); color: #5D87FF; }
+        .perfil-avatar { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; background: rgba(93,135,255,.12); color: var(--nx-primary); }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
@@ -247,7 +245,6 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
     <script src="src/assets/js/sidebarmenu.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="src/assets/js/dark-mode.js"></script>
     <script src="src/assets/js/utils.js"></script>
     <script>
         $(document).ready(function() {

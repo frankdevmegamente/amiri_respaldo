@@ -550,7 +550,7 @@ $importedFile = $_SESSION['sync_file'] ?? '';
 $scriptUrl = 'sincronizar.php';
 ?>
 <!DOCTYPE html>
-<html lang="es" data-bs-theme="light">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -559,8 +559,6 @@ $scriptUrl = 'sincronizar.php';
     <link rel="shortcut icon" type="image/png" href="src/assets/images/logos/favicon.ico">
     <link rel="stylesheet" href="src/assets/css/styles.min.css">
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css">
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css">
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css">
     <link rel="stylesheet" href="src/assets/css/layout-custom.css">
     <style>
         .card { border: none; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); transition: all 0.3s ease; }
@@ -573,12 +571,12 @@ $scriptUrl = 'sincronizar.php';
         .badge-status { font-size: 0.75rem; padding: 0.3rem 0.6rem; border-radius: 20px; font-weight: 500; }
         .table-result th { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6c757d; font-weight: 600; border-top: none; }
         .table-result td { vertical-align: middle; font-size: 0.9rem; }
-        .preview-wrap { max-height: 450px; overflow-y: auto; border: 1px solid #e9ecef; border-radius: 8px; display: none; }
+        .preview-wrap { max-height: 450px; overflow-y: auto; border: 1px solid #f5f2f4; border-radius: 8px; display: none; }
         .preview-wrap table { margin-bottom: 0; font-size: 0.8rem; }
         .preview-wrap th { position: sticky; top: 0; background: #f8f9fa; z-index: 1; font-size: 0.75rem; white-space: nowrap; }
         .preview-wrap td { white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
         .preview-loading { text-align: center; padding: 2rem; display: none; }
-        .preview-loading .spinner { width: 40px; height: 40px; border: 4px solid #e9ecef; border-top-color: #5D87FF; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+        .preview-loading .spinner { width: 40px; height: 40px; border: 4px solid #f5f2f4; border-top-color: var(--nx-primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .sync-progress { display: none; }
         .fade-in { animation: fadeIn 0.3s ease; }
@@ -591,9 +589,9 @@ $scriptUrl = 'sincronizar.php';
         [data-bs-theme="dark"] .preview-wrap { border-color: #2b3350; }
         [data-bs-theme="dark"] .preview-wrap th { background: #232b3c; color: #e6ecff; border-color: #2b3350; }
         [data-bs-theme="dark"] .preview-wrap td { border-color: #2b3350; color: #c8cee8; }
-        [data-bs-theme="dark"] .preview-loading .spinner { border-color: #2b3350; border-top-color: #5D87FF; }
+        [data-bs-theme="dark"] .preview-loading .spinner { border-color: #2b3350; border-top-color: var(--nx-primary); }
         [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select { background: #232b3c; color: #e6ecff; border-color: #2b3350; }
-        [data-bs-theme="dark"] .form-control:focus { background: #1f2535; color: #e6ecff; border-color: #5D87FF; box-shadow: 0 0 0 0.2rem rgba(93,135,255,0.25); }
+        [data-bs-theme="dark"] .form-control:focus { background: #1f2535; color: #e6ecff; border-color: var(--nx-primary); box-shadow: 0 0 0 0.2rem rgba(93,135,255,0.25); }
         [data-bs-theme="dark"] .form-label { color: #c8cee8; }
         [data-bs-theme="dark"] .btn-close { filter: invert(1); }
         .file-size { font-size: 0.75rem; color: #6c757d; }
@@ -631,8 +629,8 @@ $scriptUrl = 'sincronizar.php';
                 <div class="row mb-4">
                     <div class="col-12">
                         <div class="card" style="position:relative;overflow:hidden;">
-                            <div style="position:absolute;top:-60px;right:-60px;width:180px;height:180px;background:#5D87FF;opacity:0.08;border-radius:50%;pointer-events:none;"></div>
-                            <div style="position:absolute;bottom:-40px;left:-40px;width:120px;height:120px;background:#13DEB9;opacity:0.08;border-radius:50%;pointer-events:none;"></div>
+                            <div style="position:absolute;top:-60px;right:-60px;width:180px;height:180px;background:var(--nx-primary);opacity:0.08;border-radius:50%;pointer-events:none;"></div>
+                            <div style="position:absolute;bottom:-40px;left:-40px;width:120px;height:120px;background:var(--nx-success);opacity:0.08;border-radius:50%;pointer-events:none;"></div>
                             <div class="card-body p-4" style="position:relative;z-index:1;">
                                 <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
                                     <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;">
@@ -662,7 +660,7 @@ $scriptUrl = 'sincronizar.php';
                     <div class="col-lg-5">
                         <div class="card">
                             <div class="card-body p-4">
-                                <h5 class="card-title mb-3"><i class="ti ti-file-upload" style="color:#5D87FF;"></i> Archivo SQL</h5>
+                                <h5 class="card-title mb-3"><i class="ti ti-file-upload" style="color:var(--nx-primary);"></i> Archivo SQL</h5>
                                 <form method="POST" enctype="multipart/form-data" id="importForm">
                                     <input type="hidden" name="action" value="import">
                                     <div class="mb-3">
@@ -718,7 +716,7 @@ $scriptUrl = 'sincronizar.php';
                     <div class="col-lg-7">
                         <div class="card h-100">
                             <div class="card-body p-4">
-                                <h5 class="card-title mb-3"><i class="ti ti-info-circle" style="color:#13DEB9;"></i> Instrucciones</h5>
+                                <h5 class="card-title mb-3"><i class="ti ti-info-circle" style="color:var(--nx-success);"></i> Instrucciones</h5>
                                 <ol class="small text-muted mb-0" style="line-height:1.8;">
                                     <li><strong>Selecciona</strong> un archivo <code>.sql</code> existente o <strong>sube</strong> uno nuevo (dump de producción).</li>
                                     <li>La herramienta <strong>importa</strong> el archivo a una BD temporal y <strong>compara</strong> todas las tablas contra tu BD local.</li>
@@ -738,7 +736,7 @@ $scriptUrl = 'sincronizar.php';
                         <div class="card">
                             <div class="card-body p-4">
                                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                                    <h5 class="card-title mb-0"><i class="ti ti-report-analytics" style="color:#5D87FF;"></i> Resultados</h5>
+                                    <h5 class="card-title mb-0"><i class="ti ti-report-analytics" style="color:var(--nx-primary);"></i> Resultados</h5>
                                     <div class="d-flex gap-2 align-items-center">
                                         <span class="badge bg-secondary bg-opacity-10 text-secondary border-0"><?= $totalTables ?> tablas</span>
                                         <span class="badge bg-<?= $totalMissing > 0 ? 'warning' : 'success' ?> bg-opacity-10 text-<?= $totalMissing > 0 ? 'warning' : 'success' ?> border-0">
@@ -781,9 +779,9 @@ $scriptUrl = 'sincronizar.php';
                                                 <td style="text-align:right;"><?= $r['exists_local'] ? number_format($r['count_local']) : '<span class="text-muted">N/A</span>' ?></td>
                                                 <td style="text-align:right;">
                                                     <?php if ($r['missing_count'] > 0): ?>
-                                                    <span class="fw-bold" style="color:#FA896B;"><?= number_format($r['missing_count']) ?></span>
+                                                    <span class="fw-bold" style="color:var(--nx-danger);"><?= number_format($r['missing_count']) ?></span>
                                                     <?php else: ?>
-                                                    <span style="color:#13DEB9;">0</span>
+                                                    <span style="color:var(--nx-success);">0</span>
                                                     <?php endif; ?>
                                                 </td>
                                                 <td>
@@ -843,7 +841,6 @@ $scriptUrl = 'sincronizar.php';
 <script src="src/assets/libs/jquery/dist/jquery.min.js"></script>
 <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="src/assets/js/sidebarmenu.js"></script>
-<script src="src/assets/js/dark-mode.js"></script>
 <script>
 $('#importForm').on('submit', function() {
     const hasSelect = $('#sqlFile').val() !== '';

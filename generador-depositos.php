@@ -41,72 +41,70 @@ $bancos = $pdo->query("SELECT COUNT(DISTINCT banco) FROM directorio_depositos WH
     <link rel="stylesheet" href="src/assets/css/styles.min.css" />
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
     <style>
         .body-wrapper { padding-top: 100px !important; }
         .body-wrapper-inner, .body-wrapper .container-fluid { padding-top: 15px !important; margin-top: 0 !important; }
         [data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
         [data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
-        [data-bs-theme="dark"] h3, [data-bs-theme="dark"] .page-breadcrumb h3 { color: #e9ecef !important; }
-        [data-bs-theme="dark"] .card { background: #1a2234; border-color: #2c344c; }
-        [data-bs-theme="dark"] .table>thead>tr>th { background-color: #1a2234 !important; color: #e9ecef !important; border-bottom-color: #2c344c !important; }
-        [data-bs-theme="dark"] .table>tbody>tr>td { color: #e9ecef !important; border-color: #2c344c !important; }
-        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_length, [data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter, [data-bs-theme="dark"] .dataTables_wrapper .dataTables_info, [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate { color: #8c9ea8 !important; }
-        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button { color: #8c9ea8 !important; }
-        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current, [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover { background: #252f43 !important; border-color: #2c344c !important; color: #e9ecef !important; }
-        [data-bs-theme="dark"] .dataTables_wrapper select, [data-bs-theme="dark"] .dataTables_wrapper input { background-color: #252f43; border: 1px solid #2c344c; color: #e9ecef; }
-        [data-bs-theme="dark"] .modal-content { background-color: #1a2234; border-color: #2c344c; }
-        [data-bs-theme="dark"] .modal-header { border-bottom-color: #2c344c; }
-        [data-bs-theme="dark"] .modal-footer { border-top-color: #2c344c; }
-        [data-bs-theme="dark"] .modal-title { color: #e9ecef; }
-        [data-bs-theme="dark"] .form-label { color: #e9ecef; }
-        [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select { background-color: #252f43; border-color: #2c344c; color: #e9ecef; }
-        [data-bs-theme="dark"] .form-control::placeholder { color: #8c9ea8; }
+        [data-bs-theme="dark"] h3, [data-bs-theme="dark"] .page-breadcrumb h3 { color: #f5f2f4 !important; }
+        [data-bs-theme="dark"] .card { background: var(--nx-surface) !important; border-color: rgba(255,255,255,0.12); }
+        [data-bs-theme="dark"] .table>thead>tr>th { background-color: var(--nx-surface) !important; color: #f5f2f4 !important; border-bottom-color: rgba(255,255,255,0.12) !important; }
+        [data-bs-theme="dark"] .table>tbody>tr>td { color: #f5f2f4 !important; border-color: rgba(255,255,255,0.12) !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_length, [data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter, [data-bs-theme="dark"] .dataTables_wrapper .dataTables_info, [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate { color: #9a9096 !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button { color: #9a9096 !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current, [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover { background: #1a181c !important; border-color: rgba(255,255,255,0.12) !important; color: #f5f2f4 !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper select, [data-bs-theme="dark"] .dataTables_wrapper input { background-color: #1a181c; border: 1px solid rgba(255,255,255,0.12); color: #f5f2f4; }
+        [data-bs-theme="dark"] .modal-content { background: var(--nx-surface) !important; color: var(--nx-text) !important; border-color: var(--nx-border) !important; }
+        [data-bs-theme="dark"] .modal-header { border-bottom-color: rgba(255,255,255,0.12); }
+        [data-bs-theme="dark"] .modal-footer { border-top-color: rgba(255,255,255,0.12); }
+        [data-bs-theme="dark"] .modal-title { color: #f5f2f4; }
+        [data-bs-theme="dark"] .form-label { color: #f5f2f4; }
+        [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select { background-color: #1a181c; border-color: rgba(255,255,255,0.12); color: #f5f2f4; }
+        [data-bs-theme="dark"] .form-control::placeholder { color: #9a9096; }
         [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
         .metric-card { position: relative; border-radius: 12px !important; transition: transform 0.2s ease, box-shadow 0.2s ease; cursor: pointer; }
         .metric-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important; }
         .metric-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 12px 12px 0 0; }
-        .metric-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #8c9ea8; }
+        .metric-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #9a9096; }
         .metric-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
         .metric-value { font-size: 1.75rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.25rem; }
-        .metric-footer { font-size: 0.8rem; color: #8c9ea8; }
+        .metric-footer { font-size: 0.8rem; color: #9a9096; }
         .directorio-header { position: relative; overflow: hidden; border-radius: 16px !important; }
         .directorio-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(93, 135, 255, 0.08); pointer-events: none; }
         .directorio-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(19, 222, 185, 0.06); pointer-events: none; }
         .directorio-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
-        .directorio-header .sub-badge { font-size: 1rem; color: #8c9ea8; }
-        .badge-soft-primary { background: rgba(93,135,255,0.1); color: #5D87FF; border: none; }
+        .directorio-header .sub-badge { font-size: 1rem; color: #9a9096; }
+        .badge-soft-primary { background: rgba(93,135,255,0.1); color: var(--nx-primary); border: none; }
         .badge-soft-danger { background: rgba(220,53,69,0.1); color: #dc3545; border: none; }
         .badge-soft-success { background: rgba(25,135,84,0.1); color: #198754; border: none; }
         /* ─── Ticket ─────────────────────────────────── */
         .ticket-wrapper { background-color: #f4f6f9; padding: 20px; border-radius: 12px; display: flex; justify-content: center; }
-        .ticket-card { background: #ffffff; width: 100%; max-width: 580px; border-radius: 0; padding: 35px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); color: #2A3547; position: relative; overflow: hidden; }
+        .ticket-card { background: var(--nx-surface); width: 100%; max-width: 580px; border-radius: 0; padding: 35px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); color: var(--nx-text); position: relative; overflow: hidden; }
         .ticket-deco { position: absolute; border-radius: 50%; pointer-events: none; }
-        .ticket-deco-1 { top: -60px; right: -60px; width: 180px; height: 180px; background: #5D87FF; opacity: 0.08; }
-        .ticket-deco-2 { bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; }
-        .ticket-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid #6c5ce7; position: relative; z-index: 1; }
+        .ticket-deco-1 { top: -60px; right: -60px; width: 180px; height: 180px; background: var(--nx-primary); opacity: 0.08; }
+        .ticket-deco-2 { bottom: -40px; left: -40px; width: 120px; height: 120px; background: var(--nx-success); opacity: 0.08; }
+        .ticket-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid #c58fb8; position: relative; z-index: 1; }
         .ticket-logo { max-width: 50%; overflow: hidden; }
         .ticket-logo img { height: 45px; max-width: 100%; object-fit: contain; }
-        .ticket-title { font-size: 18px; font-weight: 700; letter-spacing: 1.5px; color: #6c5ce7; text-transform: uppercase; white-space: nowrap; margin-left: 15px; }
+        .ticket-title { font-size: 18px; font-weight: 700; letter-spacing: 1.5px; color: #c58fb8; text-transform: uppercase; white-space: nowrap; margin-left: 15px; }
         .ticket-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed #ebf1f6; position: relative; }
-        .ticket-item-nombre { font-size: 15px; font-weight: 700; color: #2A3547; }
+        .ticket-item-nombre { font-size: 15px; font-weight: 700; color: var(--nx-text); }
         .ticket-item-cuenta { font-size: 12px; color: #7c8fac; text-transform: uppercase; letter-spacing: 0.5px; }
-        .ticket-item-monto { background: rgba(93,135,255,0.1); color: #6c5ce7; padding: 8px 16px; border-radius: 6px; font-size: 16px; font-weight: 700; text-align: right; min-width: 130px; }
+        .ticket-item-monto { background: rgba(93,135,255,0.1); color: #c58fb8; padding: 8px 16px; border-radius: 6px; font-size: 16px; font-weight: 700; text-align: right; min-width: 130px; }
         .ticket-quitar { position: absolute; right: 0; top: 50%; transform: translate(120%, -50%); }
         .ticket-total { background: rgba(93,135,255,0.04); border-radius: 8px; padding: 20px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; }
         .ticket-total-label { color: #7c8fac; font-size: 13px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
         .ticket-total-value { color: #36c76c; font-weight: 800; font-size: 26px; }
         [data-bs-theme="dark"] .ticket-wrapper { background-color: transparent !important; }
-        [data-bs-theme="dark"] .ticket-card { background: #1a2234; border: 1px solid #2c344c; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        [data-bs-theme="dark"] .ticket-header { border-bottom-color: #2c344c; }
-        [data-bs-theme="dark"] .ticket-item { border-bottom-color: #2c344c; }
-        [data-bs-theme="dark"] .ticket-item-nombre { color: #e9ecef; }
-        [data-bs-theme="dark"] .ticket-item-cuenta { color: #8c9ea8; }
+        [data-bs-theme="dark"] .ticket-card { background: #1a181c; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        [data-bs-theme="dark"] .ticket-header { border-bottom-color: rgba(255,255,255,0.12); }
+        [data-bs-theme="dark"] .ticket-item { border-bottom-color: rgba(255,255,255,0.12); }
+        [data-bs-theme="dark"] .ticket-item-nombre { color: #f5f2f4; }
+        [data-bs-theme="dark"] .ticket-item-cuenta { color: #9a9096; }
         [data-bs-theme="dark"] .ticket-item-monto { background: rgba(93,135,255,0.15); color: #799dfb; }
-        [data-bs-theme="dark"] .ticket-total { background-color: #252f43 !important; }
-        [data-bs-theme="dark"] #placeholderTicket { color: #8c9ea8 !important; }
+        [data-bs-theme="dark"] .ticket-total { background-color: #1a181c !important; }
+        [data-bs-theme="dark"] #placeholderTicket { color: #9a9096 !important; }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
@@ -342,7 +340,6 @@ $bancos = $pdo->query("SELECT COUNT(DISTINCT banco) FROM directorio_depositos WH
     <script src="src/assets/js/sidebarmenu.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="src/assets/js/dark-mode.js"></script>
     <script src="src/assets/js/utils.js"></script>
     <script>
         let tablaDirectorio;
@@ -645,7 +642,7 @@ $bancos = $pdo->query("SELECT COUNT(DISTINCT banco) FROM directorio_depositos WH
             if (b.includes('rappi') || b.includes('rappipay')) return '#ff4600';
             if (b.includes('bineo')) return '#ff0066';
             if (b.includes('cetes')) return '#104a3e';
-            return '#6c5ce7';
+            return '#c58fb8';
         }
     </script>
 </body>

@@ -16,8 +16,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <link rel="shortcut icon" type="image/png" href="src/assets/images/logos/favicon.ico" />
     <link rel="stylesheet" href="src/assets/css/styles.min.css" />
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -36,12 +34,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         /* DISEÑO BASE (ESCRITORIO - TU VERSIÓN ORIGINAL) */
         .ticket-card {
-            background: #ffffff;
+            background: var(--nx-surface);
             width: 100%; max-width: 550px;
             border-radius: 0px;
             padding: 45px;
             box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.03);
-            color: #2A3547;
+            color: var(--nx-text);
             font-family: 'Manrope', sans-serif;
             position: relative;
         }
@@ -49,12 +47,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .ticket-header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 30px; padding-bottom: 25px;
-            border-bottom: 3px solid #6c5ce7;
+            border-bottom: 3px solid #c58fb8;
         }
 
         .ticket-title {
             font-size: 18px; font-weight: 600; letter-spacing: 1px;
-            color: #6c5ce7; text-transform: uppercase;
+            color: #c58fb8; text-transform: uppercase;
         }
 
         /* Contenedor Híbrido: En escritorio actúa como lista vertical */
@@ -79,7 +77,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         }
 
         .fs-large { font-size: 26px; font-weight: 700; color: #1a1a1a; }
-        .text-primary-custom { color: #6c5ce7; font-weight: 700; }
+        .text-primary-custom { color: #c58fb8; font-weight: 700; }
         .text-success-custom { color: #36c76c; font-weight: 800; font-size: 34px; }
 
         .ticket-row.total-row {
@@ -94,21 +92,21 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         /* =========================================
            🌙 REGLAS PARA MODO OSCURO (GLOBAL)
            ========================================= */
-        [data-bs-theme="dark"] .ticket-card { background: #1a2234; border-color: #2c344c; box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3); }
+        [data-bs-theme="dark"] .ticket-card { background: #1a181c; border-color: rgba(255,255,255,0.12); box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3); }
         [data-bs-theme="dark"] .fs-large { color: #ffffff !important; }
         [data-bs-theme="dark"] .ticket-row,
         [data-bs-theme="dark"] .responsive-grid .grid-item,
-        [data-bs-theme="dark"] .commission-section { border-bottom-color: #2c344c; }
-        [data-bs-theme="dark"] .ticket-row.total-row { background: #252f43; }
+        [data-bs-theme="dark"] .commission-section { border-bottom-color: rgba(255,255,255,0.12); }
+        [data-bs-theme="dark"] .ticket-row.total-row { background: #1a181c; }
         [data-bs-theme="dark"] .commission-section span,
-        [data-bs-theme="dark"] .ticket-card strong { color: #e9ecef !important; }
-        [data-bs-theme="dark"] .text-muted-custom { color: #8c9ea8; }
+        [data-bs-theme="dark"] .ticket-card strong { color: #f5f2f4 !important; }
+        [data-bs-theme="dark"] .text-muted-custom { color: #9a9096; }
         [data-bs-theme="dark"] .badge-moneda.usdt { background-color: rgba(32, 201, 151, 0.15); }
-        [data-bs-theme="dark"] .badge-moneda.mxn { background-color: rgba(255, 255, 255, 0.1); color: #e9ecef;}
-        [data-bs-theme="dark"] #ticketObservaciones { background: #252f43 !important; border-color: #2c344c !important; }
-        [data-bs-theme="dark"] #outObservacionesTxt { color: #e9ecef !important; }
+        [data-bs-theme="dark"] .badge-moneda.mxn { background-color: rgba(255, 255, 255, 0.1); color: #f5f2f4;}
+        [data-bs-theme="dark"] #ticketObservaciones { background: #1a181c !important; border-color: rgba(255,255,255,0.12) !important; }
+        [data-bs-theme="dark"] #outObservacionesTxt { color: #f5f2f4 !important; }
         [data-bs-theme="dark"] .btn-check:checked + .btn-outline-primary { color: #ffffff !important; }
-        [data-bs-theme="dark"] .btn-outline-primary { color: #799dfb; border-color: #6c5ce7; }
+        [data-bs-theme="dark"] .btn-outline-primary { color: #799dfb; border-color: #c58fb8; }
 
         [data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
         [data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
@@ -199,11 +197,11 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             }
 
             [data-bs-theme="dark"] .ticket-row.total-row {
-                background: #252f43 !important; /* Fondo oscuro original */
+                background: #1a181c !important; /* Fondo oscuro original */
             }
 
             .ticket-row.total-row .text-muted-custom { 
-                color: #6c5ce7 !important; 
+                color: #c58fb8 !important; 
                 font-size: 10px !important;
             }
             
@@ -347,8 +345,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                             <div class="ticket-wrapper">
                                 <div class="ticket-card" id="vistaPreviaTicket" style="position: relative; overflow: hidden;">
                                     
-                                    <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #5D87FF; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-                                    <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                                    <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: var(--nx-primary); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                                    <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: var(--nx-success); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
 
                                     <div class="ticket-header" style="position: relative; z-index: 1;">
                                         <img src="src/assets/images/logos/logo2.png" alt="Logo Amiri" class="logo-modo-claro" style="height: 45px; max-width: 100%; object-fit: contain;" />
@@ -386,18 +384,18 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                             <span style="font-size: 15px;">PORCENTAJE: <strong id="outMargenTxt">0.00%</strong></span>
                                         </div>
                                         <div style="font-size: 14px; color: #7c8fac;">
-                                            TOTAL DE COMISIÓN: <span id="outComisionTotal" style="font-weight: 600; color: #2A3547;">$0.00 MXN</span>
+                                            TOTAL DE COMISIÓN: <span id="outComisionTotal" style="font-weight: 600; color: var(--nx-text);">$0.00 MXN</span>
                                         </div>
                                     </div>
 
                                     <div class="ticket-row total-row d-flex justify-content-between align-items-center" style="position: relative; z-index: 1;">
-                                        <div class="text-muted-custom" style="color: #6c5ce7; margin-bottom: 0;" id="outTotalLabel">TOTAL A RECIBIR</div>
+                                        <div class="text-muted-custom" style="color: #c58fb8; margin-bottom: 0;" id="outTotalLabel">TOTAL A RECIBIR</div>
                                         <div class="text-success-custom" id="outTotalTxt">$0.00 MXN</div>
                                     </div>
 
                                     <div class="observaciones-section mt-4" id="ticketObservaciones" style="display: none; background: rgba(93, 135, 255, 0.05); padding: 20px; border-radius: 12px; border: 1px solid rgba(93, 135, 255, 0.2); position: relative; z-index: 1;">
                                         <div class="text-primary-custom mb-2" style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">OBSERVACIONES</div>
-                                        <div id="outObservacionesTxt" style="font-size: 15px; color: #2A3547; white-space: pre-wrap; line-height: 1.5; font-weight: 500;"></div>
+                                        <div id="outObservacionesTxt" style="font-size: 15px; color: var(--nx-text); white-space: pre-wrap; line-height: 1.5; font-weight: 500;"></div>
                                     </div>
 
                                     <div class="text-center mt-5" style="position: relative; z-index: 1;">
@@ -416,7 +414,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     
     <script src="src/assets/js/sidebarmenu.js"></script>
-    <script src="src/assets/js/dark-mode.js"></script>
     <script src="src/assets/js/pantalla-completa.js"></script>
     <script src="src/assets/js/utils.js"></script>
 

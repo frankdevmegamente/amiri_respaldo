@@ -19,8 +19,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <link rel="stylesheet" href="src/assets/css/styles.min.css" />
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.min.css" />
 <style>
@@ -37,7 +35,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         position: absolute;
         top: 0; left: 0; right: 0;
         height: 4px;
-        background: linear-gradient(90deg, #5D87FF, #13DEB9);
+        background: linear-gradient(90deg, var(--nx-primary), var(--nx-success));
         z-index: 1;
         border-radius: 0.75rem 0.75rem 0 0;
     }
@@ -46,10 +44,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.4px;
-        color: #5A6A85;
+        color: var(--nx-text-muted);
     }
     [data-bs-theme="dark"] .capital-section-title { color: #8b92a8; }
-    .table-reportes th { position: sticky; top: 0; background: #fff; z-index: 2; }
+    .table-reportes th { position: sticky; top: 0; background: var(--nx-surface); z-index: 2; }
     [data-bs-theme="dark"] .table-reportes th,
     .dark-mode .table-reportes th { background: #1e2a3a; }
     [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
@@ -67,8 +65,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 <!-- Header -->
                 <div class="page-header">
                     <div class="card shadow-sm border-0 rounded-4" style="position:relative;overflow:hidden;">
-                        <div style="position:absolute;top:-60px;right:-60px;width:180px;height:180px;background:#5D87FF;opacity:0.08;border-radius:50%;"></div>
-                        <div style="position:absolute;bottom:-40px;left:-40px;width:120px;height:120px;background:#13deb9;opacity:0.08;border-radius:50%;"></div>
+                        <div style="position:absolute;top:-60px;right:-60px;width:180px;height:180px;background:var(--nx-primary);opacity:0.08;border-radius:50%;"></div>
+                        <div style="position:absolute;bottom:-40px;left:-40px;width:120px;height:120px;background:var(--nx-success);opacity:0.08;border-radius:50%;"></div>
                         <div class="card-body p-4" style="position:relative;z-index:1;">
                             <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                                 <div class="d-flex align-items-center gap-3">
@@ -652,7 +650,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 <script src="src/assets/js/sidebarmenu.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-<script src="src/assets/js/dark-mode.js"></script>
 <script src="src/assets/js/utils.js"></script>
 <script src="src/assets/js/pantalla-completa.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -717,8 +714,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             data: {
                 labels: labels,
                 datasets: [
-                    { label: 'Capital Acumulado', data: capitales, type: 'line', borderColor: '#5D87FF', backgroundColor: 'rgba(93,135,255,0.1)', fill: true, tension: 0.4, pointRadius: 3, yAxisID: 'y1' },
-                    { label: 'Utilidad Neta', data: utilidades, backgroundColor: 'rgba(19,222,185,0.7)', borderColor: '#13DEB9', borderWidth: 1, borderRadius: 4, yAxisID: 'y' },
+                    { label: 'Capital Acumulado', data: capitales, type: 'line', borderColor: 'var(--nx-primary)', backgroundColor: 'rgba(93,135,255,0.1)', fill: true, tension: 0.4, pointRadius: 3, yAxisID: 'y1' },
+                    { label: 'Utilidad Neta', data: utilidades, backgroundColor: 'rgba(19,222,185,0.7)', borderColor: 'var(--nx-success)', borderWidth: 1, borderRadius: 4, yAxisID: 'y' },
                 ]
             },
             options: {
@@ -742,7 +739,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             data: {
                 labels: reversed.map(function(d) { return d.mes; }),
                 datasets: [
-                    { label: 'Capital Acumulado', data: reversed.map(function(d) { return parseFloat(d.capital_acumulado); }), borderColor: '#5D87FF', backgroundColor: 'rgba(93,135,255,0.1)', fill: true, tension: 0.4, pointRadius: 3 },
+                    { label: 'Capital Acumulado', data: reversed.map(function(d) { return parseFloat(d.capital_acumulado); }), borderColor: 'var(--nx-primary)', backgroundColor: 'rgba(93,135,255,0.1)', fill: true, tension: 0.4, pointRadius: 3 },
                 ]
             },
             options: {

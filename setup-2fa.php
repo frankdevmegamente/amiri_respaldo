@@ -348,9 +348,6 @@ try {
 
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
 
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
-
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
     <style>
@@ -1130,8 +1127,6 @@ try {
     <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="src/assets/js/sidebarmenu.js"></script>
-
-    <script src="src/assets/js/dark-mode.js"></script>
 
     <script src="src/assets/js/pantalla-completa.js"></script>
 

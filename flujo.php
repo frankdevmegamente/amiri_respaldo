@@ -78,10 +78,6 @@ $serviciosDivisas = [
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css">
-
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css">
-
     <link rel="stylesheet" href="src/assets/css/layout-custom.css">
 
     <style>
@@ -177,24 +173,23 @@ $serviciosDivisas = [
 /* 1. Textos generales y Tarjetas */
 [data-bs-theme="dark"] h3,
 [data-bs-theme="dark"] .page-breadcrumb h3 {
-    color: #e9ecef !important;
+    color: #f5f2f4 !important;
 }
 
-[data-bs-theme="dark"] .card {
-    background: #1a2234;
-    border-color: #2c344c;
+[data-bs-theme="dark"] .card { background: var(--nx-surface) !important;
+    border-color: rgba(255,255,255,0.12);
 }
 
 /* 2. Tabla principal (DataTables) */
 [data-bs-theme="dark"] .table>thead>tr>th {
-    background-color: #1a2234 !important;
-    color: #e9ecef !important;
-    border-bottom-color: #2c344c !important;
+    background-color: var(--nx-surface) !important;
+    color: #f5f2f4 !important;
+    border-bottom-color: rgba(255,255,255,0.12) !important;
 }
 
 [data-bs-theme="dark"] .table>tbody>tr>td {
-    color: #e9ecef !important;
-    border-color: #2c344c !important;
+    color: #f5f2f4 !important;
+    border-color: rgba(255,255,255,0.12) !important;
 }
 
 /* Respetar el estilo "zebra" (striped) y hover en modo oscuro */
@@ -210,55 +205,52 @@ $serviciosDivisas = [
 [data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter,
 [data-bs-theme="dark"] .dataTables_wrapper .dataTables_info,
 [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate {
-    color: #8c9ea8 !important;
+    color: #9a9096 !important;
 }
 
 /* Estilo para los botones de paginación */
 [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button {
-    color: #8c9ea8 !important;
+    color: #9a9096 !important;
 }
 [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current,
 [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-    background: #252f43 !important;
-    border-color: #2c344c !important;
-    color: #e9ecef !important;
+    background: #1a181c !important;
+    border-color: rgba(255,255,255,0.12) !important;
+    color: #f5f2f4 !important;
 }
 
 /* Inputs del buscador de DataTables */
 [data-bs-theme="dark"] .dataTables_wrapper select,
 [data-bs-theme="dark"] .dataTables_wrapper input {
-    background-color: #252f43;
-    border: 1px solid #2c344c;
-    color: #e9ecef;
+    background-color: #1a181c;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #f5f2f4;
 }
 
 /* 4. Modal de Agregar/Editar Usuario */
-[data-bs-theme="dark"] .modal-content {
-    background-color: #1a2234;
-    border-color: #2c344c;
-}
+[data-bs-theme="dark"] .modal-content { background: var(--nx-surface) !important; color: var(--nx-text) !important; border-color: var(--nx-border) !important; }
 [data-bs-theme="dark"] .modal-header {
-    border-bottom-color: #2c344c;
+    border-bottom-color: rgba(255,255,255,0.12);
 }
 [data-bs-theme="dark"] .modal-footer {
-    border-top-color: #2c344c;
+    border-top-color: rgba(255,255,255,0.12);
 }
 [data-bs-theme="dark"] .modal-title {
-    color: #e9ecef;
+    color: #f5f2f4;
 }
 [data-bs-theme="dark"] .form-label {
-    color: #e9ecef;
+    color: #f5f2f4;
 }
 
 /* Campos de texto y select dentro del Modal */
 [data-bs-theme="dark"] .form-control,
 [data-bs-theme="dark"] .form-select {
-    background-color: #252f43;
-    border-color: #2c344c;
-    color: #e9ecef;
+    background-color: #1a181c;
+    border-color: rgba(255,255,255,0.12);
+    color: #f5f2f4;
 }
 [data-bs-theme="dark"] .form-control::placeholder {
-    color: #8c9ea8;
+    color: #9a9096;
 }
 /* =========================================
    🌙 ESTILOS PARA TARJETAS DE RESUMEN EN MODO OSCURO Y CLARO
@@ -276,15 +268,15 @@ $serviciosDivisas = [
 /* 2. MODO OSCURO: FONDOS TRANSLÚCIDOS (Efecto Badge) */
 [data-bs-theme="dark"] .header-saldos, .dark-mode .header-saldos {
     background-color: rgba(25, 135, 84, 0.15) !important;
-    border-bottom: 1px solid #2c344c !important;
+    border-bottom: 1px solid rgba(255,255,255,0.12) !important;
 }
 [data-bs-theme="dark"] .header-capital, .dark-mode .header-capital {
     background-color: rgba(255, 193, 7, 0.15) !important;
-    border-bottom: 1px solid #2c344c !important;
+    border-bottom: 1px solid rgba(255,255,255,0.12) !important;
 }
 [data-bs-theme="dark"] .header-prestamos, .dark-mode .header-prestamos {
     background-color: rgba(220, 53, 69, 0.15) !important;
-    border-bottom: 1px solid #2c344c !important;
+    border-bottom: 1px solid rgba(255,255,255,0.12) !important;
 }
 
 /* ── Capital destacado: Capital Amiri / Utilidades AMIRI ──────────── */
@@ -312,12 +304,12 @@ $serviciosDivisas = [
 /* =========================================
            🎨 BADGES VIBRANTES (MODO OSCURO)
            ========================================= */
-        [data-bs-theme="dark"] .table .badge.bg-success { background-color: rgba(19, 222, 185, 0.15) !important; color: #13DEB9 !important; background-image: none !important; }
-        [data-bs-theme="dark"] .table .badge.bg-danger { background-color: rgba(250, 137, 107, 0.15) !important; color: #FA896B !important; background-image: none !important; }
-        [data-bs-theme="dark"] .table .badge.bg-info { background-color: rgba(93, 135, 255, 0.15) !important; color: #5D87FF !important; background-image: none !important; }
-        [data-bs-theme="dark"] .table .badge.bg-warning { background-color: rgba(255, 174, 31, 0.15) !important; color: #FFAE1F !important; background-image: none !important; }
-        [data-bs-theme="dark"] .table .badge.bg-primary { background-color: rgba(93, 135, 255, 0.15) !important; color: #5D87FF !important; background-image: none !important; }
-        [data-bs-theme="dark"] .table .badge.bg-secondary { background-color: rgba(140, 158, 168, 0.15) !important; color: #8c9ea8 !important; background-image: none !important; }
+        [data-bs-theme="dark"] .table .badge.bg-success { background-color: rgba(19, 222, 185, 0.15) !important; color: var(--nx-success) !important; background-image: none !important; }
+        [data-bs-theme="dark"] .table .badge.bg-danger { background-color: rgba(250, 137, 107, 0.15) !important; color: var(--nx-danger) !important; background-image: none !important; }
+        [data-bs-theme="dark"] .table .badge.bg-info { background-color: rgba(93, 135, 255, 0.15) !important; color: var(--nx-primary) !important; background-image: none !important; }
+        [data-bs-theme="dark"] .table .badge.bg-warning { background-color: rgba(255, 174, 31, 0.15) !important; color: var(--nx-warning) !important; background-image: none !important; }
+        [data-bs-theme="dark"] .table .badge.bg-primary { background-color: rgba(93, 135, 255, 0.15) !important; color: var(--nx-primary) !important; background-image: none !important; }
+        [data-bs-theme="dark"] .table .badge.bg-secondary { background-color: rgba(140, 158, 168, 0.15) !important; color: #9a9096 !important; background-image: none !important; }
         
         /* Badges Especiales de Cripto/Dólares en Flujo */
         [data-bs-theme="dark"] .table .badge.badge-usd { background-color: rgba(37, 99, 235, 0.15) !important; background-image: none !important; color: #3b82f6 !important; }
@@ -327,8 +319,8 @@ $serviciosDivisas = [
            📦 CAJA BLANCA DE INVOLUCRADOS (MODO OSCURO)
            ========================================= */
         [data-bs-theme="dark"] .table>tbody>tr>td .bg-light {
-            background-color: #252f43 !important; /* Fondo gris oscuro / azulado */
-            border-color: #2c344c !important; /* Borde oscuro sutil */
+            background-color: #1a181c !important; /* Fondo gris oscuro / azulado */
+            border-color: rgba(255,255,255,0.12) !important; /* Borde oscuro sutil */
         }
 
     </style>
@@ -1101,8 +1093,6 @@ $serviciosDivisas = [
 
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
-    <script src="src/assets/js/dark-mode.js"></script>
-
     <script src="src/assets/js/utils.js"></script>
 
     <script src="src/assets/js/pantalla-completa.js"></script>
@@ -1125,7 +1115,7 @@ $serviciosDivisas = [
 
         [data-bs-theme="dark"] #desgloseBody .alert-info      { background: linear-gradient(135deg, #0ea5e9, #2563eb); color: #e0f2fe; border: none; }
 
-        [data-bs-theme="dark"] .modal-content                 { background: #0b1220; border-color: #1f2937; }
+        [data-bs-theme="dark"] .modal-content { background: var(--nx-surface) !important; color: var(--nx-text) !important; border-color: var(--nx-border) !important; }
 
         [data-bs-theme="dark"] .input-group-text,
 

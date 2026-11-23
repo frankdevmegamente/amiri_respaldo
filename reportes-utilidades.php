@@ -16,15 +16,13 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <link rel="stylesheet" href="src/assets/css/styles.min.css">
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css">
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css">
     <link rel="stylesheet" href="src/assets/css/layout-custom.css">
     <style>
         .body-wrapper { padding-top: 100px !important; }
         .body-wrapper-inner, .body-wrapper .container-fluid { padding-top: 15px !important; margin-top: 0 !important; }
         .chart-container { position: relative; height: 300px; }
         .nav-pills .nav-link { border-radius: 8px; padding: 10px 20px; }
-        .nav-pills .nav-link.active { background: linear-gradient(135deg, #6c5ce7, #a78bfa); }
+        .nav-pills .nav-link.active { background: linear-gradient(135deg, #c58fb8, #a78bfa); }
         .table-reportes th { background-color: #f8f9fa; font-weight: 600; }
         [data-bs-theme="dark"] .table-reportes th { background-color: #1e293b; }
         /* Tarjetas estilo compacto con top strip */
@@ -33,13 +31,13 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .metric-card-util:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.25) !important; }
         .metric-card-util .top-strip { position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 0.75rem 0.75rem 0 0; }
         .util-icon { width: 42px; height: 42px; }
-        .util-label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: #5A6A85; }
+        .util-label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--nx-text-muted); }
         [data-bs-theme="dark"] .util-label { color: #8b92a8; }
-        .util-value { font-size: 1.5rem; font-weight: 800; color: #2A3547; line-height: 1.2; letter-spacing: -0.3px; }
+        .util-value { font-size: 1.5rem; font-weight: 800; color: var(--nx-text); line-height: 1.2; letter-spacing: -0.3px; }
         [data-bs-theme="dark"] .util-value { color: #e8ecf0; }
         .util-breakdown { padding-top: 10px; margin-top: 6px; border-top: 1px solid #e2e8f0; }
         [data-bs-theme="dark"] .util-breakdown { border-top-color: #2d3140; }
-        .util-breakdown .br-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 0.78rem; color: #5A6A85; }
+        .util-breakdown .br-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 0.78rem; color: var(--nx-text-muted); }
         [data-bs-theme="dark"] .util-breakdown .br-row { color: #8b92a8; }
         .util-breakdown .br-row .br-label { min-width: 0; }
         .util-breakdown .br-row .br-value { font-weight: 700; white-space: nowrap; margin-left: 12px; }
@@ -54,10 +52,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .trend-badge { font-size: 0.65rem; font-weight: 700; padding: 2px 8px; border-radius: 20px; display: inline-flex; align-items: center; gap: 3px; }
         .trend-badge.up { background: rgba(20,184,166,0.12); color: #14b8a6; }
         .trend-badge.down { background: rgba(217,106,78,0.12); color: #d96a4e; }
-        .trend-badge.neutral { background: rgba(90,106,133,0.12); color: #5A6A85; }
+        .trend-badge.neutral { background: rgba(90,106,133,0.12); color: var(--nx-text-muted); }
         .drill-link { transition: all 0.15s; display:inline-flex; align-items:center; gap:4px; }
         .drill-link .ti-search { font-size:14px; opacity:0.6; transition:all 0.15s; }
-        .drill-link:hover { color: #6c5ce7 !important; }
+        .drill-link:hover { color: #c58fb8 !important; }
         .drill-link:hover .ti-search { opacity: 1; font-size:16px; }
         [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro { display: none !important; }
@@ -74,7 +72,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         /* ── Empty states ── */
         .empty-state { text-align:center; padding:24px 16px; }
         .empty-state .empty-icon { font-size:2.5rem; opacity:0.25; margin-bottom:8px; display:block; }
-        .empty-state .empty-title { font-size:0.95rem; font-weight:600; color:#5A6A85; margin-bottom:4px; }
+        .empty-state .empty-title { font-size:0.95rem; font-weight:600; color: var(--nx-text-muted); margin-bottom:4px; }
         .empty-state .empty-sub { font-size:0.78rem; color:#8b92a8; }
         [data-bs-theme="dark"] .empty-state .empty-title { color:#8b92a8; }
         [data-bs-theme="dark"] .empty-state .empty-sub { color:#6b7280; }
@@ -83,31 +81,31 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .top-cliente-row { border-bottom-color:#2d3140; }
         .top-cliente-row:last-child { border-bottom:none; }
         .top-cliente-rank { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:700; color:#fff; flex-shrink:0; }
-        .top-cliente-name { flex:1; font-size:0.78rem; font-weight:600; color:#2A3547; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .top-cliente-name { flex:1; font-size:0.78rem; font-weight:600; color: var(--nx-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         [data-bs-theme="dark"] .top-cliente-name { color:#e8ecf0; }
         .top-cliente-bar-wrap { flex:0 0 80px; height:6px; background:#e2e8f0; border-radius:4px; overflow:hidden; }
         [data-bs-theme="dark"] .top-cliente-bar-wrap { background:#2d3140; }
         .top-cliente-bar { height:100%; border-radius:4px; transition:width 0.6s ease; }
-        .top-cliente-value { font-size:0.72rem; font-weight:700; color:#5A6A85; min-width:55px; text-align:right; }
+        .top-cliente-value { font-size:0.72rem; font-weight:700; color: var(--nx-text-muted); min-width:55px; text-align:right; }
         [data-bs-theme="dark"] .top-cliente-value { color:#8b92a8; }
         /* ── Sparkline ── */
         .sparkline-wrap { width:100%; height:36px; margin-top:6px; }
         /* ── Meta progress ── */
         .meta-bar-wrap { margin-top:8px; padding-top:6px; border-top:1px solid #e2e8f0; }
         [data-bs-theme="dark"] .meta-bar-wrap { border-top-color:#2d3140; }
-        .meta-bar-label { display:flex; justify-content:space-between; font-size:0.68rem; color:#5A6A85; margin-bottom:3px; }
+        .meta-bar-label { display:flex; justify-content:space-between; font-size:0.68rem; color: var(--nx-text-muted); margin-bottom:3px; }
         .meta-bar-track { height:5px; background:#e2e8f0; border-radius:4px; overflow:hidden; }
         [data-bs-theme="dark"] .meta-bar-track { background:#2d3140; }
         .meta-bar-fill { height:100%; border-radius:4px; transition:width 0.8s ease; }
-        .meta-btn { font-size:0.65rem; padding:0 4px; color:#5A6A85; cursor:pointer; }
-        .meta-btn:hover { color:#6c5ce7; }
+        .meta-btn { font-size:0.65rem; padding:0 4px; color: var(--nx-text-muted); cursor:pointer; }
+        .meta-btn:hover { color:#c58fb8; }
         /* ── Section labels for consolidated card ── */
         .br-section-label { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#8b92a8; margin-bottom:4px; }
         [data-bs-theme="dark"] .br-section-label { color:#6b7280; }
         /* ── Dark mode: Estado de Resultados ── */
         [data-bs-theme="dark"] .bg-light {
             background-color: #1e293b !important;
-            border-color: #2c344c !important;
+            border-color: rgba(255,255,255,0.12) !important;
         }
         [data-bs-theme="dark"] .text-dark {
             color: #e8ecf0 !important;
@@ -181,7 +179,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 <div class="row mb-4">
                     <div class="col-12">
                         <div class="card border-0 shadow-sm">
-                            <div class="top-strip" style="background:linear-gradient(90deg,#6c5ce7,#f59e0b,#14b8a6);height:3px;border-radius:0.75rem 0.75rem 0 0;"></div>
+                            <div class="top-strip" style="background:linear-gradient(90deg,#c58fb8,#f59e0b,#14b8a6);height:3px;border-radius:0.75rem 0.75rem 0 0;"></div>
                             <div class="card-body p-4">
                                 <div class="skeleton-wrap" id="skeletonResumen" style="display:none;">
                                     <div class="row g-3">
@@ -351,13 +349,13 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     <div class="col-12">
                         <div class="card shadow-sm">
                             <div class="card-header bg-transparent d-flex align-items-center flex-wrap gap-2">
-                                <h6 class="fw-semibold mb-0"><i class="ti ti-dashboard me-2" style="color:#6c5ce7;"></i>Dashboard de Utilidades</h6>
+                                <h6 class="fw-semibold mb-0"><i class="ti ti-dashboard me-2" style="color:#c58fb8;"></i>Dashboard de Utilidades</h6>
                                 <span class="badge bg-purple bg-opacity-10 text-purple border-0 ms-1" id="rangoDashboard">Período actual</span>
                             </div>
                             <div class="card-body p-4">
                                 <div class="row">
                                     <div class="col-lg-4 mb-3 mb-lg-0">
-                                        <h6 class="fw-semibold mb-3 small text-muted text-uppercase" style="letter-spacing:0.4px;"><i class="ti ti-chart-bar me-1" style="color:#6c5ce7;"></i> Utilidad por Servicio</h6>
+                                        <h6 class="fw-semibold mb-3 small text-muted text-uppercase" style="letter-spacing:0.4px;"><i class="ti ti-chart-bar me-1" style="color:#c58fb8;"></i> Utilidad por Servicio</h6>
                                         <div class="chart-container">
                                             <canvas id="chartServicio"></canvas>
                                         </div>
@@ -379,23 +377,23 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                 <div class="row g-2 mt-3 pt-3 border-top">
                                     <div class="col-md-3 col-6">
                                         <div class="d-flex align-items-center gap-2">
-                                            <div class="rounded-2 d-flex align-items-center justify-content-center" style="width:32px;height:32px;background:rgba(108,92,231,0.1);color:#6c5ce7;">
+                                            <div class="rounded-2 d-flex align-items-center justify-content-center" style="width:32px;height:32px;background:rgba(108,92,231,0.1);color:#c58fb8;">
                                                 <i class="ti ti-clipboard-list" style="font-size:14px;"></i>
                                             </div>
                                             <div style="line-height:1.2;">
                                                 <p class="text-muted mb-0" style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.3px;">Servicios</p>
-                                                <strong class="fs-6" id="totalUtilidadServicio" style="color:#2A3547;">$0.00</strong>
+                                                <strong class="fs-6" id="totalUtilidadServicio" style="color: var(--nx-text);">$0.00</strong>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-md-3 col-6">
                                         <div class="d-flex align-items-center gap-2">
-                                            <div class="rounded-2 d-flex align-items-center justify-content-center" style="width:32px;height:32px;background:rgba(93,135,255,0.1);color:#5D87FF;">
+                                            <div class="rounded-2 d-flex align-items-center justify-content-center" style="width:32px;height:32px;background:rgba(93,135,255,0.1);color:var(--nx-primary);">
                                                 <i class="ti ti-users" style="font-size:14px;"></i>
                                             </div>
                                             <div style="line-height:1.2;">
                                                 <p class="text-muted mb-0" style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.3px;">Clientes</p>
-                                                <strong class="fs-6" id="totalUtilidadCliente" style="color:#2A3547;">$0.00</strong>
+                                                <strong class="fs-6" id="totalUtilidadCliente" style="color: var(--nx-text);">$0.00</strong>
                                             </div>
                                         </div>
                                     </div>
@@ -406,7 +404,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                             </div>
                                             <div style="line-height:1.2;">
                                                 <p class="text-muted mb-0" style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.3px;">Promotores</p>
-                                                <strong class="fs-6" id="totalUtilidadPromotor" style="color:#2A3547;">$0.00</strong>
+                                                <strong class="fs-6" id="totalUtilidadPromotor" style="color: var(--nx-text);">$0.00</strong>
                                             </div>
                                         </div>
                                     </div>
@@ -417,7 +415,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                             </div>
                                             <div style="line-height:1.2;">
                                                 <p class="text-muted mb-0" style="font-size:0.62rem;text-transform:uppercase;letter-spacing:0.3px;">Margen Prom.</p>
-                                                <strong class="fs-6" id="statMargenPromedio" style="color:#2A3547;">0%</strong>
+                                                <strong class="fs-6" id="statMargenPromedio" style="color: var(--nx-text);">0%</strong>
                                             </div>
                                         </div>
                                     </div>
@@ -433,7 +431,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                     </div>
                                     <div class="col-lg-9">
                                         <div class="d-flex align-items-center gap-2 mb-2">
-                                            <i class="ti ti-table" style="color:#6c5ce7;font-size:14px;"></i>
+                                            <i class="ti ti-table" style="color:#c58fb8;font-size:14px;"></i>
                                             <h6 class="fw-semibold mb-0" style="font-size:0.82rem;">Explorador de Datos</h6>
                                             <div class="btn-group btn-group-sm ms-3" role="group" id="tablaToggle2">
                                                 <button type="button" class="btn btn-primary active" data-table="servicio">Por Servicio</button>
@@ -534,7 +532,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     <div class="col-12">
                         <div class="card shadow-sm">
                             <div class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                <h6 class="fw-semibold mb-0"><i class="ti ti-chart-bar me-2" style="color:#6c5ce7;"></i>Utilidad por Día</h6>
+                                <h6 class="fw-semibold mb-0"><i class="ti ti-chart-bar me-2" style="color:#c58fb8;"></i>Utilidad por Día</h6>
                                 <div class="d-flex align-items-center gap-2">
                                     <small class="text-muted" id="totalPeriodoGrafica"></small>
                                     <select class="form-select form-select-sm w-auto" id="selectGrafica">
@@ -600,7 +598,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-<script src="src/assets/js/dark-mode.js"></script>
 <script src="src/assets/js/utils.js"></script>
 <script src="src/assets/js/pantalla-completa.js"></script>
 <script>
@@ -612,7 +609,7 @@ function renderTopClientes(datos) {
         return;
     }
     var maxVal = parseFloat(top[0].comision_amiri) || 1;
-    var colores = ['#6c5ce7','#5D87FF','#14b8a6','#f59e0b','#d96a4e','#e74c3c','#3498db','#2ecc71','#9b59b6','#1abc9c'];
+    var colores = ['#c58fb8','var(--nx-primary)','#14b8a6','#f59e0b','#d96a4e','#e74c3c','#3498db','#2ecc71','#9b59b6','#1abc9c'];
     var html = '';
     top.forEach(function(r, i) {
         var v = parseFloat(r.comision_amiri) || 0;
@@ -629,7 +626,7 @@ function renderTopClientes(datos) {
 
 let chartServicio, chartCliente, chartPromotor, chartComparativa;
 let dtServicio, dtCliente, dtPromotor;
-const COLORES = ['#6c5ce7','#f59e0b','#14b8a6','#a78bfa','#fbbf24','#2dd4bf','#8b5cf6','#d97706','#0d9488','#c084fc'];
+const COLORES = ['#c58fb8','#f59e0b','#14b8a6','#a78bfa','#fbbf24','#2dd4bf','#8b5cf6','#d97706','#0d9488','#c084fc'];
 
 function formatoNumero(num) {
     num = parseFloat(num || 0);
@@ -978,7 +975,7 @@ function cargarGraficaComparativa() {
                     data: {
                         labels: dias.map(function(d) { return 'Día ' + d; }),
                         datasets: [
-                            { label: 'Utilidad AMIRI', data: comisiones, backgroundColor: '#6c5ce7', borderRadius: 4, borderSkipped: false },
+                            { label: 'Utilidad AMIRI', data: comisiones, backgroundColor: '#c58fb8', borderRadius: 4, borderSkipped: false },
                             { label: 'Utilidad Promotor', data: comisionesProm, backgroundColor: '#a78bfa', borderRadius: 4, borderSkipped: false }
                         ]
                     },
@@ -1024,7 +1021,7 @@ function cargarGraficaComparativa() {
                     data: {
                         labels: data.map(function(d) { return d.mes; }),
                         datasets: [
-                            { label: 'Utilidad AMIRI', data: data.map(function(d) { return parseFloat(d.comisiones) || 0; }), backgroundColor: '#6c5ce7', borderRadius: 4, borderSkipped: false },
+                            { label: 'Utilidad AMIRI', data: data.map(function(d) { return parseFloat(d.comisiones) || 0; }), backgroundColor: '#c58fb8', borderRadius: 4, borderSkipped: false },
                             { label: 'Utilidad Promotor', data: data.map(function(d) { return parseFloat(d.comisiones_promotor) || 0; }), backgroundColor: '#a78bfa', borderRadius: 4, borderSkipped: false }
                         ]
                     },
@@ -1089,7 +1086,7 @@ function abrirDetalleDia(dia) {
                     '<td>' + (r.cliente || '-') + '</td>' +
                     '<td>' + (r.promotor || '-') + '</td>' +
                     '<td class="text-end fw-bold">$' + formatoNumero(monto) + '</td>' +
-                    '<td class="text-end" style="color:#6c5ce7;">$' + formatoNumero(amiri) + '</td>' +
+                    '<td class="text-end" style="color:#c58fb8;">$' + formatoNumero(amiri) + '</td>' +
                     '<td class="text-end" style="color:#14b8a6;">$' + formatoNumero(prom) + '</td>' +
                     '</tr>';
             });
@@ -1130,7 +1127,7 @@ $(document).on('click', '.drill-link', function(e) {
                     '<td>' + (r.cliente || '-') + '</td>' +
                     '<td>' + (r.promotor || '-') + '</td>' +
                     '<td class="text-end fw-bold">$' + formatoNumero(monto) + '</td>' +
-                    '<td class="text-end" style="color:#6c5ce7;">$' + formatoNumero(amiri) + '</td>' +
+                    '<td class="text-end" style="color:#c58fb8;">$' + formatoNumero(amiri) + '</td>' +
                     '<td class="text-end" style="color:#14b8a6;">$' + formatoNumero(prom) + '</td>' +
                     '</tr>';
             });
@@ -1217,7 +1214,7 @@ function dibujarSparkline(id, datos) {
         var x = i * stepX, y = h - ((v - min) / range) * (h - 6) - 3;
         if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     });
-    ctx.strokeStyle = '#6c5ce7';
+    ctx.strokeStyle = '#c58fb8';
     ctx.lineWidth = 1.5;
     ctx.stroke();
     // dot on last value
@@ -1225,7 +1222,7 @@ function dibujarSparkline(id, datos) {
     var lastY = h - ((vals[vals.length - 1] - min) / range) * (h - 6) - 3;
     ctx.beginPath();
     ctx.arc(lastX, lastY, 2.5, 0, Math.PI * 2);
-    ctx.fillStyle = '#6c5ce7';
+    ctx.fillStyle = '#c58fb8';
     ctx.fill();
 }
 

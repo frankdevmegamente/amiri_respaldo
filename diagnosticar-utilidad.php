@@ -10,11 +10,10 @@ $ff = $_GET['fin'] ?? date('Y-m-t');
 <meta charset="UTF-8">
 <title>Diagnostico - Utilidad AMIRI</title>
 <link rel="stylesheet" href="src/assets/css/styles.min.css">
-<link rel="stylesheet" href="src/assets/css/dark-mode.css">
 <style>
 body{background:#0f172a;color:#e2e8f0;padding:20px;font-family:'Segoe UI',sans-serif}
-h1{color:#a78bfa;border-bottom:2px solid #6c5ce7;padding-bottom:10px}
-h2{color:#6c5ce7;margin-top:30px;font-size:1.1rem}
+h1{color:#a78bfa;border-bottom:2px solid #c58fb8;padding-bottom:10px}
+h2{color:#c58fb8;margin-top:30px;font-size:1.1rem}
 table{width:100%;border-collapse:collapse;margin:10px 0 20px 0;font-size:0.85rem}
 th{background:#1e293b;color:#a78bfa;padding:8px 12px;text-align:left;border:1px solid #334155}
 td{padding:6px 12px;border:1px solid #334155}
@@ -25,7 +24,7 @@ tr:hover{background:#334155}
 .filters{background:#1e293b;padding:12px 16px;border-radius:8px;margin-bottom:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .filters label{color:#94a3b8;font-size:0.85rem}
 .filters input{background:#0f172a;border:1px solid #334155;color:#e2e8f0;padding:4px 8px;border-radius:4px}
-.filters button{background:#6c5ce7;color:#fff;border:none;padding:6px 16px;border-radius:4px;cursor:pointer}
+.filters button{background:#c58fb8;color:#fff;border:none;padding:6px 16px;border-radius:4px;cursor:pointer}
 .alert{padding:12px 16px;border-radius:8px;margin:10px 0;font-size:0.85rem}
 .alert-danger{background:rgba(248,113,113,0.15);border:1px solid rgba(248,113,113,0.3);color:#fca5a5}
 .alert-info{background:rgba(96,165,250,0.15);border:1px solid rgba(96,165,250,0.3);color:#93c5fd}

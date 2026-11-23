@@ -40,10 +40,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css">
-
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css">
-
     <link rel="stylesheet" href="src/assets/css/layout-custom.css">
 
     <style>
@@ -120,7 +116,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         .nav-pills .nav-link.active {
 
-            background: linear-gradient(135deg, #5D87FF, #49BEFF);
+            background: linear-gradient(135deg, var(--nx-primary), #49BEFF);
 
         }
 
@@ -138,7 +134,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         .filter-card {
 
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            background: linear-gradient(135deg, #f8f9fa, #f5f2f4);
 
             border: none;
 
@@ -273,7 +269,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         [data-bs-theme="dark"] .nav-tabs .nav-link.active {
             color: #ffffff !important;
-            border-bottom-color: #6c5ce7 !important;
+            border-bottom-color: #c58fb8 !important;
         }
 
         [data-bs-theme="dark"] .bg-light {
@@ -325,8 +321,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         <div class="col-12">
                             <div class="card shadow-sm border-0 rounded-4" style="position: relative; overflow: hidden;">
                                 
-                                <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #5D87FF; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-                                <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                                <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: var(--nx-primary); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                                <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: var(--nx-success); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
 
                                 <div class="card-body p-4" style="position: relative; z-index: 1;">
                                     <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
@@ -1084,7 +1080,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="src/assets/js/dark-mode.js"></script>
     <script src="src/assets/js/utils.js"></script>
     <script src="src/assets/js/pantalla-completa.js"></script>
 
@@ -1277,14 +1272,14 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     datasets: [{
                         label: 'AMIRI',
                         data: data.map(d => parseFloat(d.amiri || 0)),
-                        borderColor: '#5D87FF',
+                        borderColor: 'var(--nx-primary)',
                         backgroundColor: 'rgba(93, 135, 255, 0.1)',
                         fill: true,
                         tension: 0.4
                     }, {
                         label: 'Promotores',
                         data: data.map(d => parseFloat(d.promotores || 0)),
-                        borderColor: '#13DEB9',
+                        borderColor: 'var(--nx-success)',
                         backgroundColor: 'rgba(19, 222, 185, 0.1)',
                         fill: true,
                         tension: 0.4
@@ -1311,7 +1306,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         function _renderGraficaComisionesPromotor(data) {
             const ctx = document.getElementById('chartComisionesPromotor').getContext('2d');
             if (chartComisionesPromotor) chartComisionesPromotor.destroy();
-            const colores = ['#5D87FF', '#13DEB9', '#FFAE1F', '#FA896B', '#539BFF', '#49BEFF', '#FF6692', '#36A2EB', '#FFCE56', '#4BC0C0'];
+            const colores = ['var(--nx-primary)', 'var(--nx-success)', 'var(--nx-warning)', 'var(--nx-danger)', '#539BFF', '#49BEFF', '#FF6692', '#36A2EB', '#FFCE56', '#4BC0C0'];
             chartComisionesPromotor = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
@@ -1342,7 +1337,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         label: 'Monto Total',
                         data: data.map(d => parseFloat(d.total || 0)),
                         backgroundColor: 'rgba(255, 174, 31, 0.7)',
-                        borderColor: '#FFAE1F',
+                        borderColor: 'var(--nx-warning)',
                         borderWidth: 1
                     }]
                 },

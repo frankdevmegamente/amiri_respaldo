@@ -38,9 +38,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
 
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
-
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
     <style>
@@ -56,9 +53,9 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             margin-top: 0 !important;
         }
         #cuentasTab .nav-link.active {
-            color: #5D87FF !important;
+            color: var(--nx-primary) !important;
             background-color: transparent !important;
-            border-bottom: 2px solid #5D87FF !important;
+            border-bottom: 2px solid var(--nx-primary) !important;
             border-top: none;
             border-left: none;
             border-right: none;
@@ -69,7 +66,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             color: #64748b;
         }
         #cuentasTab .nav-link:not(.active):hover {
-            color: #5D87FF;
+            color: var(--nx-primary);
         }
          [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
@@ -87,24 +84,23 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 /* 1. Textos generales y Tarjetas */
 [data-bs-theme="dark"] h3,
 [data-bs-theme="dark"] .page-breadcrumb h3 {
-    color: #e9ecef !important;
+    color: #f5f2f4 !important;
 }
 
-[data-bs-theme="dark"] .card {
-    background: #1a2234;
-    border-color: #2c344c;
+[data-bs-theme="dark"] .card { background: var(--nx-surface) !important;
+    border-color: rgba(255,255,255,0.12);
 }
 
 /* 2. Tabla principal (DataTables) */
 [data-bs-theme="dark"] .table>thead>tr>th {
-    background-color: #1a2234 !important;
-    color: #e9ecef !important;
-    border-bottom-color: #2c344c !important;
+    background-color: var(--nx-surface) !important;
+    color: #f5f2f4 !important;
+    border-bottom-color: rgba(255,255,255,0.12) !important;
 }
 
 [data-bs-theme="dark"] .table>tbody>tr>td {
-    color: #e9ecef !important;
-    border-color: #2c344c !important;
+    color: #f5f2f4 !important;
+    border-color: rgba(255,255,255,0.12) !important;
 }
 
 /* Respetar el estilo "zebra" (striped) y hover en modo oscuro */
@@ -120,55 +116,52 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 [data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter,
 [data-bs-theme="dark"] .dataTables_wrapper .dataTables_info,
 [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate {
-    color: #8c9ea8 !important;
+    color: #9a9096 !important;
 }
 
 /* Estilo para los botones de paginación */
 [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button {
-    color: #8c9ea8 !important;
+    color: #9a9096 !important;
 }
 [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current,
 [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
-    background: #252f43 !important;
-    border-color: #2c344c !important;
-    color: #e9ecef !important;
+    background: #1a181c !important;
+    border-color: rgba(255,255,255,0.12) !important;
+    color: #f5f2f4 !important;
 }
 
 /* Inputs del buscador de DataTables */
 [data-bs-theme="dark"] .dataTables_wrapper select,
 [data-bs-theme="dark"] .dataTables_wrapper input {
-    background-color: #252f43;
-    border: 1px solid #2c344c;
-    color: #e9ecef;
+    background-color: #1a181c;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #f5f2f4;
 }
 
 /* 4. Modal de Agregar/Editar Usuario */
-[data-bs-theme="dark"] .modal-content {
-    background-color: #1a2234;
-    border-color: #2c344c;
-}
+[data-bs-theme="dark"] .modal-content { background: var(--nx-surface) !important; color: var(--nx-text) !important; border-color: var(--nx-border) !important; }
 [data-bs-theme="dark"] .modal-header {
-    border-bottom-color: #2c344c;
+    border-bottom-color: rgba(255,255,255,0.12);
 }
 [data-bs-theme="dark"] .modal-footer {
-    border-top-color: #2c344c;
+    border-top-color: rgba(255,255,255,0.12);
 }
 [data-bs-theme="dark"] .modal-title {
-    color: #e9ecef;
+    color: #f5f2f4;
 }
 [data-bs-theme="dark"] .form-label {
-    color: #e9ecef;
+    color: #f5f2f4;
 }
 
 /* Campos de texto y select dentro del Modal */
 [data-bs-theme="dark"] .form-control,
 [data-bs-theme="dark"] .form-select {
-    background-color: #252f43;
-    border-color: #2c344c;
-    color: #e9ecef;
+    background-color: #1a181c;
+    border-color: rgba(255,255,255,0.12);
+    color: #f5f2f4;
 }
 [data-bs-theme="dark"] .form-control::placeholder {
-    color: #8c9ea8;
+    color: #9a9096;
 }
 
 /* =========================================
@@ -176,31 +169,31 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
            ========================================= */
         .tarjeta-bancaria {
             width: 100%; max-width: 380px; 
-            background: #ffffff; 
+            background: var(--nx-surface); 
             border-radius: 16px; padding: 30px 25px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
             position: relative; overflow: hidden; 
             border: 1px solid #eef2f6;
         }
         .tb-texto-principal { color: #1e293b; font-size: 1.1rem; font-weight: 700; line-height: 1.2; }
-        .tb-texto-secundario { color: #8c9ea8; font-size: 0.7rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
-        .tb-cuenta { color: #5D87FF; font-size: 1.4rem; font-weight: 800; letter-spacing: 1px; word-break: break-all; }
+        .tb-texto-secundario { color: #9a9096; font-size: 0.7rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
+        .tb-cuenta { color: var(--nx-primary); font-size: 1.4rem; font-weight: 800; letter-spacing: 1px; word-break: break-all; }
         .tb-linea { border-top: 1px dashed #e2e8f0; }
 
         /* MODO OSCURO PARA LA TARJETA */
         [data-bs-theme="dark"] .tarjeta-bancaria,
         .dark-mode .tarjeta-bancaria {
-            background: #1a2234 !important;
-            border-color: #2c344c !important;
+            background: #1a181c !important;
+            border-color: rgba(255,255,255,0.12) !important;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
         }
         [data-bs-theme="dark"] .tb-texto-principal,
         .dark-mode .tb-texto-principal {
-            color: #e9ecef !important;
+            color: #f5f2f4 !important;
         }
         [data-bs-theme="dark"] .tb-linea,
         .dark-mode .tb-linea {
-            border-top: 1px dashed #2c344c !important;
+            border-top: 1px dashed rgba(255,255,255,0.12) !important;
         }
 
         /* ─── Page Header ─────────────────────────────── */
@@ -208,18 +201,18 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .cuentas-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(93, 135, 255, 0.08); pointer-events: none; }
         .cuentas-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(19, 222, 185, 0.06); pointer-events: none; }
         .cuentas-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
-        .cuentas-header .sub-badge { font-size: 1rem; color: #8c9ea8; }
+        .cuentas-header .sub-badge { font-size: 1rem; color: #9a9096; }
 
         /* ─── Metric Cards ────────────────────────────── */
         .metric-card { position: relative; border-radius: 12px !important; transition: transform 0.2s ease, box-shadow 0.2s ease; cursor: pointer; }
         .metric-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important; }
         .metric-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 12px 12px 0 0; }
-        .metric-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #8c9ea8; }
+        .metric-label { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #9a9096; }
         .metric-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; }
         .metric-value { font-size: 1.75rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.25rem; }
-        .metric-footer { font-size: 0.8rem; color: #8c9ea8; }
+        .metric-footer { font-size: 0.8rem; color: #9a9096; }
 
-        [data-bs-theme="dark"] .cuentas-header .sub-badge { color: #8c9ea8 !important; }
+        [data-bs-theme="dark"] .cuentas-header .sub-badge { color: #9a9096 !important; }
         [data-bs-theme="dark"] .bg-primary.bg-opacity-10 { background-color: rgba(93,135,255,0.12) !important; }
         [data-bs-theme="dark"] .bg-success.bg-opacity-10 { background-color: rgba(19,222,185,0.12) !important; }
         [data-bs-theme="dark"] .bg-warning.bg-opacity-10 { background-color: rgba(255,174,31,0.12) !important; }
@@ -577,8 +570,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         
                         <div id="tarjetaCuentaAmiri" class="tarjeta-bancaria">
                             
-                            <div style="position: absolute; top: -60px; right: -60px; width: 160px; height: 160px; background: #5D87FF; opacity: 0.08; border-radius: 50%;"></div>
-                            <div style="position: absolute; bottom: -40px; left: -40px; width: 100px; height: 100px; background: #13deb9; opacity: 0.08; border-radius: 50%;"></div>
+                            <div style="position: absolute; top: -60px; right: -60px; width: 160px; height: 160px; background: var(--nx-primary); opacity: 0.08; border-radius: 50%;"></div>
+                            <div style="position: absolute; bottom: -40px; left: -40px; width: 100px; height: 100px; background: var(--nx-success); opacity: 0.08; border-radius: 50%;"></div>
                             
                             <div class="text-center mb-4" style="position: relative; z-index: 2;">
                                 <img src="src/assets/images/logos/logo2.png" alt="Logo Amiri" class="logo-modo-claro mx-auto" style="height: 45px; max-width: 100%; object-fit: contain;" />
@@ -636,8 +629,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 
         <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-
-        <script src="src/assets/js/dark-mode.js"></script>
 
         <script src="src/assets/js/utils.js"></script>
 
@@ -1081,7 +1072,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     $('#genCuenta').text(d.numero_cuenta);
                     
                     // Colores de la moneda según sea MXN, USD o USDT
-                    const colorMoneda = d.tipo_moneda === 'MXN' ? '#5D87FF' : (d.tipo_moneda === 'USD' ? '#13deb9' : '#0ea5e9');
+                    const colorMoneda = d.tipo_moneda === 'MXN' ? 'var(--nx-primary)' : (d.tipo_moneda === 'USD' ? 'var(--nx-success)' : '#0ea5e9');
                     $('#genMoneda').css('color', colorMoneda).text(d.tipo_moneda);
                     
                     // Mostramos el modal
@@ -1111,8 +1102,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 const logoOscuroDisplay = logoOscuro ? logoOscuro.style.display : null;
 
                 if (esModoOscuro) {
-                    tarjeta.style.background = '#1a2234';
-                    tarjeta.style.border = '1px solid #2c344c';
+                    tarjeta.style.background = '#1a181c';
+                    tarjeta.style.border = '1px solid rgba(255,255,255,0.12)';
                     tarjeta.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
                     if (logoClaro) logoClaro.style.display = 'none';
                     if (logoOscuro) logoOscuro.style.display = 'block';
@@ -1123,7 +1114,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                 html2canvas(tarjeta, {
                     scale: 3,
-                    backgroundColor: esModoOscuro ? '#1a2234' : '#ffffff',
+                    backgroundColor: esModoOscuro ? '#1a181c' : '#ffffff',
                     useCORS: true
                 }).then(canvas => {
                     tarjeta.style.borderRadius = estilosOriginales.borderRadius;

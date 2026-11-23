@@ -122,10 +122,6 @@ try {
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css      " />
 
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
-
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
-
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
     <style>
@@ -146,13 +142,13 @@ try {
         }
 
         #tabsPromotor .nav-link.active {
-            color: #5D87FF; /* Morado Amiri */
+            color: var(--nx-primary); /* Morado Amiri */
             background-color: transparent;
-            border-bottom: 2px solid #5D87FF;
+            border-bottom: 2px solid var(--nx-primary);
             font-weight: 600;
         }
         #tabsPromotor .nav-link:not(.active):hover {
-            color: #5D87FF; /* Morado Amiri al pasar el mouse */
+            color: var(--nx-primary); /* Morado Amiri al pasar el mouse */
         }
 
         [data-bs-theme="dark"] .logo-modo-claro,
@@ -209,7 +205,7 @@ try {
 
         [data-bs-theme="dark"] .nav-tabs .nav-link.active {
             color: #ffffff !important;
-            border-bottom-color: #6c5ce7 !important;
+            border-bottom-color: #c58fb8 !important;
         }
 
         [data-bs-theme="dark"] .bg-light {
@@ -512,8 +508,6 @@ try {
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js      "></script>
 
         <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js      "></script>
-
-        <script src="src/assets/js/dark-mode.js"></script>
 
         <script src="src/assets/js/pantalla-completa.js"></script>
 

@@ -56,9 +56,6 @@ $twoFAEnabled = $user2FA['two_fa_enabled'] ?? false;
 
   <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
 
-  <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
-  <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
-
   <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
@@ -90,16 +87,15 @@ $twoFAEnabled = $user2FA['two_fa_enabled'] ?? false;
 
 [data-bs-theme="dark"] h3,
 [data-bs-theme="dark"] .page-breadcrumb h3 {
-    color: #e9ecef !important;
+    color: #f5f2f4 !important;
 }
 
-[data-bs-theme="dark"] .card {
-    background: #1a2234;
-    border-color: #2c344c;
+[data-bs-theme="dark"] .card { background: var(--nx-surface) !important;
+    border-color: rgba(255,255,255,0.12);
 }
 
 [data-bs-theme="dark"] .form-label {
-    color: #e9ecef !important;
+    color: #f5f2f4 !important;
 }
 
 [data-bs-theme="dark"] .form-control {
@@ -119,7 +115,7 @@ $twoFAEnabled = $user2FA['two_fa_enabled'] ?? false;
 }
 
 [data-bs-theme="dark"] .text-muted {
-    color: #8c9ea8 !important;
+    color: #9a9096 !important;
 }
 
 [data-bs-theme="dark"] .bg-light {
@@ -131,9 +127,9 @@ $twoFAEnabled = $user2FA['two_fa_enabled'] ?? false;
 .perfil-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(93, 135, 255, 0.08); pointer-events: none; }
 .perfil-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(19, 222, 185, 0.06); pointer-events: none; }
 .perfil-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
-.perfil-header .sub-badge { font-size: 1rem; color: #8c9ea8; }
+.perfil-header .sub-badge { font-size: 1rem; color: #9a9096; }
 
-[data-bs-theme="dark"] .perfil-header .sub-badge { color: #8c9ea8 !important; }
+[data-bs-theme="dark"] .perfil-header .sub-badge { color: #9a9096 !important; }
 </style>
 
 <body>
@@ -349,8 +345,6 @@ $twoFAEnabled = $user2FA['two_fa_enabled'] ?? false;
     <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="src/assets/js/sidebarmenu.js"></script>
-
-    <script src="src/assets/js/dark-mode.js"></script>
 
     <script src="src/assets/js/pantalla-completa.js"></script>
 

@@ -15,7 +15,7 @@ $pdo = getPDO();
 
 ?>
 <!DOCTYPE html>
-<html lang="es" data-bs-theme="light">
+<html lang="es">
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -25,8 +25,6 @@ $pdo = getPDO();
     <link rel="stylesheet" href="src/assets/css/styles.min.css" />
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
     <style>
@@ -62,13 +60,13 @@ $pdo = getPDO();
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.4px;
-            color: #5A6A85;
+            color: var(--nx-text-muted);
             line-height: 1.3;
         }
         .kpi-value {
             font-size: 1.5rem;
             font-weight: 800;
-            color: #2A3547;
+            color: var(--nx-text);
             line-height: 1.1;
             letter-spacing: -0.3px;
         }
@@ -88,10 +86,10 @@ $pdo = getPDO();
         }
         .nav-moneda .nav-link.active {
             color: #fff;
-            background: #6c5ce7;
+            background: #c58fb8;
         }
         .nav-moneda .nav-link:not(.active):hover {
-            color: #6c5ce7;
+            color: #c58fb8;
             background: rgba(108, 92, 231, 0.06);
         }
 
@@ -104,10 +102,10 @@ $pdo = getPDO();
         }
         .nav-subtabs .nav-link.active {
             color: #fff;
-            background: #6c5ce7;
+            background: #c58fb8;
         }
         .nav-subtabs .nav-link:not(.active):hover {
-            color: #6c5ce7;
+            color: #c58fb8;
             background: rgba(108, 92, 231, 0.06);
         }
 
@@ -143,13 +141,13 @@ $pdo = getPDO();
             border-radius: 6px;
             padding: 4px 10px;
             cursor: pointer;
-            color: #5A6A85;
+            color: var(--nx-text-muted);
             transition: all 0.2s ease;
         }
         .month-nav-btn:hover {
             background: #f0f0f0;
-            color: #6c5ce7;
-            border-color: #6c5ce7;
+            color: #c58fb8;
+            border-color: #c58fb8;
         }
         [data-bs-theme="dark"] .month-nav-btn {
             border-color: #2b3350;
@@ -157,8 +155,8 @@ $pdo = getPDO();
         }
         [data-bs-theme="dark"] .month-nav-btn:hover {
             background: #2b3350;
-            color: #6c5ce7;
-            border-color: #6c5ce7;
+            color: #c58fb8;
+            border-color: #c58fb8;
         }
         #fifoLoading {
             transition: opacity 0.3s ease;
@@ -183,8 +181,8 @@ $pdo = getPDO();
 
                     <!-- Page Header -->
                     <div class="card shadow-sm border-0 rounded-4 mb-4" style="position: relative; overflow: hidden;">
-                        <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #6c5ce7; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-                        <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                        <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #c58fb8; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                        <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: var(--nx-success); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
 
                         <div class="card-body p-4" style="position: relative; z-index: 1;">
                             <div class="row align-items-center g-3 mb-4">
@@ -194,7 +192,7 @@ $pdo = getPDO();
                                             <i class="ti ti-currency-tenge fs-4"></i>
                                         </div>
                                         <div>
-                                            <h4 class="mb-0 fw-bold" style="color: #2A3547;">Módulo FIFO</h4>
+                                            <h4 class="mb-0 fw-bold" style="color: var(--nx-text);">Módulo FIFO</h4>
                                             <small class="text-muted">Control de inventarios y ventas USDT / USD</small>
                                         </div>
                                     </div>
@@ -229,7 +227,7 @@ $pdo = getPDO();
                                 <div class="col-md-3">
                                     <div class="card kpi-card border-0 shadow-sm h-100">
                                         <div class="card-body d-flex align-items-center gap-3 p-3">
-                                            <div class="kpi-icon" style="background: rgba(108,92,231,0.1); color: #6c5ce7;"><i class="ti ti-currency-tenge"></i></div>
+                                            <div class="kpi-icon" style="background: rgba(108,92,231,0.1); color: #c58fb8;"><i class="ti ti-currency-tenge"></i></div>
                                             <div>
                                                 <div class="kpi-label">USDT Disponible</div>
                                                 <div class="kpi-value" id="kpiUsdtDisponible">0.00</div>
@@ -412,7 +410,6 @@ $pdo = getPDO();
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="src/assets/libs/simplebar/dist/simplebar.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
-    <script src="src/assets/js/dark-mode.js"></script>
     <script src="src/assets/js/pantalla-completa.js"></script>
     <script src="src/assets/js/utils.js"></script>
 

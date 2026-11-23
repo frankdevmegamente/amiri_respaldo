@@ -8,7 +8,7 @@ if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_rol'] ?? '',
 $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 ?>
 <!DOCTYPE html>
-<html lang="es" data-bs-theme="light">
+<html lang="es">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -17,8 +17,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <link rel="stylesheet" href="src/assets/css/styles.min.css" />
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
     <script src="src/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
     <style>
@@ -54,7 +52,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             pointer-events: none;
         }
         .gastos-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
-        .gastos-header .mes-badge { font-size: 1rem; color: #8c9ea8; }
+        .gastos-header .mes-badge { font-size: 1rem; color: #9a9096; }
 
         /* ─── Metric Cards ────────────────────────────── */
         .metric-card {
@@ -72,49 +70,49 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         }
         .metric-label {
             font-size: 0.8rem; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 0.5px; color: #8c9ea8;
+            letter-spacing: 0.5px; color: #9a9096;
         }
         .metric-icon {
             width: 40px; height: 40px; border-radius: 10px;
             display: flex; align-items: center; justify-content: center; font-size: 1.25rem;
         }
         .metric-value { font-size: 1.75rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.25rem; }
-        .metric-footer { font-size: 0.8rem; color: #8c9ea8; }
+        .metric-footer { font-size: 0.8rem; color: #9a9096; }
 
         /* ─── Chart containers ────────────────────────── */
         /* ─── Desglose items ─────────────────────────── */
         .desglose-item { transition: background 0.15s ease; border-radius: 8px; padding: 0 8px; cursor: pointer; }
         .desglose-item:hover { background: rgba(0,0,0,0.02); }
-        .desglose-item.active { background: rgba(93,135,255,0.06); box-shadow: inset 3px 0 0 #5D87FF; }
+        .desglose-item.active { background: rgba(93,135,255,0.06); box-shadow: inset 3px 0 0 var(--nx-primary); }
         [data-bs-theme="dark"] .desglose-item:hover { background: rgba(255,255,255,0.03); }
         [data-bs-theme="dark"] .desglose-item.active { background: rgba(93,135,255,0.12); }
-        [data-bs-theme="dark"] .progress { background: #2c344c; }
+        [data-bs-theme="dark"] .progress { background: rgba(255,255,255,0.12); }
 
         /* ─── Dark mode ───────────────────────────────── */
         [data-bs-theme="dark"] h3,
-        [data-bs-theme="dark"] .page-breadcrumb h3 { color: #e9ecef !important; }
-        [data-bs-theme="dark"] .card { background: #1a2234; border-color: #2c344c; }
-        [data-bs-theme="dark"] .table>thead>tr>th { background-color: #1a2234 !important; color: #e9ecef !important; border-bottom-color: #2c344c !important; }
-        [data-bs-theme="dark"] .table>tbody>tr>td { color: #e9ecef !important; border-color: #2c344c !important; }
+        [data-bs-theme="dark"] .page-breadcrumb h3 { color: #f5f2f4 !important; }
+        [data-bs-theme="dark"] .card { /* Helios handles card bg */ }
+        [data-bs-theme="dark"] .table>thead>tr>th { background-color: var(--nx-surface) !important; color: #f5f2f4 !important; border-bottom-color: rgba(255,255,255,0.12) !important; }
+        [data-bs-theme="dark"] .table>tbody>tr>td { color: #f5f2f4 !important; border-color: rgba(255,255,255,0.12) !important; }
         [data-bs-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd)>* { box-shadow: inset 0 0 0 9999px rgba(255, 255, 255, 0.02); }
         [data-bs-theme="dark"] .table-hover>tbody>tr:hover>* { box-shadow: inset 0 0 0 9999px rgba(255, 255, 255, 0.05); }
         [data-bs-theme="dark"] .dataTables_wrapper .dataTables_length,
         [data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter,
         [data-bs-theme="dark"] .dataTables_wrapper .dataTables_info,
-        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate { color: #8c9ea8 !important; }
-        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button { color: #8c9ea8 !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate { color: #9a9096 !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button { color: #9a9096 !important; }
         [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current,
-        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover { background: #252f43 !important; border-color: #2c344c !important; color: #e9ecef !important; }
+        [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover { background: #1a181c !important; border-color: rgba(255,255,255,0.12) !important; color: #f5f2f4 !important; }
         [data-bs-theme="dark"] .dataTables_wrapper select,
-        [data-bs-theme="dark"] .dataTables_wrapper input { background-color: #252f43; border: 1px solid #2c344c; color: #e9ecef; }
-        [data-bs-theme="dark"] .modal-content { background-color: #1a2234; border-color: #2c344c; }
-        [data-bs-theme="dark"] .modal-header { border-bottom-color: #2c344c; }
-        [data-bs-theme="dark"] .modal-footer { border-top-color: #2c344c; }
-        [data-bs-theme="dark"] .modal-title { color: #e9ecef; }
-        [data-bs-theme="dark"] .form-label { color: #e9ecef; }
+        [data-bs-theme="dark"] .dataTables_wrapper input { background-color: #1a181c; border: 1px solid rgba(255,255,255,0.12); color: #f5f2f4; }
+        [data-bs-theme="dark"] .modal-content { background: var(--nx-surface) !important; color: var(--nx-text) !important; border-color: var(--nx-border) !important; }
+        [data-bs-theme="dark"] .modal-header { border-bottom-color: rgba(255,255,255,0.12); }
+        [data-bs-theme="dark"] .modal-footer { border-top-color: rgba(255,255,255,0.12); }
+        [data-bs-theme="dark"] .modal-title { color: #f5f2f4; }
+        [data-bs-theme="dark"] .form-label { color: #f5f2f4; }
         [data-bs-theme="dark"] .form-control,
-        [data-bs-theme="dark"] .form-select { background-color: #252f43; border-color: #2c344c; color: #e9ecef; }
-        [data-bs-theme="dark"] .form-control::placeholder { color: #8c9ea8; }
+        [data-bs-theme="dark"] .form-select { background-color: #1a181c; border-color: rgba(255,255,255,0.12); color: #f5f2f4; }
+        [data-bs-theme="dark"] .form-control::placeholder { color: #9a9096; }
         [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
@@ -397,7 +395,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         <script src="src/assets/js/sidebarmenu.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
         <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-        <script src="src/assets/js/dark-mode.js"></script>
         <script src="src/assets/js/pantalla-completa.js"></script>
         <script src="src/assets/js/utils.js"></script>
         <script src="src/assets/js/anular.js"></script>
@@ -510,8 +507,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     let total = parseFloat(d.total) || 0;
                     let pct = totalGeneral > 0 ? (total / totalGeneral * 100) : 0;
                     let pctBar = Math.max(pct, 2); // mínimo 2% para barra visible
-                    let color = d.clasificacion === 'fijo' ? '#5D87FF' :
-                                d.clasificacion === 'variable' ? '#FFAE1F' : '#8c9ea8';
+                    let color = d.clasificacion === 'fijo' ? 'var(--nx-primary)' :
+                                d.clasificacion === 'variable' ? 'var(--nx-warning)' : '#9a9096';
 
                     html += '<div class="desglose-item" data-tipo="' + d.tipo.replace(/"/g, '&quot;') + '" data-index="' + i + '">';
                     html += '  <div class="d-flex align-items-center gap-3 py-2">';
@@ -526,10 +523,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     html += '          <span class="fw-bold" style="color:' + color + ';font-size:0.95rem;">' + formatoMoneda(total) + '</span>';
                     html += '        </div>';
                     html += '      </div>';
-                    html += '      <div class="progress" style="height:6px;background:#e9ecef;">';
+                    html += '      <div class="progress" style="height:6px;background:#f5f2f4;">';
                     html += '        <div class="progress-bar rounded-pill" role="progressbar" style="width:' + pctBar + '%;background:' + color + ';" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100"></div>';
                     html += '      </div>';
-                    html += '      <div class="d-flex justify-content-end" style="font-size:0.7rem;color:#8c9ea8;margin-top:2px;">' + pct.toFixed(1) + '% del total</div>';
+                    html += '      <div class="d-flex justify-content-end" style="font-size:0.7rem;color:#9a9096;margin-top:2px;">' + pct.toFixed(1) + '% del total</div>';
                     html += '    </div>';
                     html += '  </div>';
                     html += datos.length > 1 && i < datos.length - 1 ? '<hr class="my-0 opacity-25">' : '';

@@ -40,8 +40,6 @@ try {
     <link rel="stylesheet" href="src/assets/css/styles.min.css" />
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
@@ -72,23 +70,22 @@ try {
        ========================================= */
     [data-bs-theme="dark"] h3,
     [data-bs-theme="dark"] .page-breadcrumb h3 {
-        color: #e9ecef !important;
+        color: #f5f2f4 !important;
     }
 
-    [data-bs-theme="dark"] .card {
-        background: #1a2234;
-        border-color: #2c344c;
+    [data-bs-theme="dark"] .card { background: var(--nx-surface) !important;
+        border-color: rgba(255,255,255,0.12);
     }
 
     [data-bs-theme="dark"] .table>thead>tr>th {
-        background-color: #1a2234 !important;
-        color: #e9ecef !important;
-        border-bottom-color: #2c344c !important;
+        background-color: var(--nx-surface) !important;
+        color: #f5f2f4 !important;
+        border-bottom-color: rgba(255,255,255,0.12) !important;
     }
 
     [data-bs-theme="dark"] .table>tbody>tr>td {
-        color: #e9ecef !important;
-        border-color: #2c344c !important;
+        color: #f5f2f4 !important;
+        border-color: rgba(255,255,255,0.12) !important;
     }
 
     /* Estilo Zebra y Hover */
@@ -104,18 +101,18 @@ try {
     [data-bs-theme="dark"] .dataTables_wrapper .dataTables_filter,
     [data-bs-theme="dark"] .dataTables_wrapper .dataTables_info,
     [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate {
-        color: #8c9ea8 !important;
+        color: #9a9096 !important;
     }
 
     [data-bs-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button {
-        color: #8c9ea8 !important;
+        color: #9a9096 !important;
     }
     
     [data-bs-theme="dark"] .dataTables_wrapper select,
     [data-bs-theme="dark"] .dataTables_wrapper input {
-        background-color: #252f43;
-        border: 1px solid #2c344c;
-        color: #e9ecef;
+        background-color: #1a181c;
+        border: 1px solid rgba(255,255,255,0.12);
+        color: #f5f2f4;
     }
 
     /* =========================================
@@ -123,23 +120,23 @@ try {
        ========================================= */
     [data-bs-theme="dark"] .badge.bg-success {
         background-color: rgba(19, 222, 185, 0.15) !important;
-        color: #13DEB9 !important;
+        color: var(--nx-success) !important;
     }
     
     [data-bs-theme="dark"] .badge.bg-danger {
         background-color: rgba(250, 137, 107, 0.15) !important;
-        color: #FA896B !important;
+        color: var(--nx-danger) !important;
     }
 
     /* Este es el que estabas buscando para Comisión */
     [data-bs-theme="dark"] .badge.bg-info {
         background-color: rgba(93, 135, 255, 0.15) !important;
-        color: #5D87FF !important;
+        color: var(--nx-primary) !important;
     }
     
     [data-bs-theme="dark"] .badge.bg-secondary {
         background-color: rgba(140, 158, 168, 0.15) !important;
-        color: #8c9ea8 !important;
+        color: #9a9096 !important;
     }
 </style>
 <body>
@@ -193,7 +190,6 @@ try {
     <script src="src/assets/js/sidebarmenu.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="src/assets/js/dark-mode.js"></script>
     <script src="src/assets/js/utils.js"></script>
 
     <script>

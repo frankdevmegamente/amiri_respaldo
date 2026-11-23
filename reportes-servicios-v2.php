@@ -17,8 +17,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css">
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css">
     <link rel="stylesheet" href="src/assets/css/layout-custom.css">
     <style>
         .body-wrapper { padding-top: 100px !important; }
@@ -31,12 +29,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .metric-card-serv:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.07) !important; }
         [data-bs-theme="dark"] .metric-card-serv:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.2) !important; }
         .metric-card-serv .top-strip { position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 0.75rem 0.75rem 0 0; }
-        .metric-card-serv.active { border-color: #5D87FF !important; box-shadow: 0 0 0 2px rgba(93,135,255,0.3) !important; }
+        .metric-card-serv.active { border-color: var(--nx-primary) !important; box-shadow: 0 0 0 2px rgba(93,135,255,0.3) !important; }
         .metric-card-serv.active .top-strip { height: 4px !important; }
         .svc-icon { width: 32px; height: 32px; }
-        .svc-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: #5A6A85; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        .svc-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--nx-text-muted); line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
         [data-bs-theme="dark"] .svc-label { color: #8b92a8; }
-        .svc-value { font-size: 1.1rem; font-weight: 800; color: #2A3547; line-height: 1.2; letter-spacing: -0.2px; }
+        .svc-value { font-size: 1.1rem; font-weight: 800; color: var(--nx-text); line-height: 1.2; letter-spacing: -0.2px; }
         [data-bs-theme="dark"] .svc-value { color: #e8ecf0; }
         .svc-footer { font-size: 0.65rem; color: #8b92a8; padding-top: 4px; margin-top: 4px; border-top: 1px solid #eef0f4; }
         [data-bs-theme="dark"] .svc-footer { color: #6b7280; border-top-color: #2d3140; }
@@ -227,7 +225,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
-<script src="src/assets/js/dark-mode.js"></script>
 <script src="src/assets/js/utils.js"></script>
 <script src="src/assets/js/pantalla-completa.js"></script>
 <script>
@@ -466,7 +463,7 @@ function abrirDetalleDia(dia) {
                 var entidad = r.beneficiario
                     ? '<span class="badge bg-secondary bg-opacity-10 text-secondary border-0">Beneficiario</span> ' + r.beneficiario
                     : (r.prestamista && r.prestamista !== '-'
-                        ? '<span class="badge bg-purple bg-opacity-10 text-purple border-0" style="background:rgba(108,92,231,0.1)!important;color:#6c5ce7!important;">Prestamista</span> ' + r.prestamista
+                        ? '<span class="badge bg-purple bg-opacity-10 text-purple border-0" style="background:rgba(108,92,231,0.1)!important;color:#c58fb8!important;">Prestamista</span> ' + r.prestamista
                         : (r.proveedor && r.proveedor !== '-'
                             ? '<span class="badge bg-warning bg-opacity-10 text-warning border-0">Proveedor</span> ' + r.proveedor
                             : (r.promotor && r.promotor !== '-'

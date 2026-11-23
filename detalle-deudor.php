@@ -50,8 +50,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <link rel="stylesheet" href="src/assets/css/styles.min.css">
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css">
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css">
     <link rel="stylesheet" href="src/assets/css/layout-custom.css">
     <link rel="stylesheet" href="css/detalle-deudor.css">
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
@@ -82,7 +80,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     <div class="row mb-4">
                         <div class="col-md-4">
                             <div class="card shadow-sm border-0 rounded-4 h-100" style="position: relative; overflow: hidden;">
-                                <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: #ffae1f; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                                <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: var(--nx-warning); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
                                 <div class="card-body p-4" style="position: relative; z-index: 1;">
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
@@ -99,7 +97,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         </div>
                         <div class="col-md-4">
                             <div class="card shadow-sm border-0 rounded-4 h-100" style="position: relative; overflow: hidden;">
-                                <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                                <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: var(--nx-success); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
                                 <div class="card-body p-4" style="position: relative; z-index: 1;">
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
@@ -202,7 +200,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     <div class="row mt-4">
                         <div class="col-12">
                             <div class="card shadow-sm border-0 rounded-4">
-                                <div class="card-header border-0 pt-4 px-4" style="background: linear-gradient(135deg, #0e6b4a 0%, #13deb9 100%);">
+                                <div class="card-header border-0 pt-4 px-4" style="background: linear-gradient(135deg, #0e6b4a 0%, var(--nx-success) 100%);">
                                     <h5 class="mb-0 fw-semibold text-white"><i class="ti ti-cash me-2"></i>Registrar Cobro de Préstamo</h5>
                                 </div>
                                 <div class="card-body p-4">
@@ -250,7 +248,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <script src="src/assets/js/sidebarmenu.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    <script src="src/assets/js/dark-mode.js"></script>
     <script src="src/assets/js/utils.js"></script>
 
     <script>

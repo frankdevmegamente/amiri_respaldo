@@ -44,8 +44,6 @@ sort($bancos_unicos);
     <link rel="shortcut icon" type="image/png" href="src/assets/images/logos/favicon.ico" />
     <link rel="stylesheet" href="src/assets/css/styles.min.css" />
     <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -53,16 +51,16 @@ sort($bancos_unicos);
     <style>
         .body-wrapper { padding-top: 100px !important; }
         .body-wrapper-inner, .body-wrapper .container-fluid { padding-top: 15px !important; margin-top: 0 !important; }
-        .crud-header { background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%); border-radius: 16px; padding: 24px; color: white; margin-bottom: 20px; }
+        .crud-header { background: linear-gradient(135deg, #c58fb8 0%, #a29bfe 100%); border-radius: 16px; padding: 24px; color: white; margin-bottom: 20px; }
         .ticket-wrapper { background-color: #f4f6f9; padding: 40px; border-radius: 12px; display: flex; justify-content: center; }
-        .ticket-card { background: #ffffff; width: 100%; max-width: 580px; border-radius: 0px; padding: 35px; box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05); color: #2A3547; font-family: 'Manrope', sans-serif; border: 1px solid #ebf1f6; }
-        .ticket-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid #6c5ce7; }
-        .ticket-title { font-size: 18px; font-weight: 700; letter-spacing: 1.5px; color: #6c5ce7; text-transform: uppercase; white-space: nowrap; }
+        .ticket-card { background: var(--nx-surface); width: 100%; max-width: 580px; border-radius: 0px; padding: 35px; box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05); color: var(--nx-text); font-family: 'Manrope', sans-serif; border: 1px solid #ebf1f6; }
+        .ticket-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid #c58fb8; }
+        .ticket-title { font-size: 18px; font-weight: 700; letter-spacing: 1.5px; color: #c58fb8; text-transform: uppercase; white-space: nowrap; }
         .client-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed #ebf1f6; }
         .client-info { display: flex; flex-direction: column; gap: 4px; }
-        .client-name { font-size: 15px; font-weight: 700; color: #2A3547; }
+        .client-name { font-size: 15px; font-weight: 700; color: var(--nx-text); }
         .client-account { font-size: 12px; color: #7c8fac; text-transform: uppercase; letter-spacing: 0.5px; }
-        .client-amount { background-color: rgba(93, 135, 255, 0.1); color: #6c5ce7; padding: 8px 16px; border-radius: 6px; font-size: 16px; font-weight: 700; text-align: right; min-width: 130px; }
+        .client-amount { background-color: rgba(93, 135, 255, 0.1); color: #c58fb8; padding: 8px 16px; border-radius: 6px; font-size: 16px; font-weight: 700; text-align: right; min-width: 130px; }
         .ticket-row.total-row { background: rgba(93, 135, 255, 0.04); border: none; border-radius: 8px; padding: 20px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; }
         .text-muted-custom { color: #7c8fac; font-size: 13px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
         .text-success-custom { color: #36c76c; }
@@ -72,20 +70,20 @@ sort($bancos_unicos);
         [data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
         [data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
         [data-bs-theme="dark"] .ticket-wrapper { background-color: transparent !important; }
-        [data-bs-theme="dark"] .ticket-card { background: #1a2234; border-color: #2c344c; box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3); }
-        [data-bs-theme="dark"] .ticket-header { border-bottom-color: #2c344c; }
-        [data-bs-theme="dark"] .client-name { color: #e9ecef; }
-        [data-bs-theme="dark"] .client-account { color: #8c9ea8; }
-        [data-bs-theme="dark"] .client-row { border-bottom-color: #2c344c; }
+        [data-bs-theme="dark"] .ticket-card { background: #1a181c; border-color: rgba(255,255,255,0.12); box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3); }
+        [data-bs-theme="dark"] .ticket-header { border-bottom-color: rgba(255,255,255,0.12); }
+        [data-bs-theme="dark"] .client-name { color: #f5f2f4; }
+        [data-bs-theme="dark"] .client-account { color: #9a9096; }
+        [data-bs-theme="dark"] .client-row { border-bottom-color: rgba(255,255,255,0.12); }
         [data-bs-theme="dark"] .client-amount { background-color: rgba(93, 135, 255, 0.15); color: #799dfb; }
-        [data-bs-theme="dark"] #placeholderTicket, [data-bs-theme="dark"] .text-muted-custom { color: #8c9ea8 !important; }
-        [data-bs-theme="dark"] .ticket-row.total-row { background-color: #252f43 !important; }
-        [data-bs-theme="dark"] .select2-container--default .select2-selection--single { background-color: #1a2234; border-color: #2c344c; }
-        [data-bs-theme="dark"] .select2-container--default .select2-selection--single .select2-selection__rendered { color: #e9ecef; }
-        [data-bs-theme="dark"] .select2-dropdown { background-color: #1a2234; border-color: #2c344c; }
-        [data-bs-theme="dark"] .select2-container--default .select2-search--dropdown .select2-search__field { background-color: #252f43; border-color: #2c344c; color: #e9ecef; }
-        [data-bs-theme="dark"] .select2-container--default .select2-results__option[aria-selected=true] { background-color: #252f43; color: #e9ecef; }
-        [data-bs-theme="dark"] .select2-container--default .select2-results__option--highlighted[aria-selected] { background-color: #6c5ce7; color: #ffffff; }
+        [data-bs-theme="dark"] #placeholderTicket, [data-bs-theme="dark"] .text-muted-custom { color: #9a9096 !important; }
+        [data-bs-theme="dark"] .ticket-row.total-row { background-color: #1a181c !important; }
+        [data-bs-theme="dark"] .select2-container--default .select2-selection--single { background-color: #1a181c; border-color: rgba(255,255,255,0.12); }
+        [data-bs-theme="dark"] .select2-container--default .select2-selection--single .select2-selection__rendered { color: #f5f2f4; }
+        [data-bs-theme="dark"] .select2-dropdown { background-color: #1a181c; border-color: rgba(255,255,255,0.12); }
+        [data-bs-theme="dark"] .select2-container--default .select2-search--dropdown .select2-search__field { background-color: #1a181c; border-color: rgba(255,255,255,0.12); color: #f5f2f4; }
+        [data-bs-theme="dark"] .select2-container--default .select2-results__option[aria-selected=true] { background-color: #1a181c; color: #f5f2f4; }
+        [data-bs-theme="dark"] .select2-container--default .select2-results__option--highlighted[aria-selected] { background-color: #c58fb8; color: #ffffff; }
         @media (max-width: 768px) {
             .ticket-wrapper { padding: 15px 10px !important; }
             .ticket-card { padding: 20px 15px !important; }
@@ -196,8 +194,8 @@ sort($bancos_unicos);
                         <div class="col-lg-7 col-md-7">
                             <div class="ticket-wrapper">
                                 <div class="ticket-card" id="vistaPreviaTicket" style="position: relative; overflow: hidden;">
-                                    <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #5D87FF; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-                                    <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: #13deb9; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                                    <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: var(--nx-primary); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                                    <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: var(--nx-success); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
                                     <div class="ticket-header" style="position: relative; z-index: 1;">
                                         <div class="d-flex align-items-center" style="max-width: 50%; overflow: hidden;">
                                             <img src="src/assets/images/logos/logo2.png" alt="Logo Amiri" class="logo-modo-claro" style="height: 45px; max-width: 100%; object-fit: contain;" />
@@ -215,7 +213,7 @@ sort($bancos_unicos);
                                     </div>
                                     <div class="ticket-row total-row" style="display: none;" id="contenedorTotal">
                                         <div>
-                                            <div class="text-muted-custom mb-1" style="color: #6c5ce7;">TOTAL TRANSFERENCIAS</div>
+                                            <div class="text-muted-custom mb-1" style="color: #c58fb8;">TOTAL TRANSFERENCIAS</div>
                                         </div>
                                         <div class="fs-large text-success-custom fw-bolder" id="outTotal" style="font-size: 26px;">$0.00 MXN</div>
                                     </div>
@@ -232,7 +230,7 @@ sort($bancos_unicos);
         <div class="modal-dialog">
             <div class="modal-content">
                 <form id="formCliente">
-                    <div class="modal-header" style="background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%); color: white;">
+                    <div class="modal-header" style="background: linear-gradient(135deg, #c58fb8 0%, #a29bfe 100%); color: white;">
                         <h5 class="modal-title" id="tituloModalCliente"><i class="ti ti-user-plus"></i> Nuevo Cliente</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
@@ -291,7 +289,6 @@ sort($bancos_unicos);
     <script src="src/assets/libs/jquery/dist/jquery.min.js"></script>
     <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="src/assets/js/sidebarmenu.js"></script>
-    <script src="src/assets/js/dark-mode.js"></script>
     <script src="src/assets/js/utils.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
@@ -539,7 +536,7 @@ sort($bancos_unicos);
             if (b.includes('rappi') || b.includes('rappipay')) return '#ff4600';
             if (b.includes('bineo')) return '#ff0066';
             if (b.includes('cetes')) return '#104a3e';
-            return '#6c5ce7';
+            return '#c58fb8';
         }
     </script>
 </body>

@@ -62,10 +62,6 @@ $serviciosDivisas = [
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
 
-    <link rel="stylesheet" href="src/assets/css/dark-mode.css">
-
-    <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css">
-
     <link rel="stylesheet" href="src/assets/css/layout-custom.css">
 
     <style>
@@ -781,8 +777,6 @@ $serviciosDivisas = [
 
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 
-    <script src="src/assets/js/dark-mode.js"></script>
-
     <script src="src/assets/js/utils.js"></script>
 
     <script src="src/assets/js/pantalla-completa.js"></script>
@@ -867,13 +861,7 @@ $serviciosDivisas = [
 
 
 
-        [data-bs-theme="dark"] .modal-content {
-
-            background: #0b1220;
-
-            border-color: #1f2937;
-
-        }
+        [data-bs-theme="dark"] .modal-content { background: var(--nx-surface) !important; color: var(--nx-text) !important; border-color: var(--nx-border) !important; }
 
 
 
