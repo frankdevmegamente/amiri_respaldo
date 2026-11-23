@@ -1,0 +1,853 @@
+/* testdienio.css - Nexo-style preview adapted for Amiri */
+:root {
+  --nx-canvas: #E5E7EB;
+  --nx-surface: #F0EDE8;
+  --nx-surface-2: #E5E2DD;
+  --nx-border: #9CA3AF;
+  --nx-text: #111827;
+  --nx-text-muted: #4B5563;
+  --nx-primary: #8B7EC8;
+  --nx-primary-2: #9B8EC4;
+  --nx-primary-soft: rgba(139,126,200,0.10);
+  --nx-primary-soft-2: rgba(139,126,200,0.15);
+  --nx-success: #6EE7B7;
+  --nx-warning: #FCD34D;
+  --nx-warning-soft: rgba(252,211,77,0.15);
+  --nx-danger: #FCA5A5;
+  --nx-sidebar-w: 240px;
+  --nx-sidebar-mini: 72px;
+  --nx-topbar-h: 64px;
+  --nx-radius: 6px;
+  --nx-radius-sm: 4px;
+  --nx-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  --nx-font: 'Montserrat', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+[data-bs-theme="dark"] {
+  --nx-canvas: #0D111C;
+  --nx-surface: #161C2E;
+  --nx-surface-2: #131826;
+  --nx-border: #222A3F;
+  --nx-text: #F8FAFC;
+  --nx-text-muted: #8A94A6;
+  --nx-primary-soft: rgba(139,126,200,0.12);
+  --nx-primary-soft-2: rgba(139,126,200,0.18);
+  --nx-shadow: 0 2px 8px rgba(0,0,0,0.35);
+}
+html, body { height: 100%; }
+body.nexo-body {
+  margin: 0;
+  font-family: var(--nx-font);
+  background: var(--nx-canvas);
+  color: var(--nx-text);
+  font-size: 14px;
+}
+.nexo-app { min-height: 100vh; }
+
+/* Sidebar */
+.nx-sidebar {
+  position: fixed; top: 0; left: 0; bottom: 0;
+  width: var(--nx-sidebar-w);
+  background: #E5E7EB;
+  border-right: 1px solid var(--nx-border);
+  z-index: 1040;
+  display: flex; flex-direction: column;
+  transition: width .2s ease, transform .2s ease;
+  overflow: hidden;
+}
+[data-bs-theme="dark"] .nx-sidebar {
+  background: var(--nx-surface);
+  border-right: 1px solid var(--nx-border);
+}
+.nx-nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; margin: 1px 0; border-radius: var(--nx-radius-sm);
+  color: var(--nx-text-muted); text-decoration: none; font-weight: 500;
+  font-size: 0.85rem;
+  transition: background .15s, color .15s;
+}
+.nx-nav-item:hover { background: var(--nx-primary-soft); color: var(--nx-text); }
+.nx-nav-item.active { background: var(--nx-primary-soft); color: var(--nx-primary); font-weight: 600; }
+[data-bs-theme="dark"] .nx-nav-item.active { color: #c4b5fd; }
+.nx-nav-item i { font-size: 17px; width: 20px; text-align: center; flex: 0 0 20px; }
+.nx-sidebar-inner { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.nx-brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 14px 12px; text-decoration: none; color: var(--nx-text);
+}
+.nx-brand-mark {
+  width: 34px; height: 34px; border-radius: var(--nx-radius-sm);
+  background: var(--nx-primary); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 16px; flex: 0 0 34px;
+}
+.nx-brand-text { line-height: 1.1; min-width: 0; }
+.nx-brand-title { font-weight: 700; font-size: 18px; letter-spacing: -0.01em; }
+.nx-brand-sub { font-size: 10px; letter-spacing: .08em; color: var(--nx-text-muted); font-weight: 600; margin-top: 2px; }
+
+.nx-workspace { padding: 0 12px 10px; }
+.nx-workspace-card {
+  border: 1px solid var(--nx-border); border-radius: var(--nx-radius);
+  padding: 10px 12px; background: var(--nx-surface-2);
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.nx-ws-name { font-weight: 600; font-size: 13px; }
+.nx-ws-sub { font-size: 12px; color: var(--nx-text-muted); }
+.nx-ws-caret { color: var(--nx-text-muted); }
+
+.nx-nav { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 10px 12px; }
+.nx-section { font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--nx-text-muted); padding: 14px 10px 6px; }
+.nx-nav-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nx-badge {
+  margin-left: auto; font-size: 10px; font-weight: 600; color: var(--nx-primary);
+  background: var(--nx-primary-soft-2); padding: 1px 6px; border-radius: var(--nx-radius-sm);
+}
+.nx-nav-group-toggle { cursor: pointer; width: 100%; border: 0; background: transparent; text-align: left; }
+.nx-caret { margin-left: auto; font-size: 14px; transition: transform .15s; }
+.nx-nav-group.open .nx-caret { transform: rotate(180deg); }
+.nx-subnav { display: none; padding-left: 20px; margin: 2px 0 4px; }
+.nx-nav-group.open .nx-subnav { display: block; }
+.nx-subnav .nx-nav-item { padding: 7px 10px; font-size: 13px; }
+
+.nx-sidebar-footer { padding: 12px; border-top: 1px solid var(--nx-border); }
+.nx-status-card {
+  border: 1px solid var(--nx-border); border-radius: var(--nx-radius); padding: 10px 12px;
+  background: var(--nx-surface-2); display: flex; gap: 10px; align-items: flex-start;
+}
+.nx-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #6EE7B7; margin-top: 6px; flex: 0 0 8px; }
+.nx-status-title { font-weight: 600; font-size: 13px; }
+.nx-status-sub { font-size: 12px; color: var(--nx-text-muted); }
+.nx-plan { margin-top: 10px; font-size: 10px; letter-spacing: .08em; color: var(--nx-text-muted); font-weight: 700; text-align: center; }
+
+/* Topbar */
+.nx-topbar {
+  position: fixed; top: 0; right: 0; left: var(--nx-sidebar-w); height: var(--nx-topbar-h);
+  background: var(--nx-surface); border-bottom: 2px solid var(--nx-border);
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 0 20px; z-index: 1030; transition: left .2s ease;
+  border-radius: 0;
+}
+.nx-topbar-left, .nx-topbar-right { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.nx-icon-btn {
+  width: 34px; height: 34px; border-radius: var(--nx-radius-sm); border: 1px solid var(--nx-border);
+  background: var(--nx-surface); color: var(--nx-text); display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.nx-icon-btn:hover { background: var(--nx-surface-2); }
+.nx-breadcrumb { color: var(--nx-text-muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nx-breadcrumb strong { color: var(--nx-text); font-weight: 500; }
+.nx-search {
+  position: relative; width: 320px; max-width: 34vw;
+}
+.nx-search i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--nx-text-muted); }
+.nx-search input {
+  width: 100%; height: 38px; border-radius: 10px; border: 1px solid var(--nx-border);
+  background: var(--nx-surface-2); color: var(--nx-text); padding: 0 12px 0 36px; font-size: 13px;
+}
+.nx-search input::placeholder { color: var(--nx-text-muted); }
+.nx-theme-toggle {
+  height: 34px; border-radius: var(--nx-radius-sm); border: 1px solid var(--nx-border); background: var(--nx-surface);
+  color: var(--nx-text); padding: 0 12px; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 500; cursor: pointer;
+}
+.nx-theme-toggle:hover { background: var(--nx-surface-2); }
+.nx-user { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 4px 6px; border-radius: 10px; }
+.nx-user:hover { background: var(--nx-surface-2); }
+.nx-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--nx-primary-soft); color: var(--nx-primary); font-weight: 700; font-size: 12px; display: inline-flex; align-items: center; justify-content: center; }
+.nx-user-meta { line-height: 1.2; }
+.nx-user-name { font-size: 13px; font-weight: 600; }
+.nx-user-role { font-size: 12px; color: var(--nx-text-muted); }
+
+/* Main */
+.nx-main { margin-left: var(--nx-sidebar-w); padding-top: var(--nx-topbar-h); min-height: 100vh; transition: margin-left .2s ease; }
+.nx-content { padding: 24px 28px 16px; }
+.nx-page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.nx-page-title { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 2px; }
+.nx-page-sub { color: var(--nx-text-muted); margin: 0; }
+.nx-page-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.nx-select, .nx-date {
+  height: 36px; border-radius: var(--nx-radius-sm); border: 1px solid var(--nx-border); background: var(--nx-surface);
+  color: var(--nx-text); padding: 0 12px; font-size: 13px; display: inline-flex; align-items: center; gap: 8px;
+}
+.nx-btn-primary {
+  height: 34px; border-radius: var(--nx-radius-sm); border: 0; background: var(--nx-primary); color: #fff;
+  padding: 0 12px; font-weight: 600; font-size: 12px; display: inline-flex; align-items: center; gap: 6px;
+  letter-spacing: 0.2px;
+}
+.nx-btn-primary:hover { background: var(--nx-primary-2); color: #fff; }
+
+/* Cards */
+.nx-card {
+  background: linear-gradient(145deg, var(--nx-surface) 0%, var(--nx-surface-2) 100%);
+  border: none;
+  border-radius: var(--nx-radius);
+  box-shadow: var(--nx-shadow);
+  height: 100%;
+  position: relative; z-index: 1;
+  overflow: hidden;
+}
+[data-bs-theme="dark"] .nx-card {
+  background: linear-gradient(145deg, var(--nx-surface) 0%, var(--nx-surface-2) 100%);
+}
+.nx-card::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle at top right, rgba(0,0,0,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+[data-bs-theme="dark"] .nx-card::before {
+  background: radial-gradient(circle at top right, rgba(255,255,255,0.04) 0%, transparent 70%);
+}
+.nx-card-header { padding: 14px 16px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.nx-card-title { font-size: 14px; font-weight: 600; margin: 0; letter-spacing: 0.1px; }
+.nx-card-sub { font-size: 13px; color: var(--nx-text-muted); margin: 2px 0 0; }
+.nx-card-body { padding: 16px 18px 18px; }
+.nx-link { color: var(--nx-primary); text-decoration: none; font-size: 13px; font-weight: 500; }
+.nx-link:hover { text-decoration: underline; }
+
+/* KPI */
+.nx-kpi { padding: 14px 16px; }
+.nx-kpi-top { display: flex; align-items: flex-start; justify-content: space-between; color: var(--nx-text-muted); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
+.nx-kpi-icon { width: 30px; height: 30px; border-radius: var(--nx-radius-sm); background: var(--nx-surface-2); display: inline-flex; align-items: center; justify-content: center; color: var(--nx-text-muted); font-size: 0.85rem; }
+.nx-kpi-value { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; margin: 6px 0 4px; font-variant-numeric: tabular-nums; }
+.nx-kpi-currency { font-size: 13px; font-weight: 600; color: var(--nx-text-muted); margin-left: 4px; }
+.nx-kpi-foot { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--nx-text-muted); }
+.nx-pill { display: inline-flex; align-items: center; padding: 2px 6px; border-radius: var(--nx-radius-sm); font-size: 11px; font-weight: 600; }
+.nx-pill.pos { color: var(--nx-primary); background: var(--nx-primary-soft); }
+.nx-pill.neg { color: #FCA5A5; background: rgba(252,165,165,0.12); }
+.nx-pill.warn { color: var(--nx-warning); background: var(--nx-warning-soft); }
+[data-bs-theme="dark"] .nx-pill.pos { color: #c4b5fd; }
+
+/* Accounts */
+.nx-account { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--nx-border); }
+.nx-account:first-child { border-top: 0; padding-top: 4px; }
+.nx-account-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.nx-acct-bar { width: 3px; align-self: stretch; border-radius: 2px; }
+.nx-acct-name { font-weight: 600; font-size: 14px; }
+.nx-acct-meta { font-size: 12px; color: var(--nx-text-muted); }
+.nx-acct-amt { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Table & tabs */
+.nx-tabs { display: flex; gap: 18px; padding: 0 18px; border-bottom: 1px solid var(--nx-border); }
+.nx-tab { padding: 12px 2px; font-size: 13px; font-weight: 500; color: var(--nx-text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.nx-tab.active { color: var(--nx-primary); border-bottom-color: var(--nx-primary); font-weight: 600; }
+.nx-table-wrap { overflow-x: auto; }
+.nx-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.nx-table th { font-size: 10px; letter-spacing: .08em; color: var(--nx-text-muted); font-weight: 700; text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--nx-border); text-transform: uppercase; }
+.nx-table td { padding: 10px 14px; border-bottom: 1px solid var(--nx-border); font-size: 13px; vertical-align: middle; }
+.nx-table tr:last-child td { border-bottom: 0; }
+.nx-concept { font-weight: 600; color: var(--nx-text); }
+.nx-subconcept { font-size: 12px; color: var(--nx-text-muted); margin-top: 2px; }
+.nx-amt { font-weight: 700; font-variant-numeric: tabular-nums; }
+.nx-amt.pos { color: var(--nx-primary); }
+.nx-status { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: var(--nx-radius-sm); font-size: 11px; font-weight: 600; }
+.nx-status.ok { color: #059669; background: rgba(16,185,129,0.12); }
+[data-bs-theme="dark"] .nx-status.ok { color: #34d399; }
+.nx-status.pending { color: var(--nx-warning); background: var(--nx-warning-soft); }
+.nx-table-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; border-top: 1px solid var(--nx-border); color: var(--nx-text-muted); font-size: 13px; }
+.nx-pagination { display: inline-flex; align-items: center; gap: 4px; }
+.nx-page-btn { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--nx-border); background: var(--nx-surface); color: var(--nx-text); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; }
+.nx-page-btn.active { background: var(--nx-primary-soft); color: var(--nx-primary); border-color: transparent; font-weight: 600; }
+
+/* Receivables */
+.nx-recv { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--nx-border); }
+.nx-recv:first-child { border-top: 0; padding-top: 4px; }
+.nx-recv-name { font-weight: 600; font-size: 14px; }
+.nx-recv-meta { font-size: 12px; color: var(--nx-text-muted); margin-top: 2px; }
+.nx-recv-meta.warn { color: var(--nx-warning); font-weight: 500; }
+.nx-recv-amt { font-weight: 700; font-variant-numeric: tabular-nums; }
+.nx-recv-total { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; margin-top: 4px; border-top: 1px solid var(--nx-border); font-weight: 600; }
+.nx-recv-total .val { color: var(--nx-primary); font-size: 16px; font-variant-numeric: tabular-nums; }
+
+/* Chart legend/header */
+.nx-legend { display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--nx-text-muted); margin-top: 8px; }
+.nx-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+.nx-chart { min-height: 280px; }
+
+/* Footer */
+.nx-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 28px 22px; color: var(--nx-text-muted); font-size: 12px; }
+
+/* Overlay (mobile) */
+.nx-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1035; }
+
+/* Collapsed sidebar (desktop) */
+@media (min-width: 992px) {
+  .nexo-app.sidebar-collapsed .nx-sidebar { width: var(--nx-sidebar-mini); }
+  .nexo-app.sidebar-collapsed .nx-topbar { left: var(--nx-sidebar-mini); }
+  .nexo-app.sidebar-collapsed .nx-main { margin-left: var(--nx-sidebar-mini); }
+  .nexo-app.sidebar-collapsed .nx-brand-text,
+  .nexo-app.sidebar-collapsed .nx-workspace,
+  .nexo-app.sidebar-collapsed .nx-section,
+  .nexo-app.sidebar-collapsed .nx-nav-label,
+  .nexo-app.sidebar-collapsed .nx-badge,
+  .nexo-app.sidebar-collapsed .nx-caret,
+  .nexo-app.sidebar-collapsed .nx-subnav,
+  .nexo-app.sidebar-collapsed .nx-status-text,
+  .nexo-app.sidebar-collapsed .nx-plan { display: none !important; }
+  .nexo-app.sidebar-collapsed .nx-brand { justify-content: center; padding: 18px 0 14px; }
+  .nexo-app.sidebar-collapsed .nx-nav-item { justify-content: center; padding: 10px 0; }
+  .nexo-app.sidebar-collapsed .nx-status-card { justify-content: center; padding: 10px 0; }
+  .nexo-app.sidebar-collapsed .nx-status-dot { margin-top: 0; }
+  .nexo-app.sidebar-collapsed .nx-sidebar-footer { padding: 12px 8px; }
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+  .nx-sidebar { transform: translateX(-100%); width: var(--nx-sidebar-w); }
+  .nexo-app.sidebar-open .nx-sidebar { transform: translateX(0); }
+  .nexo-app.sidebar-open .nx-overlay { display: block; }
+  .nx-topbar { left: 0; }
+  .nx-main { margin-left: 0; }
+  .nx-search { display: none; }
+  .nx-user-meta { display: none; }
+  .nx-content { padding: 18px 16px; }
+  .nx-footer { padding: 8px 16px 18px; flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 1199.98px) {
+  .nx-kpi-value { font-size: 24px; }
+}
+.dropdown-menu { border: 1px solid var(--nx-border); background: var(--nx-surface); }
+.dropdown-item { color: var(--nx-text); }
+.dropdown-item:hover { background: var(--nx-surface-2); color: var(--nx-text); }
+.form-select, .form-control { background-color: var(--nx-surface); color: var(--nx-text); border-color: var(--nx-border); }/* ============================================================
+   nexo-bridge.css — overrides para clases existentes en index.php
+   Aplica el look nexo a markup Bootstrap/existente dentro de .nexo-app
+   ============================================================ */
+
+/* ---------- Base canvas ---------- */
+.nexo-body {
+  background: var(--nx-canvas) !important;
+  color: var(--nx-text) !important;
+  font-family: var(--nx-font) !important;
+}
+
+/* ---------- Cards ---------- (corporate: less rounded, subtle) */
+.nexo-app .card,
+.nexo-app .card.shadow-sm,
+.nexo-app .card.border-0 {
+  background: linear-gradient(145deg, var(--nx-surface) 0%, var(--nx-surface-2) 100%) !important;
+  border: none !important;
+  outline: none !important;
+  border-radius: var(--nx-radius) !important;
+  box-shadow: var(--nx-shadow) !important;
+  color: var(--nx-text) !important;
+  position: relative;
+  overflow: hidden;
+}
+.nexo-app .card::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 100px; height: 100px;
+  background: radial-gradient(circle at top right, rgba(0,0,0,0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+[data-bs-theme="dark"] .nexo-app .card::before {
+  background: radial-gradient(circle at top right, rgba(255,255,255,0.03) 0%, transparent 70%);
+}
+.nexo-app .card-body {
+  padding: 14px 16px !important;
+  color: var(--nx-text) !important;
+  position: relative;
+  z-index: 1;
+  border: none !important;
+  background: transparent !important;
+}
+.nexo-app .card-header {
+  background: transparent !important;
+  border-bottom: 1px solid rgba(0,0,0,0.06) !important;
+  padding: 12px 16px !important;
+  color: var(--nx-text) !important;
+  font-weight: 600 !important;
+  font-size: 0.85rem !important;
+  position: relative;
+  z-index: 1;
+}
+.nexo-app .card-header.bg-primary {
+  background: var(--nx-primary) !important;
+  border: none !important;
+  border-bottom: none !important;
+  color: #fff;
+  border-radius: var(--nx-radius) var(--nx-radius) 0 0 !important;
+}
+.nexo-app .card-header.bg-primary h5,
+.nexo-app .card-header.bg-primary .nav-link {
+  color: #fff !important;
+}
+.nexo-app .card-footer {
+  background: transparent;
+  border-top: 1px solid var(--nx-border);
+}
+
+/* ---------- Page header card ---------- */
+.nexo-app .dashboard-header {
+  background: var(--nx-surface);
+  border: 1px solid var(--nx-border);
+  border-radius: var(--nx-radius);
+  box-shadow: var(--nx-shadow);
+  position: relative;
+  overflow: hidden;
+}
+.nexo-app .dashboard-header .bg-pattern,
+.nexo-app .dashboard-header .bg-pattern-2 {
+  opacity: 0.06;
+}
+
+/* ---------- Metric / KPI cards ---------- */
+.nexo-app .metric-card {
+  background: var(--nx-surface) !important;
+  border: 1px solid var(--nx-border) !important;
+  border-radius: var(--nx-radius) !important;
+  box-shadow: var(--nx-shadow) !important;
+  position: relative;
+  overflow: hidden;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.nexo-app .metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+[data-bs-theme="dark"] .nexo-app .metric-card:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+.nexo-app .metric-accent {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 3px;
+  border-radius: 0;
+  opacity: 0.8;
+}
+.nexo-app .metric-label {
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.4px !important;
+  color: var(--nx-text-muted) !important;
+  line-height: 1.3;
+}
+.nexo-app .metric-value {
+  font-size: 1.6rem !important;
+  font-weight: 800 !important;
+  color: var(--nx-text) !important;
+  line-height: 1.1;
+  letter-spacing: -0.3px !important;
+  font-variant-numeric: tabular-nums;
+}
+.nexo-app .metric-icon {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--nx-radius-sm);
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+.nexo-app .metric-footer {
+  display: flex; align-items: center; gap: 6px;
+  padding-top: 8px; margin-top: 8px;
+  border-top: 1px solid var(--nx-border);
+  font-size: 0.78rem;
+  color: var(--nx-text-muted);
+}
+.nexo-app .metric-footer strong { color: var(--nx-text); font-weight: 700; }
+
+/* ---------- Crypto compact cards ---------- */
+.nexo-app .crypto-compact {
+  background: var(--nx-surface) !important;
+  border: 1px solid var(--nx-border) !important;
+  border-radius: var(--nx-radius) !important;
+  box-shadow: var(--nx-shadow) !important;
+  transition: transform .2s ease;
+}
+.nexo-app .crypto-compact:hover { transform: translateY(-1px); }
+.nexo-app .crypto-icon {
+  width: 30px; height: 30px;
+  border-radius: var(--nx-radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.95rem;
+}
+.nexo-app .crypto-price {
+  font-weight: 700;
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--nx-text);
+}
+.nexo-app .crypto-change {
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* ---------- Buttons ---------- */
+.nexo-app .btn {
+  border-radius: var(--nx-radius-sm) !important;
+  font-weight: 600 !important;
+  font-size: 0.82rem !important;
+  transition: all .15s ease;
+  letter-spacing: 0.2px;
+}
+.nexo-app .btn-primary {
+  background: var(--nx-text-muted) !important;
+  border-color: var(--nx-text-muted) !important;
+  color: #fff !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+}
+.nexo-app .btn-primary:hover {
+  background: var(--nx-text) !important;
+  border-color: var(--nx-text) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.15) !important;
+}
+.nexo-app .btn-outline-primary {
+  color: var(--nx-text-muted) !important;
+  border-color: var(--nx-border) !important;
+  background: transparent !important;
+}
+.nexo-app .btn-outline-primary:hover {
+  background: var(--nx-surface-2) !important;
+  color: var(--nx-text) !important;
+  border-color: var(--nx-border) !important;
+}
+.nexo-app .btn-outline-secondary {
+  color: var(--nx-text-muted) !important;
+  border-color: var(--nx-border) !important;
+  background: transparent !important;
+}
+.nexo-app .btn-outline-secondary:hover {
+  background: var(--nx-surface-2) !important;
+  color: var(--nx-text) !important;
+  border-color: var(--nx-border) !important;
+}
+.nexo-app .btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+}
+.nexo-app .btn-outline-primary.btn-sm,
+.nexo-app .btn-outline-secondary.btn-sm {
+  border-radius: var(--nx-radius-sm);
+}
+
+/* ---------- Form controls ---------- */
+.nexo-app .form-select,
+.nexo-app .form-control {
+  background-color: var(--nx-surface) !important;
+  border: 1px solid var(--nx-border) !important;
+  border-radius: var(--nx-radius-sm) !important;
+  color: var(--nx-text) !important;
+  font-size: 0.85rem !important;
+  transition: border-color .15s, box-shadow .15s;
+}
+.nexo-app .form-select:focus,
+.nexo-app .form-control:focus {
+  border-color: var(--nx-primary);
+  box-shadow: 0 0 0 3px var(--nx-primary-soft);
+  background-color: var(--nx-surface);
+  color: var(--nx-text);
+}
+.nexo-app .form-select-sm {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+}
+.nexo-app .form-label {
+  color: var(--nx-text);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* ---------- Badges ---------- */
+.nexo-app .badge {
+  border-radius: var(--nx-radius-sm);
+  font-weight: 600;
+  font-size: 0.7rem;
+  padding: 0.3em 0.6em;
+  letter-spacing: 0.2px;
+}
+.nexo-app .badge.bg-primary { background: var(--nx-primary-soft) !important; color: var(--nx-primary) !important; }
+.nexo-app .badge.bg-success { background: rgba(5,150,105,0.12) !important; color: #059669 !important; }
+.nexo-app .badge.bg-danger { background: rgba(220,38,38,0.12) !important; color: #DC2626 !important; }
+.nexo-app .badge.bg-warning { background: rgba(217,119,6,0.12) !important; color: #D97706 !important; }
+.nexo-app .badge.bg-info { background: rgba(37,99,235,0.12) !important; color: #2563EB !important; }
+[data-bs-theme="dark"] .nexo-app .badge.bg-success { background: rgba(110,231,183,0.15) !important; color: #6EE7B7 !important; }
+[data-bs-theme="dark"] .nexo-app .badge.bg-danger { background: rgba(252,165,165,0.15) !important; color: #FCA5A5 !important; }
+[data-bs-theme="dark"] .nexo-app .badge.bg-warning { background: rgba(252,211,77,0.15) !important; color: #FCD34D !important; }
+[data-bs-theme="dark"] .nexo-app .badge.bg-info { background: rgba(147,197,253,0.15) !important; color: #93C5FD !important; }
+.nexo-app .mes-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 4px 10px; border-radius: 999px;
+  font-size: 0.78rem; font-weight: 600;
+  background: var(--nx-primary-soft);
+  color: var(--nx-primary);
+}
+
+/* ---------- Tables ---------- */
+.nexo-app .table {
+  color: var(--nx-text);
+  font-size: 0.85rem;
+  margin-bottom: 0;
+}
+.nexo-app .table thead th {
+  background: var(--nx-surface-2) !important;
+  color: var(--nx-text-muted) !important;
+  font-size: 0.7rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  font-weight: 700 !important;
+  border-bottom: 2px solid var(--nx-border) !important;
+  border-top: none !important;
+  padding: 12px 14px !important;
+}
+.nexo-app .table tbody td {
+  padding: 12px 14px !important;
+  border-bottom: 1px solid var(--nx-border) !important;
+  vertical-align: middle;
+  color: var(--nx-text) !important;
+}
+.nexo-app .table tbody tr:hover {
+  background: var(--nx-primary-soft);
+}
+.nexo-app .table-dark {
+  background: var(--nx-surface-2) !important;
+  color: var(--nx-text) !important;
+}
+.nexo-app .table-dark th {
+  background: var(--nx-surface-2) !important;
+  color: var(--nx-text-muted) !important;
+  border-color: var(--nx-border) !important;
+}
+.nexo-app .table-striped > tbody > tr:nth-of-type(odd) > * {
+  background: var(--nx-surface-2);
+}
+.nexo-app .table-hover > tbody > tr:hover > * {
+  background: var(--nx-primary-soft);
+}
+.nexo-app .table-responsive {
+  border-radius: var(--nx-radius);
+  border: 1px solid var(--nx-border);
+  overflow: hidden;
+}
+
+/* ---------- Tabs ---------- */
+.nexo-app .nav-tabs {
+  border-bottom: 1px solid var(--nx-border);
+  gap: 0;
+}
+.nexo-app .nav-tabs .nav-link {
+  color: var(--nx-text-muted);
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: transparent;
+}
+.nexo-app .nav-tabs .nav-link:hover {
+  color: var(--nx-text);
+  border-bottom-color: var(--nx-border);
+}
+.nexo-app .nav-tabs .nav-link.active {
+  color: var(--nx-primary);
+  border-bottom-color: var(--nx-primary);
+  background: transparent;
+  font-weight: 600;
+}
+.nexo-app .card-header-tabs .nav-link {
+  color: rgba(255,255,255,0.8) !important;
+}
+.nexo-app .card-header-tabs .nav-link.active {
+  color: #fff !important;
+  background: rgba(255,255,255,0.15);
+  border-radius: 6px;
+}
+
+/* ---------- Nav tabs inside card header (primary) ---------- */
+.nexo-app .card-header.bg-primary .nav-tabs {
+  border-bottom: none;
+}
+
+/* ---------- Spinner ---------- */
+.nexo-app .spinner-border {
+  color: var(--nx-primary);
+}
+
+/* ---------- Toast ---------- */
+.nexo-app .toast-container {
+  z-index: 9999;
+}
+
+/* ---------- Divider ---------- */
+.nexo-app .vr {
+  background-color: var(--nx-border);
+  opacity: 1;
+}
+
+/* ---------- Month nav button ---------- */
+.nexo-app .month-nav-btn {
+  width: 34px; height: 34px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 8px;
+  border: 1px solid var(--nx-border);
+  background: transparent;
+  color: var(--nx-text);
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.nexo-app .month-nav-btn:hover {
+  background: var(--nx-primary-soft);
+  border-color: var(--nx-primary);
+  color: var(--nx-primary);
+}
+
+/* ---------- Text colors ---------- (contrasted in light, pastel in dark) */
+.nexo-app .text-muted { color: #374151 !important; }
+.nexo-app .text-primary { color: var(--nx-primary) !important; }
+.nexo-app .text-success { color: #059669 !important; }
+.nexo-app .text-danger { color: #DC2626 !important; }
+.nexo-app .text-warning { color: #D97706 !important; }
+.nexo-app .text-info { color: #2563EB !important; }
+.nexo-app .text-white { color: #fff !important; }
+[data-bs-theme="dark"] .nexo-app .text-success { color: #6EE7B7 !important; }
+[data-bs-theme="dark"] .nexo-app .text-danger { color: #FCA5A5 !important; }
+[data-bs-theme="dark"] .nexo-app .text-warning { color: #FCD34D !important; }
+[data-bs-theme="dark"] .nexo-app .text-info { color: #93C5FD !important; }
+
+/* ---------- Backgrounds ---------- */
+/* NOTE: .bg-* overrides removed to preserve bg-opacity-* functionality.
+   styles.min.css already defines --bs-primary: #6c5ce7 which matches --nx-primary.
+   Overriding with !important broke bg-opacity-10 (icons became invisible). */
+
+/* ---------- Shadows ---------- */
+.nexo-app .shadow-sm {
+  box-shadow: var(--nx-shadow) !important;
+}
+
+/* ---------- Rounded ---------- */
+.nexo-app .rounded-4 {
+  border-radius: var(--nx-radius) !important;
+}
+
+/* ---------- Resultado body ---------- */
+.nexo-app #resultadoBody {
+  color: var(--nx-text);
+}
+
+/* ---------- Barras pastel (Resultado del Mes) ---------- */
+.nexo-app .result-bar-fill.bg-primary { background-color: #A78BFA !important; }
+.nexo-app .result-bar-fill.bg-success { background-color: #6EE7B7 !important; }
+.nexo-app .result-bar-fill.bg-danger { background-color: #FCA5A5 !important; }
+.nexo-app .result-bar-fill.bg-warning { background-color: #FCD34D !important; }
+.nexo-app .result-bar-fill.bg-info { background-color: #93C5FD !important; }
+
+/* ---------- Accent bars pastel (metric-accent) ---------- */
+.nexo-app .metric-accent.bg-primary { background-color: #A78BFA !important; opacity: 0.7; }
+.nexo-app .metric-accent.bg-success { background-color: #6EE7B7 !important; opacity: 0.7; }
+.nexo-app .metric-accent.bg-danger { background-color: #FCA5A5 !important; opacity: 0.7; }
+.nexo-app .metric-accent.bg-warning { background-color: #FCD34D !important; opacity: 0.7; }
+.nexo-app .metric-accent.bg-info { background-color: #93C5FD !important; opacity: 0.7; }
+
+/* ---------- Degradado: haz de luz en el centro ---------- */
+.nexo-app .nx-content {
+  background: radial-gradient(ellipse 70% 45% at 50% 15%, #C0C0C0 0%, #D0D0D0 20%, var(--nx-canvas) 50%, var(--nx-surface-2) 100%);
+  min-height: calc(100vh - var(--nx-topbar-h));
+}
+[data-bs-theme="dark"] .nexo-app .nx-content {
+  background: radial-gradient(ellipse 70% 45% at 50% 15%, #2a3550 0%, #1a2234 20%, #0D111C 50%, #060910 100%);
+}
+
+/* ---------- Chart containers ---------- */
+.nexo-app #chartComisionesAmiri,
+.nexo-app #chartGastosDona {
+  min-height: 280px;
+}
+
+/* ---------- FIFO loading ---------- */
+.nexo-app #fifoLoading {
+  color: var(--nx-text-muted);
+}
+
+/* ---------- Resultado del mes card ---------- */
+.nexo-app .card-header.bg-primary h5 {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* ---------- Dashboard header badge ---------- */
+.nexo-app .dashboard-header .badge.bg-primary {
+  background: var(--nx-primary-soft) !important;
+  color: var(--nx-primary) !important;
+}
+
+/* ---------- Main content area ---------- */
+.nexo-app .nx-main {
+  background: var(--nx-canvas);
+}
+
+/* ---------- Ensure body doesn't double-scroll ---------- */
+.nexo-body {
+  overflow-x: hidden;
+}
+
+/* ---------- Responsive adjustments ---------- */
+@media (max-width: 767.98px) {
+  .nexo-app .metric-value {
+    font-size: 1.3rem;
+  }
+  .nexo-app .crypto-price {
+    font-size: 0.85rem;
+  }
+  .nexo-app .card-header {
+    padding: 12px 14px;
+  }
+  .nexo-app .card-body {
+    padding: 12px 14px;
+  }
+}
+
+/* ---------- Dark mode specific overrides for bridge ---------- */
+[data-bs-theme="dark"] .nexo-app .card {
+  background: linear-gradient(145deg, var(--nx-surface) 0%, var(--nx-surface-2) 100%) !important;
+  border: none !important;
+}
+[data-bs-theme="dark"] .nexo-app .metric-card {
+  background: var(--nx-surface);
+  border-color: var(--nx-border);
+}
+[data-bs-theme="dark"] .nexo-app .crypto-compact {
+  background: var(--nx-surface);
+  border-color: var(--nx-border);
+}
+[data-bs-theme="dark"] .nexo-app .form-select,
+[data-bs-theme="dark"] .nexo-app .form-control {
+  background-color: var(--nx-surface-2);
+  border-color: var(--nx-border);
+  color: var(--nx-text);
+}
+[data-bs-theme="dark"] .nexo-app .table thead th {
+  background: var(--nx-surface-2);
+  color: var(--nx-text-muted);
+}
+[data-bs-theme="dark"] .nexo-app .table tbody td {
+  border-bottom-color: var(--nx-border);
+  color: var(--nx-text);
+}
+[data-bs-theme="dark"] .nexo-app .table-striped > tbody > tr:nth-of-type(odd) > * {
+  background: var(--nx-surface-2);
+}
+[data-bs-theme="dark"] .nexo-app .badge.bg-success { color: #34d399 !important; }
+[data-bs-theme="dark"] .nexo-app .badge.bg-danger { color: #f87171 !important; }
+[data-bs-theme="dark"] .nexo-app .badge.bg-warning { color: var(--nx-warning) !important; }
+[data-bs-theme="dark"] .nexo-app .badge.bg-info { color: #60a5fa !important; }
+
+/* ---------- ApexCharts menu (dark mode) ---------- */
+[data-bs-theme="dark"] .nexo-app .apexcharts-menu {
+  background-color: #1a2234 !important;
+  color: #e9ecef !important;
+  border: 1px solid #2c344c !important;
+}
+[data-bs-theme="dark"] .nexo-app .apexcharts-menu-item:hover {
+  background-color: rgba(93, 135, 255, 0.15) !important;
+}
+[data-bs-theme="light"] .nexo-app .apexcharts-menu {
+  background-color: #FAF8F5 !important;
+  color: #111827 !important;
+  border: 1px solid #E6E8F0 !important;
+}

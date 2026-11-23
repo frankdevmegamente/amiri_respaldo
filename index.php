@@ -38,6 +38,9 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
   <title>Dashboard - AmiriApp</title>
 
   <link rel="shortcut icon" type="image/png" href="src/assets/images/logos/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="src/assets/css/styles.min.css" />
 
@@ -48,6 +51,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
   <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
 
   <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
+  <link rel="stylesheet" href="src/assets/css/nexo.css" />
 
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
@@ -77,8 +81,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
            ========================================= */
         
         [data-bs-theme="dark"] .card {
-            background-color: #1a2234 !important;
-            border-color: #2c344c !important;
+            background: linear-gradient(145deg, #1a2234 0%, #131826 100%) !important;
+            border: none !important;
             box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2) !important;
         }
         
@@ -86,13 +90,13 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .text-muted { color: #8c9ea8 !important; }
         
         [data-bs-theme="dark"] .card-header.bg-primary {
-            background-color: rgba(93, 135, 255, 0.15) !important;
+            background-color: rgba(139, 126, 200, 0.15) !important;
             border-bottom: 1px solid #2c344c !important;
         }
         
         [data-bs-theme="dark"] .card-header.bg-primary h5,
         [data-bs-theme="dark"] .card-header.bg-primary i {
-            color: #5D87FF !important;
+            color: #8B7EC8 !important;
             font-weight: 700 !important;
         }
 
@@ -109,16 +113,16 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             color: #e9ecef !important;
         }
         
-        [data-bs-theme="dark"] .border-success { border-color: #13DEB9 !important; background-color: rgba(19, 222, 185, 0.05) !important; }
-        [data-bs-theme="dark"] .border-danger { border-color: #FA896B !important; background-color: rgba(250, 137, 107, 0.05) !important; }
-        [data-bs-theme="dark"] .border-info { border-color: #5D87FF !important; background-color: rgba(93, 135, 255, 0.05) !important; }
-        [data-bs-theme="dark"] .border-warning { border-color: #FFAE1F !important; background-color: rgba(255, 174, 31, 0.05) !important; }
+        [data-bs-theme="dark"] .border-success { border-color: #6EE7B7 !important; background-color: rgba(110, 231, 183, 0.05) !important; }
+        [data-bs-theme="dark"] .border-danger { border-color: #FCA5A5 !important; background-color: rgba(252, 165, 165, 0.05) !important; }
+        [data-bs-theme="dark"] .border-info { border-color: #93C5FD !important; background-color: rgba(147, 197, 253, 0.05) !important; }
+        [data-bs-theme="dark"] .border-warning { border-color: #FCD34D !important; background-color: rgba(252, 211, 77, 0.05) !important; }
         
-        [data-bs-theme="dark"] .text-success { color: #13DEB9 !important; }
-        [data-bs-theme="dark"] .text-danger { color: #FA896B !important; }
-        [data-bs-theme="dark"] .text-info { color: #5D87FF !important; }
-        [data-bs-theme="dark"] .text-warning { color: #FFAE1F !important; }
-        [data-bs-theme="dark"] .text-primary { color: #5D87FF !important; }
+        [data-bs-theme="dark"] .text-success { color: #6EE7B7 !important; }
+        [data-bs-theme="dark"] .text-danger { color: #FCA5A5 !important; } 
+        [data-bs-theme="dark"] .text-info { color: #93C5FD !important; }   
+        [data-bs-theme="dark"] .text-warning { color: #FCD34D !important; }
+        [data-bs-theme="dark"] .text-primary { color: #8B7EC8 !important; }
         
         [data-bs-theme="dark"] .card-title[style] { color: #e9ecef !important; }
         [data-bs-theme="dark"] #usd-mxn,
@@ -327,25 +331,16 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         }
 </style>
 
-<body>
+<body class="nexo-body">
 
-  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+  <div class="nexo-app" id="nexoApp">
 
-    data-sidebar-position="fixed" data-header-position="fixed">
+    <!-- Header / Sidebar nexo -->
+    <?php include 'src/assets/partials/header-nexo.php'; ?>
+    <?php include 'src/assets/partials/sidebar-nexo.php'; ?>
 
-
-
-    <!-- Header / Sidebar -->
-
-    <?php include 'src/assets/partials/header.php'; ?>
-
-    <?php include 'src/assets/partials/sidebar.php'; ?>
-
-
-
-    <div class="body-wrapper">
-      <div class="body-wrapper-inner">
-        <div class="container-fluid px-4" style="max-width: 100%;">
+    <main class="nx-main">
+      <div class="nx-content">
 
           <!-- ============================================
                PAGE HEADER
@@ -656,10 +651,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
           </div>
 
         </div>
-      </div>
+      </main>
     </div>
-
-  </div>
 
   <!-- Scripts -->
 
@@ -668,6 +661,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
   <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
   <script src="src/assets/js/sidebarmenu.js"></script>
+  <script src="src/assets/js/nexo-shell.js"></script>
 
   <script src="src/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
 
@@ -677,7 +671,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
 
-  <script src="src/assets/js/dark-mode.js"></script>
+  <!-- dark-mode.js reemplazado por nexo-shell.js + bridge CSS -->
 
   <script src="src/assets/js/pantalla-completa.js"></script>
 
