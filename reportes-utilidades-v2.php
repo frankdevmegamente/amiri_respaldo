@@ -28,7 +28,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .nav-pills .nav-link { border-radius: 8px; padding: 10px 20px; }
         .nav-pills .nav-link.active { background: linear-gradient(135deg, #c58fb8, #a78bfa); }
         .table-reportes th { background-color: #f8f9fa; font-weight: 600; }
-        [data-bs-theme="dark"] .table-reportes th { background-color: #1e293b; }
+        [data-bs-theme="dark"] .table-reportes th { background-color: var(--nx-surface-2); }
         .metric-card-util { transition: all 0.25s ease; position: relative; overflow: hidden; }
         .metric-card-util:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.08) !important; }
         [data-bs-theme="dark"] .metric-card-util:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.25) !important; }
@@ -47,7 +47,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .util-breakdown .br-divider { height: 1px; background: #e2e8f0; margin: 4px 0; }
         [data-bs-theme="dark"] .util-breakdown .br-divider { background: #2d3140; }
         .util-breakdown .br-total .br-value { font-size: 0.85rem; }
-        [data-bs-theme="dark"] .metric-card-util { background-color: #1f2535 !important; border-color: #2b3350 !important; }
+        [data-bs-theme="dark"] .metric-card-util { background-color: var(--nx-surface) !important; border-color: var(--nx-border) !important; }
         [data-bs-theme="dark"] .metric-card-util .util-icon { background-color: rgba(255,255,255,0.06) !important; }
         [data-bs-theme="dark"] .metric-card-util .util-value { color: #e8ecf0 !important; }
         [data-bs-theme="dark"] .quick-stat-box { background-color: rgba(255,255,255,0.04) !important; }
@@ -364,7 +364,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                     </div>
                                     <div class="col-md-3 col-6">
                                         <div class="d-flex align-items-center gap-2">
-                                            <div class="rounded-2 d-flex align-items-center justify-content-center" style="width:32px;height:32px;background:rgba(93,135,255,0.1);color:var(--nx-primary);">
+                                            <div class="rounded-2 d-flex align-items-center justify-content-center" style="width:32px;height:32px;background:rgba(197,143,184,0.12);color:var(--nx-primary);">
                                                 <i class="ti ti-users" style="font-size:14px;"></i>
                                             </div>
                                             <div style="line-height:1.2;">
@@ -785,7 +785,7 @@ function cargarPorServicio() {
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { backgroundColor: '#1e293b', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 }, callbacks: { label: function(c) { return '$' + formatoNumero(c.parsed.y); } } } },
+                    plugins: { legend: { display: false }, tooltip: { backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 }, callbacks: { label: function(c) { return '$' + formatoNumero(c.parsed.y); } } } },
                     scales: { y: { beginAtZero: true, ticks: { callback: function(v) { return '$' + v.toFixed(0); } } } }
                 }
             });
@@ -848,7 +848,7 @@ function cargarPorCliente() {
                     labels: datos.slice(0, 5).map(d => d.cliente),
                     datasets: [{ data: datos.slice(0, 5).map(d => parseFloat(d.comision_amiri) || 0), backgroundColor: COLORES, borderWidth: 0, hoverOffset: 6 }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, padding: 12 } }, tooltip: { backgroundColor: '#1e293b', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 }, callbacks: { label: function(c) { return ' $' + formatoNumero(c.parsed || 0); } } } } }
+                options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, padding: 12 } }, tooltip: { backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 }, callbacks: { label: function(c) { return ' $' + formatoNumero(c.parsed || 0); } } } } }
             });
             renderTopClientes(datos);
         })
@@ -913,7 +913,7 @@ function cargarPorPromotor() {
                         labels: datos.map(d => d.promotor),
                         datasets: [{ data: datos.map(d => parseFloat(d.comision_amiri) || 0), backgroundColor: COLORES, borderWidth: 0, hoverOffset: 6 }]
                     },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12, padding: 12 } }, tooltip: { backgroundColor: '#1e293b', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 }, callbacks: { label: function(c) { return ' $' + formatoNumero(c.parsed || 0); } } } } }
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12, padding: 12 } }, tooltip: { backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 }, callbacks: { label: function(c) { return ' $' + formatoNumero(c.parsed || 0); } } } } }
                 });
             }
         })
@@ -981,7 +981,7 @@ function cargarGraficaComparativa() {
                         plugins: {
                             legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14, usePointStyle: true } },
                             tooltip: {
-                                backgroundColor: '#1e293b', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 },
+                                backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 },
                                 callbacks: {
                                     label: function(c) { return c.dataset.label + ': $' + formatoNumero(c.parsed.y); },
                                     afterBody: function(items) {
@@ -1016,7 +1016,7 @@ function cargarGraficaComparativa() {
                         plugins: {
                             legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14, usePointStyle: true } },
                             tooltip: {
-                                backgroundColor: '#1e293b', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 },
+                                backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 },
                                 callbacks: {
                                     label: function(c) { return c.dataset.label + ': $' + formatoNumero(c.parsed.y); }
                                 }
@@ -1044,7 +1044,7 @@ function cargarGraficaComparativa() {
                     chartComparativa = new Chart(ctx, {
                         type: 'bar',
                         data: { labels: meses, datasets: datasets.map(ds => ({ ...ds, borderRadius: 4, borderSkipped: false })) },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 14, padding: 14 } }, tooltip: { backgroundColor: '#1e293b', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 } } }, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { callback: function(v) { return '$' + v.toFixed(0); } } } } }
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 14, padding: 14 } }, tooltip: { backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 } } }, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { callback: function(v) { return '$' + v.toFixed(0); } } } } }
                     });
                 }
             }

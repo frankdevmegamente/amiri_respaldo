@@ -9,7 +9,7 @@ $usuario_rol = $usuario_rol ?? ($_SESSION['usuario_rol'] ?? 'usuario');
 ?>
 <!-- Helios shell assets (injected for legacy pages that don't include them in <head>) -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="src/assets/css/nexo.css?v=helios3" />
+<link rel="stylesheet" href="src/assets/css/nexo.css?v=helios9" />
 <script>
 (function(){
   try {
@@ -22,7 +22,8 @@ $usuario_rol = $usuario_rol ?? ($_SESSION['usuario_rol'] ?? 'usuario');
   }
 })();
 </script>
-<style>.left-sidebar,.app-topstrip{display:none!important}body{font-family:var(--nx-font,'Montserrat',sans-serif)!important;background-color:var(--nx-canvas,#0a0709)!important}</style>
+<style>.left-sidebar,.app-topstrip{display:none!important}body{font-family:var(--nx-font,'Montserrat',sans-serif)!important;}</style>
+<script>document.addEventListener('DOMContentLoaded',function(){document.body.classList.add('nexo-body');});</script>
 
 <header class="nx-topbar">
   <div class="nx-topbar-left">

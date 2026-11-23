@@ -116,7 +116,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         .nav-pills .nav-link.active {
 
-            background: linear-gradient(135deg, var(--nx-primary), #49BEFF);
+            background: var(--nx-accent-gradient);
 
         }
 
@@ -134,7 +134,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         .filter-card {
 
-            background: linear-gradient(135deg, #f8f9fa, #f5f2f4);
+            background: var(--nx-surface-2);
 
             border: none;
 
@@ -144,7 +144,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         [data-bs-theme="dark"] .filter-card {
 
-            background: linear-gradient(135deg, #1e293b, #0f172a);
+            background: var(--nx-surface-2);
 
         }
 
@@ -152,7 +152,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         .badge-usd {
 
-            background: linear-gradient(135deg, #0ea5e9, #2563eb);
+            background: var(--nx-accent-gradient);
 
             color: white;
 
@@ -162,7 +162,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         .badge-usdt {
 
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #3ddc84, #059669);
 
             color: white;
 
@@ -182,7 +182,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         [data-bs-theme="dark"] .table-reportes th {
 
-            background-color: #1e293b;
+            background-color: var(--nx-surface-2);
 
         }
  [data-bs-theme="dark"] .logo-modo-claro,
@@ -197,7 +197,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         /* Dark mode styles for stat cards info boxes */
         [data-bs-theme="dark"] .card-stat .bg-light {
-            background-color: #1e293b !important;
+            background-color: var(--nx-surface-2) !important;
             color: #e2e8f0 !important;
             border-color: #334155 !important;
         }
@@ -233,60 +233,15 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .modal-content,
         [data-bs-theme="dark"] .modal-header,
         [data-bs-theme="dark"] .modal-footer {
-            background-color: #1f2535 !important;
-            border-color: #2b3350 !important;
+            background-color: var(--nx-surface) !important;
+            border-color: var(--nx-border) !important;
             color: #e6ecff !important;
         }
 
-        [data-bs-theme="dark"] .card {
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        [data-bs-theme="dark"] .table,
-        [data-bs-theme="dark"] .table thead th,
-        [data-bs-theme="dark"] .table tbody td,
-        [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
-            background-color: #1f2535 !important;
-            color: #e6ecff !important;
-            border-color: #2b3350 !important;
-        }
-
-        [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
-            background-color: #232b3c !important;
-        }
-
-        [data-bs-theme="dark"] .form-control,
-        [data-bs-theme="dark"] .form-select,
-        [data-bs-theme="dark"] .input-group-text,
-        [data-bs-theme="dark"] .form-control-plaintext,
-        [data-bs-theme="dark"] .alert,
-        [data-bs-theme="dark"] .badge,
-        [data-bs-theme="dark"] .nav-tabs .nav-link {
-            background-color: #232b3c !important;
-            color: #e6ecff !important;
-            border-color: #2b3350 !important;
-        }
-
-        [data-bs-theme="dark"] .nav-tabs .nav-link.active {
-            color: #ffffff !important;
-            border-bottom-color: #c58fb8 !important;
-        }
-
-        [data-bs-theme="dark"] .bg-light {
-            background-color: rgba(255, 255, 255, 0.06) !important;
-        }
-
-        [data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
-            background-color: rgba(93, 135, 255, 0.12) !important;
-        }
-
-        [data-bs-theme="dark"] .bg-success.bg-opacity-10 {
-            background-color: rgba(25, 135, 84, 0.12) !important;
-        }
-
-        [data-bs-theme="dark"] .bg-warning.bg-opacity-10 {
-            background-color: rgba(255, 193, 7, 0.12) !important;
-        }
+        [data-bs-theme="dark"] .bg-primary.bg-opacity-10 { background-color: rgba(197,143,184,0.12) !important; }
+[data-bs-theme="dark"] .bg-success.bg-opacity-10 { background-color: rgba(61,220,132,0.12) !important; }
+[data-bs-theme="dark"] .bg-warning.bg-opacity-10 { background-color: rgba(251,191,36,0.12) !important; }
+[data-bs-theme="dark"] .bg-info.bg-opacity-10 { background-color: rgba(197,143,184,0.10) !important; }
     </style>
 
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
@@ -443,10 +398,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     <div class="row mb-4" id="tarjetasResumen">
                         
                         <div class="col-xl-4 col-md-6 mb-3">
-                            <div class="card card-stat border-0 shadow-sm h-100" id="cardNeta">
+                            <div class="card card-stat metric-card border-0 shadow-sm h-100" id="cardNeta"><div class="metric-accent bg-success" id="accentNeta"></div>
                                 <div class="card-body">
                                     <div class="d-flex align-items-center mb-3">
-                                        <div class="stat-icon bg-success bg-opacity-10 text-success me-3" id="iconNetaBg">
+                                        <div class="metric-icon bg-success bg-opacity-10 text-success me-3" id="iconNetaBg">
                                             <i class="ti ti-trending-up" id="iconNeta"></i>
                                         </div>
                                         <div class="flex-grow-1">
@@ -483,11 +438,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                         <!-- Capital Amiri -->
                         <div class="col-xl-4 col-md-6 mb-3">
-                            <div class="card card-stat border-0 shadow-sm h-100">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="stat-icon bg-primary bg-opacity-10 text-primary me-3">
-                                            <i class="ti ti-crown"></i>
+                            <div class="card card-stat metric-card border-0 shadow-sm h-100"><div class="metric-accent bg-primary"></div><div class="card-body"><div class="d-flex align-items-center mb-3"><div class="metric-icon bg-primary bg-opacity-10 text-primary me-3"><i class="ti ti-crown"></i>
                                         </div>
                                         <div class="flex-grow-1">
                                             <p class="text-muted mb-1 small">Capital Amiri</p>
@@ -511,11 +462,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         </div>
 
                         <div class="col-xl-4 col-md-6 mb-3">
-                            <div class="card card-stat border-0 shadow-sm h-100">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="stat-icon bg-info bg-opacity-10 text-info me-3">
-                                            <i class="ti ti-currency-dollar"></i>
+                            <div class="card card-stat metric-card border-0 shadow-sm h-100"><div class="metric-accent bg-info"></div><div class="card-body"><div class="d-flex align-items-center mb-3"><div class="metric-icon bg-info bg-opacity-10 text-info me-3"><i class="ti ti-currency-dollar"></i>
                                         </div>
                                         <div class="flex-grow-1">
                                             <p class="text-muted mb-1 small">
@@ -541,11 +488,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         </div>
 
                         <div class="col-xl-4 col-md-6 mb-3">
-                            <div class="card card-stat border-0 shadow-sm h-100">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center mb-3">
-                                        <div class="stat-icon bg-warning bg-opacity-10 text-warning me-3">
-                                            <i class="ti ti-cash"></i>
+                            <div class="card card-stat metric-card border-0 shadow-sm h-100"><div class="metric-accent bg-warning"></div><div class="card-body"><div class="d-flex align-items-center mb-3"><div class="metric-icon bg-warning bg-opacity-10 text-warning me-3"><i class="ti ti-cash"></i>
                                         </div>
                                         <div class="flex-grow-1">
                                             <p class="text-muted mb-1 small">
@@ -1273,7 +1216,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         label: 'AMIRI',
                         data: data.map(d => parseFloat(d.amiri || 0)),
                         borderColor: 'var(--nx-primary)',
-                        backgroundColor: 'rgba(93, 135, 255, 0.1)',
+                        backgroundColor: 'rgba(197,143,184,0.12)',
                         fill: true,
                         tension: 0.4
                     }, {
@@ -1306,7 +1249,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         function _renderGraficaComisionesPromotor(data) {
             const ctx = document.getElementById('chartComisionesPromotor').getContext('2d');
             if (chartComisionesPromotor) chartComisionesPromotor.destroy();
-            const colores = ['var(--nx-primary)', 'var(--nx-success)', 'var(--nx-warning)', 'var(--nx-danger)', '#539BFF', '#49BEFF', '#FF6692', '#36A2EB', '#FFCE56', '#4BC0C0'];
+            const colores = ['var(--nx-primary)', 'var(--nx-success)', 'var(--nx-warning)', 'var(--nx-danger)', '#539BFF', '#d9a3cc', '#FF6692', '#36A2EB', '#FFCE56', '#4BC0C0'];
             chartComisionesPromotor = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
@@ -1372,7 +1315,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     datasets: [{
                         label: 'Compras USD',
                         data: usdCompras,
-                        backgroundColor: 'rgba(93, 135, 255, 0.7)'
+                        backgroundColor: 'rgba(197,143,184,0.7)'
                     }, {
                         label: 'Ventas USD',
                         data: usdVentas,

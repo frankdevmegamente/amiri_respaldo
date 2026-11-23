@@ -96,7 +96,7 @@ $nf = function($n) { return '$' . number_format((float)$n, 2); };
         .progress-bar .fill { height: 100%; border-radius: 3px; }
         .table-detail { width: 100%; margin-top: 20px; background: white; border: none; border-radius: var(--card-radius); box-shadow: var(--card-shadow); overflow: hidden; }
         .table-detail table { width: 100%; border-collapse: collapse; }
-        .table-detail th { background: #f8f9fa; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6c757d; padding: 12px 20px; text-align: left; font-weight: 600; }
+        .table-detail th { background: var(--nx-surface-2) !important; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6c757d; padding: 12px 20px; text-align: left; font-weight: 600; }
         .table-detail td { padding: 10px 20px; font-size: 0.9rem; border-top: 1px solid #f5f2f4; }
         .table-detail tr:last-child td { font-weight: 700; border-top: 2px solid #dee2e6; }
         .badge-green { color: var(--nx-success); } .badge-red { color: var(--nx-danger); }

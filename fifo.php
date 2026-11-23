@@ -109,27 +109,7 @@ $pdo = getPDO();
             background: rgba(108, 92, 231, 0.06);
         }
 
-        [data-bs-theme="dark"] .table,
-        [data-bs-theme="dark"] .table thead th,
-        [data-bs-theme="dark"] .table tbody td,
-        [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
-            background-color: #1f2535 !important;
-            color: #e6ecff !important;
-            border-color: #2b3350 !important;
-        }
-        [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
-            background-color: #232b3c !important;
-        }
-        [data-bs-theme="dark"] .card,
-        [data-bs-theme="dark"] .card-header,
-        [data-bs-theme="dark"] .card-body {
-            background-color: #1f2535 !important;
-            border-color: #2b3350 !important;
-            color: #e6ecff !important;
-        }
-        [data-bs-theme="dark"] .table-dark {
-            background-color: #2b3350 !important;
-        }
+        /* FIFO dark table overrides removed - Helios */
         [data-bs-theme="dark"] .table-dark th {
             background-color: #2b3350 !important;
             color: #e6ecff !important;
@@ -181,8 +161,8 @@ $pdo = getPDO();
 
                     <!-- Page Header -->
                     <div class="card shadow-sm border-0 rounded-4 mb-4" style="position: relative; overflow: hidden;">
-                        <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: #c58fb8; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-                        <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: var(--nx-success); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                        <div class="bg-pattern"></div>
+                        <div class="bg-pattern-2"></div>
 
                         <div class="card-body p-4" style="position: relative; z-index: 1;">
                             <div class="row align-items-center g-3 mb-4">
@@ -225,9 +205,9 @@ $pdo = getPDO();
                             <!-- KPI Cards -->
                             <div class="row g-3" id="kpiRow">
                                 <div class="col-md-3">
-                                    <div class="card kpi-card border-0 shadow-sm h-100">
+                                    <div class="card metric-card border-0 shadow-sm h-100"><div class="metric-accent bg-primary"></div>
                                         <div class="card-body d-flex align-items-center gap-3 p-3">
-                                            <div class="kpi-icon" style="background: rgba(108,92,231,0.1); color: #c58fb8;"><i class="ti ti-currency-tenge"></i></div>
+                                            <div class="kpi-icon" style="background: rgba(197,143,184,0.14); color: var(--nx-primary);"><i class="ti ti-currency-tenge"></i></div>
                                             <div>
                                                 <div class="kpi-label">USDT Disponible</div>
                                                 <div class="kpi-value" id="kpiUsdtDisponible">0.00</div>
@@ -236,9 +216,9 @@ $pdo = getPDO();
                                     </div>
                                 </div>
                                 <div class="col-md-3">
-                                    <div class="card kpi-card border-0 shadow-sm h-100">
+                                    <div class="card metric-card border-0 shadow-sm h-100"><div class="metric-accent bg-primary"></div>
                                         <div class="card-body d-flex align-items-center gap-3 p-3">
-                                            <div class="kpi-icon" style="background: rgba(0,200,83,0.1); color: #00c853;"><i class="ti ti-currency-dollar"></i></div>
+                                            <div class="kpi-icon" style="background: rgba(61,220,132,0.14); color: var(--nx-success);"><i class="ti ti-currency-dollar"></i></div>
                                             <div>
                                                 <div class="kpi-label">USD Disponible</div>
                                                 <div class="kpi-value" id="kpiUsdDisponible">0.00</div>
@@ -247,9 +227,9 @@ $pdo = getPDO();
                                     </div>
                                 </div>
                                 <div class="col-md-3">
-                                    <div class="card kpi-card border-0 shadow-sm h-100">
+                                    <div class="card metric-card border-0 shadow-sm h-100"><div class="metric-accent bg-primary"></div>
                                         <div class="card-body d-flex align-items-center gap-3 p-3">
-                                            <div class="kpi-icon" style="background: rgba(255,193,7,0.1); color: #ffc107;"><i class="ti ti-trending-up"></i></div>
+                                            <div class="kpi-icon" style="background: rgba(251,191,36,0.14); color: var(--nx-warning);"><i class="ti ti-trending-up"></i></div>
                                             <div>
                                                 <div class="kpi-label">Ganancia USDT</div>
                                                 <div class="kpi-value" id="kpiGananciaUsdt">$0.00</div>
@@ -258,9 +238,9 @@ $pdo = getPDO();
                                     </div>
                                 </div>
                                 <div class="col-md-3">
-                                    <div class="card kpi-card border-0 shadow-sm h-100">
+                                    <div class="card metric-card border-0 shadow-sm h-100"><div class="metric-accent bg-primary"></div>
                                         <div class="card-body d-flex align-items-center gap-3 p-3">
-                                            <div class="kpi-icon" style="background: rgba(0,152,255,0.1); color: #0098ff;"><i class="ti ti-trending-up"></i></div>
+                                            <div class="kpi-icon" style="background: rgba(197,143,184,0.14); color: var(--nx-primary);"><i class="ti ti-trending-up"></i></div>
                                             <div>
                                                 <div class="kpi-label">Ganancia USD</div>
                                                 <div class="kpi-value" id="kpiGananciaUsd">$0.00</div>

@@ -24,12 +24,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .chart-container { position: relative; height: 260px; }
         .chart-container-clickable { cursor: pointer; }
         .table-reportes th { background-color: #f8f9fa; font-weight: 600; }
-        [data-bs-theme="dark"] .table-reportes th { background-color: #1e293b; }
+        [data-bs-theme="dark"] .table-reportes th { background-color: var(--nx-surface-2); }
         .metric-card-serv { transition: all 0.2s ease; position: relative; overflow: hidden; cursor: pointer; }
         .metric-card-serv:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.07) !important; }
         [data-bs-theme="dark"] .metric-card-serv:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.2) !important; }
         .metric-card-serv .top-strip { position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 0.75rem 0.75rem 0 0; }
-        .metric-card-serv.active { border-color: var(--nx-primary) !important; box-shadow: 0 0 0 2px rgba(93,135,255,0.3) !important; }
+        .metric-card-serv.active { border-color: var(--nx-primary) !important; box-shadow: 0 0 0 2px rgba(197,143,184,0.3) !important; }
         .metric-card-serv.active .top-strip { height: 4px !important; }
         .svc-icon { width: 32px; height: 32px; }
         .svc-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--nx-text-muted); line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
@@ -38,7 +38,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .svc-value { color: #e8ecf0; }
         .svc-footer { font-size: 0.65rem; color: #8b92a8; padding-top: 4px; margin-top: 4px; border-top: 1px solid #eef0f4; }
         [data-bs-theme="dark"] .svc-footer { color: #6b7280; border-top-color: #2d3140; }
-        [data-bs-theme="dark"] .metric-card-serv { background-color: #1f2535 !important; border-color: #2b3350 !important; }
+        [data-bs-theme="dark"] .metric-card-serv { background-color: var(--nx-surface) !important; border-color: var(--nx-border) !important; }
         [data-bs-theme="dark"] .metric-card-serv .svc-icon { background-color: rgba(255,255,255,0.06) !important; }
         .metric-card-serv[data-servicio-id]:hover { border-color: #cbd5e1 !important; }
         [data-bs-theme="dark"] .logo-modo-claro,
@@ -367,8 +367,8 @@ function cargarGraficaServicio(servicioId, servicioNombre) {
 
             const ctx = canvas.getContext('2d');
             var gradient = ctx.createLinearGradient(0, 0, 0, 260);
-            gradient.addColorStop(0, 'rgba(93, 135, 255, 0.85)');
-            gradient.addColorStop(1, 'rgba(93, 135, 255, 0.2)');
+            gradient.addColorStop(0, 'rgba(197,143,184,0.85)');
+            gradient.addColorStop(1, 'rgba(197,143,184,0.2)');
 
             chartServicioDiario = new Chart(ctx, {
                 type: 'bar',
@@ -378,7 +378,7 @@ function cargarGraficaServicio(servicioId, servicioNombre) {
                         label: 'Monto',
                         data: valores,
                         backgroundColor: gradient,
-                        borderColor: 'rgba(93,135,255,0.5)',
+                        borderColor: 'rgba(197,143,184,0.5)',
                         borderWidth: 1,
                         borderRadius: { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 },
                         borderSkipped: false

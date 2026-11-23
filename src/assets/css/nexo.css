@@ -1077,3 +1077,208 @@ body[data-bs-theme="dark"],
 .select2-container--default .select2-selection--single, .select2-container--default .select2-selection--multiple { background: var(--nx-surface-2) !important; border-color: var(--nx-border) !important; color: var(--nx-text) !important; }
 .select2-dropdown { background: var(--nx-surface) !important; border-color: var(--nx-border) !important; color: var(--nx-text) !important; }
 .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable { background: var(--nx-primary-soft) !important; color: var(--nx-text) !important; }
+/* ===== 2.2b: Global Helios normalization for legacy custom components ===== */
+
+/* Page headers (gastos-header, mov-header, any card with bg-pattern) */
+.page-wrapper .card[class*="-header"], #main-wrapper .card[class*="-header"],
+.page-wrapper .dashboard-header, #main-wrapper .dashboard-header {
+  background: var(--nx-surface) !important;
+  border: 1px solid var(--nx-border) !important;
+  border-radius: var(--nx-radius) !important;
+  box-shadow: var(--nx-shadow) !important;
+  overflow: hidden;
+}
+.page-wrapper .bg-pattern, .page-wrapper .bg-pattern-2,
+#main-wrapper .bg-pattern, #main-wrapper .bg-pattern-2 {
+  background: radial-gradient(circle, rgba(197,143,184,0.18) 0%, transparent 70%) !important;
+  opacity: .6;
+}
+.page-wrapper .bg-pattern-2, #main-wrapper .bg-pattern-2 {
+  background: radial-gradient(circle, rgba(181,133,168,0.12) 0%, transparent 70%) !important;
+}
+
+/* Metric cards - unify with Helios (left accent bar like dashboard) */
+.page-wrapper .metric-card, #main-wrapper .metric-card {
+  background: var(--nx-surface) !important;
+  border: 1px solid var(--nx-border) !important;
+  border-radius: var(--nx-radius) !important;
+  box-shadow: var(--nx-shadow) !important;
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  position: relative;
+}
+.page-wrapper .metric-card:hover, #main-wrapper .metric-card:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.25) !important; }
+.page-wrapper .metric-accent, #main-wrapper .metric-accent {
+  position: absolute !important; top: 0 !important; left: 0 !important; bottom: 0 !important; right: auto !important;
+  width: 3px !important; height: auto !important; border-radius: 0 16px 16px 0 !important;
+}
+.page-wrapper .metric-label, #main-wrapper .metric-label {
+  font-size: 0.72rem !important; font-weight: 600 !important; text-transform: uppercase !important;
+  letter-spacing: 0.4px !important; color: var(--nx-text-muted) !important;
+}
+.page-wrapper .metric-value, #main-wrapper .metric-value {
+  font-size: 1.6rem !important; font-weight: 800 !important; color: var(--nx-text) !important;
+  line-height: 1.1; letter-spacing: -0.3px !important; font-variant-numeric: tabular-nums;
+}
+.page-wrapper .metric-icon, #main-wrapper .metric-icon {
+  width: 32px !important; height: 32px !important; border-radius: 10px !important;
+  display: flex; align-items: center; justify-content: center; font-size: 0.95rem !important;
+}
+.page-wrapper .metric-footer, #main-wrapper .metric-footer {
+  display: flex; align-items: center; gap: 6px; padding-top: 8px; margin-top: 8px;
+  border-top: 1px solid var(--nx-border) !important; font-size: 0.78rem !important; color: var(--nx-text-muted) !important;
+}
+.page-wrapper .metric-footer strong, #main-wrapper .metric-footer strong { color: var(--nx-text) !important; }
+
+/* Accent colors */
+.page-wrapper .metric-accent.bg-primary, #main-wrapper .metric-accent.bg-primary { background: var(--nx-accent-gradient) !important; }
+.page-wrapper .metric-accent.bg-success, #main-wrapper .metric-accent.bg-success { background: linear-gradient(180deg, var(--nx-success), rgba(61,220,132,0.4)) !important; }
+.page-wrapper .metric-accent.bg-danger, #main-wrapper .metric-accent.bg-danger { background: linear-gradient(180deg, var(--nx-danger), rgba(255,122,122,0.4)) !important; }
+.page-wrapper .metric-accent.bg-warning, #main-wrapper .metric-accent.bg-warning { background: linear-gradient(180deg, var(--nx-warning), rgba(251,191,36,0.4)) !important; }
+.page-wrapper .metric-accent.bg-info, #main-wrapper .metric-accent.bg-info { background: var(--nx-accent-gradient) !important; }
+
+/* Filters / search bars */
+.page-wrapper .filtros-bar, #main-wrapper .filtros-bar,
+.page-wrapper .filter-bar, #main-wrapper .filter-bar {
+  background: var(--nx-surface-2) !important; border: 1px solid var(--nx-border) !important;
+  border-radius: var(--nx-radius-sm) !important; padding: 14px 16px !important;
+}
+.page-wrapper .filtros-bar .form-label, #main-wrapper .filtros-bar .form-label,
+.page-wrapper .filter-bar .form-label, #main-wrapper .filter-bar .form-label {
+  font-size: 0.72rem !important; font-weight: 600 !important; text-transform: uppercase !important;
+  letter-spacing: 0.4px !important; color: var(--nx-text-muted) !important;
+}
+
+/* Pills / type selectors */
+.page-wrapper .tipo-pill, #main-wrapper .tipo-pill {
+  border: 1px solid var(--nx-border) !important; background: var(--nx-surface-2) !important;
+  color: var(--nx-text-muted) !important; border-radius: 999px !important;
+}
+.page-wrapper .tipo-pill:hover, #main-wrapper .tipo-pill:hover { border-color: var(--nx-primary) !important; color: var(--nx-primary) !important; background: var(--nx-primary-soft) !important; }
+.page-wrapper .tipo-pill.active, #main-wrapper .tipo-pill.active { background: var(--nx-accent-gradient) !important; border-color: transparent !important; color: #fff !important; }
+.page-wrapper .tipo-pill .count, #main-wrapper .tipo-pill .count { background: rgba(255,255,255,0.12) !important; color: inherit !important; }
+
+/* Tables - responsive + Helios */
+.page-wrapper .card .table-responsive, #main-wrapper .card .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.page-wrapper .table, #main-wrapper .table { width: 100%; margin-bottom: 0; }
+.page-wrapper .table td, .page-wrapper .table th, #main-wrapper .table td, #main-wrapper .table th { white-space: nowrap; }
+@media (max-width: 991.98px) {
+  .page-wrapper .table td, .page-wrapper .table th, #main-wrapper .table td, #main-wrapper .table th { white-space: normal; }
+}
+.page-wrapper .dataTables_wrapper, #main-wrapper .dataTables_wrapper { overflow-x: auto; }
+.page-wrapper .dataTables_wrapper .dataTables_scroll, #main-wrapper .dataTables_wrapper .dataTables_scroll { overflow-x: auto; }
+
+/* Small screen card/table padding */
+@media (max-width: 767.98px) {
+  .page-wrapper .card-body, #main-wrapper .card-body { padding: 14px !important; }
+  .page-wrapper .card-header, #main-wrapper .card-header { padding: 12px 14px !important; }
+  .page-wrapper .metric-value, #main-wrapper .metric-value { font-size: 1.35rem !important; }
+  .page-wrapper .btn, #main-wrapper .btn { font-size: 0.8rem; }
+  .page-wrapper .filtros-bar, #main-wrapper .filtros-bar { padding: 12px !important; }
+}
+
+/* ApexCharts Helios theme */
+.page-wrapper .apexcharts-canvas, #main-wrapper .apexcharts-canvas { background: transparent !important; }
+[data-bs-theme="dark"] .page-wrapper .apexcharts-text, [data-bs-theme="dark"] #main-wrapper .apexcharts-text { fill: #9a9096 !important; }
+[data-bs-theme="dark"] .page-wrapper .apexcharts-gridline, [data-bs-theme="dark"] #main-wrapper .apexcharts-gridline { stroke: rgba(255,255,255,0.06) !important; }
+[data-bs-theme="dark"] .page-wrapper .apexcharts-tooltip, [data-bs-theme="dark"] #main-wrapper .apexcharts-tooltip { background: #1a181c !important; border: 1px solid rgba(255,255,255,0.12) !important; color: #f5f2f4 !important; }
+[data-bs-theme="dark"] .page-wrapper .apexcharts-tooltip-title, [data-bs-theme="dark"] #main-wrapper .apexcharts-tooltip-title { background: #121012 !important; border-bottom: 1px solid rgba(255,255,255,0.12) !important; }
+[data-bs-theme="dark"] .page-wrapper .apexcharts-legend-text, [data-bs-theme="dark"] #main-wrapper .apexcharts-legend-text { color: #9a9096 !important; }
+
+/* Neutralize lingering old inline-style helpers */
+.page-wrapper .bg-pattern[style], #main-wrapper .bg-pattern[style] { opacity: 0.5; }
+[data-bs-theme="dark"] .page-wrapper .text-dark, [data-bs-theme="dark"] #main-wrapper .text-dark { color: var(--nx-text) !important; }
+[data-bs-theme="dark"] .page-wrapper .bg-white, [data-bs-theme="dark"] #main-wrapper .bg-white { background-color: var(--nx-surface) !important; }
+/* Force override for leftover inline dark rules (loaded after page styles? no, nexo.css is in head; inline styles in page head come later - so use higher specificity+!important and also target common patterns) */
+html[data-bs-theme="dark"] .page-wrapper .card,
+html[data-bs-theme="dark"] #main-wrapper .card,
+html[data-bs-theme="dark"] .nexo-app .card { background: var(--nx-surface) !important; border-color: var(--nx-border) !important; color: var(--nx-text) !important; }
+html[data-bs-theme="dark"] .page-wrapper .table>thead>tr>th,
+html[data-bs-theme="dark"] #main-wrapper .table>thead>tr>th { background-color: transparent !important; color: var(--nx-text-muted) !important; border-color: var(--nx-border) !important; }
+html[data-bs-theme="dark"] .page-wrapper .table>tbody>tr>td,
+html[data-bs-theme="dark"] #main-wrapper .table>tbody>tr>td { color: var(--nx-text) !important; border-color: var(--nx-border) !important; }
+html[data-bs-theme="dark"] .page-wrapper .form-control,
+html[data-bs-theme="dark"] .page-wrapper .form-select,
+html[data-bs-theme="dark"] #main-wrapper .form-control,
+html[data-bs-theme="dark"] #main-wrapper .form-select { background-color: var(--nx-surface-2) !important; border-color: var(--nx-border) !important; color: var(--nx-text) !important; }
+html[data-bs-theme="dark"] .page-wrapper .modal-content,
+html[data-bs-theme="dark"] #main-wrapper .modal-content { background: var(--nx-surface) !important; border-color: var(--nx-border) !important; color: var(--nx-text) !important; }
+html[data-bs-theme="dark"] .page-wrapper .dropdown-menu,
+html[data-bs-theme="dark"] #main-wrapper .dropdown-menu { background: var(--nx-surface) !important; border-color: var(--nx-border) !important; }
+html[data-bs-theme="dark"] .page-wrapper .bg-light,
+html[data-bs-theme="dark"] #main-wrapper .bg-light { background-color: var(--nx-surface-2) !important; }
+html[data-bs-theme="dark"] .page-wrapper h1,html[data-bs-theme="dark"] .page-wrapper h2,html[data-bs-theme="dark"] .page-wrapper h3,html[data-bs-theme="dark"] .page-wrapper h4,html[data-bs-theme="dark"] .page-wrapper h5,html[data-bs-theme="dark"] .page-wrapper h6,
+html[data-bs-theme="dark"] #main-wrapper h1,html[data-bs-theme="dark"] #main-wrapper h2,html[data-bs-theme="dark"] #main-wrapper h3,html[data-bs-theme="dark"] #main-wrapper h4,html[data-bs-theme="dark"] #main-wrapper h5,html[data-bs-theme="dark"] #main-wrapper h6 { color: var(--nx-text) !important; }
+/* Reportes / legacy stat cards */
+.page-wrapper .stat-icon, #main-wrapper .stat-icon { width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:0.95rem; }
+.page-wrapper .card-stat, #main-wrapper .card-stat { background: var(--nx-surface) !important; border: 1px solid var(--nx-border) !important; border-radius: var(--nx-radius) !important; box-shadow: var(--nx-shadow) !important; }
+.page-wrapper .card-stat .bg-light, #main-wrapper .card-stat .bg-light { background: var(--nx-surface-2) !important; border-color: var(--nx-border) !important; }
+html[data-bs-theme="dark"] .page-wrapper .card-stat .text-dark, html[data-bs-theme="dark"] #main-wrapper .card-stat .text-dark { color: var(--nx-text) !important; }
+.page-wrapper .card-header.bg-white, #main-wrapper .card-header.bg-white { background: transparent !important; color: var(--nx-text) !important; }
+.page-wrapper .kpi-icon, #main-wrapper .kpi-icon { width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem; flex:0 0 36px; }
+.page-wrapper .kpi-label, #main-wrapper .kpi-label { font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;color:var(--nx-text-muted); }
+.page-wrapper .kpi-value, #main-wrapper .kpi-value { font-size:1.2rem;font-weight:700;color:var(--nx-text); font-variant-numeric: tabular-nums; }
+.page-wrapper .kpi-sub, #main-wrapper .kpi-sub { font-size:0.72rem;color:var(--nx-text-muted); }
+html[data-bs-theme="dark"] .page-wrapper .kpi-card, html[data-bs-theme="dark"] #main-wrapper .kpi-card { background: var(--nx-surface) !important; }
+/* flujo/table hover fix - no white flash */
+.page-wrapper .table-hover tbody tr:hover,
+.page-wrapper .table-hover tbody tr:hover > td,
+.page-wrapper .table-hover tbody tr:hover > th,
+#main-wrapper .table-hover tbody tr:hover,
+#main-wrapper .table-hover tbody tr:hover > td,
+#main-wrapper .table-hover tbody tr:hover > th {
+  background-color: var(--nx-primary-soft) !important;
+  color: var(--nx-text) !important;
+}
+.page-wrapper .table-hover tbody tr:hover .text-muted, #main-wrapper .table-hover tbody tr:hover .text-muted { color: var(--nx-text-muted) !important; }
+.page-wrapper .table-hover tbody tr:hover .text-dark, #main-wrapper .table-hover tbody tr:hover .text-dark { color: var(--nx-text) !important; }
+/* sticky thead in scroll containers */
+.page-wrapper thead[style*="sticky"], #main-wrapper thead[style*="sticky"],
+.page-wrapper thead.sticky-top, #main-wrapper thead.sticky-top { background: var(--nx-surface-2) !important; }
+.page-wrapper thead th, #main-wrapper thead th { background: transparent; }
+html[data-bs-theme="dark"] .page-wrapper thead th, html[data-bs-theme="dark"] #main-wrapper thead th { background-color: transparent !important; }
+/* light mode: cards/categories should not look washed white */
+html[data-bs-theme="light"] .page-wrapper .card, html[data-bs-theme="light"] #main-wrapper .card { background: var(--nx-surface) !important; }
+html[data-bs-theme="light"] .page-wrapper .bg-white, html[data-bs-theme="light"] #main-wrapper .bg-white { background: var(--nx-surface) !important; }
+html[data-bs-theme="light"] .page-wrapper .card-header, html[data-bs-theme="light"] #main-wrapper .card-header { background: transparent !important; }
+/* category/filter chips in light mode */
+html[data-bs-theme="light"] .page-wrapper .list-group-item, html[data-bs-theme="light"] #main-wrapper .list-group-item,
+html[data-bs-theme="light"] .page-wrapper .categoria-item, html[data-bs-theme="light"] #main-wrapper .categoria-item { background: var(--nx-surface-2) !important; color: var(--nx-text) !important; border-color: var(--nx-border) !important; }
+/* ===== Background parity with dashboard (all pages, light+dark) ===== */
+html, body { min-height: 100%; }
+html[data-bs-theme="light"] body,
+html[data-bs-theme="light"] body.nexo-body,
+html[data-bs-theme="light"] body:not(.nexo-body) {
+  background-color: #F3F0F4 !important;
+  background-image: radial-gradient(circle at 50% 0%, #FDFCFD 0%, #F3F0F4 60%, #F3F0F4 100%) !important;
+  background-attachment: fixed !important;
+  background-size: cover !important;
+  color: #1A171A !important;
+}
+html[data-bs-theme="dark"] body,
+html[data-bs-theme="dark"] body.nexo-body,
+html[data-bs-theme="dark"] body:not(.nexo-body) {
+  background-color: #0a0709 !important;
+  background-image: radial-gradient(circle at 50% 0%, #2d1b3a 0%, #0a0709 60%, #0a0709 100%) !important;
+  background-attachment: fixed !important;
+  background-size: cover !important;
+  color: #FFFFFF !important;
+}
+.page-wrapper, #main-wrapper, .body-wrapper, .body-wrapper-inner, .nexo-app, .nx-main, .nx-main-inner {
+  background: transparent !important;
+}
+/* styles.min.css can set white backgrounds on wrappers */
+html[data-bs-theme="light"] .page-wrapper,
+html[data-bs-theme="light"] #main-wrapper,
+html[data-bs-theme="light"] .body-wrapper,
+html[data-bs-theme="light"] .body-wrapper-inner { background: transparent !important; }
+html[data-bs-theme="dark"] .page-wrapper,
+html[data-bs-theme="dark"] #main-wrapper,
+html[data-bs-theme="dark"] .body-wrapper,
+html[data-bs-theme="dark"] .body-wrapper-inner { background: transparent !important; }
+/* icon safeguards */
+.page-wrapper .metric-icon i, #main-wrapper .metric-icon i,
+.page-wrapper .kpi-icon i, #main-wrapper .kpi-icon i { font-size: 1rem; line-height: 1; display: inline-block; }
+.page-wrapper .metric-icon.bg-secondary, #main-wrapper .metric-icon.bg-secondary { background: rgba(154,144,150,0.15) !important; color: var(--nx-text-muted) !important; }
+.page-wrapper .metric-accent.bg-secondary, #main-wrapper .metric-accent.bg-secondary { background: linear-gradient(180deg, #9a9096, rgba(154,144,150,0.4)) !important; }
+html[data-bs-theme="dark"] .page-wrapper .text-secondary, html[data-bs-theme="dark"] #main-wrapper .text-secondary { color: var(--nx-text-muted) !important; }

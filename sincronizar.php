@@ -565,7 +565,7 @@ $scriptUrl = 'sincronizar.php';
         .card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
         .card-title { font-size: 1rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         .card-title i { font-size: 1.3rem; }
-        .stat-box { background: #f8f9fa; border-radius: 12px; padding: 16px; text-align: center; }
+        .stat-box { background: var(--nx-surface-2) !important; border-radius: 12px; padding: 16px; text-align: center; }
         .stat-box .num { font-size: 1.8rem; font-weight: 700; line-height: 1.2; }
         .stat-box .label { font-size: 0.75rem; color: #6c757d; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
         .badge-status { font-size: 0.75rem; padding: 0.3rem 0.6rem; border-radius: 20px; font-weight: 500; }
@@ -573,7 +573,7 @@ $scriptUrl = 'sincronizar.php';
         .table-result td { vertical-align: middle; font-size: 0.9rem; }
         .preview-wrap { max-height: 450px; overflow-y: auto; border: 1px solid #f5f2f4; border-radius: 8px; display: none; }
         .preview-wrap table { margin-bottom: 0; font-size: 0.8rem; }
-        .preview-wrap th { position: sticky; top: 0; background: #f8f9fa; z-index: 1; font-size: 0.75rem; white-space: nowrap; }
+        .preview-wrap th { position: sticky; top: 0; background: var(--nx-surface-2) !important; z-index: 1; font-size: 0.75rem; white-space: nowrap; }
         .preview-wrap td { white-space: nowrap; max-width: 200px; overflow: hidden; text-overflow: ellipsis; }
         .preview-loading { text-align: center; padding: 2rem; display: none; }
         .preview-loading .spinner { width: 40px; height: 40px; border: 4px solid #f5f2f4; border-top-color: var(--nx-primary); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }

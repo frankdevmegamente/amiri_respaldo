@@ -97,6 +97,7 @@
   }
 
   function init() {
+    document.body.classList.add('nexo-body');
     var app = getApp();
     if (app) app.classList.add('nexo-app');
 

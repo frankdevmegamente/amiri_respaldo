@@ -135,22 +135,14 @@ $serviciosDivisas = [
 }
 
         #modalDetalle .table-hover tbody tr:hover,
-
         #modalDetalle .table-hover tbody tr:hover td {
-
-            background-color: rgba(255, 255, 255, 0.95) !important;
-
-            color: inherit !important;
-
+            background-color: var(--nx-primary-soft, rgba(197,143,184,0.12)) !important;
+            color: var(--nx-text, inherit) !important;
         }
-
-        #modalDetalle .table-hover tbody tr:hover .text-muted  { color: #000 !important; }
-
-        #modalDetalle .table-hover tbody tr:hover .text-success { color: #28a745 !important; }
-
-        #modalDetalle .table-hover tbody tr:hover .text-danger  { color: #dc3545 !important; }
-
-        #modalDetalle .table-hover tbody tr:hover .text-warning { color: #ffc107 !important; }
+        #modalDetalle .table-hover tbody tr:hover .text-muted  { color: var(--nx-text-muted) !important; }
+        #modalDetalle .table-hover tbody tr:hover .text-success { color: var(--nx-success) !important; }
+        #modalDetalle .table-hover tbody tr:hover .text-danger  { color: var(--nx-danger) !important; }
+        #modalDetalle .table-hover tbody tr:hover .text-warning { color: var(--nx-warning) !important; }
 
 
 
@@ -280,7 +272,7 @@ $serviciosDivisas = [
 }
 
 /* ── Capital destacado: Capital Amiri / Utilidades AMIRI ──────────── */
-.capital-destacado { background: #fff8e1 !important; border-left: 4px solid #ffc107 !important; font-weight: 700 !important; position: sticky; z-index: 11; }
+.capital-destacado { background: rgba(251,191,36,0.12) !important; border-left: 4px solid var(--nx-warning, #ffc107) !important; font-weight: 700 !important; position: sticky; z-index: 11; }
 .capital-destacado td { background: transparent !important; font-weight: 700 !important; }
 .capital-destacado:nth-of-type(1) { top: 38px; }
 .capital-destacado:nth-of-type(2) { top: 76px; }
@@ -389,7 +381,7 @@ $serviciosDivisas = [
 </div>
                                 <div class="card-body p-0" style="max-height: 500px; overflow-y: auto; overflow-x: auto;">
                                     <table class="table table-sm table-striped mb-0">
-                                        <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">
+                                        <thead style="position: sticky; top: 0; background-color: var(--nx-surface-2) !important; z-index: 10;">
                                             <tr>
                                                 <th>Cuenta</th>
                                                 <th>Tipo</th>
@@ -411,7 +403,7 @@ $serviciosDivisas = [
 </div>
                                 <div class="card-body p-0" style="max-height: 500px; overflow-y: auto; overflow-x: auto;">
                                     <table class="table table-sm table-striped mb-0">
-                                        <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">
+                                        <thead style="position: sticky; top: 0; background-color: var(--nx-surface-2) !important; z-index: 10;">
                                             <tr>
                                                 <th>Cuenta</th>
                                                 <th>Tipo</th>
@@ -433,7 +425,7 @@ $serviciosDivisas = [
 </div>
                                 <div class="card-body p-0" style="max-height: 500px; overflow-y: auto; overflow-x: auto;">
                                     <table class="table table-sm table-striped mb-0">
-                                        <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">
+                                        <thead style="position: sticky; top: 0; background-color: var(--nx-surface-2) !important; z-index: 10;">
                                             <tr>
                                                 <th>Nombre</th>
                                                 <th>Tipo</th>
@@ -471,7 +463,7 @@ $serviciosDivisas = [
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
-                                <div class="card-header bg-white pt-4 pb-0 border-bottom">
+                                <div class="card-header pt-4 pb-0 border-bottom">
                                     <ul class="nav nav-tabs border-0" id="tabsFlujo" role="tablist">
                                         <li class="nav-item" role="presentation">
                                             <button class="nav-link active border-0 border-bottom border-2 border-primary text-primary fw-semibold" id="tab-activos" data-vista="activos" data-bs-toggle="tab" type="button" role="tab" style="background: transparent;">

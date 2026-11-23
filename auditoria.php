@@ -96,7 +96,7 @@ $usuarios = $pdo->query("SELECT id, nombre FROM usuarios WHERE activo = 1 ORDER 
 
         /* ─── JSON Viewer ─────────────────────────────── */
         .json-viewer {
-            background: #f8f9fa;
+            background: var(--nx-surface-2) !important;
             border: 1px solid #dee2e6;
             border-radius: 4px;
             padding: 10px;

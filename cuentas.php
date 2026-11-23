@@ -987,7 +987,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 return `
                 <div class="d-flex align-items-center flex-wrap gap-1">
                     <a class="badge bg-primary bg-opacity-10 text-primary border-0 me-2 text-decoration-none" style="cursor: pointer; font-size: 0.75rem;" href="movimientos.php?cuenta_id=${id}" title="Ver estado de cuenta: entradas, salidas y saldo remanente">
-                        <i class="ti ti-arrows-transfer"></i> Movimientos
+                        <i class="ti ti-arrows-exchange"></i> Movimientos
                     </a>
                     ${btnCompartir}
                     <button class="badge bg-warning bg-opacity-10 text-warning border-0 me-2" style="cursor: pointer; font-size: 0.75rem;" onclick="editarCuenta(${id},${tipo})" title="Editar">

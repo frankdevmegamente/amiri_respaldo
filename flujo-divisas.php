@@ -72,7 +72,7 @@ $serviciosDivisas = [
 
         #modalDetalle .table-hover tbody tr:hover td {
 
-            background-color: rgba(255, 255, 255, 0.95) !important;
+            background-color: var(--nx-primary-soft) !important;
 
             color: inherit !important;
 
@@ -277,7 +277,7 @@ $serviciosDivisas = [
 
                                     <table class="table table-sm table-striped mb-0">
 
-                                        <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">
+                                        <thead style="position: sticky; top: 0; background-color: var(--nx-surface-2) !important; z-index: 10;">
 
                                             <tr>
 
@@ -329,7 +329,7 @@ $serviciosDivisas = [
 
                                     <table class="table table-sm table-striped mb-0">
 
-                                        <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">
+                                        <thead style="position: sticky; top: 0; background-color: var(--nx-surface-2) !important; z-index: 10;">
 
                                             <tr>
 
@@ -381,7 +381,7 @@ $serviciosDivisas = [
 
                                     <table class="table table-sm table-striped mb-0">
 
-                                        <thead style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 10;">
+                                        <thead style="position: sticky; top: 0; background-color: var(--nx-surface-2) !important; z-index: 10;">
 
                                             <tr>
 

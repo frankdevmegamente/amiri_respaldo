@@ -50,10 +50,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         /* ─── Dark Mode ─── */
         [data-bs-theme="dark"] .metric-card .metric-value { color:#e8ecf0; }
-        [data-bs-theme="dark"] .metric-card { background:#1e293b !important; }
+        [data-bs-theme="dark"] .metric-card { background:var(--nx-surface-2) !important; }
         [data-bs-theme="dark"] .metric-card .metric-label { color:#9a9096; }
         [data-bs-theme="dark"] .metric-card .metric-footer { color:#6b7a90; }
-        [data-bs-theme="dark"] .section-card { background:#1e293b !important; }
+        [data-bs-theme="dark"] .section-card { background:var(--nx-surface-2) !important; }
         [data-bs-theme="dark"] .section-card .card-header { border-bottom-color:rgba(255,255,255,0.04); }
         [data-bs-theme="dark"] .servicios-header .subtitle { color:#9a9096; }
 
@@ -412,8 +412,8 @@ function cargarGraficaServicio() {
 
             const ctx = canvas.getContext('2d');
             var gradient = ctx.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, 'rgba(93, 135, 255, 0.85)');
-            gradient.addColorStop(1, 'rgba(93, 135, 255, 0.2)');
+            gradient.addColorStop(0, 'rgba(197,143,184,0.85)');
+            gradient.addColorStop(1, 'rgba(197,143,184,0.2)');
 
             chartServicioDiario = new Chart(ctx, {
                 type: 'bar',

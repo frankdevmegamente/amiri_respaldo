@@ -44,12 +44,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         [data-bs-theme="dark"] .badge.bg-success { background-color: rgba(19,222,185,0.15) !important; color: var(--nx-success) !important; }
         [data-bs-theme="dark"] .badge.bg-danger { background-color: rgba(250,137,107,0.15) !important; color: var(--nx-danger) !important; }
-        [data-bs-theme="dark"] .badge.bg-info { background-color: rgba(93,135,255,0.15) !important; color: var(--nx-primary) !important; }
+        [data-bs-theme="dark"] .badge.bg-info { background-color: rgba(197,143,184,0.15) !important; color: var(--nx-primary) !important; }
         [data-bs-theme="dark"] .badge.bg-secondary { background-color: rgba(140,158,168,0.15) !important; color: #9a9096 !important; }
         [data-bs-theme="dark"] .badge.bg-warning { background-color: rgba(255,174,31,0.15) !important; color: var(--nx-warning) !important; }
 
         .mov-header { position: relative; overflow: hidden; border-radius: 16px !important; }
-        .mov-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(93,135,255,0.08); pointer-events: none; }
+        .mov-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(197,143,184,0.10); pointer-events: none; }
         .mov-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(19,222,185,0.06); pointer-events: none; }
         .mov-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
         .mov-header .sub-badge { font-size: 1rem; color: #9a9096; }
@@ -63,15 +63,15 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .metric-footer { font-size: 0.8rem; color: #9a9096; }
 
         [data-bs-theme="dark"] .mov-header .sub-badge { color: #9a9096 !important; }
-        [data-bs-theme="dark"] .bg-primary.bg-opacity-10 { background-color: rgba(93,135,255,0.12) !important; }
+        [data-bs-theme="dark"] .bg-primary.bg-opacity-10 { background-color: rgba(197,143,184,0.12) !important; }
         [data-bs-theme="dark"] .bg-success.bg-opacity-10 { background-color: rgba(19,222,185,0.12) !important; }
         [data-bs-theme="dark"] .bg-warning.bg-opacity-10 { background-color: rgba(255,174,31,0.12) !important; }
         [data-bs-theme="dark"] .bg-info.bg-opacity-10 { background-color: rgba(83,155,255,0.12) !important; }
         [data-bs-theme="dark"] .bg-danger.bg-opacity-10 { background-color: rgba(250,137,107,0.12) !important; }
-        [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
+        [data-bs-theme="dark"] .bg-light { background-color: var(--nx-surface-2) !important; }
 
-        .filtros-bar { background: #f8f9fa; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; }
-        [data-bs-theme="dark"] .filtros-bar { background: #1e293b; }
+        .filtros-bar { background: var(--nx-surface-2) !important; border-radius: 12px; padding: 15px 20px; margin-bottom: 20px; }
+        [data-bs-theme="dark"] .filtros-bar { background: var(--nx-surface-2); }
         .filtros-bar .form-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #9a9096; margin-bottom: 4px; }
         .filtros-bar .form-control, .filtros-bar .form-select { font-size: 0.85rem; }
 
@@ -79,14 +79,14 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         tr.fila-anulada td { text-decoration: line-through; }
 
         .tipo-pills { display: flex; flex-wrap: wrap; gap: 8px; }
-        .tipo-pill { cursor: pointer; border: 1px solid #dee2e6; background: var(--nx-surface); color: #495057;
+        .tipo-pill { cursor: pointer; border: 1px solid var(--nx-border); background: var(--nx-surface-2); color: var(--nx-text-muted);
             border-radius: 999px; padding: 6px 14px; font-size: 0.82rem; font-weight: 600;
             display: inline-flex; align-items: center; gap: 6px; transition: all .15s ease; }
         .tipo-pill:hover { border-color: var(--nx-primary); color: var(--nx-primary); }
         .tipo-pill.active { background: var(--nx-primary); border-color: var(--nx-primary); color: #fff; }
         .tipo-pill .count { background: rgba(0,0,0,.08); border-radius: 999px; padding: 0 8px; font-size: 0.75rem; }
         .tipo-pill.active .count { background: rgba(255,255,255,.25); }
-        [data-bs-theme="dark"] .tipo-pill { background: #1e293b; border-color: rgba(255,255,255,0.12); color: #9a9096; }
+        [data-bs-theme="dark"] .tipo-pill { background: var(--nx-surface-2); border-color: var(--nx-border); color: var(--nx-text-muted); }
         [data-bs-theme="dark"] .tipo-pill:hover { border-color: var(--nx-primary); color: var(--nx-primary); }
         [data-bs-theme="dark"] .tipo-pill.active { background: var(--nx-primary); border-color: var(--nx-primary); color: #fff; }
 
@@ -121,8 +121,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                 <div class="col-md">
                                     <div class="d-flex align-items-center gap-3 mb-1">
                                         <div class="d-flex align-items-center justify-content-center rounded-3"
-                                             style="width:48px;height:48px;background:rgba(93,135,255,0.12);">
-                                            <i class="ti ti-arrows-transfer text-primary" style="font-size:1.6rem;"></i>
+                                             style="width:48px;height:48px;background:rgba(197,143,184,0.14);">
+                                            <i class="ti ti-arrows-exchange text-primary" style="font-size:1.6rem;"></i>
                                         </div>
                                         <div>
                                             <h2 class="mb-0">Movimientos</h2>
@@ -212,7 +212,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                 <div class="card-body p-3">
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <span class="metric-label">Movimientos revertidos</span>
-                                        <div class="metric-icon bg-secondary bg-opacity-10 text-secondary"><i class="ti ti-rotate-ccw"></i></div>
+                                        <div class="metric-icon bg-secondary bg-opacity-10 text-secondary"><i class="ti ti-arrow-back-up"></i></div>
                                     </div>
                                     <div class="metric-value text-secondary" id="kpiRevertidos">0</div>
                                     <div class="metric-footer">Tipo ajuste</div>
@@ -228,7 +228,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                 <div class="col-md-4">
                                     <div class="d-flex align-items-center gap-2">
                                         <div class="d-flex align-items-center justify-content-center rounded-3"
-                                             style="width:42px;height:42px;background:rgba(93,135,255,0.12);">
+                                             style="width:42px;height:42px;background:rgba(197,143,184,0.14);">
                                             <i class="ti ti-building-bank text-primary" style="font-size:1.4rem;"></i>
                                         </div>
                                         <div>
@@ -272,7 +272,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                 <button type="button" class="tipo-pill" data-tipo="salida"><i class="ti ti-arrow-up-right"></i> Salidas <span class="count" id="countSalidas">0</span></button>
                                 <button type="button" class="tipo-pill" data-tipo="traspaso"><i class="ti ti-arrows-double-ne-sw"></i> Traspasos <span class="count" id="countTraspasos">0</span></button>
                                 <button type="button" class="tipo-pill" data-tipo="comision"><i class="ti ti-percentage"></i> Comisiones <span class="count" id="countComisiones">0</span></button>
-                                <button type="button" class="tipo-pill" data-tipo="ajuste"><i class="ti ti-rotate-ccw"></i> Revertidos <span class="count" id="countAjustes">0</span></button>
+                                <button type="button" class="tipo-pill" data-tipo="ajuste"><i class="ti ti-arrow-back-up"></i> Revertidos <span class="count" id="countAjustes">0</span></button>
                             </div>
                         </div>
                     </div>
