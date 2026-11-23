@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 require_once __DIR__ . '/src/config/session.php';
 
@@ -46,10 +46,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
   <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
 
-  <link rel="stylesheet" href="src/assets/css/dark-mode.css" />
-
-  <link rel="stylesheet" href="src/assets/css/dark-mode-extension.css" />
-
   <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
   <link rel="stylesheet" href="src/assets/css/nexo.css" />
 
@@ -79,7 +75,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         /* =========================================
            Overrides mínimos para Helios (nexo.css maneja el resto)
            ========================================= */
-        [data-bs-theme="dark"] .text-gray { color: #e9ecef !important; }
+        [data-bs-theme="dark"] .text-gray { color: #f5f2f4 !important; }
         [data-bs-theme="dark"] #usd-mxn,
         [data-bs-theme="dark"] #btc-usd,
         [data-bs-theme="dark"] #eth-usd,
@@ -106,10 +102,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         }
         .month-nav-btn:hover {
             background: rgba(93, 135, 255, 0.1);
-            border-color: #5D87FF;
+            border-color: var(--nx-primary);
         }
         [data-bs-theme="dark"] .month-nav-btn {
-            border-color: #2c344c;
+            border-color: rgba(255,255,255,0.12);
         }
         [data-bs-theme="dark"] .month-nav-btn:hover {
             background: rgba(93, 135, 255, 0.2);
@@ -121,8 +117,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
   <div class="nexo-app" id="nexoApp">
 
     <!-- Header / Sidebar nexo -->
-    <?php include 'src/assets/partials/header-nexo.php'; ?>
-    <?php include 'src/assets/partials/sidebar-nexo.php'; ?>
+    <?php include 'src/assets/partials/header.php'; ?>
+    <?php include 'src/assets/partials/sidebar.php'; ?>
 
     <main class="nx-main">
       <div class="nx-content">
