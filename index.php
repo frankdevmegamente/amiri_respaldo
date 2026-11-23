@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 require_once __DIR__ . '/src/config/session.php';
 
@@ -77,229 +77,14 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         }
 
         /* =========================================
-           🌙 REGLAS PARA MODO OSCURO
+           Overrides mínimos para Helios (nexo.css maneja el resto)
            ========================================= */
-        
-        [data-bs-theme="dark"] .card {
-            background: linear-gradient(145deg, #1a2234 0%, #131826 100%) !important;
-            border: none !important;
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2) !important;
-        }
-        
         [data-bs-theme="dark"] .text-gray { color: #e9ecef !important; }
-        [data-bs-theme="dark"] .text-muted { color: #8c9ea8 !important; }
-        
-        [data-bs-theme="dark"] .card-header.bg-primary {
-            background-color: rgba(139, 126, 200, 0.15) !important;
-            border-bottom: 1px solid #2c344c !important;
-        }
-        
-        [data-bs-theme="dark"] .card-header.bg-primary h5,
-        [data-bs-theme="dark"] .card-header.bg-primary i {
-            color: #8B7EC8 !important;
-            font-weight: 700 !important;
-        }
-
-        [data-bs-theme="dark"] .card-header.bg-gradient-info {
-            background: linear-gradient(135deg, rgba(19, 222, 185, 0.2), rgba(93, 135, 255, 0.1)) !important;
-            border-bottom: 1px solid #2c344c !important;
-        }
-
-        [data-bs-theme="dark"] .form-label { color: #e9ecef !important; }
-        [data-bs-theme="dark"] .form-control,
-        [data-bs-theme="dark"] .form-select {
-            background-color: #252f43 !important;
-            border-color: #2c344c !important;
-            color: #e9ecef !important;
-        }
-        
-        [data-bs-theme="dark"] .border-success { border-color: #6EE7B7 !important; background-color: rgba(110, 231, 183, 0.05) !important; }
-        [data-bs-theme="dark"] .border-danger { border-color: #FCA5A5 !important; background-color: rgba(252, 165, 165, 0.05) !important; }
-        [data-bs-theme="dark"] .border-info { border-color: #93C5FD !important; background-color: rgba(147, 197, 253, 0.05) !important; }
-        [data-bs-theme="dark"] .border-warning { border-color: #FCD34D !important; background-color: rgba(252, 211, 77, 0.05) !important; }
-        
-        [data-bs-theme="dark"] .text-success { color: #6EE7B7 !important; }
-        [data-bs-theme="dark"] .text-danger { color: #FCA5A5 !important; } 
-        [data-bs-theme="dark"] .text-info { color: #93C5FD !important; }   
-        [data-bs-theme="dark"] .text-warning { color: #FCD34D !important; }
-        [data-bs-theme="dark"] .text-primary { color: #8B7EC8 !important; }
-        
-        [data-bs-theme="dark"] .card-title[style] { color: #e9ecef !important; }
         [data-bs-theme="dark"] #usd-mxn,
         [data-bs-theme="dark"] #btc-usd,
         [data-bs-theme="dark"] #eth-usd,
-        [data-bs-theme="dark"] #usdt-usd { color: #e9ecef !important; }
-        [data-bs-theme="dark"] .cambio-positivo { color: #13DEB9 !important; }
-        [data-bs-theme="dark"] .cambio-negativo { color: #FA896B !important; }
-        
-        [data-bs-theme="dark"] .apexcharts-text { fill: #8c9ea8 !important; }
-        [data-bs-theme="dark"] .apexcharts-gridline { stroke: #2c344c !important; }
-        [data-bs-theme="dark"] .apexcharts-tooltip {
-            background: #1a2234 !important;
-            border: 1px solid #2c344c !important;
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3) !important;
-        }
-        [data-bs-theme="dark"] .apexcharts-tooltip-title {
-            background: #252f43 !important;
-            border-bottom: 1px solid #2c344c !important;
-            color: #e9ecef !important;
-        }
-        [data-bs-theme="dark"] .apexcharts-tooltip-text {
-            color: #e9ecef !important;
-        }
+        [data-bs-theme="dark"] #usdt-usd { color: var(--nx-text, #fff) !important; }
 
-        /* =========================================
-           📊 ESTILOS DEL DASHBOARD
-           ========================================= */
-
-        /* Page Header */
-        .dashboard-header {
-            position: relative;
-            overflow: hidden;
-            border-radius: 16px !important;
-        }
-        .dashboard-header .bg-pattern {
-            position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 400px;
-            height: 400px;
-            border-radius: 50%;
-            background: rgba(93, 135, 255, 0.08);
-            pointer-events: none;
-        }
-        .dashboard-header .bg-pattern-2 {
-            position: absolute;
-            bottom: -30%;
-            left: 20%;
-            width: 250px;
-            height: 250px;
-            border-radius: 50%;
-            background: rgba(19, 222, 185, 0.06);
-            pointer-events: none;
-        }
-        .dashboard-header h2 {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
-        .dashboard-header .mes-badge {
-            font-size: 1rem;
-            color: #8c9ea8;
-        }
-
-        /* Metric Cards */
-        .metric-card {
-            position: relative;
-            border-radius: 12px !important;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .metric-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
-        }
-        .metric-accent {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            border-radius: 12px 12px 0 0;
-        }
-        .metric-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #8c9ea8;
-        }
-        .metric-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-        }
-        .metric-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: 0.25rem;
-        }
-        .metric-footer {
-            font-size: 0.8rem;
-            color: #8c9ea8;
-        }
-
-        /* Progress bars en Resultado del Mes */
-        .result-item {
-            margin-bottom: 0.75rem;
-        }
-        .result-item:last-child {
-            margin-bottom: 0;
-        }
-        .result-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            margin-bottom: 0.2rem;
-        }
-        .result-bar {
-            height: 6px;
-            border-radius: 3px;
-            background: rgba(0,0,0,0.06);
-            overflow: hidden;
-        }
-        [data-bs-theme="dark"] .result-bar {
-            background: rgba(255,255,255,0.06);
-        }
-        .result-bar-fill {
-            height: 100%;
-            border-radius: 3px;
-            transition: width 0.6s ease;
-        }
-
-        /* Crypto Cards */
-                .crypto-compact .card-body {
-            padding: 0.6rem 0.75rem !important;
-        }
-        .crypto-compact .crypto-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.85rem;
-        }
-        .crypto-compact .metric-label {
-            font-size: 0.7rem;
-        }
-        .crypto-compact .crypto-price {
-            font-size: 0.85rem;
-            font-weight: 700;
-            font-family: 'Roboto Mono', monospace;
-            line-height: 1.2;
-        }
-        .crypto-compact .crypto-change {
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
-        .crypto-compact .metric-accent {
-            height: 3px;
-        }
-
-        /* Chart tabs */
-        .card-header-tabs .nav-link {
-            font-size: 0.8rem;
-            padding: 0.4rem 0.8rem;
-            border: none;
-            border-radius: 6px;
-        }
-        .card-header-tabs .nav-link.active {
-            background: rgba(255,255,255,0.2);
             color: white !important;
         }
         [data-bs-theme="dark"] .card-header-tabs .nav-link.active {
@@ -479,7 +264,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                   <div class="d-flex justify-content-between align-items-start mb-2">
                     <span class="metric-label">Utilidad Neta</span>
                     <div class="metric-icon bg-info bg-opacity-10 text-info">
-                      <i class="ti ti-piggy-bank"></i>
+                      <i class="ti ti-cash"></i>
                     </div>
                   </div>
                   <div class="metric-value text-info" id="kpiUtilidad">$0.00</div>
@@ -583,7 +368,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                       <div id="chartComisionesAmiri"></div>
                     </div>
                     <div class="tab-pane fade" id="tabDistribucion">
-                      <div id="chartGastosDona" class="d-flex justify-content-center"></div>
+                      <div id="chartGastosDona" class="d-flex justify-content-center" style="max-height:320px;"></div>
                     </div>
                   </div>
                 </div>
@@ -853,7 +638,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 <hr class="my-2">
                 <div class="result-item">
                     <div class="result-label">
-                        <span class="fw-bold"><i class="ti ti-piggy-bank text-info"></i> Utilidad Neta</span>
+                        <span class="fw-bold"><i class="ti ti-cash text-info"></i> Utilidad Neta</span>
                         <span class="fw-bold fs-5 text-info">${formatoMoneda(utilidad)}</span>
                     </div>
                     <div class="result-bar" style="height:10px">
@@ -892,13 +677,14 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         let options = {
             series: [{ name: 'Comisiones', data: montos }],
-            chart: { type: 'area', height: 280, toolbar: { show: false } },
+            chart: { type: 'area', height: 260, toolbar: { show: false }, parentHeightOffset: 0 },
             dataLabels: { enabled: false },
             stroke: { curve: 'smooth', width: 2 },
             xaxis: { categories: fechas, labels: { rotate: -45 } },
             yaxis: { labels: { formatter: function(v) { return '$' + v.toFixed(2); } } },
-            colors: ['#5D87FF'],
-            fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.3 } },
+            colors: ['#c58fb8'],
+            fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0.05 } },
+            grid: { borderColor: 'rgba(255,255,255,0.06)', strokeDashArray: 4 },
             tooltip: { y: { formatter: function(v) { return formatoMoneda(v); } } }
         };
         comisionesChart = new ApexCharts(document.querySelector("#chartComisionesAmiri"), options);
@@ -926,17 +712,17 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 labels: ['Comisiones AMIRI', 'Ganancia Divisas', 'Gastos Fijos', 'Gastos Variables'],
                 datasets: [{
                     data: [comisiones, divisas, gastosF, gastosV],
-                    backgroundColor: ['#5D87FF', '#13DEB9', '#FA896B', '#FFAE1F'],
+                    backgroundColor: ['#c58fb8', '#3ddc84', '#ff7a7a', '#fbbf24'],
                     borderWidth: 0
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: {
                         position: 'bottom',
-                        labels: { boxWidth: 12, padding: 8, font: { size: 10 } }
+                        labels: { boxWidth: 12, padding: 10, font: { size: 11 }, color: getComputedStyle(document.documentElement).getPropertyValue('--nx-text-muted').trim() || '#9a9096' }
                     },
                     tooltip: {
                         callbacks: {

@@ -50,15 +50,15 @@ $usuario_rol = $usuario_rol ?? ($_SESSION['usuario_rol'] ?? 'usuario');
         <i class="ti ti-calendar"></i>
         <span style="font-size:12px;font-weight:600;"><?php echo htmlspecialchars($labelMes, ENT_QUOTES, 'UTF-8'); ?></span>
         <?php if ($cerradoActivo): ?>
-          <i class="ti ti-lock" style="font-size:12px;color:#dc3545;"></i>
+          <i class="ti ti-lock" style="font-size:12px;color:var(--nx-danger);"></i>
         <?php else: ?>
-          <i class="ti ti-circle-check" style="font-size:12px;color:#198754;"></i>
+          <i class="ti ti-circle-check" style="font-size:12px;color:var(--nx-success);"></i>
         <?php endif; ?>
       </button>
       <ul class="dropdown-menu dropdown-menu-end py-0" style="max-height:350px;overflow-y:auto;min-width:220px;">
         <li class="dropdown-header small text-muted py-2 px-3 border-bottom" style="cursor:default;background:var(--nx-surface-2);">
           <i class="ti ti-info-circle me-1"></i> Estados de meses
-          <span class="float-end"><span class="text-success">✅</span> abierto <span class="text-danger ms-1">🔒</span> cerrado</span>
+          <span class="float-end"><span style="color:var(--nx-success)">●</span> abierto <span style="color:var(--nx-danger)" class="ms-1">●</span> cerrado</span>
         </li>
         <?php
         for ($anio = 2026; $anio <= (int)date('Y'); $anio++):
@@ -72,11 +72,11 @@ $usuario_rol = $usuario_rol ?? ($_SESSION['usuario_rol'] ?? 'usuario');
               $esActual = ($mesKey === $mesActivo);
               $cerrado = in_array($mesKey, $mesesCerrados);
           ?>
-            <li class="dropdown-item d-flex align-items-center gap-2 px-3" style="cursor:default;<?php echo $esActual ? 'background:rgba(108,92,231,0.06);border-left:3px solid #6c5ce7;' : ''; ?>">
+            <li class="dropdown-item d-flex align-items-center gap-2 px-3" style="cursor:default;<?php echo $esActual ? 'background:var(--nx-primary-soft);border-left:3px solid var(--nx-primary);' : ''; ?>">
               <i class="ti ti-<?php echo $cerrado ? 'lock' : 'circle-check'; ?> text-<?php echo $cerrado ? 'danger' : 'success'; ?>"></i>
               <span class="flex-grow-1"><?php echo $nombresMes[sprintf('%02d', $m)] . ' ' . $anio; ?></span>
               <?php if ($esActual): ?>
-                <span class="badge rounded-pill" style="background:#6c5ce7;color:#fff;font-size:0.55rem;font-weight:600;">actual</span>
+                <span class="badge rounded-pill" style="background:var(--nx-primary);color:#fff;font-size:0.55rem;font-weight:600;">actual</span>
               <?php endif; ?>
             </li>
           <?php endfor; endfor; ?>
