@@ -82,7 +82,7 @@ $pdo = getPDO();
             font-weight: 600;
             padding: 10px 24px;
             border-radius: 10px 10px 0 0;
-            color: #6c757d;
+            color: var(--nx-text-muted);
         }
         .nav-moneda .nav-link.active {
             color: #fff;
@@ -90,7 +90,7 @@ $pdo = getPDO();
         }
         .nav-moneda .nav-link:not(.active):hover {
             color: #c58fb8;
-            background: rgba(108, 92, 231, 0.06);
+            background: rgba(197, 143, 184, 0.06);
         }
 
         .nav-subtabs .nav-link {
@@ -98,7 +98,7 @@ $pdo = getPDO();
             font-weight: 500;
             padding: 8px 18px;
             border-radius: 8px;
-            color: #6c757d;
+            color: var(--nx-text-muted);
         }
         .nav-subtabs .nav-link.active {
             color: #fff;
@@ -106,7 +106,7 @@ $pdo = getPDO();
         }
         .nav-subtabs .nav-link:not(.active):hover {
             color: #c58fb8;
-            background: rgba(108, 92, 231, 0.06);
+            background: rgba(197, 143, 184, 0.06);
         }
 
         /* FIFO dark table overrides removed - Helios */
@@ -117,7 +117,7 @@ $pdo = getPDO();
 
         .month-nav-btn {
             background: none;
-            border: 1px solid #dee2e6;
+            border: 1px solid var(--nx-border);
             border-radius: 6px;
             padding: 4px 10px;
             cursor: pointer;

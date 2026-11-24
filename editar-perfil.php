@@ -59,6 +59,7 @@ $twoFAEnabled = $user2FA['two_fa_enabled'] ?? false;
   <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 
 <style>
@@ -124,7 +125,7 @@ $twoFAEnabled = $user2FA['two_fa_enabled'] ?? false;
 
 /* ─── Page Header ─────────────────────────────── */
 .perfil-header { position: relative; overflow: hidden; border-radius: 16px !important; }
-.perfil-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(93, 135, 255, 0.08); pointer-events: none; }
+.perfil-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(197, 143, 184, 0.08); pointer-events: none; }
 .perfil-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(19, 222, 185, 0.06); pointer-events: none; }
 .perfil-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
 .perfil-header .sub-badge { font-size: 1rem; color: #9a9096; }
@@ -163,7 +164,7 @@ $twoFAEnabled = $user2FA['two_fa_enabled'] ?? false;
                       <div class="col-md">
                           <div class="d-flex align-items-center gap-3 mb-1">
                               <div class="d-flex align-items-center justify-content-center rounded-3"
-                                   style="width:48px;height:48px;background:rgba(93,135,255,0.12);">
+                                   style="width:48px;height:48px;background:rgba(197,143,184,0.12);">
                                   <i class="ti ti-user text-primary" style="font-size:1.6rem;"></i>
                               </div>
                               <div>

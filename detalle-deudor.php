@@ -53,6 +53,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <link rel="stylesheet" href="src/assets/css/layout-custom.css">
     <link rel="stylesheet" href="css/detalle-deudor.css">
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">

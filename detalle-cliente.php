@@ -172,7 +172,7 @@ try {
 
         #tabsCliente .nav-link {
 
-            color: #6c757d;
+            color: var(--nx-text-muted);
 
         }
 
@@ -247,7 +247,7 @@ try {
         }
 
         [data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
-            background-color: rgba(93, 135, 255, 0.12) !important;
+            background-color: rgba(197, 143, 184, 0.12) !important;
         }
 
         [data-bs-theme="dark"] .bg-success.bg-opacity-10 {
@@ -260,6 +260,7 @@ try {
     </style>
 
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 
 

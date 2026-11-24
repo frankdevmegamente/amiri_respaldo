@@ -42,6 +42,7 @@ try {
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 <style>
         .body-wrapper {

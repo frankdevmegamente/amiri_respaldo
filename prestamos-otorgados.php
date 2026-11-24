@@ -25,7 +25,7 @@ $cuentas = $pdo->query("SELECT id, nombre, saldo_actual FROM cuentas WHERE activ
 
         /* ─── Page Header ─────────────────────────────── */
         .loans-header { position: relative; overflow: hidden; border-radius: 16px !important; }
-        .loans-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(93, 135, 255, 0.08); pointer-events: none; }
+        .loans-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(197, 143, 184, 0.08); pointer-events: none; }
         .loans-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(19, 222, 185, 0.06); pointer-events: none; }
         .loans-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
         .loans-header .sub-badge { font-size: 1rem; color: #9a9096; }
@@ -69,12 +69,13 @@ $cuentas = $pdo->query("SELECT id, nombre, saldo_actual FROM cuentas WHERE activ
         [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select, [data-bs-theme="dark"] .input-group-text { background-color: #1a181c; border-color: rgba(255,255,255,0.12); color: #f5f2f4; }
         [data-bs-theme="dark"] .form-control::placeholder { color: #9a9096; }
         [data-bs-theme="dark"] .bg-light { background-color: var(--nx-surface-2) !important; }
-        [data-bs-theme="dark"] .bg-primary.bg-opacity-10 { background-color: rgba(93, 135, 255, 0.12) !important; }
+        [data-bs-theme="dark"] .bg-primary.bg-opacity-10 { background-color: rgba(197, 143, 184, 0.12) !important; }
         [data-bs-theme="dark"] .bg-success.bg-opacity-10 { background-color: rgba(25, 135, 84, 0.12) !important; }
         [data-bs-theme="dark"] .bg-warning.bg-opacity-10 { background-color: rgba(255, 193, 7, 0.12) !important; }
         [data-bs-theme="dark"] .bg-danger.bg-opacity-10 { background-color: rgba(220, 53, 69, 0.12) !important; }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">

@@ -43,6 +43,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
 
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 
 <style>
@@ -155,7 +156,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 
 /* ─── Page Header ─────────────────────────────── */
 .promotores-header { position: relative; overflow: hidden; border-radius: 16px !important; }
-.promotores-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(93, 135, 255, 0.08); pointer-events: none; }
+.promotores-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(197, 143, 184, 0.08); pointer-events: none; }
 .promotores-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(19, 222, 185, 0.06); pointer-events: none; }
 .promotores-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
 .promotores-header .sub-badge { font-size: 1rem; color: #9a9096; }
@@ -170,7 +171,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 .metric-footer { font-size: 0.8rem; color: #9a9096; }
 
 [data-bs-theme="dark"] .promotores-header .sub-badge { color: #9a9096 !important; }
-[data-bs-theme="dark"] .bg-primary.bg-opacity-10 { background-color: rgba(93,135,255,0.12) !important; }
+[data-bs-theme="dark"] .bg-primary.bg-opacity-10 { background-color: rgba(197,143,184,0.12) !important; }
 [data-bs-theme="dark"] .bg-success.bg-opacity-10 { background-color: rgba(19,222,185,0.12) !important; }
 [data-bs-theme="dark"] .bg-warning.bg-opacity-10 { background-color: rgba(255,174,31,0.12) !important; }
 [data-bs-theme="dark"] .bg-info.bg-opacity-10 { background-color: rgba(83,155,255,0.12) !important; }
@@ -206,7 +207,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                                 <div class="col-md">
                                     <div class="d-flex align-items-center gap-3 mb-1">
                                         <div class="d-flex align-items-center justify-content-center rounded-3"
-                                             style="width:48px;height:48px;background:rgba(93,135,255,0.12);">
+                                             style="width:48px;height:48px;background:rgba(197,143,184,0.12);">
                                             <i class="ti ti-user-plus text-primary" style="font-size:1.6rem;"></i>
                                         </div>
                                         <div>

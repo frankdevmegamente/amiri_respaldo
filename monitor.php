@@ -379,7 +379,7 @@ $metricas = obtenerMetricas($pdo);
         .monitor-header .bg-pattern {
             position: absolute; top: -50%; right: -10%;
             width: 400px; height: 400px; border-radius: 50%;
-            background: rgba(93, 135, 255, 0.08); pointer-events: none;
+            background: rgba(197, 143, 184, 0.08); pointer-events: none;
         }
         .monitor-header .bg-pattern-2 {
             position: absolute; bottom: -30%; left: 20%;
@@ -427,6 +427,7 @@ $metricas = obtenerMetricas($pdo);
     </style>
 
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 
 <body>
@@ -455,7 +456,7 @@ $metricas = obtenerMetricas($pdo);
                                 <div class="col-md">
                                     <div class="d-flex align-items-center gap-3 mb-1">
                                         <div class="d-flex align-items-center justify-content-center rounded-3"
-                                             style="width:48px;height:48px;background:rgba(93,135,255,0.12);">
+                                             style="width:48px;height:48px;background:rgba(197,143,184,0.12);">
                                             <i class="ti ti-device-heart-monitor text-primary" style="font-size:1.6rem;"></i>
                                         </div>
                                         <div>

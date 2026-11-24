@@ -71,11 +71,11 @@ $bancos = $pdo->query("SELECT COUNT(DISTINCT banco) FROM directorio_depositos WH
         .metric-value { font-size: 1.75rem; font-weight: 700; line-height: 1.2; margin-bottom: 0.25rem; }
         .metric-footer { font-size: 0.8rem; color: #9a9096; }
         .directorio-header { position: relative; overflow: hidden; border-radius: 16px !important; }
-        .directorio-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(93, 135, 255, 0.08); pointer-events: none; }
+        .directorio-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(197, 143, 184, 0.08); pointer-events: none; }
         .directorio-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(19, 222, 185, 0.06); pointer-events: none; }
         .directorio-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
         .directorio-header .sub-badge { font-size: 1rem; color: #9a9096; }
-        .badge-soft-primary { background: rgba(93,135,255,0.1); color: var(--nx-primary); border: none; }
+        .badge-soft-primary { background: rgba(197,143,184,0.1); color: var(--nx-primary); border: none; }
         .badge-soft-danger { background: rgba(220,53,69,0.1); color: #dc3545; border: none; }
         .badge-soft-success { background: rgba(25,135,84,0.1); color: #198754; border: none; }
         /* ─── Ticket ─────────────────────────────────── */
@@ -91,22 +91,23 @@ $bancos = $pdo->query("SELECT COUNT(DISTINCT banco) FROM directorio_depositos WH
         .ticket-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed #ebf1f6; position: relative; }
         .ticket-item-nombre { font-size: 15px; font-weight: 700; color: var(--nx-text); }
         .ticket-item-cuenta { font-size: 12px; color: #7c8fac; text-transform: uppercase; letter-spacing: 0.5px; }
-        .ticket-item-monto { background: rgba(93,135,255,0.1); color: #c58fb8; padding: 8px 16px; border-radius: 6px; font-size: 16px; font-weight: 700; text-align: right; min-width: 130px; }
+        .ticket-item-monto { background: rgba(197,143,184,0.1); color: #c58fb8; padding: 8px 16px; border-radius: 6px; font-size: 16px; font-weight: 700; text-align: right; min-width: 130px; }
         .ticket-quitar { position: absolute; right: 0; top: 50%; transform: translate(120%, -50%); }
-        .ticket-total { background: rgba(93,135,255,0.04); border-radius: 8px; padding: 20px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; }
+        .ticket-total { background: rgba(197,143,184,0.04); border-radius: 8px; padding: 20px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; }
         .ticket-total-label { color: #7c8fac; font-size: 13px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
-        .ticket-total-value { color: #36c76c; font-weight: 800; font-size: 26px; }
+        .ticket-total-value { color: var(--nx-success); font-weight: 800; font-size: 26px; }
         [data-bs-theme="dark"] .ticket-wrapper { background-color: transparent !important; }
         [data-bs-theme="dark"] .ticket-card { background: #1a181c; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         [data-bs-theme="dark"] .ticket-header { border-bottom-color: rgba(255,255,255,0.12); }
         [data-bs-theme="dark"] .ticket-item { border-bottom-color: rgba(255,255,255,0.12); }
         [data-bs-theme="dark"] .ticket-item-nombre { color: #f5f2f4; }
         [data-bs-theme="dark"] .ticket-item-cuenta { color: #9a9096; }
-        [data-bs-theme="dark"] .ticket-item-monto { background: rgba(93,135,255,0.15); color: #799dfb; }
+        [data-bs-theme="dark"] .ticket-item-monto { background: rgba(197,143,184,0.15); color: var(--nx-primary); }
         [data-bs-theme="dark"] .ticket-total { background-color: #1a181c !important; }
         [data-bs-theme="dark"] #placeholderTicket { color: #9a9096 !important; }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
@@ -123,7 +124,7 @@ $bancos = $pdo->query("SELECT COUNT(DISTINCT banco) FROM directorio_depositos WH
                             <div class="row align-items-center g-3">
                                 <div class="col-md">
                                     <div class="d-flex align-items-center gap-3 mb-1">
-                                        <div class="d-flex align-items-center justify-content-center rounded-3" style="width:48px;height:48px;background:rgba(93,135,255,0.12);">
+                                        <div class="d-flex align-items-center justify-content-center rounded-3" style="width:48px;height:48px;background:rgba(197,143,184,0.12);">
                                             <i class="ti ti-database text-primary" style="font-size:1.6rem;"></i>
                                         </div>
                                         <div>

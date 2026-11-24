@@ -1391,7 +1391,10 @@ html[data-bs-theme="light"] .page-wrapper .btn-primary,
 html[data-bs-theme="light"] #main-wrapper .btn-primary,
 html[data-bs-theme="light"] .nx-btn-primary,
 html[data-bs-theme="light"] .nx-page-btn.active,
-html[data-bs-theme="light"] .tipo-pill.active {
+html[data-bs-theme="light"] .tipo-pill.active,
+html[data-bs-theme="light"] .page-wrapper .btn-ver,
+html[data-bs-theme="light"] #main-wrapper .btn-ver,
+html[data-bs-theme="light"] .btn-ver-detalle {
     color: #0a0709 !important;
 }
 html[data-bs-theme="light"] .tipo-pill.active .count {
@@ -1413,3 +1416,14 @@ html[data-bs-theme="light"] .badge-usd,
 html[data-bs-theme="light"] .badge-usdt {
     color: #0a0709 !important;
 }
+/* ============================================================
+   Cabeceras semánticas de resumen (flujo.php)
+   Deben ganar a la regla genérica .card-header:not(...)
+   ============================================================ */
+html[data-bs-theme="light"] #main-wrapper .card-header.header-saldos:not(.bg-primary):not(.bg-gradient-info):not(.bg-success):not(.bg-danger):not(.bg-warning) { background: rgba(61,220,132,0.10) !important; color: var(--nx-success) !important; }
+html[data-bs-theme="light"] #main-wrapper .card-header.header-capital:not(.bg-primary):not(.bg-gradient-info):not(.bg-success):not(.bg-danger):not(.bg-warning) { background: rgba(251,191,36,0.10) !important; color: var(--nx-warning) !important; }
+html[data-bs-theme="light"] #main-wrapper .card-header.header-prestamos:not(.bg-primary):not(.bg-gradient-info):not(.bg-success):not(.bg-danger):not(.bg-warning) { background: rgba(255,122,122,0.10) !important; color: var(--nx-danger) !important; }
+html[data-bs-theme="dark"] #main-wrapper .card-header.header-saldos:not(.bg-primary):not(.bg-gradient-info):not(.bg-success):not(.bg-danger):not(.bg-warning) { background: rgba(61,220,132,0.12) !important; color: var(--nx-success) !important; }
+html[data-bs-theme="dark"] #main-wrapper .card-header.header-capital:not(.bg-primary):not(.bg-gradient-info):not(.bg-success):not(.bg-danger):not(.bg-warning) { background: rgba(251,191,36,0.12) !important; color: var(--nx-warning) !important; }
+html[data-bs-theme="dark"] #main-wrapper .card-header.header-prestamos:not(.bg-primary):not(.bg-gradient-info):not(.bg-success):not(.bg-danger):not(.bg-warning) { background: rgba(255,122,122,0.12) !important; color: var(--nx-danger) !important; }
+#main-wrapper .card-header.header-saldos *, #main-wrapper .card-header.header-capital *, #main-wrapper .card-header.header-prestamos * { color: inherit !important; }

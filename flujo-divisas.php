@@ -106,7 +106,7 @@ $serviciosDivisas = [
 
         #modalDetalle .table-hover tbody tr:hover .text-warning {
 
-            color: #ffc107 !important;
+            color: var(--nx-warning) !important;
 
         }
 
@@ -116,7 +116,7 @@ $serviciosDivisas = [
 
         .badge-usd {
 
-            background: linear-gradient(135deg, #0ea5e9, #2563eb);
+            background: linear-gradient(135deg, var(--nx-info), var(--nx-primary));
 
             color: white;
 
@@ -126,7 +126,7 @@ $serviciosDivisas = [
 
         .badge-usdt {
 
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: var(--nx-success);
 
             color: white;
 
@@ -143,6 +143,7 @@ $serviciosDivisas = [
     </style>
 
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 
 
@@ -799,11 +800,11 @@ $serviciosDivisas = [
 
         [data-bs-theme="dark"] #totalesGroup .card-header {
 
-            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+            background: var(--nx-primary);
 
             border-color: transparent;
 
-            color: #e5e7eb;
+            color: var(--nx-text);
 
         }
 
@@ -811,9 +812,9 @@ $serviciosDivisas = [
 
         [data-bs-theme="dark"] #desgloseBody table {
 
-            background: #0b1220;
+            background: var(--nx-surface);
 
-            color: #e5e7eb;
+            color: var(--nx-text);
 
         }
 
@@ -821,9 +822,9 @@ $serviciosDivisas = [
 
         [data-bs-theme="dark"] #desgloseBody .table-warning {
 
-            background: #4b5563;
+            background: var(--nx-text-muted);
 
-            color: #e5e7eb;
+            color: var(--nx-text);
 
         }
 
@@ -831,9 +832,9 @@ $serviciosDivisas = [
 
         [data-bs-theme="dark"] #desgloseBody .table-info {
 
-            background: #374151;
+            background: var(--nx-surface-2);
 
-            color: #e5e7eb;
+            color: var(--nx-text);
 
         }
 
@@ -841,9 +842,9 @@ $serviciosDivisas = [
 
         [data-bs-theme="dark"] #desgloseBody .table-success {
 
-            background: #14532d;
+            background: rgba(61,220,132,0.12);
 
-            color: #e5e7eb;
+            color: var(--nx-text);
 
         }
 
@@ -851,9 +852,9 @@ $serviciosDivisas = [
 
         [data-bs-theme="dark"] #desgloseBody .alert-info {
 
-            background: linear-gradient(135deg, #0ea5e9, #2563eb);
+            background: linear-gradient(135deg, var(--nx-info), var(--nx-primary));
 
-            color: #e0f2fe;
+            color: var(--nx-text);
 
             border: none;
 
@@ -871,11 +872,11 @@ $serviciosDivisas = [
 
         [data-bs-theme="dark"] .form-select {
 
-            background: #111827;
+            background: var(--nx-surface);
 
             border-color: var(--nx-border);
 
-            color: #e5e7eb;
+            color: var(--nx-text);
 
         }
 
@@ -885,9 +886,9 @@ $serviciosDivisas = [
 
         [data-bs-theme="dark"] .form-select:focus {
 
-            border-color: #2563eb;
+            border-color: var(--nx-primary);
 
-            box-shadow: 0 0 0 0.15rem rgba(37, 99, 235, 0.35);
+            box-shadow: 0 0 0 0.15rem rgba(197,143,184,0.25);
 
         }
 

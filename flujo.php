@@ -92,7 +92,16 @@ $serviciosDivisas = [
             padding-top: 15px !important;
             margin-top: 0 !important;
         }
-    /* =========================================
+    /* Helios: cabeceras de resumen (alta especificidad vs nexo.css) */
+html[data-bs-theme="light"] #main-wrapper .card .header-saldos { background: rgba(61,220,132,0.10) !important; color: var(--nx-success) !important; }
+html[data-bs-theme="light"] #main-wrapper .card .header-capital { background: rgba(251,191,36,0.10) !important; color: var(--nx-warning) !important; }
+html[data-bs-theme="light"] #main-wrapper .card .header-prestamos { background: rgba(255,122,122,0.10) !important; color: var(--nx-danger) !important; }
+html[data-bs-theme="dark"] #main-wrapper .card .header-saldos { background: rgba(61,220,132,0.12) !important; color: var(--nx-success) !important; }
+html[data-bs-theme="dark"] #main-wrapper .card .header-capital { background: rgba(251,191,36,0.12) !important; color: var(--nx-warning) !important; }
+html[data-bs-theme="dark"] #main-wrapper .card .header-prestamos { background: rgba(255,122,122,0.12) !important; color: var(--nx-danger) !important; }
+#main-wrapper .card .header-saldos *, #main-wrapper .card .header-capital *, #main-wrapper .card .header-prestamos * { color: inherit !important; }
+
+/* =========================================
    🌙 ESTILOS PARA TARJETAS DE RESUMEN EN MODO OSCURO (BLINDADO)
    ========================================= */
 
@@ -101,37 +110,37 @@ $serviciosDivisas = [
 [data-bs-theme="dark"] .card .card-header.header-capital,
 [data-bs-theme="dark"] .card .card-header.header-prestamos {
     padding: 16px 20px !important; /* Devuelve el tamaño grande */
-    border-radius: 12px 12px 0 0 !important;
+    border-radius: var(--nx-radius) var(--nx-radius) 0 0 !important;
 }
 
 /* 2. SALDOS BANCARIOS (SUCCESS) */
 [data-bs-theme="dark"] .card .header-saldos {
-    background-color: rgba(102, 187, 106, 0.15) !important;
-    border-bottom: 1px solid rgba(102, 187, 106, 0.3) !important;
+    background-color: rgba(61,220,132,0.12) !important;
+    border-bottom: 1px solid rgba(61,220,132,0.28) !important;
 }
 [data-bs-theme="dark"] .card .header-saldos span,
 [data-bs-theme="dark"] .card .header-saldos i {
-    color: #66bb6a !important; /* Verde exacto de tu plantilla */
+    color: var(--nx-success) !important; /* Verde exacto de tu plantilla */
 }
 
 /* 3. CAPITAL (WARNING - Este color faltaba en tu dark-mode.css) */
 [data-bs-theme="dark"] .card .header-capital {
-    background-color: rgba(255, 193, 7, 0.15) !important;
-    border-bottom: 1px solid rgba(255, 193, 7, 0.3) !important;
+    background-color: rgba(251,191,36,0.12) !important;
+    border-bottom: 1px solid rgba(251,191,36,0.28) !important;
 }
 [data-bs-theme="dark"] .card .header-capital span,
 [data-bs-theme="dark"] .card .header-capital i {
-    color: #ffc107 !important; /* Amarillo brillante */
+    color: var(--nx-warning) !important; /* Amarillo brillante */
 }
 
 /* 4. PRÉSTAMOS (DANGER) */
 [data-bs-theme="dark"] .card .header-prestamos {
-    background-color: rgba(239, 83, 80, 0.15) !important;
-    border-bottom: 1px solid rgba(239, 83, 80, 0.3) !important;
+    background-color: rgba(255,122,122,0.12) !important;
+    border-bottom: 1px solid rgba(255,122,122,0.28) !important;
 }
 [data-bs-theme="dark"] .card .header-prestamos span,
 [data-bs-theme="dark"] .card .header-prestamos i {
-    color: #ef5350 !important; /* Rojo exacto de tu plantilla */
+    color: var(--nx-danger) !important; /* Rojo exacto de tu plantilla */
 }
 
         #modalDetalle .table-hover tbody tr:hover,
@@ -146,9 +155,9 @@ $serviciosDivisas = [
 
 
 
-        .badge-usd  { background: linear-gradient(135deg, #0ea5e9, #2563eb); color: white; }
+        .badge-usd  { background: linear-gradient(135deg, var(--nx-info), var(--nx-primary)); color: white; }
 
-        .badge-usdt { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+        .badge-usdt { background: var(--nx-success); color: white; }
  [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro {
             display: none !important;
@@ -259,53 +268,53 @@ $serviciosDivisas = [
 
 /* 2. MODO OSCURO: FONDOS TRANSLÚCIDOS (Efecto Badge) */
 [data-bs-theme="dark"] .header-saldos, .dark-mode .header-saldos {
-    background-color: rgba(25, 135, 84, 0.15) !important;
+    background-color: rgba(61,220,132,0.12) !important;
     border-bottom: 1px solid rgba(255,255,255,0.12) !important;
 }
 [data-bs-theme="dark"] .header-capital, .dark-mode .header-capital {
-    background-color: rgba(255, 193, 7, 0.15) !important;
+    background-color: rgba(251,191,36,0.12) !important;
     border-bottom: 1px solid rgba(255,255,255,0.12) !important;
 }
 [data-bs-theme="dark"] .header-prestamos, .dark-mode .header-prestamos {
-    background-color: rgba(220, 53, 69, 0.15) !important;
+    background-color: rgba(255,122,122,0.12) !important;
     border-bottom: 1px solid rgba(255,255,255,0.12) !important;
 }
 
 /* ── Capital destacado: Capital Amiri / Utilidades AMIRI ──────────── */
-.capital-destacado { background: rgba(251,191,36,0.12) !important; border-left: 4px solid var(--nx-warning, #ffc107) !important; font-weight: 700 !important; position: sticky; z-index: 11; }
+.capital-destacado { background: rgba(251,191,36,0.12) !important; border-left: 4px solid var(--nx-warning, var(--nx-warning)) !important; font-weight: 700 !important; position: sticky; z-index: 11; }
 .capital-destacado td { background: transparent !important; font-weight: 700 !important; }
 .capital-destacado:nth-of-type(1) { top: 38px; }
 .capital-destacado:nth-of-type(2) { top: 76px; }
-.capital-destacado .ti { color: #ffb300 !important; }
-[data-bs-theme="dark"] .capital-destacado, .dark-mode .capital-destacado { background: rgba(255,193,7,0.18) !important; border-left-color: #ffc107 !important; }
-[data-bs-theme="dark"] .capital-destacado td, .dark-mode .capital-destacado td { color: #ffe08a !important; }
+.capital-destacado .ti { color: var(--nx-warning) !important; }
+[data-bs-theme="dark"] .capital-destacado, .dark-mode .capital-destacado { background: rgba(255,193,7,0.18) !important; border-left-color: var(--nx-warning) !important; }
+[data-bs-theme="dark"] .capital-destacado td, .dark-mode .capital-destacado td { color: var(--nx-warning) !important; }
 
 /* 3. MODO OSCURO: FORZAR COLORES DE TEXTO E ICONOS (Para vencer al text-white) */
 [data-bs-theme="dark"] .header-saldos, .dark-mode .header-saldos,
 [data-bs-theme="dark"] .header-saldos *, .dark-mode .header-saldos * {
-    color: #36c76c !important; /* Verde brillante */
+    color: var(--nx-success) !important; /* Verde brillante */
 }
 [data-bs-theme="dark"] .header-capital, .dark-mode .header-capital,
 [data-bs-theme="dark"] .header-capital *, .dark-mode .header-capital * {
-    color: #ffc107 !important; /* Amarillo brillante */
+    color: var(--nx-warning) !important; /* Amarillo brillante */
 }
 [data-bs-theme="dark"] .header-prestamos, .dark-mode .header-prestamos,
 [data-bs-theme="dark"] .header-prestamos *, .dark-mode .header-prestamos * {
-    color: #fc4b6c !important; /* Rojo brillante */
+    color: var(--nx-danger) !important; /* Rojo brillante */
 }
 /* =========================================
            🎨 BADGES VIBRANTES (MODO OSCURO)
            ========================================= */
         [data-bs-theme="dark"] .table .badge.bg-success { background-color: rgba(19, 222, 185, 0.15) !important; color: var(--nx-success) !important; background-image: none !important; }
         [data-bs-theme="dark"] .table .badge.bg-danger { background-color: rgba(250, 137, 107, 0.15) !important; color: var(--nx-danger) !important; background-image: none !important; }
-        [data-bs-theme="dark"] .table .badge.bg-info { background-color: rgba(93, 135, 255, 0.15) !important; color: var(--nx-primary) !important; background-image: none !important; }
+        [data-bs-theme="dark"] .table .badge.bg-info { background-color: rgba(197, 143, 184, 0.15) !important; color: var(--nx-primary) !important; background-image: none !important; }
         [data-bs-theme="dark"] .table .badge.bg-warning { background-color: rgba(255, 174, 31, 0.15) !important; color: var(--nx-warning) !important; background-image: none !important; }
-        [data-bs-theme="dark"] .table .badge.bg-primary { background-color: rgba(93, 135, 255, 0.15) !important; color: var(--nx-primary) !important; background-image: none !important; }
+        [data-bs-theme="dark"] .table .badge.bg-primary { background-color: rgba(197, 143, 184, 0.15) !important; color: var(--nx-primary) !important; background-image: none !important; }
         [data-bs-theme="dark"] .table .badge.bg-secondary { background-color: rgba(140, 158, 168, 0.15) !important; color: #9a9096 !important; background-image: none !important; }
         
         /* Badges Especiales de Cripto/Dólares en Flujo */
-        [data-bs-theme="dark"] .table .badge.badge-usd { background-color: rgba(37, 99, 235, 0.15) !important; background-image: none !important; color: #3b82f6 !important; }
-        [data-bs-theme="dark"] .table .badge.badge-usdt { background-color: rgba(16, 185, 129, 0.15) !important; background-image: none !important; color: #10b981 !important; }
+        [data-bs-theme="dark"] .table .badge.badge-usd { background-color: var(--nx-primary-soft) !important; background-image: none !important; color: var(--nx-primary) !important; }
+        [data-bs-theme="dark"] .table .badge.badge-usdt { background-color: rgba(61,220,132,0.15) !important; background-image: none !important; color: var(--nx-success) !important; }
 
         /* =========================================
            📦 CAJA BLANCA DE INVOLUCRADOS (MODO OSCURO)
@@ -318,6 +327,7 @@ $serviciosDivisas = [
     </style>
 
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 
 
@@ -420,7 +430,7 @@ $serviciosDivisas = [
 
                         <div class="col-lg-4 mb-3">
                             <div class="card shadow-sm h-100">
-                                <div class="card-header header-prestamos bg-danger text-white fw-bold fs-5 py-3">
+                                <div class="card-header header-prestamos fw-bold fs-5 py-3">
     <span><i class="ti ti-coin"></i> PRÉSTAMOS / PROVEEDORES</span>
 </div>
                                 <div class="card-body p-0" style="max-height: 500px; overflow-y: auto; overflow-x: auto;">
@@ -1095,17 +1105,17 @@ $serviciosDivisas = [
 
         [data-bs-theme="dark"] #totalesGroup .card            { background: var(--nx-surface); border-color: var(--nx-border); }
 
-        [data-bs-theme="dark"] #totalesGroup .card-header     { background: linear-gradient(135deg, #1d4ed8, #2563eb); border-color: transparent; color: #e5e7eb; }
+        [data-bs-theme="dark"] #totalesGroup .card-header     { background: var(--nx-primary); border-color: transparent; color: var(--nx-text); }
 
-        [data-bs-theme="dark"] #desgloseBody table            { background: #0b1220; color: #e5e7eb; }
+        [data-bs-theme="dark"] #desgloseBody table            { background: var(--nx-surface); color: var(--nx-text); }
 
-        [data-bs-theme="dark"] #desgloseBody .table-warning   { background: #4b5563; color: #e5e7eb; }
+        [data-bs-theme="dark"] #desgloseBody .table-warning   { background: var(--nx-text-muted); color: var(--nx-text); }
 
-        [data-bs-theme="dark"] #desgloseBody .table-info      { background: #374151; color: #e5e7eb; }
+        [data-bs-theme="dark"] #desgloseBody .table-info      { background: var(--nx-surface-2); color: var(--nx-text); }
 
-        [data-bs-theme="dark"] #desgloseBody .table-success   { background: #14532d; color: #e5e7eb; }
+        [data-bs-theme="dark"] #desgloseBody .table-success   { background: rgba(61,220,132,0.12); color: var(--nx-text); }
 
-        [data-bs-theme="dark"] #desgloseBody .alert-info      { background: linear-gradient(135deg, #0ea5e9, #2563eb); color: #e0f2fe; border: none; }
+        [data-bs-theme="dark"] #desgloseBody .alert-info      { background: linear-gradient(135deg, var(--nx-info), var(--nx-primary)); color: var(--nx-text); border: none; }
 
         [data-bs-theme="dark"] .modal-content { background: var(--nx-surface) !important; color: var(--nx-text) !important; border-color: var(--nx-border) !important; }
 
@@ -1113,11 +1123,11 @@ $serviciosDivisas = [
 
         [data-bs-theme="dark"] .form-control,
 
-        [data-bs-theme="dark"] .form-select                   { background: #111827; border-color: var(--nx-border); color: #e5e7eb; }
+        [data-bs-theme="dark"] .form-select                   { background: var(--nx-surface); border-color: var(--nx-border); color: var(--nx-text); }
 
         [data-bs-theme="dark"] .form-control:focus,
 
-        [data-bs-theme="dark"] .form-select:focus             { border-color: #2563eb; box-shadow: 0 0 0 0.15rem rgba(37,99,235,0.35); }
+        [data-bs-theme="dark"] .form-select:focus             { border-color: var(--nx-primary); box-shadow: 0 0 0 0.15rem rgba(197,143,184,0.25); }
 
 
 
@@ -1132,20 +1142,20 @@ $serviciosDivisas = [
         /* ── Dark mode: Modales Proveedor / Deudor ────────────────────── */
         /* Cards dentro de los modales */
         [data-bs-theme="dark"] #modalProveedor .card,
-        [data-bs-theme="dark"] #modalDeudor .card                 { background-color: #111827 !important; border-color: var(--nx-border) !important; }
+        [data-bs-theme="dark"] #modalDeudor .card                 { background-color: var(--nx-surface) !important; border-color: var(--nx-border) !important; }
 
         [data-bs-theme="dark"] #modalProveedor .card-body,
-        [data-bs-theme="dark"] #modalDeudor .card-body            { background-color: transparent !important; color: #e5e7eb !important; }
+        [data-bs-theme="dark"] #modalDeudor .card-body            { background-color: transparent !important; color: var(--nx-text) !important; }
 
         [data-bs-theme="dark"] #modalProveedor .card-header,
-        [data-bs-theme="dark"] #modalDeudor .card-header          { background-color: var(--nx-surface-2) !important; border-color: var(--nx-border) !important; color: #e5e7eb !important; }
+        [data-bs-theme="dark"] #modalDeudor .card-header          { background-color: var(--nx-surface-2) !important; border-color: var(--nx-border) !important; color: var(--nx-text) !important; }
 
         /* Tablas */
         [data-bs-theme="dark"] #modalProveedor .table,
-        [data-bs-theme="dark"] #modalDeudor .table                 { color: #e5e7eb !important; --bs-table-bg: transparent !important; }
+        [data-bs-theme="dark"] #modalDeudor .table                 { color: var(--nx-text) !important; --bs-table-bg: transparent !important; }
 
         [data-bs-theme="dark"] #modalProveedor .table > :not(caption) > * > *,
-        [data-bs-theme="dark"] #modalDeudor .table > :not(caption) > * > *   { background-color: transparent !important; color: #e5e7eb !important; border-color: var(--nx-border) !important; }
+        [data-bs-theme="dark"] #modalDeudor .table > :not(caption) > * > *   { background-color: transparent !important; color: var(--nx-text) !important; border-color: var(--nx-border) !important; }
 
         [data-bs-theme="dark"] #modalProveedor .table thead th,
         [data-bs-theme="dark"] #modalDeudor .table thead th        { background-color: var(--nx-surface-2) !important; color: var(--nx-text-muted) !important; border-color: var(--nx-border) !important; }
@@ -1154,7 +1164,7 @@ $serviciosDivisas = [
         [data-bs-theme="dark"] #modalDeudor .table-striped > tbody > tr:nth-of-type(odd) > *  { background-color: rgba(255,255,255,0.02) !important; }
 
         [data-bs-theme="dark"] #modalProveedor .table-hover tbody tr:hover > *,
-        [data-bs-theme="dark"] #modalDeudor .table-hover tbody tr:hover > *    { background-color: rgba(99,102,241,0.12) !important; color: #e5e7eb !important; }
+        [data-bs-theme="dark"] #modalDeudor .table-hover tbody tr:hover > *    { background-color: rgba(197,143,184,0.12) !important; color: var(--nx-text) !important; }
 
         [data-bs-theme="dark"] #modalProveedor .table-responsive,
         [data-bs-theme="dark"] #modalDeudor .table-responsive      { border-color: var(--nx-border) !important; }
@@ -1164,14 +1174,14 @@ $serviciosDivisas = [
         [data-bs-theme="dark"] #modalDeudor .text-muted            { color: #6b7280 !important; }
 
         [data-bs-theme="dark"] #modalProveedor .text-body,
-        [data-bs-theme="dark"] #modalDeudor .text-body             { color: #e5e7eb !important; }
+        [data-bs-theme="dark"] #modalDeudor .text-body             { color: var(--nx-text) !important; }
 
         [data-bs-theme="dark"] #modalProveedor h4,
         [data-bs-theme="dark"] #modalDeudor h4,
         [data-bs-theme="dark"] #modalProveedor h6,
         [data-bs-theme="dark"] #modalDeudor h6,
         [data-bs-theme="dark"] #modalProveedor h5,
-        [data-bs-theme="dark"] #modalDeudor h5                     { color: #e5e7eb !important; }
+        [data-bs-theme="dark"] #modalDeudor h5                     { color: var(--nx-text) !important; }
 
         [data-bs-theme="dark"] #modalProveedor small,
         [data-bs-theme="dark"] #modalDeudor small                  { color: #9ca3af !important; }
@@ -1185,7 +1195,7 @@ $serviciosDivisas = [
 
         /* Input groups */
         [data-bs-theme="dark"] #modalProveedor .input-group-text,
-        [data-bs-theme="dark"] #modalDeudor .input-group-text      { background-color: var(--nx-surface-2) !important; border-color: var(--nx-border) !important; color: #e5e7eb !important; }
+        [data-bs-theme="dark"] #modalDeudor .input-group-text      { background-color: var(--nx-surface-2) !important; border-color: var(--nx-border) !important; color: var(--nx-text) !important; }
 
         /* Alertas */
         [data-bs-theme="dark"] #modalProveedor .alert-danger,
@@ -1197,11 +1207,11 @@ $serviciosDivisas = [
 
         /* Strong / bold */
         [data-bs-theme="dark"] #modalProveedor strong,
-        [data-bs-theme="dark"] #modalDeudor strong                  { color: #e5e7eb !important; }
+        [data-bs-theme="dark"] #modalDeudor strong                  { color: var(--nx-text) !important; }
 
         /* p tags */
         [data-bs-theme="dark"] #modalProveedor p,
-        [data-bs-theme="dark"] #modalDeudor p                       { color: #e5e7eb !important; }
+        [data-bs-theme="dark"] #modalDeudor p                       { color: var(--nx-text) !important; }
 
         /* Iconos */
         [data-bs-theme="dark"] #modalProveedor .ti,
@@ -1236,7 +1246,7 @@ $serviciosDivisas = [
         }
 
         function buildEfectosReverso(res) {
-          var html = '<hr><h6 style="color:#ffc107;font-weight:600;margin-top:14px;"><i class="ti ti-list-details"></i> Efectos del Reverso:</h6>';
+          var html = '<hr><h6 style="color:var(--nx-warning);font-weight:600;margin-top:14px;"><i class="ti ti-list-details"></i> Efectos del Reverso:</h6>';
           html += '<p class="text-muted" style="font-size:.85rem;margin-bottom:10px;">Se crear\u00e1n <strong>' + (res.total_movimientos_reverso || 0) + '</strong> movimiento(s) de reverso (tipo: ajuste) que afectar\u00e1n las siguientes cuentas:</p>';
           if (res.efectos && res.efectos.length > 0) {
             html += '<div style="border-radius:8px;padding:8px 12px;">';
@@ -1556,7 +1566,7 @@ $serviciosDivisas = [
                         let nombre = c.nombre;
                         if (destacado) {
                             const icon = c.nombre === 'Capital Amiri' ? 'ti ti-pig-money' : 'ti ti-building-bank';
-                            nombre = `<span class="d-inline-flex align-items-center gap-1"><i class="${icon}"></i> ${c.nombre} <i class="ti ti-star-filled" style="font-size:0.7rem; color:#ffb300;"></i></span>`;
+                            nombre = `<span class="d-inline-flex align-items-center gap-1"><i class="${icon}"></i> ${c.nombre} <i class="ti ti-star-filled" style="font-size:0.7rem; color:var(--nx-warning);"></i></span>`;
                         } else if (c.es_deuda_cliente && c.cliente_id) {
 
                             nombre = `<a href="detalle-cliente.php?id=${c.cliente_id}" class="text-decoration-none">${c.nombre}</a>`;

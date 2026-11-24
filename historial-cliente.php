@@ -42,6 +42,7 @@ try {
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 <style>
     .body-wrapper {
@@ -130,7 +131,7 @@ try {
 
     /* Este es el que estabas buscando para Comisión */
     [data-bs-theme="dark"] .badge.bg-info {
-        background-color: rgba(93, 135, 255, 0.15) !important;
+        background-color: rgba(197, 143, 184, 0.15) !important;
         color: var(--nx-primary) !important;
     }
     

@@ -58,6 +58,7 @@ $total_mxn = floatval($proveedor['valor_mxn_usd'] ?? 0) + floatval($proveedor['v
         [data-bs-theme="dark"] .table thead th { background-color: var(--nx-surface) !important; color: #f5f2f4; }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">

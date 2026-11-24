@@ -53,6 +53,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     [data-bs-theme="dark"] .bg-light { background-color: var(--nx-surface-2) !important; }
 </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
@@ -256,7 +257,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                                 <span class="text-muted">- Retiros</span>
                                                 <span class="text-danger" id="remRetirosVal">$0</span>
                                             </div>
-                                            <div class="d-flex justify-content-between px-1 fw-bold pt-1" style="border-top:2px solid #dee2e6;">
+                                            <div class="d-flex justify-content-between px-1 fw-bold pt-1" style="border-top:2px solid var(--nx-border);">
                                                 <span>Capital Acumulado</span>
                                                 <span class="text-success fs-6" id="remCapAcumVal">$0</span>
                                             </div>
@@ -714,7 +715,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             data: {
                 labels: labels,
                 datasets: [
-                    { label: 'Capital Acumulado', data: capitales, type: 'line', borderColor: 'var(--nx-primary)', backgroundColor: 'rgba(93,135,255,0.1)', fill: true, tension: 0.4, pointRadius: 3, yAxisID: 'y1' },
+                    { label: 'Capital Acumulado', data: capitales, type: 'line', borderColor: 'var(--nx-primary)', backgroundColor: 'rgba(197,143,184,0.1)', fill: true, tension: 0.4, pointRadius: 3, yAxisID: 'y1' },
                     { label: 'Utilidad Neta', data: utilidades, backgroundColor: 'rgba(19,222,185,0.7)', borderColor: 'var(--nx-success)', borderWidth: 1, borderRadius: 4, yAxisID: 'y' },
                 ]
             },
@@ -739,7 +740,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             data: {
                 labels: reversed.map(function(d) { return d.mes; }),
                 datasets: [
-                    { label: 'Capital Acumulado', data: reversed.map(function(d) { return parseFloat(d.capital_acumulado); }), borderColor: 'var(--nx-primary)', backgroundColor: 'rgba(93,135,255,0.1)', fill: true, tension: 0.4, pointRadius: 3 },
+                    { label: 'Capital Acumulado', data: reversed.map(function(d) { return parseFloat(d.capital_acumulado); }), borderColor: 'var(--nx-primary)', backgroundColor: 'rgba(197,143,184,0.1)', fill: true, tension: 0.4, pointRadius: 3 },
                 ]
             },
             options: {

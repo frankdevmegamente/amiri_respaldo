@@ -64,9 +64,10 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
         [data-bs-theme="dark"] .table, [data-bs-theme="dark"] .table thead th, [data-bs-theme="dark"] .table tbody td { background-color: var(--nx-surface) !important; color: var(--nx-text) !important; border-color: var(--nx-border) !important; }
         [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select { background-color: var(--nx-surface-2) !important; color: var(--nx-text) !important; border-color: var(--nx-border) !important; }
         [data-bs-theme="dark"] .modal-content { background-color: var(--nx-surface) !important; border-color: var(--nx-border) !important; color: var(--nx-text) !important; }
-        .perfil-avatar { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; background: rgba(93,135,255,.12); color: var(--nx-primary); }
+        .perfil-avatar { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; background: rgba(197,143,184,.12); color: var(--nx-primary); }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"

@@ -60,10 +60,10 @@ sort($bancos_unicos);
         .client-info { display: flex; flex-direction: column; gap: 4px; }
         .client-name { font-size: 15px; font-weight: 700; color: var(--nx-text); }
         .client-account { font-size: 12px; color: #7c8fac; text-transform: uppercase; letter-spacing: 0.5px; }
-        .client-amount { background-color: rgba(93, 135, 255, 0.1); color: #c58fb8; padding: 8px 16px; border-radius: 6px; font-size: 16px; font-weight: 700; text-align: right; min-width: 130px; }
-        .ticket-row.total-row { background: rgba(93, 135, 255, 0.04); border: none; border-radius: 8px; padding: 20px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; }
+        .client-amount { background-color: rgba(197, 143, 184, 0.1); color: #c58fb8; padding: 8px 16px; border-radius: 6px; font-size: 16px; font-weight: 700; text-align: right; min-width: 130px; }
+        .ticket-row.total-row { background: rgba(197, 143, 184, 0.04); border: none; border-radius: 8px; padding: 20px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; }
         .text-muted-custom { color: #7c8fac; font-size: 13px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
-        .text-success-custom { color: #36c76c; }
+        .text-success-custom { color: var(--nx-success); }
         .select2-container--default .select2-selection--single { height: 40px; border: 1px solid #ebf1f6; border-radius: 6px; display: flex; align-items: center; }
         .select2-container--default .select2-selection--single .select2-selection__arrow { height: 38px; }
         .btn-crud { width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; }
@@ -75,7 +75,7 @@ sort($bancos_unicos);
         [data-bs-theme="dark"] .client-name { color: #f5f2f4; }
         [data-bs-theme="dark"] .client-account { color: #9a9096; }
         [data-bs-theme="dark"] .client-row { border-bottom-color: rgba(255,255,255,0.12); }
-        [data-bs-theme="dark"] .client-amount { background-color: rgba(93, 135, 255, 0.15); color: #799dfb; }
+        [data-bs-theme="dark"] .client-amount { background-color: rgba(197, 143, 184, 0.15); color: var(--nx-primary); }
         [data-bs-theme="dark"] #placeholderTicket, [data-bs-theme="dark"] .text-muted-custom { color: #9a9096 !important; }
         [data-bs-theme="dark"] .ticket-row.total-row { background-color: #1a181c !important; }
         [data-bs-theme="dark"] .select2-container--default .select2-selection--single { background-color: #1a181c; border-color: rgba(255,255,255,0.12); }
@@ -92,8 +92,8 @@ sort($bancos_unicos);
             .client-account { font-size: 11px !important; }
         }
     </style>
-    <link rel="stylesheet" href="src/assets/css/descargables-helios.css?v=helios5" />
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">

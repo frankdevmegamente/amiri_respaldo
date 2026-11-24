@@ -7,21 +7,8 @@ if (!isset($pagina_actual)) {
 $nombre_usuario = $nombre_usuario ?? ($_SESSION['usuario_nombre'] ?? 'Usuario');
 $usuario_rol = $usuario_rol ?? ($_SESSION['usuario_rol'] ?? 'usuario');
 ?>
-<!-- Helios shell assets (injected for legacy pages that don't include them in <head>) -->
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="src/assets/css/nexo.css?v=helios25" />
-<script>
-(function(){
-  try {
-    var saved = localStorage.getItem('darkMode');
-    var dark = saved === null ? true : saved === 'true';
-    document.documentElement.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
-    localStorage.setItem('darkMode', dark ? 'true' : 'false');
-  } catch(e) {
-    document.documentElement.setAttribute('data-bs-theme','dark');
-  }
-})();
-</script>
+<!-- Helios shell assets: único punto de carga (helios-assets.php) -->
+<?php if (empty($heliosAssetsLoaded)) { include __DIR__ . '/helios-assets.php'; } ?>
 <style>.left-sidebar,.app-topstrip{display:none!important}body{font-family:var(--nx-font,'Montserrat',sans-serif)!important;}</style>
 <script>document.addEventListener('DOMContentLoaded',function(){document.body.classList.add('nexo-body');});</script>
 

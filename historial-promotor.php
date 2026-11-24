@@ -43,6 +43,7 @@ try {
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
     <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 <style>
         .body-wrapper {
@@ -120,7 +121,7 @@ try {
         }
 
         [data-bs-theme="dark"] .bg-primary.bg-opacity-10 {
-            background-color: rgba(93, 135, 255, 0.12) !important;
+            background-color: rgba(197, 143, 184, 0.12) !important;
         }
 
         [data-bs-theme="dark"] .bg-success.bg-opacity-10 {

@@ -38,18 +38,14 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
   <title>Dashboard - AmiriApp</title>
 
   <link rel="shortcut icon" type="image/png" href="src/assets/images/logos/favicon.ico" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="src/assets/css/styles.min.css" />
 
   <link rel="stylesheet" href="src/assets/css/icons/tabler-icons/tabler-icons.css" />
 
   <link rel="stylesheet" href="src/assets/css/layout-custom.css" />
-  <link rel="stylesheet" href="src/assets/css/nexo.css" />
 
-    <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+  <!-- Assets Helios centralizados en src/assets/partials/helios-assets.php (vía header.php) -->
 </head>
 
 <style>
@@ -84,7 +80,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             color: white !important;
         }
         [data-bs-theme="dark"] .card-header-tabs .nav-link.active {
-            background: rgba(93, 135, 255, 0.3);
+            background: rgba(197, 143, 184, 0.3);
         }
 
         .month-nav-btn {
@@ -94,21 +90,21 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             align-items: center;
             justify-content: center;
             border-radius: 8px;
-            border: 1px solid #dee2e6;
+            border: 1px solid var(--nx-border);
             background: transparent;
             color: inherit;
             cursor: pointer;
             transition: all 0.15s ease;
         }
         .month-nav-btn:hover {
-            background: rgba(93, 135, 255, 0.1);
+            background: rgba(197, 143, 184, 0.1);
             border-color: var(--nx-primary);
         }
         [data-bs-theme="dark"] .month-nav-btn {
             border-color: rgba(255,255,255,0.12);
         }
         [data-bs-theme="dark"] .month-nav-btn:hover {
-            background: rgba(93, 135, 255, 0.2);
+            background: rgba(197, 143, 184, 0.2);
         }
 </style>
 

@@ -76,29 +76,29 @@ $nf = function($n) { return '$' . number_format((float)$n, 2); };
         .header-card::after { content: ""; position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: var(--nx-success); opacity: 0.06; border-radius: 50%; pointer-events: none; }
         .header-card h1 { font-size: 1.5rem; font-weight: 700; margin: 0; color: #1a1a2e; display: flex; align-items: center; gap: 12px; }
         .header-card h1 i { color: var(--nx-primary); font-size: 1.8rem; }
-        .header-card p { color: #6c757d; margin: 6px 0 0 0; font-size: 0.9rem; }
+        .header-card p { color: var(--nx-text-muted); margin: 6px 0 0 0; font-size: 0.9rem; }
         .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
         .card-stat { background: white; border: none; border-radius: var(--card-radius); box-shadow: var(--card-shadow); padding: 24px; transition: var(--transition); }
         .card-stat:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.12); }
         .card-stat .stat-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
         .card-stat .stat-header .icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
-        .card-stat .stat-header h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; color: #6c757d; font-weight: 600; }
+        .card-stat .stat-header h3 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; margin: 0; color: var(--nx-text-muted); font-weight: 600; }
         .card-stat .total { font-size: 1.6rem; font-weight: 700; margin: 0 0 12px 0; line-height: 1.2; }
         .card-stat .breakdown { list-style: none; padding: 0; margin: 0; border-top: 1px solid #f5f2f4; padding-top: 10px; }
-        .card-stat .breakdown li { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 3px 0; color: #495057; }
-        .card-stat .breakdown li .label { color: #6c757d; }
+        .card-stat .breakdown li { display: flex; justify-content: space-between; font-size: 0.8rem; padding: 3px 0; color: var(--nx-text-muted); }
+        .card-stat .breakdown li .label { color: var(--nx-text-muted); }
         .card-stat .breakdown li .value { font-weight: 600; }
         .status-card { background: white; border: none; border-radius: var(--card-radius); box-shadow: var(--card-shadow); padding: 28px 32px; text-align: center; }
         .status-card .status-icon { font-size: 3rem; margin-bottom: 8px; }
         .status-card .status-text { font-size: 1.4rem; font-weight: 700; }
-        .status-card .status-detail { font-size: 0.9rem; color: #6c757d; margin-top: 4px; }
+        .status-card .status-detail { font-size: 0.9rem; color: var(--nx-text-muted); margin-top: 4px; }
         .progress-bar { height: 6px; border-radius: 3px; background: #f5f2f4; margin-top: 14px; overflow: hidden; }
         .progress-bar .fill { height: 100%; border-radius: 3px; }
         .table-detail { width: 100%; margin-top: 20px; background: white; border: none; border-radius: var(--card-radius); box-shadow: var(--card-shadow); overflow: hidden; }
         .table-detail table { width: 100%; border-collapse: collapse; }
-        .table-detail th { background: var(--nx-surface-2) !important; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: #6c757d; padding: 12px 20px; text-align: left; font-weight: 600; }
+        .table-detail th { background: var(--nx-surface-2) !important; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--nx-text-muted); padding: 12px 20px; text-align: left; font-weight: 600; }
         .table-detail td { padding: 10px 20px; font-size: 0.9rem; border-top: 1px solid #f5f2f4; }
-        .table-detail tr:last-child td { font-weight: 700; border-top: 2px solid #dee2e6; }
+        .table-detail tr:last-child td { font-weight: 700; border-top: 2px solid var(--nx-border); }
         .badge-green { color: var(--nx-success); } .badge-red { color: var(--nx-danger); }
         @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 500px) { .grid { grid-template-columns: 1fr; } }
@@ -127,7 +127,7 @@ $nf = function($n) { return '$' . number_format((float)$n, 2); };
     <div class="grid">
         <div class="card-stat">
             <div class="stat-header">
-                <div class="icon" style="background:rgba(93,135,255,0.1);color:var(--nx-primary);"><i class="ti ti-building-bank"></i></div>
+                <div class="icon" style="background:rgba(197,143,184,0.1);color:var(--nx-primary);"><i class="ti ti-building-bank"></i></div>
                 <h3>Saldos</h3>
             </div>
             <div class="total" style="color:var(--nx-primary);"><?= $nf($totalSaldos) ?></div>
@@ -207,7 +207,7 @@ $nf = function($n) { return '$' . number_format((float)$n, 2); };
                 <tr><td>Pr�stamos empresa pendientes</td><td>OBLIGACIONES</td><td style="text-align:right;"><?= $nf($totalPrestamistas) ?></td></tr>
                 <tr><td>Proveedores</td><td>OBLIGACIONES</td><td style="text-align:right;"><?= $nf($totalProveedores) ?></td></tr>
                 <tr><td>Subtotal OBLIGACIONES</td><td></td><td style="text-align:right;font-weight:700;"><?= $nf($totalObligaciones) ?></td></tr>
-                <tr style="background:#f8f9fa;">
+                <tr style="background:var(--nx-surface-2);">
                     <td><strong>DIFERENCIA (Saldos &minus; Capital &minus; Obligaciones)</strong></td>
                     <td></td>
                     <td style="text-align:right;font-weight:700;color:<?= $esBalanceado ? "var(--nx-success)" : "var(--nx-danger)" ?>;font-size:1.1rem;"><?= $nf($diferencia) ?></td>

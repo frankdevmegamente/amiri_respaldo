@@ -162,7 +162,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         .badge-usdt {
 
-            background: linear-gradient(135deg, #3ddc84, #059669);
+            background: linear-gradient(135deg, #3ddc84, var(--nx-success));
 
             color: white;
 
@@ -172,7 +172,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         .table-reportes th {
 
-            background-color: #f8f9fa;
+            background-color: var(--nx-surface-2);
 
             font-weight: 600;
 
@@ -198,7 +198,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         /* Dark mode styles for stat cards info boxes */
         [data-bs-theme="dark"] .card-stat .bg-light {
             background-color: var(--nx-surface-2) !important;
-            color: #e2e8f0 !important;
+            color: var(--nx-text) !important;
             border-color: var(--nx-border) !important;
         }
 
@@ -207,7 +207,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         }
 
         [data-bs-theme="dark"] .card-stat .bg-light .text-dark {
-            color: #e2e8f0 !important;
+            color: var(--nx-text) !important;
         }
 
         [data-bs-theme="dark"] .card-stat .bg-light .text-danger {
@@ -245,6 +245,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     </style>
 
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 
 

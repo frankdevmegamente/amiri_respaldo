@@ -23,7 +23,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .chart-container { position: relative; height: 300px; }
         .nav-pills .nav-link { border-radius: 8px; padding: 10px 20px; }
         .nav-pills .nav-link.active { background: var(--nx-accent-gradient); }
-        .table-reportes th { background-color: #f8f9fa; font-weight: 600; }
+        .table-reportes th { background-color: var(--nx-surface-2); font-weight: 600; }
         [data-bs-theme="dark"] .table-reportes th { background-color: var(--nx-surface-2); }
         /* Tarjetas estilo compacto con top strip */
         .metric-card-util { transition: all 0.25s ease; position: relative; overflow: hidden; }
@@ -35,13 +35,13 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .util-label { color: var(--nx-text-muted); }
         .util-value { font-size: 1.5rem; font-weight: 800; color: var(--nx-text); line-height: 1.2; letter-spacing: -0.3px; }
         [data-bs-theme="dark"] .util-value { color: #e8ecf0; }
-        .util-breakdown { padding-top: 10px; margin-top: 6px; border-top: 1px solid #e2e8f0; }
+        .util-breakdown { padding-top: 10px; margin-top: 6px; border-top: 1px solid var(--nx-border); }
         [data-bs-theme="dark"] .util-breakdown { border-top-color: #2d3140; }
         .util-breakdown .br-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 0.78rem; color: var(--nx-text-muted); }
         [data-bs-theme="dark"] .util-breakdown .br-row { color: var(--nx-text-muted); }
         .util-breakdown .br-row .br-label { min-width: 0; }
         .util-breakdown .br-row .br-value { font-weight: 700; white-space: nowrap; margin-left: 12px; }
-        .util-breakdown .br-divider { height: 1px; background: #e2e8f0; margin: 4px 0; }
+        .util-breakdown .br-divider { height: 1px; background: var(--nx-border); margin: 4px 0; }
         [data-bs-theme="dark"] .util-breakdown .br-divider { background: #2d3140; }
         .util-breakdown .br-total .br-value { font-size: 0.85rem; }
         [data-bs-theme="dark"] .metric-card-util { background-color: var(--nx-surface) !important; border-color: var(--nx-border) !important; }
@@ -63,7 +63,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .dark-mode .logo-modo-oscuro { display: block !important; }
         /* ── Skeleton screens ── */
         @keyframes skeleton-pulse { 0%{opacity:0.6} 50%{opacity:1} 100%{opacity:0.6} }
-        .skeleton { animation:skeleton-pulse 1.4s ease-in-out infinite; background:linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%); background-size:200% 100%; border-radius:6px; }
+        .skeleton { animation:skeleton-pulse 1.4s ease-in-out infinite; background:linear-gradient(90deg,var(--nx-surface-2) 25%,var(--nx-surface-3) 50%,var(--nx-surface-2) 75%); background-size:200% 100%; border-radius:6px; }
         [data-bs-theme="dark"] .skeleton { background:linear-gradient(90deg,#2d3140 25%,#3d4250 50%,#2d3140 75%); background-size:200% 100%; }
         .skeleton-text { height:14px; width:60%; margin-bottom:6px; }
         .skeleton-value { height:28px; width:45%; margin-bottom:8px; }
@@ -77,13 +77,13 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .empty-state .empty-title { color:var(--nx-text-muted); }
         [data-bs-theme="dark"] .empty-state .empty-sub { color:#6b7280; }
         /* ── Top clientes ── */
-        .top-cliente-row { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid #f0f2f5; }
+        .top-cliente-row { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid var(--nx-border); }
         [data-bs-theme="dark"] .top-cliente-row { border-bottom-color:#2d3140; }
         .top-cliente-row:last-child { border-bottom:none; }
         .top-cliente-rank { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.6rem; font-weight:700; color:#fff; flex-shrink:0; }
         .top-cliente-name { flex:1; font-size:0.78rem; font-weight:600; color: var(--nx-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
         [data-bs-theme="dark"] .top-cliente-name { color:#e8ecf0; }
-        .top-cliente-bar-wrap { flex:0 0 80px; height:6px; background:#e2e8f0; border-radius:4px; overflow:hidden; }
+        .top-cliente-bar-wrap { flex:0 0 80px; height:6px; background:var(--nx-border); border-radius:4px; overflow:hidden; }
         [data-bs-theme="dark"] .top-cliente-bar-wrap { background:#2d3140; }
         .top-cliente-bar { height:100%; border-radius:4px; transition:width 0.6s ease; }
         .top-cliente-value { font-size:0.72rem; font-weight:700; color: var(--nx-text-muted); min-width:55px; text-align:right; }
@@ -91,10 +91,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         /* ── Sparkline ── */
         .sparkline-wrap { width:100%; height:36px; margin-top:6px; }
         /* ── Meta progress ── */
-        .meta-bar-wrap { margin-top:8px; padding-top:6px; border-top:1px solid #e2e8f0; }
+        .meta-bar-wrap { margin-top:8px; padding-top:6px; border-top:1px solid var(--nx-border); }
         [data-bs-theme="dark"] .meta-bar-wrap { border-top-color:#2d3140; }
         .meta-bar-label { display:flex; justify-content:space-between; font-size:0.68rem; color: var(--nx-text-muted); margin-bottom:3px; }
-        .meta-bar-track { height:5px; background:#e2e8f0; border-radius:4px; overflow:hidden; }
+        .meta-bar-track { height:5px; background:var(--nx-border); border-radius:4px; overflow:hidden; }
         [data-bs-theme="dark"] .meta-bar-track { background:#2d3140; }
         .meta-bar-fill { height:100%; border-radius:4px; transition:width 0.8s ease; }
         .meta-btn { font-size:0.65rem; padding:0 4px; color: var(--nx-text-muted); cursor:pointer; }
@@ -118,6 +118,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 <body>
 <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6"
@@ -377,7 +378,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                 <div class="row g-2 mt-3 pt-3 border-top">
                                     <div class="col-md-3 col-6">
                                         <div class="d-flex align-items-center gap-2">
-                                            <div class="rounded-2 d-flex align-items-center justify-content-center" style="width:32px;height:32px;background:rgba(108,92,231,0.1);color:#c58fb8;">
+                                            <div class="rounded-2 d-flex align-items-center justify-content-center" style="width:32px;height:32px;background:rgba(197,143,184,0.1);color:#c58fb8;">
                                                 <i class="ti ti-clipboard-list" style="font-size:14px;"></i>
                                             </div>
                                             <div style="line-height:1.2;">
@@ -811,7 +812,7 @@ function cargarPorServicio() {
                 },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 }, callbacks: { label: function(c) { return '$' + formatoNumero(c.parsed.y); } } } },
+                    plugins: { legend: { display: false }, tooltip: { backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: 'var(--nx-text)', cornerRadius: 8, padding: { x: 12, y: 8 }, callbacks: { label: function(c) { return '$' + formatoNumero(c.parsed.y); } } } },
                     scales: { y: { beginAtZero: true, ticks: { callback: function(v) { return '$' + v.toFixed(0); } } } }
                 }
             });
@@ -868,7 +869,7 @@ function cargarPorCliente() {
                     labels: datos.slice(0, 5).map(d => d.cliente),
                     datasets: [{ data: datos.slice(0, 5).map(d => parseFloat(d.comision_amiri) || 0), backgroundColor: COLORES, borderWidth: 0, hoverOffset: 6 }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, padding: 12 } }, tooltip: { backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 }, callbacks: { label: function(c) { return ' $' + formatoNumero(c.parsed || 0); } } } } }
+                options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right', labels: { boxWidth: 12, padding: 12 } }, tooltip: { backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: 'var(--nx-text)', cornerRadius: 8, padding: { x: 12, y: 8 }, callbacks: { label: function(c) { return ' $' + formatoNumero(c.parsed || 0); } } } } }
             });
             renderTopClientes(datos);
         })
@@ -927,7 +928,7 @@ function cargarPorPromotor() {
                         labels: datos.map(d => d.promotor),
                         datasets: [{ data: datos.map(d => parseFloat(d.comision_amiri) || 0), backgroundColor: COLORES, borderWidth: 0, hoverOffset: 6 }]
                     },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12, padding: 12 } }, tooltip: { backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 }, callbacks: { label: function(c) { return ' $' + formatoNumero(c.parsed || 0); } } } } }
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12, padding: 12 } }, tooltip: { backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: 'var(--nx-text)', cornerRadius: 8, padding: { x: 12, y: 8 }, callbacks: { label: function(c) { return ' $' + formatoNumero(c.parsed || 0); } } } } }
                 });
             }
         })
@@ -995,7 +996,7 @@ function cargarGraficaComparativa() {
                         plugins: {
                             legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14, usePointStyle: true } },
                             tooltip: {
-                                backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 },
+                                backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: 'var(--nx-text)', cornerRadius: 8, padding: { x: 12, y: 8 },
                                 callbacks: {
                                     label: function(c) { return c.dataset.label + ': $' + formatoNumero(c.parsed.y); },
                                     afterBody: function(items) {
@@ -1030,7 +1031,7 @@ function cargarGraficaComparativa() {
                         plugins: {
                             legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14, usePointStyle: true } },
                             tooltip: {
-                                backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 },
+                                backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: 'var(--nx-text)', cornerRadius: 8, padding: { x: 12, y: 8 },
                                 callbacks: {
                                     label: function(c) { return c.dataset.label + ': $' + formatoNumero(c.parsed.y); }
                                 }
@@ -1058,7 +1059,7 @@ function cargarGraficaComparativa() {
                     chartComparativa = new Chart(ctx, {
                         type: 'bar',
                         data: { labels: meses, datasets: datasets.map(ds => ({ ...ds, borderRadius: 4, borderSkipped: false })) },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 14, padding: 14 } }, tooltip: { backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: '#e2e8f0', cornerRadius: 8, padding: { x: 12, y: 8 } } }, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { callback: function(v) { return '$' + v.toFixed(0); } } } } }
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 14, padding: 14 } }, tooltip: { backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: 'var(--nx-text)', cornerRadius: 8, padding: { x: 12, y: 8 } } }, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { callback: function(v) { return '$' + v.toFixed(0); } } } } }
                     });
                 }
             }
@@ -1195,8 +1196,8 @@ function dibujarSparkline(id, datos) {
     ctx.clearRect(0, 0, w, h);
     // gradient fill
     var grad = ctx.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0, 'rgba(108,92,231,0.25)');
-    grad.addColorStop(1, 'rgba(108,92,231,0.02)');
+    grad.addColorStop(0, 'rgba(197,143,184,0.25)');
+    grad.addColorStop(1, 'rgba(197,143,184,0.02)');
     ctx.beginPath();
     vals.forEach(function(v, i) {
         var x = i * stepX, y = h - ((v - min) / range) * (h - 6) - 3;

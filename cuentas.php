@@ -178,7 +178,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .tb-texto-principal { color: var(--nx-surface-2); font-size: 1.1rem; font-weight: 700; line-height: 1.2; }
         .tb-texto-secundario { color: #9a9096; font-size: 0.7rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
         .tb-cuenta { color: var(--nx-primary); font-size: 1.4rem; font-weight: 800; letter-spacing: 1px; word-break: break-all; }
-        .tb-linea { border-top: 1px dashed #e2e8f0; }
+        .tb-linea { border-top: 1px dashed var(--nx-border); }
 
         /* MODO OSCURO PARA LA TARJETA */
         [data-bs-theme="dark"] .tarjeta-bancaria,
@@ -198,7 +198,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         /* ─── Page Header ─────────────────────────────── */
         .cuentas-header { position: relative; overflow: visible; border-radius: 16px !important; }
-        .cuentas-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(93, 135, 255, 0.08); pointer-events: none; }
+        .cuentas-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(197, 143, 184, 0.08); pointer-events: none; }
         .cuentas-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(19, 222, 185, 0.06); pointer-events: none; }
         .cuentas-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
         .cuentas-header .sub-badge { font-size: 1rem; color: #9a9096; }
@@ -213,15 +213,15 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .metric-footer { font-size: 0.8rem; color: #9a9096; }
 
         [data-bs-theme="dark"] .cuentas-header .sub-badge { color: #9a9096 !important; }
-        [data-bs-theme="dark"] .bg-primary.bg-opacity-10 { background-color: rgba(93,135,255,0.12) !important; }
+        [data-bs-theme="dark"] .bg-primary.bg-opacity-10 { background-color: rgba(197,143,184,0.12) !important; }
         [data-bs-theme="dark"] .bg-success.bg-opacity-10 { background-color: rgba(19,222,185,0.12) !important; }
         [data-bs-theme="dark"] .bg-warning.bg-opacity-10 { background-color: rgba(255,174,31,0.12) !important; }
         [data-bs-theme="dark"] .bg-info.bg-opacity-10 { background-color: rgba(83,155,255,0.12) !important; }
         [data-bs-theme="dark"] .bg-light { background-color: var(--nx-surface-2) !important; }
     </style>
-    <link rel="stylesheet" href="src/assets/css/descargables-helios.css?v=helios5" />
 
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 
 
@@ -254,7 +254,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                 <div class="col-md">
                                     <div class="d-flex align-items-center gap-3 mb-1">
                                         <div class="d-flex align-items-center justify-content-center rounded-3"
-                                             style="width:48px;height:48px;background:rgba(93,135,255,0.12);">
+                                             style="width:48px;height:48px;background:rgba(197,143,184,0.12);">
                                             <i class="ti ti-wallet text-primary" style="font-size:1.6rem;"></i>
                                         </div>
                                         <div>
@@ -1073,7 +1073,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     $('#genCuenta').text(d.numero_cuenta);
                     
                     // Colores de la moneda según sea MXN, USD o USDT
-                    const colorMoneda = d.tipo_moneda === 'MXN' ? 'var(--nx-primary)' : (d.tipo_moneda === 'USD' ? 'var(--nx-success)' : '#0ea5e9');
+                    const colorMoneda = d.tipo_moneda === 'MXN' ? 'var(--nx-primary)' : (d.tipo_moneda === 'USD' ? 'var(--nx-success)' : 'var(--nx-info)');
                     $('#genMoneda').css('color', colorMoneda).text(d.tipo_moneda);
                     
                     // Mostramos el modal

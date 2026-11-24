@@ -100,6 +100,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .monto-entrada { color: var(--nx-success) !important; }
         [data-bs-theme="dark"] .monto-salida { color: var(--nx-danger) !important; }
     </style>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"

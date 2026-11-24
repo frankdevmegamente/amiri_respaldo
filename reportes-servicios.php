@@ -24,7 +24,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
         /* ─── Page Header ─── */
         .servicios-header { position:relative; overflow:hidden; border-radius:16px !important; }
-        .servicios-header .bg-pattern { position:absolute; top:-50%; right:-10%; width:400px; height:400px; border-radius:50%; background:rgba(108,92,231,0.08); pointer-events:none; }
+        .servicios-header .bg-pattern { position:absolute; top:-50%; right:-10%; width:400px; height:400px; border-radius:50%; background:rgba(197,143,184,0.08); pointer-events:none; }
         .servicios-header .bg-pattern-2 { position:absolute; bottom:-30%; left:20%; width:250px; height:250px; border-radius:50%; background:rgba(19,222,185,0.06); pointer-events:none; }
         .servicios-header h2 { font-size:1.75rem; font-weight:700; margin-bottom:0.25rem; }
         .servicios-header .subtitle { font-size:0.85rem; color:#9a9096; }
@@ -38,7 +38,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .metric-card .metric-icon { width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:8px; font-size:14px; flex-shrink:0; }
         .metric-card .metric-value { font-size:1.25rem; font-weight:700; color: var(--nx-text); line-height:1.2; margin-top:2px; }
         .metric-card .metric-footer { font-size:0.68rem; color:#9a9096; margin-top:6px; }
-        .metric-card.selected { outline:2px solid #c58fb8; outline-offset:-2px; box-shadow:0 4px 16px rgba(108,92,231,0.2)!important; }
+        .metric-card.selected { outline:2px solid #c58fb8; outline-offset:-2px; box-shadow:0 4px 16px rgba(197,143,184,0.2)!important; }
         .metric-card.selected .metric-accent { height:4px; }
 
         /* ─── Chart / Table Cards ─── */
@@ -66,6 +66,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         @keyframes fadeInUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 <body>
 <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6"
@@ -84,7 +85,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                             <div class="col-md">
                                 <div class="d-flex align-items-center gap-3 mb-1">
                                     <div class="d-flex align-items-center justify-content-center rounded-3"
-                                         style="width:48px;height:48px;background:rgba(108,92,231,0.12);">
+                                         style="width:48px;height:48px;background:rgba(197,143,184,0.12);">
                                         <i class="ti ti-clipboard-list text-primary" style="font-size:1.6rem;"></i>
                                     </div>
                                     <div>
@@ -307,7 +308,7 @@ function crearTarjetaResumen(nombre, total, cantidad, icon, color, delay, servic
     if (ganancia !== undefined && ganancia !== null && totalMxn !== undefined && totalMxn !== null && ganancia !== 0) {
         var reposicion = totalMxn - ganancia;
         var gananciaClass = ganancia >= 0 ? 'text-success' : 'text-danger';
-        montoHtml += '<div class="d-block small mt-1" style="padding-left:1rem;border-left:2px solid #dee2e6;">' +
+        montoHtml += '<div class="d-block small mt-1" style="padding-left:1rem;border-left:2px solid var(--nx-border);">' +
             '<span class="d-block text-muted"><i class="ti ti-recycle"></i> $' + formatoNumero(reposicion) + ' reposición inventario</span>' +
             '<span class="d-block ' + gananciaClass + ' fw-bold"><i class="ti ti-trending-up"></i> $' + formatoNumero(ganancia) + ' utilidad Amiri</span>' +
             '</div>';
@@ -423,7 +424,7 @@ function cargarGraficaServicio() {
                         label: 'Monto',
                         data: valores,
                         backgroundColor: gradient,
-                        borderColor: 'rgba(108,92,231,0.5)',
+                        borderColor: 'rgba(197,143,184,0.5)',
                         borderWidth: 1,
                         borderRadius: { topLeft: 4, topRight: 4, bottomLeft: 0, bottomRight: 0 },
                         borderSkipped: false

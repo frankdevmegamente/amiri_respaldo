@@ -23,7 +23,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .body-wrapper-inner, .body-wrapper .container-fluid { padding-top: 15px !important; margin-top: 0 !important; }
         .chart-container { position: relative; height: 260px; }
         .chart-container-clickable { cursor: pointer; }
-        .table-reportes th { background-color: #f8f9fa; font-weight: 600; }
+        .table-reportes th { background-color: var(--nx-surface-2); font-weight: 600; }
         [data-bs-theme="dark"] .table-reportes th { background-color: var(--nx-surface-2); }
         .metric-card-serv { transition: all 0.2s ease; position: relative; overflow: hidden; cursor: pointer; }
         .metric-card-serv:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.07) !important; }
@@ -47,6 +47,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .dark-mode .logo-modo-oscuro { display: block !important; }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 <body>
 <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6"
@@ -463,7 +464,7 @@ function abrirDetalleDia(dia) {
                 var entidad = r.beneficiario
                     ? '<span class="badge bg-secondary bg-opacity-10 text-secondary border-0">Beneficiario</span> ' + r.beneficiario
                     : (r.prestamista && r.prestamista !== '-'
-                        ? '<span class="badge bg-purple bg-opacity-10 text-purple border-0" style="background:rgba(108,92,231,0.1)!important;color:#c58fb8!important;">Prestamista</span> ' + r.prestamista
+                        ? '<span class="badge bg-purple bg-opacity-10 text-purple border-0" style="background:rgba(197,143,184,0.1)!important;color:#c58fb8!important;">Prestamista</span> ' + r.prestamista
                         : (r.proveedor && r.proveedor !== '-'
                             ? '<span class="badge bg-warning bg-opacity-10 text-warning border-0">Proveedor</span> ' + r.proveedor
                             : (r.promotor && r.promotor !== '-'

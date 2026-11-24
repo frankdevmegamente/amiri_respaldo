@@ -83,9 +83,9 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         /* ─── Desglose items ─────────────────────────── */
         .desglose-item { transition: background 0.15s ease; border-radius: 8px; padding: 0 8px; cursor: pointer; }
         .desglose-item:hover { background: rgba(0,0,0,0.02); }
-        .desglose-item.active { background: rgba(93,135,255,0.06); box-shadow: inset 3px 0 0 var(--nx-primary); }
+        .desglose-item.active { background: rgba(197,143,184,0.06); box-shadow: inset 3px 0 0 var(--nx-primary); }
         [data-bs-theme="dark"] .desglose-item:hover { background: rgba(255,255,255,0.03); }
-        [data-bs-theme="dark"] .desglose-item.active { background: rgba(93,135,255,0.12); }
+        [data-bs-theme="dark"] .desglose-item.active { background: rgba(197,143,184,0.12); }
         [data-bs-theme="dark"] .progress { background: rgba(255,255,255,0.12); }
 
         /* ─── Dark mode ───────────────────────────────── */
@@ -116,6 +116,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .bg-light { background-color: var(--nx-surface-2) !important; }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
+<?php include 'src/assets/partials/helios-assets.php'; ?>
 </head>
 <body>
     <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
