@@ -132,6 +132,31 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
 
 
+        .reportes-header {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reportes-header .bg-pattern {
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .reportes-header .bg-pattern-2 {
+            position: absolute;
+            bottom: -30%;
+            left: 20%;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
         .filter-card {
 
             background: var(--nx-surface-2);
@@ -275,20 +300,24 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     <!-- Header -->
                     <div class="row mb-4">
                         <div class="col-12">
-                            <div class="card shadow-sm border-0 rounded-4" style="position: relative; overflow: hidden;">
-                                
-                                <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: var(--nx-primary); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-                                <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: var(--nx-success); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-
-                                <div class="card-body p-4" style="position: relative; z-index: 1;">
-                                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
-                                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
-                                            <i class="ti ti-chart-bar fs-5"></i>
+                            <div class="card reportes-header dashboard-header shadow-sm border-0 rounded-4">
+                                <div class="bg-pattern"></div>
+                                <div class="bg-pattern-2"></div>
+                                <div class="card-body p-4 position-relative">
+                                    <div class="row align-items-center g-3">
+                                        <div class="col-md">
+                                            <div class="d-flex align-items-center gap-3 mb-1">
+                                                <div class="d-flex align-items-center justify-content-center rounded-3"
+                                                     style="width:48px;height:48px;background:var(--nx-primary-soft);">
+                                                    <i class="ti ti-chart-bar" style="font-size:1.6rem;color:var(--nx-primary);"></i>
+                                                </div>
+                                                <div>
+                                                    <h2 class="mb-0">Reportes y Estadísticas</h2>
+                                                    <p class="text-muted mb-0 mt-1 small">Visualiza métricas y estadísticas del sistema en tiempo real</p>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <h5 class="card-title fw-semibold mb-0">Reportes y Estadísticas</h5>
                                     </div>
-                                    
-                                    <p class="text-muted mb-0">Visualiza métricas y estadísticas del sistema en tiempo real</p>
                                 </div>
                             </div>
                         </div>
@@ -1022,6 +1051,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     <script src="src/assets/js/sidebarmenu.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>if (window.nxChartTheme) window.nxChartTheme();</script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="src/assets/js/utils.js"></script>

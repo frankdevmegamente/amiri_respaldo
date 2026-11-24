@@ -26,7 +26,8 @@ $usuario_rol = $usuario_rol ?? ($_SESSION['usuario_rol'] ?? 'usuario');
   <div class="nx-topbar-right">
     <div class="nx-search d-none d-md-block">
       <i class="ti ti-search"></i>
-      <input type="text" id="globalSearch" placeholder="Buscar..." aria-label="Buscar">
+      <input type="text" id="globalSearch" placeholder="Buscar página o categoría..." aria-label="Buscar página o categoría" autocomplete="off" aria-expanded="false" aria-controls="globalSearchResults">
+      <div class="nx-search-results" id="globalSearchResults" role="listbox" aria-label="Resultados de búsqueda" hidden></div>
     </div>
 
     <?php

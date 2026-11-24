@@ -281,7 +281,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                             <div class="ticket-wrapper">
                                  <div class="ticket-card" id="vistaPreviaTicket">
                                      <div class="ticket-header">
-                                         <img src="src/assets/images/logos/logo2-blanco-sin-fondo.png" alt="Logo Amiri" class="logo-modo-claro" style="height: 45px; max-width: 100%; object-fit: contain;" />
+                                         <img src="src/assets/images/logos/logo2-blanco-sin-fondo.png" alt="Logo Amiri" class="logo-modo-oscuro" style="height: 45px; max-width: 100%; object-fit: contain;" />
                                          <div class="ticket-title" id="outTicketTitle">C&Aacute;LCULO DE VENTA</div>
                                      </div>
 

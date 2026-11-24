@@ -597,6 +597,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="src/assets/js/sidebarmenu.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>if (window.nxChartTheme) window.nxChartTheme();</script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="src/assets/js/utils.js"></script>

@@ -8,22 +8,9 @@ $usuario_rol = $usuario_rol ?? ($_SESSION['usuario_rol'] ?? 'usuario');
 <aside class="nx-sidebar">
   <div class="nx-sidebar-inner">
     <a href="index.php" class="nx-brand" title="Ir al dashboard">
-      <span class="nx-brand-mark">A</span>
-      <span class="nx-brand-text">
-        <div class="nx-brand-title">Amiri</div>
-        <div class="nx-brand-sub">FINANZAS EMPRESARIALES</div>
-      </span>
+      <img src="src/assets/images/logos/logo2-sin-fondo.png" alt="Logo Amiri" class="nx-brand-logo nx-brand-logo-light">
+      <img src="src/assets/images/logos/logo2-blanco-sin-fondo.png" alt="Logo Amiri" class="nx-brand-logo nx-brand-logo-dark">
     </a>
-
-    <div class="nx-workspace">
-      <div class="nx-workspace-card">
-        <div>
-          <div class="nx-ws-name">Amiri App</div>
-          <div class="nx-ws-sub">Espacio de trabajo</div>
-        </div>
-        <i class="ti ti-selector nx-ws-caret"></i>
-      </div>
-    </div>
 
     <nav class="nx-nav" aria-label="Navegación principal">
       <div class="nx-section">PRINCIPAL</div>
@@ -114,17 +101,6 @@ $usuario_rol = $usuario_rol ?? ($_SESSION['usuario_rol'] ?? 'usuario');
         <a href="editar-perfil.php" class="nx-nav-item <?php echo ($pagina_actual === 'editar-perfil.php') ? 'active' : ''; ?>"><i class="ti ti-settings"></i><span class="nx-nav-label">Editar Perfil</span></a>
       <?php endif; ?>
     </nav>
-
-    <div class="nx-sidebar-footer">
-      <div class="nx-status-card">
-        <span class="nx-status-dot" aria-hidden="true"></span>
-        <div class="nx-status-text">
-          <div class="nx-status-title">Todo está al día</div>
-          <div class="nx-status-sub">Actualizado ahora</div>
-        </div>
-      </div>
-      <div class="nx-plan mt-2">AMIRI APP v2</div>
-    </div>
   </div>
 </aside>
 
@@ -152,7 +128,7 @@ $usuario_rol = $usuario_rol ?? ($_SESSION['usuario_rol'] ?? 'usuario');
   </div>
 </div>
 
-<script src="src/assets/js/nexo-shell.js"></script>
+<script src="src/assets/js/nexo-shell.js?v=helios34"></script>
 <script src="src/assets/js/session-timeout.js"></script>
 <script>
 // Compat mínima: nexo-shell.js maneja el toggle. Esto solo asegura clase y estado legacy.

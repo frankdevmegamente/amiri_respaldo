@@ -438,7 +438,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
   <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
   <script src="src/assets/js/sidebarmenu.js"></script>
-  <script src="src/assets/js/nexo-shell.js"></script>
+  <script src="src/assets/js/nexo-shell.js?v=helios34"></script>
 
   <script src="src/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
 

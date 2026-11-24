@@ -218,6 +218,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="src/assets/js/sidebarmenu.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>if (window.nxChartTheme) window.nxChartTheme();</script>
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
@@ -466,7 +467,7 @@ function cargarGraficaServicio() {
                     scales: {
                         y: {
                             beginAtZero: true,
-                            grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false },
+                            grid: { color: nxChartGridColor('rgba(0,0,0,0.04)'), drawBorder: false },
                             ticks: {
                                 callback: function(v) {
                                     if (v >= 1000) { return '$' + (v / 1000).toFixed(0) + 'k'; }

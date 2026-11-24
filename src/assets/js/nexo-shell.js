@@ -96,6 +96,181 @@
     el.addEventListener('click', fn);
   }
 
+  function normalizeSearch(value) {
+    return (value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
+  var SEARCH_ALIASES = {
+    'index.php': 'dashboard inicio panel principal',
+    'flujo.php': 'flujo efectivo operaciones caja',
+    'cuentas.php': 'cuentas banco bancaria caja saldos',
+    'movimientos.php': 'movimientos transacciones operaciones',
+    'capital-amiri.php': 'capital amiri inversion reserva',
+    'gastos.php': 'gastos egresos costos',
+    'clientes.php': 'clientes contactos',
+    'promotores.php': 'promotores comisiones afiliados',
+    'proveedores.php': 'proveedores contactos',
+    'prestamistas.php': 'prestamistas acreedores',
+    'prestamos-otorgados.php': 'prestamos otorgados creditos',
+    'reportes.php': 'reportes totales resumen general estadisticas',
+    'reportes-utilidades.php': 'utilidades ganancias utilidad reportes',
+    'reportes-servicios.php': 'servicios comisiones reportes',
+    'generador-recibos.php': 'cotizador divisas calculo ventas recibo cotizacion',
+    'generador-depositos.php': 'deposito efectivo depositos generador',
+    'generador-transferencias.php': 'deposito transferencia transferencias generador',
+    'fifo.php': 'fifo inventario valorizacion',
+    'usuarios.php': 'usuarios accesos roles',
+    'auditoria.php': 'auditoria logs historial',
+    'monitor.php': 'monitor sistema estado',
+    'mi-cuenta.php': 'mi cuenta perfil',
+    'editar-perfil.php': 'editar perfil configuracion'
+  };
+
+  function nearestSection(node, nav) {
+    while (node && node !== nav) {
+      var sib = node.previousElementSibling;
+      while (sib) {
+        if (sib.classList.contains('nx-section')) return sib.textContent.trim();
+        sib = sib.previousElementSibling;
+      }
+      node = node.parentElement;
+    }
+    return '';
+  }
+
+  function collectSearchItems() {
+    var nav = $('.nx-nav');
+    if (!nav) return [];
+    return $all('.nx-nav-item[href]', nav).map(function (a) {
+      var labelEl = a.querySelector('.nx-nav-label');
+      var label = a.getAttribute('data-title') || (labelEl ? labelEl.textContent.trim() : a.textContent.trim());
+      var href = a.getAttribute('href') || '';
+      var file = href.split('?')[0].split('/').pop().toLowerCase();
+      var groupEl = a.closest('.nx-nav-group');
+      var groupToggle = groupEl ? groupEl.querySelector('.nx-nav-group-toggle .nx-nav-label') : null;
+      var group = groupToggle ? groupToggle.textContent.trim() : '';
+      var section = nearestSection(a, nav) || '';
+      var path = group || section || 'Páginas';
+      var keywords = a.getAttribute('data-search') || SEARCH_ALIASES[file] || '';
+      return {
+        label: label,
+        path: path,
+        haystack: normalizeSearch([label, section, group, keywords].join(' ')),
+        href: href
+      };
+    });
+  }
+
+  function searchScore(item, query, tokens) {
+    var label = normalizeSearch(item.label);
+    if (label === query) return 0;
+    if (label.indexOf(query) === 0) return 1;
+    if (label.indexOf(query) !== -1) return 2;
+    return tokens.length > 1 ? 4 : 3;
+  }
+
+  function initGlobalSearch() {
+    var input = $('#globalSearch');
+    if (!input || input.dataset.nxSearchBound === '1') return;
+    input.dataset.nxSearchBound = '1';
+
+    var wrapper = input.closest('.nx-search') || input.parentNode;
+    var box = $('#globalSearchResults');
+    if (!box) {
+      box = document.createElement('div');
+      box.className = 'nx-search-results';
+      box.id = 'globalSearchResults';
+      box.setAttribute('role', 'listbox');
+      wrapper.appendChild(box);
+    }
+
+    var items = collectSearchItems();
+    var matches = [];
+    var activeIndex = -1;
+
+    function hide() {
+      box.hidden = true;
+      box.innerHTML = '';
+      wrapper.classList.remove('is-open');
+      input.setAttribute('aria-expanded', 'false');
+      matches = [];
+      activeIndex = -1;
+    }
+
+    function setActive(index) {
+      var nodes = $all('.nx-search-result', box);
+      if (!nodes.length) return;
+      activeIndex = (index + nodes.length) % nodes.length;
+      nodes.forEach(function (node, i) { node.classList.toggle('active', i === activeIndex); });
+    }
+
+    function go(index) {
+      var item = matches[index];
+      if (item && item.href) window.location.href = item.href;
+    }
+
+    function render() {
+      var query = normalizeSearch(input.value.trim());
+      box.innerHTML = '';
+      matches = [];
+      activeIndex = -1;
+      if (!query) { hide(); return; }
+
+      var tokens = query.split(/\s+/).filter(Boolean);
+      matches = items.filter(function (item) {
+        return tokens.every(function (token) { return item.haystack.indexOf(token) !== -1; });
+      }).map(function (item) {
+        item.score = searchScore(item, query, tokens);
+        return item;
+      }).sort(function (a, b) { return a.score - b.score; }).slice(0, 8);
+
+      if (!matches.length) {
+        var empty = document.createElement('div');
+        empty.className = 'nx-search-empty';
+        empty.textContent = 'Sin resultados';
+        box.appendChild(empty);
+      } else {
+        matches.forEach(function (item, index) {
+          var result = document.createElement('button');
+          result.type = 'button';
+          result.className = 'nx-search-result';
+          result.setAttribute('role', 'option');
+          var label = document.createElement('span');
+          label.className = 'nx-search-result-label';
+          label.textContent = item.label;
+          var path = document.createElement('span');
+          path.className = 'nx-search-result-path';
+          path.textContent = item.path;
+          result.appendChild(label);
+          result.appendChild(path);
+          result.addEventListener('click', function () { go(index); });
+          result.addEventListener('mouseenter', function () { setActive(index); });
+          box.appendChild(result);
+        });
+        setActive(0);
+      }
+
+      box.hidden = false;
+      wrapper.classList.add('is-open');
+      input.setAttribute('aria-expanded', 'true');
+    }
+
+    input.addEventListener('input', render);
+    input.addEventListener('focus', function () { if (input.value.trim()) render(); });
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { hide(); input.blur(); return; }
+      if (e.key === 'ArrowDown') { e.preventDefault(); setActive(activeIndex + 1); return; }
+      if (e.key === 'ArrowUp') { e.preventDefault(); setActive(activeIndex - 1); return; }
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (!box.hidden && matches.length) go(activeIndex >= 0 ? activeIndex : 0);
+      }
+    });
+    document.addEventListener('click', function (e) {
+      if (!wrapper.contains(e.target)) hide();
+    });
+  }
+
   function init() {
     document.body.classList.add('nexo-body');
     var app = getApp();
@@ -140,6 +315,7 @@
 
     initNavGroups();
     initActiveNav();
+    initGlobalSearch();
   }
 
   if (document.readyState === 'loading') {

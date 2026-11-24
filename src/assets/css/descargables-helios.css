@@ -140,7 +140,10 @@
 #tarjetaCuentaAmiri.tarjeta-bancaria {
     width: 100%;
     max-width: 420px;
-    background: linear-gradient(160deg, #3d3539 0%, #2a2427 100%) !important;
+    background-color: #2a2427 !important;
+    background-image:
+        radial-gradient(circle at 100% 0%, rgba(197, 143, 184, 0.22) 0%, rgba(197, 143, 184, 0) 58%),
+        linear-gradient(160deg, #3d3539 0%, #2a2427 100%) !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
     border-radius: 24px !important;
     padding: 22px 20px;
@@ -156,20 +159,22 @@
 #tarjetaCuentaAmiri .tb-linea { border-top: 1px solid rgba(197, 143, 184, 0.35) !important; }
 
 /* Logo fijo en descargables: siempre blanco sobre fondo transparente */
-#vistaPreviaTicket .logo-modo-claro,
-#tarjetaCuentaAmiri .logo-modo-claro { display: none !important; }
-#vistaPreviaTicket .logo-modo-oscuro,
-#tarjetaCuentaAmiri .logo-modo-oscuro { display: block !important; }
+#vistaPreviaTicket .logo-modo-claro { display: none !important; }
+#vistaPreviaTicket .logo-modo-oscuro { display: block !important; }
+#tarjetaCuentaAmiri .nx-desc-logo { display: block !important; }
 
 /* ---------- EXPORTACIÓN PNG ---------- */
 /* Estos estilos se aplican en onclone para evitar gradientes/sombras que html2canvas dibuja como cuadros */
 .descargable-export #vistaPreviaTicket,
 .descargable-export #tarjetaCuentaAmiri {
-    background: #302a2e !important;
+    background-color: #302a2e !important;
     border: 1px solid #4a4045 !important;
     box-shadow: none !important;
     border-radius: 24px !important;
     overflow: hidden !important;
+}
+.descargable-export #tarjetaCuentaAmiri {
+    background-image: radial-gradient(circle at 100% 0%, rgba(197, 143, 184, 0.20) 0%, rgba(197, 143, 184, 0) 58%) !important;
 }
 .descargable-export .ticket-item,
 .descargable-export .ticket-total,
@@ -229,17 +234,6 @@
 }
 #vistaPreviaTicket .client-list { position: relative; z-index: 1; }
 #vistaPreviaTicket .client-list .text-muted { color: #9a9096 !important; }
-/* Glows inline de la tarjeta bancaria */
-#tarjetaCuentaAmiri > div[style*="top: -60px"] {
-    background: rgba(197, 143, 184, 0.14) !important;
-    border-radius: 50% !important;
-    opacity: 1 !important;
-}
-#tarjetaCuentaAmiri > div[style*="bottom: -40px"] {
-    background: rgba(61, 220, 132, 0.08) !important;
-    border-radius: 50% !important;
-    opacity: 1 !important;
-}
 /* ---------- Modal "Compartir cuenta" (cuentas.php) ---------- */
 #main-wrapper #modalCompartirCuenta .modal-content {
     background: linear-gradient(160deg, #2a2427 0%, #1c181b 100%) !important;
@@ -258,18 +252,34 @@
     font-weight: 600;
     letter-spacing: 0.3px;
 }
-#main-wrapper #modalCompartirCuenta .btn-close { filter: invert(1); opacity: 0.6; }
-#main-wrapper #modalCompartirCuenta .modal-footer .btn { border-radius: 999px; font-weight: 600; }
+#main-wrapper #modalCompartirCuenta .btn-close { filter: invert(1); opacity: 0.6; transition: opacity .18s ease, transform .18s ease; }
+#main-wrapper #modalCompartirCuenta .btn-close:hover { opacity: .9; transform: rotate(90deg); }
+#main-wrapper #modalCompartirCuenta .modal-footer .btn {
+    border-radius: 999px;
+    font-weight: 600;
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, filter .18s ease;
+}
 #main-wrapper #modalCompartirCuenta .modal-footer .btn.btn-secondary {
     background: rgba(255, 255, 255, 0.08) !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
     color: #fff !important;
+}
+#main-wrapper #modalCompartirCuenta .modal-footer .btn.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.14) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, .32);
 }
 #main-wrapper #modalCompartirCuenta .modal-footer .btn.btn-success {
     background: #3ddc84 !important;
     border: 1px solid rgba(61, 220, 132, 0.35) !important;
     color: #0a0709 !important;
 }
+#main-wrapper #modalCompartirCuenta .modal-footer .btn.btn-success:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    box-shadow: 0 8px 24px rgba(61, 220, 132, .28), inset 0 1px 0 rgba(255, 255, 255, .35);
+}
+#main-wrapper #modalCompartirCuenta .modal-footer .btn:active { transform: translateY(0); }
 
 /* Botón "Compartir" en la tabla de cuentas */
 #main-wrapper button[onclick^="abrirGeneradorCuenta"] {
@@ -280,8 +290,11 @@
     font-size: 0.75rem !important;
     font-weight: 600;
     padding: 4px 10px !important;
+    transition: transform .18s ease, box-shadow .18s ease, background .18s ease, color .18s ease;
 }
 #main-wrapper button[onclick^="abrirGeneradorCuenta"]:hover {
     background: rgba(197, 143, 184, 0.2) !important;
     color: #fff !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(197, 143, 184, .22);
 }

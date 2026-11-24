@@ -68,15 +68,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         #cuentasTab .nav-link:not(.active):hover {
             color: var(--nx-primary);
         }
-         [data-bs-theme="dark"] .logo-modo-claro,
-        .dark-mode .logo-modo-claro {
-            display: none !important;
-        }
-
-        [data-bs-theme="dark"] .logo-modo-oscuro,
-        .dark-mode .logo-modo-oscuro {
-            display: block !important;
-        }
         /* =========================================
    🌙 REGLAS PARA MODO OSCURO (Usuarios y DataTables)
    ========================================= */
@@ -164,42 +155,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     color: #9a9096;
 }
 
-/* =========================================
-           ESTILOS TARJETA DATOS BANCARIOS (Adaptable)
-           ========================================= */
-        .tarjeta-bancaria {
-            width: 100%; max-width: 380px; 
-            background: var(--nx-surface); 
-            border-radius: 16px; padding: 30px 25px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
-            position: relative; overflow: hidden; 
-            border: 1px solid #eef2f6;
-        }
-        .tb-texto-principal { color: var(--nx-surface-2); font-size: 1.1rem; font-weight: 700; line-height: 1.2; }
-        .tb-texto-secundario { color: #9a9096; font-size: 0.7rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
-        .tb-cuenta { color: var(--nx-primary); font-size: 1.4rem; font-weight: 800; letter-spacing: 1px; word-break: break-all; }
-        .tb-linea { border-top: 1px dashed var(--nx-border); }
-
-        /* MODO OSCURO PARA LA TARJETA */
-        [data-bs-theme="dark"] .tarjeta-bancaria,
-        .dark-mode .tarjeta-bancaria {
-            background: #1a181c !important;
-            border-color: rgba(255,255,255,0.12) !important;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
-        }
-        [data-bs-theme="dark"] .tb-texto-principal,
-        .dark-mode .tb-texto-principal {
-            color: #f5f2f4 !important;
-        }
-        [data-bs-theme="dark"] .tb-linea,
-        .dark-mode .tb-linea {
-            border-top: 1px dashed rgba(255,255,255,0.12) !important;
-        }
-
         /* ─── Page Header ─────────────────────────────── */
-        .cuentas-header { position: relative; overflow: visible; border-radius: 16px !important; }
-        .cuentas-header .bg-pattern { position: absolute; top: -50%; right: -10%; width: 400px; height: 400px; border-radius: 50%; background: rgba(197, 143, 184, 0.08); pointer-events: none; }
-        .cuentas-header .bg-pattern-2 { position: absolute; bottom: -30%; left: 20%; width: 250px; height: 250px; border-radius: 50%; background: rgba(19, 222, 185, 0.06); pointer-events: none; }
+        .cuentas-header { position: relative; overflow: hidden; border-radius: 16px !important; }
         .cuentas-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
         .cuentas-header .sub-badge { font-size: 1rem; color: #9a9096; }
 
@@ -247,8 +204,6 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                          PAGE HEADER
                          ════════════════════════════════════ -->
                     <div class="card cuentas-header shadow-sm border-0 rounded-4 mb-4">
-                        <div class="bg-pattern"></div>
-                        <div class="bg-pattern-2"></div>
                         <div class="card-body p-4">
                             <div class="row align-items-center g-3">
                                 <div class="col-md">
@@ -570,15 +525,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     <div class="modal-body d-flex justify-content-center py-4">
                         
                         <div id="tarjetaCuentaAmiri" class="tarjeta-bancaria">
-                            
-                            <div style="position: absolute; top: -60px; right: -60px; width: 160px; height: 160px; background: var(--nx-primary); opacity: 0.08; border-radius: 50%;"></div>
-                            <div style="position: absolute; bottom: -40px; left: -40px; width: 100px; height: 100px; background: var(--nx-success); opacity: 0.08; border-radius: 50%;"></div>
-                            
-                            <div class="text-center mb-4" style="position: relative; z-index: 2;">
-                                <img src="src/assets/images/logos/logo2.png" alt="Logo Amiri" class="logo-modo-claro mx-auto" style="height: 45px; max-width: 100%; object-fit: contain;" />
 
-                                <img src="src/assets/images/logos/logo2-blanco-sin-fondo.png" alt="Logo Amiri" class="logo-modo-oscuro mx-auto" style="height: 45px; max-width: 100%; object-fit: contain; display: none;" />
-                                
+                            <div class="text-center mb-4" style="position: relative; z-index: 2;">
+                                <img src="src/assets/images/logos/logo2-blanco-sin-fondo.png" alt="Logo Amiri" class="nx-desc-logo mx-auto" style="height: 45px; max-width: 100%; object-fit: contain;" />
+
                                 <p class="tb-texto-secundario mb-0" style="margin-top: 5px;">Datos Bancarios</p>
                             </div>
                             
@@ -1094,13 +1044,15 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     useCORS: true,
                     onclone: function(doc) {
                         doc.body.classList.add('descargable-export');
+                        doc.documentElement.setAttribute('data-bs-theme', 'dark');
                         const el = doc.querySelector('#tarjetaCuentaAmiri');
                         if (el) {
-                            el.style.background = '#302a2e';
-                            el.style.border = '1px solid #4a4045';
-                            el.style.boxShadow = 'none';
-                            el.style.borderRadius = '24px';
-                            el.style.overflow = 'hidden';
+                            el.style.setProperty('background-color', '#302a2e', 'important');
+                            el.style.setProperty('background-image', 'radial-gradient(circle at 100% 0%, rgba(197, 143, 184, 0.20) 0%, rgba(197, 143, 184, 0) 58%)', 'important');
+                            el.style.setProperty('border', '1px solid #4a4045', 'important');
+                            el.style.setProperty('box-shadow', 'none', 'important');
+                            el.style.setProperty('border-radius', '24px', 'important');
+                            el.style.setProperty('overflow', 'hidden', 'important');
                         }
                     }
                 }).then(canvas => {
