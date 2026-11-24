@@ -309,7 +309,7 @@ $cuentas = $pdo->query("SELECT id, nombre, saldo_actual FROM cuentas WHERE activ
             <div class="modal-dialog modal-lg">
                 <form id="formNuevoPrestamo" class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title"><i class="ti ti-plus-circle text-primary"></i> Registrar Nuevo Préstamo</h5>
+                        <h5 class="modal-title"><i class="ti ti-circle-plus text-primary"></i> Registrar Nuevo Préstamo</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">

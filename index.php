@@ -349,7 +349,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     </li>
                     <li class="nav-item">
                       <a class="nav-link text-white" data-bs-toggle="tab" href="#tabDistribucion">
-                        <i class="ti ti-pie-chart"></i> Distribución
+                        <i class="ti ti-chart-pie"></i> Distribución
                       </a>
                     </li>
                   </ul>
@@ -601,7 +601,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 </div>
                 <div class="result-item">
                     <div class="result-label">
-                        <span><i class="ti ti-currency-exchange text-success"></i> Ganancia Divisas</span>
+                        <span><i class="ti ti-arrows-exchange text-success"></i> Ganancia Divisas</span>
                         <span class="fw-bold text-success">${formatoMoneda(divisas)}</span>
                     </div>
                     <div class="result-bar">

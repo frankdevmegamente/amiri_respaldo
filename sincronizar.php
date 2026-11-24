@@ -634,7 +634,7 @@ $scriptUrl = 'sincronizar.php';
                             <div class="card-body p-4" style="position:relative;z-index:1;">
                                 <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
                                     <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;">
-                                        <i class="ti ti-transfer fs-5"></i>
+                                        <i class="ti ti-transfer-in fs-5"></i>
                                     </div>
                                     <div>
                                         <h5 class="card-title fw-semibold mb-0" style="font-size:1.2rem;">Sincronizar Base de Datos</h5>
@@ -722,7 +722,7 @@ $scriptUrl = 'sincronizar.php';
                                     <li>La herramienta <strong>importa</strong> el archivo a una BD temporal y <strong>compara</strong> todas las tablas contra tu BD local.</li>
                                     <li>Revisa los resultados: tablas con registros faltantes aparecen resaltadas.</li>
                                     <li>Haz clic en <span class="badge bg-info bg-opacity-10 text-info border-0">Ver</span> para previsualizar los registros faltantes.</li>
-                                    <li>Usa <button class="btn btn-success btn-sm py-0 px-1" style="font-size:0.7rem;pointer-events:none;"><i class="ti ti-transfer"></i></button> <strong>Sincronizar</strong> para insertar los registros faltantes en tu BD local.</li>
+                                    <li>Usa <button class="btn btn-success btn-sm py-0 px-1" style="font-size:0.7rem;pointer-events:none;"><i class="ti ti-transfer-in"></i></button> <strong>Sincronizar</strong> para insertar los registros faltantes en tu BD local.</li>
                                     <li>Al terminar, limpia la BD temporal con <span class="badge bg-danger bg-opacity-10 text-danger border-0">Limpiar</span>.</li>
                                 </ol>
                             </div>
@@ -746,7 +746,7 @@ $scriptUrl = 'sincronizar.php';
                                         <form method="POST" class="d-inline" id="syncAllForm">
                                             <input type="hidden" name="action" value="sync_all">
                                             <button type="submit" class="btn btn-success btn-sm" id="syncAllBtn">
-                                                <i class="ti ti-transfer"></i> Sincronizar todos (<?= $totalMissing ?>)
+                                                <i class="ti ti-transfer-in"></i> Sincronizar todos (<?= $totalMissing ?>)
                                             </button>
                                             <div id="syncAllProgress" class="sync-progress" style="display:none;">
                                                 <div class="spinner-border spinner-border-sm text-success" role="status"></div>
@@ -804,7 +804,7 @@ $scriptUrl = 'sincronizar.php';
                                                         <input type="hidden" name="action" value="sync_table">
                                                         <input type="hidden" name="sync_table" value="<?= htmlspecialchars($r['table']) ?>">
                                                         <button type="submit" class="btn btn-sm btn-outline-success py-0 px-1" title="Sincronizar tabla">
-                                                            <i class="ti ti-transfer"></i>
+                                                            <i class="ti ti-transfer-in"></i>
                                                         </button>
                                                     </form>
                                                     <?php else: ?>

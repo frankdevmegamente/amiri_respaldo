@@ -1427,3 +1427,142 @@ html[data-bs-theme="dark"] #main-wrapper .card-header.header-saldos:not(.bg-prim
 html[data-bs-theme="dark"] #main-wrapper .card-header.header-capital:not(.bg-primary):not(.bg-gradient-info):not(.bg-success):not(.bg-danger):not(.bg-warning) { background: rgba(251,191,36,0.12) !important; color: var(--nx-warning) !important; }
 html[data-bs-theme="dark"] #main-wrapper .card-header.header-prestamos:not(.bg-primary):not(.bg-gradient-info):not(.bg-success):not(.bg-danger):not(.bg-warning) { background: rgba(255,122,122,0.12) !important; color: var(--nx-danger) !important; }
 #main-wrapper .card-header.header-saldos *, #main-wrapper .card-header.header-capital *, #main-wrapper .card-header.header-prestamos * { color: inherit !important; }
+
+/* ============================================================
+   Detalle de movimientos (flujo.php / flujo-divisas.php)
+   Estos modales se renderizan fuera de #main-wrapper, por lo que
+   necesitan sus propias reglas Helios para no heredar Bootstrap.
+   ============================================================ */
+.nx-detail-modal .modal-content {
+  background: var(--nx-surface) !important;
+  border: 1px solid var(--nx-border) !important;
+  border-radius: var(--nx-radius) !important;
+  color: var(--nx-text) !important;
+}
+.nx-detail-modal .modal-header,
+.nx-detail-modal .modal-footer { border-color: var(--nx-border) !important; }
+.nx-detail-modal .modal-title { color: var(--nx-text) !important; }
+.nx-detail-modal .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+
+.nx-detail-modal .card {
+  background: var(--nx-surface-2) !important;
+  border: 1px solid var(--nx-border) !important;
+  border-radius: var(--nx-radius) !important;
+  box-shadow: none !important;
+  color: var(--nx-text) !important;
+}
+.nx-detail-modal .card-header,
+.nx-detail-modal .card-header.bg-primary,
+.nx-detail-modal .card-header.bg-secondary,
+.nx-detail-modal .card-header.bg-info,
+.nx-detail-modal .card-header.bg-success,
+.nx-detail-modal .card-header.bg-danger,
+.nx-detail-modal .card-header.bg-warning,
+.nx-detail-modal .card-header.bg-light,
+.nx-detail-modal .card-header.bg-dark {
+  background: transparent !important;
+  border-bottom: 1px solid var(--nx-border) !important;
+  color: var(--nx-text) !important;
+  padding: 14px 18px !important;
+}
+.nx-detail-modal .card-header h6,
+.nx-detail-modal .card-header .mb-0,
+.nx-detail-modal .card-header .text-white,
+.nx-detail-modal .card-header i { color: var(--nx-text) !important; }
+.nx-detail-modal .card-header.bg-success i { color: var(--nx-success) !important; }
+.nx-detail-modal .card-header.bg-danger i { color: var(--nx-danger) !important; }
+.nx-detail-modal .card-header.bg-warning i { color: var(--nx-warning) !important; }
+.nx-detail-modal .card-header.bg-info i,
+.nx-detail-modal .card-header.bg-primary i { color: var(--nx-primary) !important; }
+.nx-detail-modal .card-body { color: var(--nx-text) !important; }
+
+.nx-detail-modal .table {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--nx-text);
+  --bs-table-border-color: var(--nx-border);
+  color: var(--nx-text) !important;
+}
+.nx-detail-modal .table thead th,
+.nx-detail-modal .table.table-dark thead th,
+.nx-detail-modal .table.table-light thead th {
+  background: rgba(255,255,255,0.03) !important;
+  border-bottom: 1px solid var(--nx-border) !important;
+  color: var(--nx-text-muted) !important;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.nx-detail-modal .table td,
+.nx-detail-modal .table th {
+  border-color: var(--nx-border) !important;
+  color: var(--nx-text) !important;
+  vertical-align: middle;
+}
+.nx-detail-modal .table-hover tbody tr:hover,
+.nx-detail-modal .table-hover tbody tr:hover td { background: var(--nx-primary-soft) !important; color: var(--nx-text) !important; }
+.nx-detail-modal .table-bordered > :not(caption) > * > * { border-color: var(--nx-border) !important; }
+
+.nx-detail-modal .badge {
+  border-radius: 999px !important;
+  font-weight: 600;
+  font-size: 0.72rem;
+  padding: 4px 10px;
+}
+.nx-detail-modal .badge.bg-primary,
+.nx-detail-modal .badge.bg-info { background: var(--nx-primary-soft) !important; color: var(--nx-primary) !important; }
+.nx-detail-modal .badge.bg-success { background: rgba(61,220,132,0.15) !important; color: var(--nx-success) !important; }
+.nx-detail-modal .badge.bg-danger { background: rgba(255,122,122,0.15) !important; color: var(--nx-danger) !important; }
+.nx-detail-modal .badge.bg-warning { background: rgba(251,191,36,0.15) !important; color: var(--nx-warning) !important; }
+.nx-detail-modal .badge.bg-secondary,
+.nx-detail-modal .badge.bg-light,
+.nx-detail-modal .badge.bg-dark { background: var(--nx-surface-3) !important; color: var(--nx-text) !important; }
+
+.nx-detail-modal .text-muted { color: var(--nx-text-muted) !important; }
+.nx-detail-modal .text-primary,
+.nx-detail-modal .text-info { color: var(--nx-primary) !important; }
+.nx-detail-modal .text-success { color: var(--nx-success) !important; }
+.nx-detail-modal .text-danger { color: var(--nx-danger) !important; }
+.nx-detail-modal .text-warning { color: var(--nx-warning) !important; }
+.nx-detail-modal .text-dark { color: var(--nx-text) !important; }
+.nx-detail-modal hr { border-color: var(--nx-border) !important; opacity: 1; }
+
+.nx-detail-modal .btn-secondary {
+  background: var(--nx-surface-2) !important;
+  border: 1px solid var(--nx-border) !important;
+  color: var(--nx-text) !important;
+}
+.nx-detail-modal .btn-warning {
+  background: var(--nx-accent-gradient) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+}
+html[data-bs-theme="light"] .nx-detail-modal .btn-warning { color: #0a0709 !important; }
+html[data-bs-theme="light"] .nx-detail-modal .badge.bg-primary,
+html[data-bs-theme="light"] .nx-detail-modal .badge.bg-info,
+html[data-bs-theme="light"] .nx-detail-modal .badge.bg-success,
+html[data-bs-theme="light"] .nx-detail-modal .badge.bg-danger,
+html[data-bs-theme="light"] .nx-detail-modal .badge.bg-warning { color: #0a0709 !important; }
+html[data-bs-theme="light"] .nx-detail-modal .table thead th,
+html[data-bs-theme="light"] .nx-detail-modal .table.table-dark thead th,
+html[data-bs-theme="light"] .nx-detail-modal .table thead.table-dark th,
+html[data-bs-theme="light"] .nx-detail-modal .table.table-light thead th,
+html[data-bs-theme="light"] .nx-detail-modal .table thead.table-light th { background: var(--nx-surface-2) !important; }
+
+/* Bootstrap coloca table-dark/table-light en <thead>, no en <table> */
+.nx-detail-modal .table thead.table-dark th,
+.nx-detail-modal .table thead.table-light th {
+  background: rgba(255,255,255,0.03) !important;
+  border-bottom: 1px solid var(--nx-border) !important;
+  color: var(--nx-text-muted) !important;
+}
+.nx-detail-modal .table thead.table-dark th *,
+.nx-detail-modal .table thead.table-light th * { color: inherit !important; }
+
+/* flujo.php define badges de tabla con !important; igualamos especificidad */
+html[data-bs-theme="dark"] .nx-detail-modal .table .badge.bg-primary,
+html[data-bs-theme="dark"] .nx-detail-modal .table .badge.bg-info { background-color: var(--nx-primary-soft) !important; background-image: none !important; color: var(--nx-primary) !important; }
+html[data-bs-theme="dark"] .nx-detail-modal .table .badge.bg-success { background-color: rgba(61,220,132,0.15) !important; background-image: none !important; color: var(--nx-success) !important; }
+html[data-bs-theme="dark"] .nx-detail-modal .table .badge.bg-danger { background-color: rgba(255,122,122,0.15) !important; background-image: none !important; color: var(--nx-danger) !important; }
+html[data-bs-theme="dark"] .nx-detail-modal .table .badge.bg-warning { background-color: rgba(251,191,36,0.15) !important; background-image: none !important; color: var(--nx-warning) !important; }
+html[data-bs-theme="dark"] .nx-detail-modal .table .badge.bg-secondary { background-color: var(--nx-surface-3) !important; background-image: none !important; color: var(--nx-text) !important; }

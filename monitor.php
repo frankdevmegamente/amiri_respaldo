@@ -602,7 +602,7 @@ $metricas = obtenerMetricas($pdo);
                         <div class="card border-0 shadow-sm">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <h5 class="card-title mb-0"><i class="ti ti-backup me-2"></i>Backups</h5>
+                                    <h5 class="card-title mb-0"><i class="ti ti-database-export me-2"></i>Backups</h5>
                                     <a href="logs-viewer.php?file=backup.log" class="btn btn-sm btn-outline-primary">
                                         <i class="ti ti-file-text"></i> Ver log de backups
                                     </a>
@@ -806,7 +806,7 @@ $metricas = obtenerMetricas($pdo);
             .then(function(data) {
                 if (data.success) {
                     status.className = 'mt-3 alert alert-success';
-                    status.innerHTML = '<i class="ti ti-check-circle me-1"></i> ' + data.message;
+                    status.innerHTML = '<i class="ti ti-circle-check me-1"></i> ' + data.message;
                     status.style.display = 'block';
                     btn.innerHTML = '<i class="ti ti-refresh me-1"></i>Resetear Datos';
                     setTimeout(function() { location.reload(); }, 2000);
@@ -816,7 +816,7 @@ $metricas = obtenerMetricas($pdo);
             })
             .catch(function(err) {
                 status.className = 'mt-3 alert alert-danger';
-                status.innerHTML = '<i class="ti ti-x-circle me-1"></i> ' + err.message;
+                status.innerHTML = '<i class="ti ti-circle-x me-1"></i> ' + err.message;
                 status.style.display = 'block';
                 btn.disabled = false;
                 btn.innerHTML = '<i class="ti ti-refresh me-1"></i>Resetear Datos';

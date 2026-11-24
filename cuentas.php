@@ -319,7 +319,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <span class="metric-label">Cajas</span>
                                         <div class="metric-icon bg-warning bg-opacity-10 text-warning">
-                                            <i class="ti ti-safe"></i>
+                                            <i class="ti ti-lock"></i>
                                         </div>
                                     </div>
                                     <div class="metric-value text-warning" id="kpiCajas">0</div>

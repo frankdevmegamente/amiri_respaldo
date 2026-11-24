@@ -129,7 +129,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <span class="metric-label">Último Corte <i class="ti ti-info-circle text-muted" data-bs-toggle="tooltip" title="Último mes con cierre contable registrado" style="cursor:help;font-size:0.75rem;"></i></span>
                                     <div class="metric-icon bg-success bg-opacity-10 text-success">
-                                        <i class="ti ti-calendar-check"></i>
+                                        <i class="ti ti-calendar-stats"></i>
                                     </div>
                                 </div>
                                 <div class="metric-value" id="capUltimoCorte" style="font-size:1.2rem;">-</div>

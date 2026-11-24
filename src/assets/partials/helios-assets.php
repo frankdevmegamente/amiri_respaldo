@@ -3,7 +3,7 @@
 // Punto único de carga de assets Helios. Se incluye desde header.php
 // (fallback para páginas legacy) y puede incluirse al final de <head>.
 $heliosAssetsLoaded = true;
-$heliosCssVersion = 'helios28';
+$heliosCssVersion = 'helios30';
 $heliosDownloadablesVersion = 'helios6';
 ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">

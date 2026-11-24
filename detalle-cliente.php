@@ -301,7 +301,7 @@ try {
                                 </div>
                                 <div class="col-md-auto d-flex gap-2 flex-wrap">
                                     <a href="api/exportar-reporte.php?formato=pdf&reporte=estado_cuenta_cliente&cliente_id=<?= (int)$cliente_id ?>" class="btn btn-outline-danger btn-sm">
-                                        <i class="ti ti-file-type-pdf"></i> Estado de cuenta (PDF)
+                                        <i class="ti ti-file-text"></i> Estado de cuenta (PDF)
                                     </a>
                                     <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalReporteFiltrado">
                                         <i class="ti ti-filter"></i> Reporte por fechas
@@ -538,7 +538,7 @@ try {
 
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
 
-                        <button type="button" class="btn btn-danger" id="btnGenerarReporteFiltrado"><i class="ti ti-file-type-pdf"></i> Generar PDF</button>
+                        <button type="button" class="btn btn-danger" id="btnGenerarReporteFiltrado"><i class="ti ti-file-text"></i> Generar PDF</button>
 
                     </div>
 

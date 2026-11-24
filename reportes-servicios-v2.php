@@ -303,7 +303,7 @@ function cargarResumen() {
             // Cards de servicios
             if (data.servicios && data.servicios.length > 0) {
                 var colores = ['primary','info','warning','danger','secondary','dark','success'];
-                var iconos = ['ti ti-building','ti ti-currency-dollar','ti ti-coin','ti ti-exchange','ti ti-transfer','ti ti-credit-card','ti ti-wallet','ti ti-businessplan','ti ti-report-money','ti ti-pig-money'];
+                var iconos = ['ti ti-building','ti ti-currency-dollar','ti ti-coin','ti ti-exchange','ti ti-transfer-in','ti ti-credit-card','ti ti-wallet','ti ti-businessplan','ti ti-report-money','ti ti-pig-money'];
                 data.servicios.forEach(function(s, i) {
                     var c = colores[i % colores.length];
                     var ic = iconos[i % iconos.length];

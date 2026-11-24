@@ -263,7 +263,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <span class="metric-label">Operan MXN</span>
                                         <div class="metric-icon bg-warning bg-opacity-10 text-warning">
-                                            <i class="ti ti-currency-peso"></i>
+                                            <i class="ti ti-cash-banknote"></i>
                                         </div>
                                     </div>
                                     <div class="metric-value text-warning" id="kpiMxn">0</div>

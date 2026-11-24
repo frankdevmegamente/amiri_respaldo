@@ -683,7 +683,7 @@ html[data-bs-theme="dark"] #main-wrapper .card .header-prestamos { background: r
 
     <!-- Modal Detalle -->
 
-    <div class="modal fade" id="modalDetalle" tabindex="-1">
+    <div class="modal fade nx-detail-modal" id="modalDetalle" tabindex="-1">
 
         <div class="modal-dialog modal-xl">
 
@@ -1401,7 +1401,7 @@ html[data-bs-theme="dark"] #main-wrapper .card .header-prestamos { background: r
                         let personaHtml = '';
                         if (row.cliente  && row.cliente.trim())  personaHtml += '<div class="mb-1"><i class="ti ti-user text-primary"></i> <strong class="text-body">Cliente:</strong> <span class="text-muted">' + row.cliente + '</span></div>';
                         if (row.proveedor && row.proveedor.trim()) personaHtml += '<div class="mb-1"><i class="ti ti-building text-info"></i> <strong class="text-body">Proveedor:</strong> <span class="text-muted">' + row.proveedor + '</span></div>';
-                        if (row.promotor  && row.promotor.trim())  personaHtml += '<div class="mb-1"><i class="ti ti-user-star text-warning"></i> <strong class="text-body">Promotor:</strong> <span class="text-muted">' + row.promotor + '</span></div>';
+                        if (row.promotor  && row.promotor.trim())  personaHtml += '<div class="mb-1"><i class="ti ti-user-check text-warning"></i> <strong class="text-body">Promotor:</strong> <span class="text-muted">' + row.promotor + '</span></div>';
                         if (row.prestamista && row.prestamista.trim()) personaHtml += '<div class="mb-1"><i class="ti ti-businessplan text-danger"></i> <strong class="text-body">Prestamista:</strong> <span class="text-muted">' + row.prestamista + '</span></div>';
                         if (row.beneficiario && row.beneficiario.trim()) personaHtml += '<div class="mb-1"><i class="ti ti-users text-success"></i> <strong class="text-body">Beneficiario:</strong> <span class="text-muted">' + row.beneficiario + '</span></div>';
                         
@@ -1566,7 +1566,7 @@ html[data-bs-theme="dark"] #main-wrapper .card .header-prestamos { background: r
                         let nombre = c.nombre;
                         if (destacado) {
                             const icon = c.nombre === 'Capital Amiri' ? 'ti ti-pig-money' : 'ti ti-building-bank';
-                            nombre = `<span class="d-inline-flex align-items-center gap-1"><i class="${icon}"></i> ${c.nombre} <i class="ti ti-star-filled" style="font-size:0.7rem; color:var(--nx-warning);"></i></span>`;
+                            nombre = `<span class="d-inline-flex align-items-center gap-1"><i class="${icon}"></i> ${c.nombre} <i class="ti ti-star" style="font-size:0.7rem; color:var(--nx-warning);"></i></span>`;
                         } else if (c.es_deuda_cliente && c.cliente_id) {
 
                             nombre = `<a href="detalle-cliente.php?id=${c.cliente_id}" class="text-decoration-none">${c.nombre}</a>`;
@@ -1782,7 +1782,7 @@ html[data-bs-theme="dark"] #main-wrapper .card .header-prestamos { background: r
                     $cardBody.css({'background-color':'rgba(25,135,84,0.08)','overflow':'hidden','border-radius':'inherit'});
                     $monto.removeClass('text-danger text-warning text-info').addClass('text-success');
                     $icon.css('background-color', 'rgba(25,135,84,0.2)');
-                    $texto.html('<i class="ti ti-check-circle"></i> <strong>Todo cuadra correctamente</strong>');
+                    $texto.html('<i class="ti ti-circle-check"></i> <strong>Todo cuadra correctamente</strong>');
                     $detalle.html('').hide();
                 } else if (diferencia < 0) {
                     $card.removeClass('border-success border-warning border-info').addClass('border-danger');
@@ -1822,7 +1822,7 @@ html[data-bs-theme="dark"] #main-wrapper .card .header-prestamos { background: r
                 const malas = (res.tests || []).filter(function (t) { return (t.num === 5 || t.num === 10) && t.status === 'error'; });
                 if (!malas.length) return;
                 let html = '<div class="mt-2 p-2 rounded border border-danger" style="background-color:rgba(220,53,69,0.06);">';
-                html += '<strong><i class="ti ti-shield-alert"></i> Posibles causas (integridad):</strong>';
+                html += '<strong><i class="ti ti-shield-x"></i> Posibles causas (integridad):</strong>';
                 malas.forEach(function (t) {
                     html += '<div class="mt-1"><span class="badge bg-danger">Test #' + t.num + ' ' + t.nombre + '</span>';
                     html += '<div class="small">' + t.msg + '</div>';
@@ -3792,7 +3792,7 @@ html[data-bs-theme="dark"] #main-wrapper .card .header-prestamos { background: r
 
             if (data.cliente_nombre)  html += `<div class="col-md-4 mb-2"><strong><i class="ti ti-user"></i> Cliente:</strong><br>${data.cliente_nombre}</div>`;
             if (data.proveedor_nombre) html += `<div class="col-md-4 mb-2"><strong><i class="ti ti-building"></i> Proveedor:</strong><br>${data.proveedor_nombre}</div>`;
-            if (data.promotor_nombre)  html += `<div class="col-md-4 mb-2"><strong><i class="ti ti-user-star"></i> Promotor:</strong><br>${data.promotor_nombre}</div>`;
+            if (data.promotor_nombre)  html += `<div class="col-md-4 mb-2"><strong><i class="ti ti-user-check"></i> Promotor:</strong><br>${data.promotor_nombre}</div>`;
             if (data.prestamista_nombre) html += `<div class="col-md-4 mb-2"><strong><i class="ti ti-businessplan"></i> Prestamista:</strong><br>${data.prestamista_nombre}</div>`;
             if (data.beneficiario_nombre) html += `<div class="col-md-4 mb-2"><strong><i class="ti ti-users"></i> Beneficiario:</strong><br>${data.beneficiario_nombre}</div>`;
 

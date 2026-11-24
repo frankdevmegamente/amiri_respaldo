@@ -662,7 +662,7 @@ $serviciosDivisas = [
 
     <!-- Modal Detalle Movimiento -->
 
-    <div class="modal fade" id="modalDetalle" tabindex="-1">
+    <div class="modal fade nx-detail-modal" id="modalDetalle" tabindex="-1">
 
         <div class="modal-dialog modal-xl">
 
@@ -1914,7 +1914,7 @@ $serviciosDivisas = [
 
                         $icon.css('background-color', 'rgba(25, 135, 84, 0.2)');
 
-                        $texto.html('<i class="ti ti-check-circle"></i> <strong>Todo cuadra correctamente</strong>');
+                        $texto.html('<i class="ti ti-circle-check"></i> <strong>Todo cuadra correctamente</strong>');
 
                     } else if (diferencia < 0) {
 

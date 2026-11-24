@@ -90,7 +90,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                     </div>
                                     <div>
                                         <h2 class="mb-0">Reporte de Servicios</h2>
-                                        <span class="subtitle"><i class="ti ti-circle-filled" style="font-size:6px;vertical-align:middle;margin-right:4px;"></i>Monitoreo detallado de operaciones por servicio</span>
+                                        <span class="subtitle"><i class="ti ti-circle" style="font-size:6px;vertical-align:middle;margin-right:4px;"></i>Monitoreo detallado de operaciones por servicio</span>
                                     </div>
                                 </div>
                             </div>
@@ -279,7 +279,7 @@ function mostrarCarga(mostrar) {
 const resumenCardStyles = [
     { icon: 'ti ti-cash', color: 'success' },
     { icon: 'ti ti-cash-off', color: 'danger' },
-    { icon: 'ti ti-transfer', color: 'info' },
+    { icon: 'ti ti-transfer-in', color: 'info' },
     { icon: 'ti ti-currency-dollar', color: 'warning' },
     { icon: 'ti ti-coin', color: 'primary' },
     { icon: 'ti ti-credit-card', color: 'secondary' },
@@ -303,7 +303,7 @@ function crearTarjetaResumen(nombre, total, cantidad, icon, color, delay, servic
     var subHtml = subtitulo ? '<div class="metric-subtitle text-muted small">' + subtitulo + '</div>' : '';
     var montoHtml = '<span class="d-block">$' + formatoNumero(total) + '</span>';
     if (totalMxn !== undefined && totalMxn !== null) {
-        montoHtml += '<span class="d-block small text-muted mt-1"><i class="ti ti-arrow-right-to-arc"></i> $' + formatoNumero(totalMxn) + ' MXN recibidos</span>';
+        montoHtml += '<span class="d-block small text-muted mt-1"><i class="ti ti-rotate-clockwise"></i> $' + formatoNumero(totalMxn) + ' MXN recibidos</span>';
     }
     if (ganancia !== undefined && ganancia !== null && totalMxn !== undefined && totalMxn !== null && ganancia !== 0) {
         var reposicion = totalMxn - ganancia;

@@ -544,7 +544,7 @@ $scriptUrl = 'importar-sql.php';
                                     <li>La herramienta <strong>importa</strong> el SQL a una BD temporal, <strong>valida</strong> los datos y <strong>compara</strong> contra tu BD local.</li>
                                     <li>Los registros <strong>inválidos</strong> se marcan con ❌ y no se sincronizarán.</li>
                                     <li>Revisa las tablas con errores haciendo clic en el número de errores.</li>
-                                    <li>Usa <i class="ti ti-transfer"></i> <strong>Sincronizar</strong> para insertar solo registros válidos y nuevos.</li>
+                                    <li>Usa <i class="ti ti-transfer-in"></i> <strong>Sincronizar</strong> para insertar solo registros válidos y nuevos.</li>
                                     <li>Al terminar, limpia la BD temporal.</li>
                                 </ol>
                             </div>
@@ -564,7 +564,7 @@ $scriptUrl = 'importar-sql.php';
                                         <form method="POST" class="d-inline" id="syncAllForm">
                                             <input type="hidden" name="action" value="sync_all">
                                             <button type="submit" class="btn btn-success btn-sm" id="syncAllBtn">
-                                                <i class="ti ti-transfer"></i> Sincronizar válidos (<?= number_format($totalMissing) ?>)
+                                                <i class="ti ti-transfer-in"></i> Sincronizar válidos (<?= number_format($totalMissing) ?>)
                                             </button>
                                             <div id="syncAllProgress" class="sync-progress" style="display:none;">
                                                 <div class="spinner-border spinner-border-sm text-success" role="status"></div>
@@ -659,7 +659,7 @@ $scriptUrl = 'importar-sql.php';
                                                             <input type="hidden" name="action" value="sync_table">
                                                             <input type="hidden" name="sync_table" value="<?= htmlspecialchars($table) ?>">
                                                             <button type="submit" class="btn btn-sm btn-outline-success py-0 px-1" title="Sincronizar válidos">
-                                                                <i class="ti ti-transfer"></i>
+                                                                <i class="ti ti-transfer-in"></i>
                                                             </button>
                                                         </form>
                                                         <?php endif; ?>
