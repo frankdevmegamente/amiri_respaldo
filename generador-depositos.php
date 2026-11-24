@@ -79,25 +79,25 @@ $bancos = $pdo->query("SELECT COUNT(DISTINCT banco) FROM directorio_depositos WH
         .badge-soft-danger { background: rgba(220,53,69,0.1); color: #dc3545; border: none; }
         .badge-soft-success { background: rgba(25,135,84,0.1); color: #198754; border: none; }
         /* ─── Ticket ─────────────────────────────────── */
-        .ticket-wrapper { background-color: #f4f6f9; padding: 20px; border-radius: 12px; display: flex; justify-content: center; }
-        .ticket-card { background: var(--nx-surface); width: 100%; max-width: 580px; border-radius: 0; padding: 35px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); color: var(--nx-text); position: relative; overflow: hidden; }
+        .ticket-wrapper { background-color: var(--nx-surface-2); padding: 20px; border-radius: var(--nx-radius); display: flex; justify-content: center; }
+        .ticket-card { background: var(--nx-surface); width: 100%; max-width: 580px; border-radius: var(--nx-radius); padding: 35px; box-shadow: var(--nx-shadow); color: var(--nx-text); position: relative; overflow: hidden; }
         .ticket-deco { position: absolute; border-radius: 50%; pointer-events: none; }
         .ticket-deco-1 { top: -60px; right: -60px; width: 180px; height: 180px; background: var(--nx-primary); opacity: 0.08; }
         .ticket-deco-2 { bottom: -40px; left: -40px; width: 120px; height: 120px; background: var(--nx-success); opacity: 0.08; }
-        .ticket-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid #c58fb8; position: relative; z-index: 1; }
+        .ticket-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid var(--nx-primary); position: relative; z-index: 1; }
         .ticket-logo { max-width: 50%; overflow: hidden; }
         .ticket-logo img { height: 45px; max-width: 100%; object-fit: contain; }
-        .ticket-title { font-size: 18px; font-weight: 700; letter-spacing: 1.5px; color: #c58fb8; text-transform: uppercase; white-space: nowrap; margin-left: 15px; }
-        .ticket-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed #ebf1f6; position: relative; }
+        .ticket-title { font-size: 18px; font-weight: 700; letter-spacing: 1.5px; color: var(--nx-primary); text-transform: uppercase; white-space: nowrap; margin-left: 15px; }
+        .ticket-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed var(--nx-border); position: relative; }
         .ticket-item-nombre { font-size: 15px; font-weight: 700; color: var(--nx-text); }
-        .ticket-item-cuenta { font-size: 12px; color: #7c8fac; text-transform: uppercase; letter-spacing: 0.5px; }
-        .ticket-item-monto { background: rgba(197,143,184,0.1); color: #c58fb8; padding: 8px 16px; border-radius: 6px; font-size: 16px; font-weight: 700; text-align: right; min-width: 130px; }
+        .ticket-item-cuenta { font-size: 12px; color: var(--nx-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .ticket-item-monto { background: var(--nx-primary-soft); color: var(--nx-primary); padding: 8px 16px; border-radius: 6px; font-size: 16px; font-weight: 700; text-align: right; min-width: 130px; }
         .ticket-quitar { position: absolute; right: 0; top: 50%; transform: translate(120%, -50%); }
-        .ticket-total { background: rgba(197,143,184,0.04); border-radius: 8px; padding: 20px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; }
-        .ticket-total-label { color: #7c8fac; font-size: 13px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+        .ticket-total { background: var(--nx-primary-soft); border-radius: 8px; padding: 20px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; }
+        .ticket-total-label { color: var(--nx-text-muted); font-size: 13px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
         .ticket-total-value { color: var(--nx-success); font-weight: 800; font-size: 26px; }
         [data-bs-theme="dark"] .ticket-wrapper { background-color: transparent !important; }
-        [data-bs-theme="dark"] .ticket-card { background: #1a181c; border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        [data-bs-theme="dark"] .ticket-card { background: var(--nx-surface-2); border: 1px solid var(--nx-border); box-shadow: var(--nx-shadow); }
         [data-bs-theme="dark"] .ticket-header { border-bottom-color: rgba(255,255,255,0.12); }
         [data-bs-theme="dark"] .ticket-item { border-bottom-color: rgba(255,255,255,0.12); }
         [data-bs-theme="dark"] .ticket-item-nombre { color: #f5f2f4; }

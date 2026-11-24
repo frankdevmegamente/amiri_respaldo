@@ -1,17 +1,17 @@
 body[data-bs-theme="dark"] .card {
-  background: #1a2234;
-  border-color: #2c344c;
+  background: var(--nx-surface);
+  border-color: var(--nx-border);
 }
 body[data-bs-theme="dark"] .table {
-  color: #e9ecef;
+  color: var(--nx-text);
 }
 body[data-bs-theme="dark"] .table thead th {
-  background-color: #1a2234 !important;
-  color: #e9ecef;
+  background-color: var(--nx-surface-2) !important;
+  color: var(--nx-text);
 }
 body[data-bs-theme="dark"] .card-header.bg-white {
-  background-color: #1a2234 !important;
+  background-color: var(--nx-surface-2) !important;
 }
 body[data-bs-theme="dark"] .card-header.bg-success {
-  background-color: #0e6b4a !important;
+  background-color: var(--nx-accent-gradient) !important;
 }

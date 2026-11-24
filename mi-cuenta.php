@@ -110,7 +110,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
                     <!-- Filtros -->
                     <div class="card shadow-sm border-0 rounded-4 mb-4">
                         <div class="card-body p-4">
-                            <div class="row align-items-end g-2">
+                            <div class="row align-items-end g-2 filtros-periodo">
                                 <div class="col-md-3">
                                     <label class="form-label fw-bold">Período:</label>
                                     <select class="form-select" id="selectPeriodo">

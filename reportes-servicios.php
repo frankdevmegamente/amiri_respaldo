@@ -25,7 +25,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         /* ─── Page Header ─── */
         .servicios-header { position:relative; overflow:hidden; border-radius:16px !important; }
         .servicios-header .bg-pattern { position:absolute; top:-50%; right:-10%; width:400px; height:400px; border-radius:50%; background:rgba(197,143,184,0.08); pointer-events:none; }
-        .servicios-header .bg-pattern-2 { position:absolute; bottom:-30%; left:20%; width:250px; height:250px; border-radius:50%; background:rgba(19,222,185,0.06); pointer-events:none; }
+        .servicios-header .bg-pattern-2 { position:absolute; bottom:-30%; left:20%; width:250px; height:250px; border-radius:50%; background:rgba(197,143,184,0.08); pointer-events:none; }
         .servicios-header h2 { font-size:1.75rem; font-weight:700; margin-bottom:0.25rem; }
         .servicios-header .subtitle { font-size:0.85rem; color:#9a9096; }
 
@@ -49,10 +49,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .chart-container-clickable { cursor:pointer; }
 
         /* ─── Dark Mode ─── */
-        [data-bs-theme="dark"] .metric-card .metric-value { color:#e8ecf0; }
+        [data-bs-theme="dark"] .metric-card .metric-value { color:#ffffff; }
         [data-bs-theme="dark"] .metric-card { background:var(--nx-surface-2) !important; }
         [data-bs-theme="dark"] .metric-card .metric-label { color:#9a9096; }
-        [data-bs-theme="dark"] .metric-card .metric-footer { color:#6b7a90; }
+        [data-bs-theme="dark"] .metric-card .metric-footer { color:#9a9096; }
         [data-bs-theme="dark"] .section-card { background:var(--nx-surface-2) !important; }
         [data-bs-theme="dark"] .section-card .card-header { border-bottom-color:rgba(255,255,255,0.04); }
         [data-bs-theme="dark"] .servicios-header .subtitle { color:#9a9096; }
@@ -446,8 +446,8 @@ function cargarGraficaServicio() {
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(20, 25, 40, 0.9)',
-                            titleColor: '#e8ecf0',
+                            backgroundColor: 'rgba(11,11,12,0.92)',
+                            titleColor: '#ffffff',
                             bodyColor: '#fff',
                             padding: 12,
                             cornerRadius: 8,

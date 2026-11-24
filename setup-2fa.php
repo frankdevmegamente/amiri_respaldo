@@ -408,7 +408,7 @@ try {
 
             background: #e9ecef;
 
-            border-color: #6c5ce7;
+            border-color: #c58fb8;
 
         }
 
@@ -430,7 +430,7 @@ try {
 
             background: #3a3a3a;
 
-            border-color: #6c5ce7;
+            border-color: #c58fb8;
 
         }
 
@@ -452,7 +452,7 @@ try {
 
             background: #f8f9fa;
 
-            border-left: 4px solid #6c5ce7;
+            border-left: 4px solid #c58fb8;
 
             padding: 15px;
 
@@ -474,7 +474,7 @@ try {
 
             background: #333;
 
-            border-left-color: #6c5ce7;
+            border-left-color: #c58fb8;
 
         }
 
@@ -484,7 +484,7 @@ try {
 
             display: inline-block;
 
-            background: linear-gradient(135deg, #6c5ce7 0%, #6c5ce7 100%);
+            background: linear-gradient(135deg, #c58fb8 0%, #c58fb8 100%);
 
             color: white;
 

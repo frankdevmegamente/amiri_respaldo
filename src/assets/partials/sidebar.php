@@ -128,7 +128,7 @@ $usuario_rol = $usuario_rol ?? ($_SESSION['usuario_rol'] ?? 'usuario');
   </div>
 </div>
 
-<script src="src/assets/js/nexo-shell.js?v=helios34"></script>
+<script src="src/assets/js/nexo-shell.js?v=helios35"></script>
 <script src="src/assets/js/session-timeout.js"></script>
 <script>
 // Compat mínima: nexo-shell.js maneja el toggle. Esto solo asegura clase y estado legacy.

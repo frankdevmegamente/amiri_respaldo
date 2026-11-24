@@ -71,7 +71,7 @@ $pdo = getPDO();
             letter-spacing: -0.3px;
         }
         [data-bs-theme="dark"] .kpi-value {
-            color: #e8ecf0;
+            color: #ffffff;
         }
         [data-bs-theme="dark"] .kpi-label {
             color: var(--nx-text-muted);
@@ -125,7 +125,7 @@ $pdo = getPDO();
             transition: all 0.2s ease;
         }
         .month-nav-btn:hover {
-            background: #f0f0f0;
+            background: var(--nx-surface-2);
             color: #c58fb8;
             border-color: #c58fb8;
         }

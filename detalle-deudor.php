@@ -201,7 +201,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     <div class="row mt-4">
                         <div class="col-12">
                             <div class="card shadow-sm border-0 rounded-4">
-                                <div class="card-header border-0 pt-4 px-4" style="background: linear-gradient(135deg, #0e6b4a 0%, var(--nx-success) 100%);">
+                                <div class="card-header border-0 pt-4 px-4" style="background: linear-gradient(135deg, var(--nx-success) 0%, var(--nx-success) 100%);">
                                     <h5 class="mb-0 fw-semibold text-white"><i class="ti ti-cash me-2"></i>Registrar Cobro de Préstamo</h5>
                                 </div>
                                 <div class="card-body p-4">

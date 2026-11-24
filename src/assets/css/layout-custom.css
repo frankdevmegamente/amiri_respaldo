@@ -498,7 +498,7 @@ body.loading #main-wrapper {
   margin-bottom: 6px;
 }
 [data-bs-theme="dark"] .metric-subtitle {
-  color: #6b7280;
+  color: var(--nx-text-muted);
 }
 
 .metric-value {

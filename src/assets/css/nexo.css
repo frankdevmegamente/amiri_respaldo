@@ -152,8 +152,9 @@ body.nexo-body {
   cursor: pointer; transition: all .15s;
 }
 .nx-icon-btn:hover { background: var(--nx-primary-soft); color: var(--nx-text); }
-.nx-breadcrumb { color: var(--nx-text-muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nx-breadcrumb { color: var(--nx-text-muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .nx-breadcrumb strong { color: var(--nx-text); font-weight: 600; }
+.nx-search-toggle { display: none; }
 .nx-search { position: relative; width: 320px; max-width: 34vw; }
 .nx-search i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--nx-text-muted); }
 .nx-search input {
@@ -295,8 +296,6 @@ body.nexo-body {
   .nexo-app.sidebar-collapsed .nx-sidebar { width: var(--nx-sidebar-mini); }
   .nexo-app.sidebar-collapsed .nx-topbar { left: var(--nx-sidebar-mini); }
   .nexo-app.sidebar-collapsed .nx-main { margin-left: var(--nx-sidebar-mini); }
-  .nexo-app.sidebar-collapsed .nx-brand-text,
-  .nexo-app.sidebar-collapsed .nx-workspace,
   .nexo-app.sidebar-collapsed .nx-section,
   .nexo-app.sidebar-collapsed .nx-nav-label,
   .nexo-app.sidebar-collapsed .nx-badge,
@@ -308,7 +307,6 @@ body.nexo-body {
   .nexo-app.sidebar-collapsed .nx-brand-logo { width: 56px; max-width: 56px; height: 28px; }
   .nexo-app.sidebar-collapsed .nx-nav { padding-left: 8px; padding-right: 8px; }
   .nexo-app.sidebar-collapsed .nx-nav-item { justify-content: center; padding-left: 0; padding-right: 0; gap: 0; }
-  .nexo-app.sidebar-collapsed .nx-sidebar-footer { padding: 10px 8px; }
   .nexo-app.sidebar-collapsed .nx-status-card { justify-content: center; padding: 10px 0; }
 }
 
@@ -325,10 +323,82 @@ body.nexo-body {
 @media (max-width: 767.98px) {
   .nx-content { padding: 18px 16px; }
   .nx-topbar { padding: 0 14px; gap: 8px; }
-  .nx-search { display: none !important; }
+  .nx-breadcrumb { min-width: 0; }
+  .nx-search-toggle { display: inline-flex; }
+  .nx-search { display: none; }
+  .nx-topbar.search-open .nx-search {
+    display: block !important;
+    position: fixed;
+    top: var(--nx-topbar-h);
+    left: 0;
+    right: 0;
+    width: auto;
+    max-width: none;
+    padding: 10px 14px;
+    background: var(--nx-surface);
+    border-bottom: 1px solid var(--nx-border);
+    box-shadow: var(--nx-shadow);
+    z-index: 1029;
+  }
+  .nx-topbar.search-open .nx-search input { width: 100%; height: 38px; }
+  .nx-topbar.search-open .nx-search-results {
+    top: calc(100% + 6px);
+    left: 14px;
+    right: 14px;
+    max-height: calc(100vh - var(--nx-topbar-h) - 90px);
+  }
   .nx-theme-toggle span { display: none; }
   .nx-theme-toggle { width: 36px; padding: 0; justify-content: center; }
   .nx-user-meta { display: none !important; }
+
+  /* Cabeceras CRUD con botones: deben envolver en móvil */
+  .crud-header { flex-wrap: wrap; gap: 10px; }
+  .crud-header > div { min-width: 0; }
+  .crud-header h3 { font-size: 1.05rem; }
+
+  /* Los filtros del dashboard deben envolver en móvil */
+  .filtros-periodo { flex-wrap: wrap; gap: 8px !important; }
+  .filtros-periodo > *,
+  .filtros-periodo .row > *,
+  .filtros-periodo .form-select,
+  .filtros-periodo .form-control { min-width: 0 !important; }
+  .filtros-periodo select,
+  .filtros-periodo input[type="date"] { flex: 1 1 130px; width: 100%; }
+  .filtros-periodo .btn { flex: 0 0 auto; }
+  .filtros-periodo .vr { display: none !important; }
+}
+@media (max-width: 359.98px) {
+  .nx-topbar { padding: 0 6px; gap: 5px; }
+  .nx-topbar .nx-icon-btn { width: 30px; height: 30px; }
+  .nx-topbar-right { gap: 4px; }
+  .nx-theme-toggle { width: 30px; }
+  #filtroMoneda { min-width: 0; max-width: 100%; }
+  .ms-auto { min-width: 0; }
+  #selectorMesActivo .nx-icon-btn {
+    width: 30px;
+    padding: 0 !important;
+    gap: 2px;
+    justify-content: center;
+  }
+  /* Títulos largos no deben ensanchar la topbar ni generar scroll horizontal */
+  .nx-breadcrumb { font-size: 0; }
+  .nx-breadcrumb strong {
+    display: inline-block;
+    max-width: 72px;
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+}
+/* Etiqueta dinámica de reportes: no debe ensanchar la card en móvil */
+#tablaServicioLabel {
+  min-width: 0;
+  max-width: 40vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Small utils */
@@ -338,7 +408,6 @@ body.nexo-body {
 .nx-accent { color: var(--nx-primary); }
 [data-bs-theme="dark"] .nx-table th { background: rgba(255,255,255,0.02); }
 [data-bs-theme="light"] .nx-recv-item { background: #FAF8FB; }
-[data-bs-theme="light"] .nx-workspace-card { background: #F7F4F8; }
 [data-bs-theme="light"] .nx-status-card { background: #FAF8FB; }
 [data-bs-theme="light"] .nx-card,
 [data-bs-theme="light"] .nexo-app .card { box-shadow: 0 4px 20px rgba(90,69,82,0.08); }
@@ -949,8 +1018,6 @@ body:not(.nexo-body) {
   #main-wrapper.sidebar-mini .nx-sidebar { width: var(--nx-sidebar-mini); }
   #main-wrapper.sidebar-mini .nx-topbar { left: var(--nx-sidebar-mini); }
   #main-wrapper.sidebar-mini .body-wrapper { margin-left: var(--nx-sidebar-mini); }
-  #main-wrapper.sidebar-mini .nx-brand-text,
-  #main-wrapper.sidebar-mini .nx-workspace,
   #main-wrapper.sidebar-mini .nx-section,
   #main-wrapper.sidebar-mini .nx-nav-label,
   #main-wrapper.sidebar-mini .nx-badge,
@@ -962,7 +1029,6 @@ body:not(.nexo-body) {
   #main-wrapper.sidebar-mini .nx-brand-logo { width: 56px; max-width: 56px; height: 28px; }
   #main-wrapper.sidebar-mini .nx-nav { padding-left: 8px; padding-right: 8px; }
   #main-wrapper.sidebar-mini .nx-nav-item { justify-content: center; padding-left: 0; padding-right: 0; gap: 0; }
-  #main-wrapper.sidebar-mini .nx-sidebar-footer { padding: 10px 8px; }
   #main-wrapper.sidebar-mini .nx-status-card { justify-content: center; padding: 10px 0; }
 }
 /* ===== HOTFIX: dark mode + sidebar toggle on legacy pages ===== */
@@ -988,8 +1054,6 @@ body[data-bs-theme="dark"],
   #main-wrapper.sidebar-collapsed .nx-topbar { left: var(--nx-sidebar-mini) !important; }
   #main-wrapper.sidebar-collapsed .body-wrapper,
   #main-wrapper.sidebar-collapsed .nx-main { margin-left: var(--nx-sidebar-mini) !important; }
-  #main-wrapper.sidebar-collapsed .nx-brand-text,
-  #main-wrapper.sidebar-collapsed .nx-workspace,
   #main-wrapper.sidebar-collapsed .nx-section,
   #main-wrapper.sidebar-collapsed .nx-nav-label,
   #main-wrapper.sidebar-collapsed .nx-badge,
@@ -1372,6 +1436,13 @@ html[data-bs-theme="dark"] .page-wrapper .text-secondary, html[data-bs-theme="da
 .page-wrapper .dropdown-menu, #main-wrapper .dropdown-menu { position: absolute !important; z-index: 9999 !important; }
 /* Ensure card-body and chart containers respect card border-radius */
 .page-wrapper .card-body, #main-wrapper .card-body { border-radius: inherit; overflow: hidden; }
+/* El body de una card con dropdown también debe dejar ver el menú */
+.page-wrapper .card:has(.dropdown-toggle) > .card-body,
+#main-wrapper .card:has(.dropdown-toggle) > .card-body { overflow: visible !important; }
+/* Mientras el menú está abierto, la card debe apilarse por encima de las KPI */
+.page-wrapper .card:has(.dropdown-menu.show),
+#main-wrapper .card:has(.dropdown-menu.show),
+.nexo-app .card:has(.dropdown-menu.show) { z-index: 2 !important; }
 .page-wrapper .chart-container, #main-wrapper .chart-container { border-radius: var(--nx-radius-sm); overflow: hidden; }
 /* Movimientos filter bar: prevent button overflow */
 .page-wrapper .filtros-bar .btn, #main-wrapper .filtros-bar .btn { white-space: nowrap; }
@@ -1638,3 +1709,52 @@ html[data-bs-theme="dark"] .nx-detail-modal .table .badge.bg-success { backgroun
 html[data-bs-theme="dark"] .nx-detail-modal .table .badge.bg-danger { background-color: rgba(255,122,122,0.15) !important; background-image: none !important; color: var(--nx-danger) !important; }
 html[data-bs-theme="dark"] .nx-detail-modal .table .badge.bg-warning { background-color: rgba(251,191,36,0.15) !important; background-image: none !important; color: var(--nx-warning) !important; }
 html[data-bs-theme="dark"] .nx-detail-modal .table .badge.bg-secondary { background-color: var(--nx-surface-3) !important; background-image: none !important; color: var(--nx-text) !important; }
+
+/* =========================================================
+   Helios: quitar estilos Bootstrap del diseño anterior en
+   modales y componentes que viven fuera de #main-wrapper
+   ========================================================= */
+body.nexo-body .alert-info {
+  background: var(--nx-primary-soft) !important;
+  border-color: rgba(197,143,184,0.35) !important;
+  color: var(--nx-text) !important;
+}
+body.nexo-body .alert-info strong { color: var(--nx-primary) !important; }
+body.nexo-body .table thead.table-light th {
+  background: var(--nx-surface-2) !important;
+  color: var(--nx-text-muted) !important;
+  border-color: var(--nx-border) !important;
+}
+body.nexo-body .table-active {
+  --bs-table-bg: var(--nx-primary-soft) !important;
+  --bs-table-color: var(--nx-text) !important;
+}
+body.nexo-body .table-active > * { color: var(--nx-text) !important; }
+body.nexo-body .bg-light {
+  background: var(--nx-surface-2) !important;
+  border-color: var(--nx-border) !important;
+  color: var(--nx-text) !important;
+}
+body.nexo-body .text-info { color: var(--nx-primary) !important; }
+body.nexo-body .badge.bg-info {
+  background: var(--nx-primary-soft) !important;
+  border-color: rgba(197,143,184,0.3) !important;
+  color: var(--nx-primary) !important;
+}
+body.nexo-body .btn-secondary {
+  background: var(--nx-accent-gradient) !important;
+  border-color: transparent !important;
+  color: #0a0709 !important;
+}
+body.nexo-body .btn-secondary:hover,
+body.nexo-body .btn-secondary:focus { color: #0a0709 !important; filter: brightness(1.08); }
+body.nexo-body .btn-outline-info {
+  border-color: var(--nx-primary) !important;
+  color: var(--nx-primary) !important;
+}
+body.nexo-body .btn-outline-info:hover,
+body.nexo-body .btn-outline-info:focus {
+  background: var(--nx-accent-gradient) !important;
+  border-color: transparent !important;
+  color: #0a0709 !important;
+}

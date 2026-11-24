@@ -137,7 +137,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                   <span class="mes-badge" id="mesEstado"><i class="ti ti-circle"></i> Cargando...</span>
                 </div>
                 <div class="col-md-6">
-                  <div class="d-flex align-items-center justify-content-md-end gap-2">
+                  <div class="d-flex align-items-center justify-content-md-end gap-2 filtros-periodo">
                     <select class="form-select form-select-sm" id="selectPeriodo" style="min-width:130px;">
                       <option value="mes" selected>Este Mes</option>
                       <option value="mes_pasado">Mes Pasado</option>
@@ -438,7 +438,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
   <script src="src/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
   <script src="src/assets/js/sidebarmenu.js"></script>
-  <script src="src/assets/js/nexo-shell.js?v=helios34"></script>
+  <script src="src/assets/js/nexo-shell.js?v=helios35"></script>
 
   <script src="src/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
 
@@ -448,7 +448,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
 
-  <!-- dark-mode.js reemplazado por nexo-shell.js + bridge CSS -->
+  <!-- tema gestionado por nexo-shell.js -->
 
   <script src="src/assets/js/pantalla-completa.js"></script>
 

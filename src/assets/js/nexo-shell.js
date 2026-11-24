@@ -258,7 +258,13 @@
     input.addEventListener('input', render);
     input.addEventListener('focus', function () { if (input.value.trim()) render(); });
     input.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') { hide(); input.blur(); return; }
+      if (e.key === 'Escape') {
+        var bar = $('.nx-topbar');
+        if (bar) bar.classList.remove('search-open');
+        var mb = $('#mobileSearchBtn');
+        if (mb) mb.setAttribute('aria-expanded', 'false');
+        hide(); input.blur(); return;
+      }
       if (e.key === 'ArrowDown') { e.preventDefault(); setActive(activeIndex + 1); return; }
       if (e.key === 'ArrowUp') { e.preventDefault(); setActive(activeIndex - 1); return; }
       if (e.key === 'Enter') {
@@ -269,6 +275,26 @@
     document.addEventListener('click', function (e) {
       if (!wrapper.contains(e.target)) hide();
     });
+
+    var mobileBtn = $('#mobileSearchBtn');
+    if (mobileBtn) {
+      mobileBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var bar = $('.nx-topbar');
+        var open = bar ? bar.classList.toggle('search-open') : false;
+        mobileBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) { input.focus(); input.select(); } else { hide(); }
+      });
+      document.addEventListener('click', function (e) {
+        var bar = $('.nx-topbar');
+        if (!bar || !bar.classList.contains('search-open')) return;
+        if (wrapper.contains(e.target) || mobileBtn.contains(e.target)) return;
+        bar.classList.remove('search-open');
+        mobileBtn.setAttribute('aria-expanded', 'false');
+        hide();
+      });
+    }
   }
 
   function init() {
@@ -302,6 +328,10 @@
     });
 
     window.addEventListener('resize', function () {
+      var bar = $('.nx-topbar');
+      if (bar) bar.classList.remove('search-open');
+      var mb = $('#mobileSearchBtn');
+      if (mb) mb.setAttribute('aria-expanded', 'false');
       if (window.innerWidth >= 992) {
         closeMobileSidebar();
         var c = false;

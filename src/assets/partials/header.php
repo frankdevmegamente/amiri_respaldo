@@ -24,6 +24,9 @@ $usuario_rol = $usuario_rol ?? ($_SESSION['usuario_rol'] ?? 'usuario');
   </div>
 
   <div class="nx-topbar-right">
+    <button class="nx-icon-btn nx-search-toggle" id="mobileSearchBtn" type="button" aria-label="Buscar página o categoría" aria-expanded="false" aria-controls="globalSearch">
+      <i class="ti ti-search"></i>
+    </button>
     <div class="nx-search d-none d-md-block">
       <i class="ti ti-search"></i>
       <input type="text" id="globalSearch" placeholder="Buscar página o categoría..." aria-label="Buscar página o categoría" autocomplete="off" aria-expanded="false" aria-controls="globalSearchResults">
@@ -61,8 +64,13 @@ $usuario_rol = $usuario_rol ?? ($_SESSION['usuario_rol'] ?? 'usuario');
       </button>
       <ul class="dropdown-menu dropdown-menu-end py-0" style="max-height:350px;overflow-y:auto;min-width:220px;">
         <li class="dropdown-header small text-muted py-2 px-3 border-bottom" style="cursor:default;background:var(--nx-surface-2);">
-          <i class="ti ti-info-circle me-1"></i> Estados de meses
-          <span class="float-end"><span style="color:var(--nx-success)">●</span> abierto <span style="color:var(--nx-danger)" class="ms-1">●</span> cerrado</span>
+          <div class="d-flex align-items-center flex-wrap gap-2" style="row-gap:4px;">
+            <span class="d-flex align-items-center gap-1"><i class="ti ti-info-circle"></i> Estados de meses</span>
+            <span class="d-flex align-items-center gap-1 ms-auto" style="white-space:nowrap;">
+              <span style="color:var(--nx-success)">●</span> abierto
+              <span style="color:var(--nx-danger)">●</span> cerrado
+            </span>
+          </div>
         </li>
         <?php
         for ($anio = 2026; $anio <= $anioActual; $anio++):

@@ -328,9 +328,9 @@ try {
 
         .otp-input:focus {
 
-            border-color: #6c5ce7;
+            border-color: #c58fb8;
 
-            box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(197, 143, 184, 0.25);
 
             outline: none;
 
@@ -342,7 +342,7 @@ try {
 
             width: 80px; height: 80px;
 
-            background: linear-gradient(135deg, #6c5ce7 0%, #6c5ce7 100%);
+            background: linear-gradient(135deg, #c58fb8 0%, #c58fb8 100%);
 
             border-radius: 50%;
 
@@ -350,7 +350,7 @@ try {
 
             margin: 0 auto;
 
-            box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+            box-shadow: 0 4px 15px rgba(197, 143, 184, 0.3);
 
         }
 
@@ -370,7 +370,7 @@ try {
             background-color: #2a2a2a; border-color: #444; color: #fff;
         }
         [data-bs-theme="dark"] .otp-input:focus {
-            border-color: #6c5ce7; background-color: #333;
+            border-color: #c58fb8; background-color: #333;
         }
         [data-bs-theme="dark"] .backup-code-hint { color: #999; }
         [data-bs-theme="dark"] .trust-device-section { border-top-color: #444; }
@@ -428,7 +428,7 @@ try {
 
                             <div class="card-header text-center py-3 verify-header"
 
-                                style="background: linear-gradient(135deg, #6c5ce7 0%, #6c5ce7 100%); border: none;">
+                                style="background: linear-gradient(135deg, #c58fb8 0%, #c58fb8 100%); border: none;">
 
                                 <div class="bg-pattern"></div>
                                 <div class="bg-pattern-2"></div>
@@ -573,11 +573,11 @@ try {
 
                                         <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold"
 
-                                            style="background: linear-gradient(135deg, #6c5ce7 0%, #6c5ce7 100%); border: none; border-radius: 10px; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4); font-size: 0.95rem;"
+                                            style="background: linear-gradient(135deg, #c58fb8 0%, #c58fb8 100%); border: none; border-radius: 10px; box-shadow: 0 4px 15px rgba(197, 143, 184, 0.4); font-size: 0.95rem;"
 
-                                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(108, 92, 231, 0.5)'"
+                                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(197, 143, 184, 0.5)'"
 
-                                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(108, 92, 231, 0.4)'">
+                                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(197, 143, 184, 0.4)'">
 
                                             <i class="ti ti-check"></i> Verificar Código
 

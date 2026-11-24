@@ -164,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     <p>Haz clic en el siguiente enlace para restablecerla:</p>
 
-                    <p><a href='$reset_link' style='background-color:#6c5ce7;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;'>Restablecer Contraseña</a></p>
+                    <p><a href='$reset_link' style='background-color:#c58fb8;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;'>Restablecer Contraseña</a></p>
 
                     <p>El enlace expira en 1 hora.</p>
 
@@ -274,7 +274,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
           background-color: #333 !important;
 
-          border-color: #6c5ce7 !important;
+          border-color: #c58fb8 !important;
 
           color: #fff !important;
 
@@ -378,7 +378,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                             <!-- Header con gradiente -->
 
-                            <div class="card-header text-center py-3" style="background: linear-gradient(135deg, #6c5ce7 0%, #6c5ce7 100%); border: none;">
+                            <div class="card-header text-center py-3" style="background: linear-gradient(135deg, #c58fb8 0%, #c58fb8 100%); border: none;">
 
                                 <img src="src/assets/images/logos/logo.png" width="140" alt="Logo" class="mb-1" style="filter: brightness(0) invert(1);" />
 
@@ -392,7 +392,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                 <div class="text-center mb-3">
 
-                                  <div class="d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: linear-gradient(135deg, #6c5ce7 0%, #6c5ce7 100%); border-radius: 50%; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);">
+                                  <div class="d-inline-flex align-items-center justify-content-center" style="width: 50px; height: 50px; background: linear-gradient(135deg, #c58fb8 0%, #c58fb8 100%); border-radius: 50%; box-shadow: 0 4px 15px rgba(197, 143, 184, 0.3);">
 
                                     <i class="ti ti-lock-open" style="font-size: 24px; color: white;"></i>
 
@@ -448,7 +448,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                     
 
-                                    <button type="submit" class="btn btn-primary w-100 py-2 mb-2 fw-semibold" style="background: linear-gradient(135deg, #6c5ce7 0%, #6c5ce7 100%); border: none; border-radius: 10px; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.4); transition: all 0.3s ease; font-size: 0.95rem;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(108, 92, 231, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(108, 92, 231, 0.4)'">
+                                    <button type="submit" class="btn btn-primary w-100 py-2 mb-2 fw-semibold" style="background: linear-gradient(135deg, #c58fb8 0%, #c58fb8 100%); border: none; border-radius: 10px; box-shadow: 0 4px 15px rgba(197, 143, 184, 0.4); transition: all 0.3s ease; font-size: 0.95rem;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(197, 143, 184, 0.5)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(197, 143, 184, 0.4)'">
 
                                       <i class="ti ti-send"></i> Enviar Enlace
 
@@ -458,7 +458,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                                     <div class="text-center mt-3">
 
-                                        <a href="login.php" class="text-decoration-none fw-semibold" style="color: #6c5ce7; transition: all 0.3s ease; font-size: 0.85rem;" onmouseover="this.style.color='#6c5ce7'" onmouseout="this.style.color='#6c5ce7'">
+                                        <a href="login.php" class="text-decoration-none fw-semibold" style="color: #c58fb8; transition: all 0.3s ease; font-size: 0.85rem;" onmouseover="this.style.color='#c58fb8'" onmouseout="this.style.color='#c58fb8'">
 
                                           <i class="ti ti-arrow-left"></i> Volver al login
 

@@ -22,13 +22,13 @@ $cliente_id = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
 
 if (!$cliente_id) {
 
-    die("Error: ID de cliente no v�lido.");
+    die("Error: ID de cliente no válido.");
 
 }
 
 
 
-// Funci�n para obtener datos del cliente
+// Función para obtener datos del cliente
 
 function getCliente($pdo, $id)
 
@@ -56,7 +56,7 @@ function getCliente($pdo, $id)
 
 
 
-// Funci�n para obtener cuentas MXN disponibles para pago
+// Función para obtener cuentas MXN disponibles para pago
 
 function getCuentas($pdo)
 
@@ -120,7 +120,7 @@ try {
 
 } catch (PDOException $e) {
 
-    die("Error de conexi�n: " . $e->getMessage());
+    die("Error de conexión: " . $e->getMessage());
 
 }
 
@@ -160,7 +160,7 @@ try {
         
         .body-wrapper-inner, 
         .body-wrapper .container-fluid {
-            /* Le damos un peque�o respiro visual para que el t�tulo no quede pegando con el header */
+            /* Le damos un pequeño respiro visual para que el título no quede pegando con el header */
             padding-top: 15px !important;
             margin-top: 0 !important;
         }
@@ -369,7 +369,7 @@ try {
                                                     <i class="ti ti-percentage fs-5"></i>
                                                 </div>
                                                 <div>
-                                                    <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Comisi�n AMIRI</p>
+                                                    <p class="text-muted mb-0 fw-semibold" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Comisión AMIRI</p>
                                                     <span class="badge bg-warning bg-opacity-10 text-warning border-0 mt-1 fs-6"><?= htmlspecialchars($cliente['porcentaje_amiri'] ?? 0) ?>%</span>
                                                 </div>
                                             </div>
@@ -431,9 +431,9 @@ try {
                                                             <th>ID</th>
                                                             <th>Fecha</th>
                                                             <th>Total recibido</th>
-                                                            <th>Comisi�n AMIRI</th>
+                                                            <th>Comisión AMIRI</th>
                                                             <th>%</th>
-                                                            <th>Comisi�n Promotor</th>
+                                                            <th>Comisión Promotor</th>
                                                             <th>%</th>
                                                             <th>Total a pagar</th>
                                                             <th>Estado</th>
@@ -564,7 +564,7 @@ try {
             });
         </script>
 
-        <!-- Bot�n flotante para pagos m�ltiples -->
+        <!-- Botón flotante para pagos múltiples -->
         <div id="btnPagarMultipleContainer" style="display: none; position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 1050;">
             <button class="btn btn-warning shadow-lg px-4 py-2" id="btnPagarMultiple" style="border-radius: 50px; font-weight: bold;">
                 <i class="ti ti-cash me-2"></i> Pagar (<span id="contadorSeleccionadas">0</span>) Ventas
@@ -638,7 +638,7 @@ try {
 
                                 <div class="col-md-4">
 
-                                    <label class="form-label">Comisi�n AMIRI</label>
+                                    <label class="form-label">Comisión AMIRI</label>
 
                                     <p id="comisionAmiriDisplay" class="form-control-plaintext text-muted"></p>
 
@@ -646,7 +646,7 @@ try {
 
                                 <div class="col-md-4">
 
-                                    <label class="form-label">Comisi�n Promotor</label>
+                                    <label class="form-label">Comisión Promotor</label>
 
                                     <p id="comisionPromotorDisplay" class="form-control-plaintext text-muted"></p>
 
@@ -722,7 +722,7 @@ try {
 
                                     </select>
 
-                                    <small class="text-muted">Se restar� de ambas cuentas: del cliente (digital) y de nuestra caja (efectivo f�sico entregado)</small>
+                                    <small class="text-muted">Se restará de ambas cuentas: del cliente (digital) y de nuestra caja (efectivo físico entregado)</small>
 
                                 </div>
 
@@ -852,7 +852,7 @@ try {
 
 
 
-            // Formatear monto en tiempo real como gu�a visual
+            // Formatear monto en tiempo real como guía visual
 
             $('#inputMonto').on('input', function() {
 
@@ -960,7 +960,7 @@ try {
 
             /**
 
-             * Formatear moneda seg�n el tipo
+             * Formatear moneda según el tipo
 
              */
 
@@ -1027,7 +1027,7 @@ try {
                             const partes = data.split('-');
                             const fechaOperacion = partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : data;
                             
-                            // Mostrar la fecha de captura original en peque�o
+                            // Mostrar la fecha de captura original en pequeño
                             let infoExtra = '';
                             if (row.creado_en) {
                                 const fechaC = new Date(row.creado_en);
@@ -1083,7 +1083,7 @@ try {
 
                             const com = parseFloat(data.comision_amiri) || 0;
 
-                            if (total <= 0 || com <= 0) return '<span class="text-muted">�</span>';
+                            if (total <= 0 || com <= 0) return '<span class="text-muted">—</span>';
 
                             const pct = (com / total) * 100;
 
@@ -1119,7 +1119,7 @@ try {
 
                             const com = parseFloat(data.comision_promotor) || 0;
 
-                            if (total <= 0 || com <= 0) return '<span class="text-muted">�</span>';
+                            if (total <= 0 || com <= 0) return '<span class="text-muted">—</span>';
 
                             const pct = (com / total) * 100;
 
@@ -1190,11 +1190,11 @@ try {
                         render: function(data) {
                             let btnPagar = '';
                             if (data.estado !== 'pagado') {
-                                // Bot�n Pagar estilo Badge (Naranja/Warning como lo ten�as originalmente)
+                                // Botón Pagar estilo Badge (Naranja/Warning como lo tenías originalmente)
                                 btnPagar = `<button class="badge bg-warning bg-opacity-10 text-warning border-0 pagar me-2" style="cursor: pointer; font-size: 0.75rem;" data-id="${data.id}"><i class="ti ti-cash"></i> Pagar</button>`;
                             }
                             
-                            // Bot�n Eliminar estilo Badge (Rojo/Danger)
+                            // Botón Eliminar estilo Badge (Rojo/Danger)
                             let btnEliminar = `<button class="badge bg-danger bg-opacity-10 text-danger border-0 eliminar" style="cursor: pointer; font-size: 0.75rem;" data-id="${data.id}" title="Eliminar"><i class="ti ti-trash"></i> Eliminar</button>`;
                             
                             return btnPagar + btnEliminar;
@@ -1217,7 +1217,7 @@ try {
                MODAL - ABRIR Y CARGAR DATOS
 
             ============================================================ */
-            // L�gica para Selecci�n M�ltiple
+            // Lógica para Selección Múltiple
             let ventasSeleccionadas = [];
             let totalPendienteMultiple = 0;
 
@@ -1245,7 +1245,7 @@ try {
                 }
             });
 
-            // Al hacer clic en el bot�n de pago m�ltiple
+            // Al hacer clic en el botón de pago múltiple
             $('#btnPagarMultiple').on('click', function() {
                 let ids = [];
                 let htmlPagos = '<h6 class="mb-3 text-primary"><i class="ti ti-list-check"></i> Ventas seleccionadas:</h6>';
@@ -1284,7 +1284,7 @@ try {
                 $('#modalPagarVenta').modal('show');
             });
 
-            // Limpiar selecci�n cuando la tabla se recargue
+            // Limpiar selección cuando la tabla se recargue
             tablaVentas.on('draw', function() {
                 ventasSeleccionadas = [];
                 totalPendienteMultiple = 0;
@@ -1298,7 +1298,7 @@ try {
                 let val = parseFloat($(this).val()) || 0;
                 if (val > max) {
                     $(this).val(max.toFixed(2));
-                    showToast("No puedes abonar m�s del saldo pendiente", "warning");
+                    showToast("No puedes abonar más del saldo pendiente", "warning");
                 }
             });
 
@@ -1354,7 +1354,7 @@ try {
 
 
 
-            // Escuchar cambios en selector de cuenta para mostrar/ocultar bot�n de liquidar
+            // Escuchar cambios en selector de cuenta para mostrar/ocultar botón de liquidar
 
             $('#cuentaPagoSelect').on('change', function() {
 
@@ -1378,7 +1378,7 @@ try {
 
                     
 
-                    // Mostrar bot�n solo si la cuenta tiene saldo suficiente
+                    // Mostrar botón solo si la cuenta tiene saldo suficiente
 
                     if (saldoCuenta >= pendiente && pendiente > 0) {
 
@@ -1400,7 +1400,7 @@ try {
 
 
 
-            // Evento clic en bot�n Liquidar Deuda Total
+            // Evento clic en botón Liquidar Deuda Total
 
             $('#btnLiquidarDeuda').on('click', function() {
 
@@ -1432,11 +1432,11 @@ try {
 
 
 
-            // Formatear monto en tiempo real como gu�a visual
+            // Formatear monto en tiempo real como guía visual
 
             $('#montoPagarFormatted').on('input', function() {
 
-                let valor = $(this).val().replace(/[^0-9.]/g, ''); // Solo n�meros y punto
+                let valor = $(this).val().replace(/[^0-9.]/g, ''); // Solo números y punto
 
                 const spanFormato = $('#montoFormateado');
 
@@ -1526,7 +1526,7 @@ try {
 
                 } else {
 
-                    resumen += ` <strong>�Venta saldada completamente!</strong>`;
+                    resumen += ` <strong>¡Venta saldada completamente!</strong>`;
 
                 }
 
@@ -1574,7 +1574,7 @@ try {
                 } else {
                     const id = $('#ventaId').val();
                     const montoAPagar = parseMoneda($('#montoPagarHidden').val());
-                    if (montoAPagar <= 0) return alert("Ingresa un monto v�lido.");
+                    if (montoAPagar <= 0) return alert("Ingresa un monto válido.");
                     arrayPagos.push({ id: id, abono: montoAPagar });
                 }
 
@@ -1712,7 +1712,7 @@ try {
 
                         render: function(data) {
 
-                            if (!data) return '<span class="text-muted">�</span>';
+                            if (!data) return '<span class="text-muted">—</span>';
 
                             return '$' + parseFloat(data).toLocaleString('es-MX', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
 
@@ -1756,7 +1756,7 @@ try {
 
 
 
-                if (!confirm("�Eliminar esta venta? Esta acci�n no se puede deshacer.")) return;
+                if (!confirm("¿Eliminar esta venta? Esta acción no se puede deshacer.")) return;
 
 
 

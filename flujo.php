@@ -120,10 +120,10 @@ html[data-bs-theme="dark"] #main-wrapper .card .header-prestamos { background: r
 }
 [data-bs-theme="dark"] .card .header-saldos span,
 [data-bs-theme="dark"] .card .header-saldos i {
-    color: var(--nx-success) !important; /* Verde exacto de tu plantilla */
+    color: var(--nx-success) !important; /* Acento Helios */
 }
 
-/* 3. CAPITAL (WARNING - Este color faltaba en tu dark-mode.css) */
+/* 3. CAPITAL (acento Helios) */
 [data-bs-theme="dark"] .card .header-capital {
     background-color: rgba(251,191,36,0.12) !important;
     border-bottom: 1px solid rgba(251,191,36,0.28) !important;
@@ -320,7 +320,7 @@ html[data-bs-theme="dark"] #main-wrapper .card .header-prestamos { background: r
            📦 CAJA BLANCA DE INVOLUCRADOS (MODO OSCURO)
            ========================================= */
         [data-bs-theme="dark"] .table>tbody>tr>td .bg-light {
-            background-color: #1a181c !important; /* Fondo gris oscuro / azulado */
+            background-color: #1a181c !important; /* Superficie Helios */
             border-color: rgba(255,255,255,0.12) !important; /* Borde oscuro sutil */
         }
 
@@ -1171,7 +1171,7 @@ html[data-bs-theme="dark"] #main-wrapper .card .header-prestamos { background: r
 
         /* Textos */
         [data-bs-theme="dark"] #modalProveedor .text-muted,
-        [data-bs-theme="dark"] #modalDeudor .text-muted            { color: #6b7280 !important; }
+        [data-bs-theme="dark"] #modalDeudor .text-muted            { color: var(--nx-text-muted) !important; }
 
         [data-bs-theme="dark"] #modalProveedor .text-body,
         [data-bs-theme="dark"] #modalDeudor .text-body             { color: var(--nx-text) !important; }
@@ -1184,10 +1184,10 @@ html[data-bs-theme="dark"] #main-wrapper .card .header-prestamos { background: r
         [data-bs-theme="dark"] #modalDeudor h5                     { color: var(--nx-text) !important; }
 
         [data-bs-theme="dark"] #modalProveedor small,
-        [data-bs-theme="dark"] #modalDeudor small                  { color: #9ca3af !important; }
+        [data-bs-theme="dark"] #modalDeudor small                  { color: var(--nx-text-muted) !important; }
 
         [data-bs-theme="dark"] #modalProveedor .form-label,
-        [data-bs-theme="dark"] #modalDeudor .form-label            { color: #d1d5db !important; }
+        [data-bs-theme="dark"] #modalDeudor .form-label            { color: var(--nx-text) !important; }
 
         /* Badges */
         [data-bs-theme="dark"] #modalProveedor .badge,

@@ -42,7 +42,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             border: 1px solid rgba(255,255,255,0.12);
             box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
             color: #fff;
-            font-family: 'Montserrat', 'Poppins', 'Inter', sans-serif;
+            font-family: 'Montserrat', 'Poppins', sans-serif;
             overflow: hidden;
         }
 

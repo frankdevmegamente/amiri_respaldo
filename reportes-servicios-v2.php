@@ -35,12 +35,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .svc-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--nx-text-muted); line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
         [data-bs-theme="dark"] .svc-label { color: var(--nx-text-muted); }
         .svc-value { font-size: 1.1rem; font-weight: 800; color: var(--nx-text); line-height: 1.2; letter-spacing: -0.2px; }
-        [data-bs-theme="dark"] .svc-value { color: #e8ecf0; }
-        .svc-footer { font-size: 0.65rem; color: var(--nx-text-muted); padding-top: 4px; margin-top: 4px; border-top: 1px solid #eef0f4; }
-        [data-bs-theme="dark"] .svc-footer { color: #6b7280; border-top-color: #2d3140; }
+        [data-bs-theme="dark"] .svc-value { color: #ffffff; }
+        .svc-footer { font-size: 0.65rem; color: var(--nx-text-muted); padding-top: 4px; margin-top: 4px; border-top: 1px solid #d9d0d6; }
+        [data-bs-theme="dark"] .svc-footer { color: #9a9096; border-top-color: #1a181c; }
         [data-bs-theme="dark"] .metric-card-serv { background-color: var(--nx-surface) !important; border-color: var(--nx-border) !important; }
         [data-bs-theme="dark"] .metric-card-serv .svc-icon { background-color: rgba(255,255,255,0.06) !important; }
-        .metric-card-serv[data-servicio-id]:hover { border-color: #cbd5e1 !important; }
+        .metric-card-serv[data-servicio-id]:hover { border-color: #c58fb8 !important; }
         [data-bs-theme="dark"] .logo-modo-claro,
         .dark-mode .logo-modo-claro { display: none !important; }
         [data-bs-theme="dark"] .logo-modo-oscuro,
@@ -401,8 +401,8 @@ function cargarGraficaServicio(servicioId, servicioNombre) {
                     plugins: {
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: 'rgba(20, 25, 40, 0.9)',
-                            titleColor: '#e8ecf0',
+                            backgroundColor: 'rgba(11,11,12,0.92)',
+                            titleColor: '#ffffff',
                             bodyColor: '#fff',
                             padding: 12,
                             cornerRadius: 8,

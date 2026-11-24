@@ -51,39 +51,39 @@ sort($bancos_unicos);
     <style>
         .body-wrapper { padding-top: 100px !important; }
         .body-wrapper-inner, .body-wrapper .container-fluid { padding-top: 15px !important; margin-top: 0 !important; }
-        .crud-header { background: linear-gradient(135deg, #c58fb8 0%, #a29bfe 100%); border-radius: 16px; padding: 24px; color: white; margin-bottom: 20px; }
-        .ticket-wrapper { background-color: #f4f6f9; padding: 40px; border-radius: 12px; display: flex; justify-content: center; }
-        .ticket-card { background: var(--nx-surface); width: 100%; max-width: 580px; border-radius: 0px; padding: 35px; box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.05); color: var(--nx-text); font-family: 'Manrope', sans-serif; border: 1px solid #ebf1f6; }
-        .ticket-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid #c58fb8; }
-        .ticket-title { font-size: 18px; font-weight: 700; letter-spacing: 1.5px; color: #c58fb8; text-transform: uppercase; white-space: nowrap; }
-        .client-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed #ebf1f6; }
+        .crud-header { background: var(--nx-accent-gradient); border-radius: 16px; padding: 24px; color: white; margin-bottom: 20px; }
+        .ticket-wrapper { background-color: var(--nx-surface-2); padding: 40px; border-radius: var(--nx-radius); display: flex; justify-content: center; }
+        .ticket-card { background: var(--nx-surface); width: 100%; max-width: 580px; border-radius: var(--nx-radius); padding: 35px; box-shadow: var(--nx-shadow); color: var(--nx-text); font-family: var(--nx-font); border: 1px solid var(--nx-border); }
+        .ticket-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 2px solid var(--nx-primary); }
+        .ticket-title { font-size: 18px; font-weight: 700; letter-spacing: 1.5px; color: var(--nx-primary); text-transform: uppercase; white-space: nowrap; }
+        .client-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed var(--nx-border); }
         .client-info { display: flex; flex-direction: column; gap: 4px; }
         .client-name { font-size: 15px; font-weight: 700; color: var(--nx-text); }
-        .client-account { font-size: 12px; color: #7c8fac; text-transform: uppercase; letter-spacing: 0.5px; }
-        .client-amount { background-color: rgba(197, 143, 184, 0.1); color: #c58fb8; padding: 8px 16px; border-radius: 6px; font-size: 16px; font-weight: 700; text-align: right; min-width: 130px; }
+        .client-account { font-size: 12px; color: var(--nx-text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .client-amount { background-color: var(--nx-primary-soft); color: var(--nx-primary); padding: 8px 16px; border-radius: 6px; font-size: 16px; font-weight: 700; text-align: right; min-width: 130px; }
         .ticket-row.total-row { background: rgba(197, 143, 184, 0.04); border: none; border-radius: 8px; padding: 20px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; }
-        .text-muted-custom { color: #7c8fac; font-size: 13px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+        .text-muted-custom { color: var(--nx-text-muted); font-size: 13px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
         .text-success-custom { color: var(--nx-success); }
-        .select2-container--default .select2-selection--single { height: 40px; border: 1px solid #ebf1f6; border-radius: 6px; display: flex; align-items: center; }
+        .select2-container--default .select2-selection--single { height: 40px; border: 1px solid var(--nx-border); border-radius: 6px; display: flex; align-items: center; }
         .select2-container--default .select2-selection--single .select2-selection__arrow { height: 38px; }
         .btn-crud { width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; }
         [data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
         [data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
         [data-bs-theme="dark"] .ticket-wrapper { background-color: transparent !important; }
-        [data-bs-theme="dark"] .ticket-card { background: #1a181c; border-color: rgba(255,255,255,0.12); box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3); }
+        [data-bs-theme="dark"] .ticket-card { background: var(--nx-surface-2); border-color: var(--nx-border); box-shadow: var(--nx-shadow); }
         [data-bs-theme="dark"] .ticket-header { border-bottom-color: rgba(255,255,255,0.12); }
-        [data-bs-theme="dark"] .client-name { color: #f5f2f4; }
+        [data-bs-theme="dark"] .client-name { color: var(--nx-text); }
         [data-bs-theme="dark"] .client-account { color: #9a9096; }
         [data-bs-theme="dark"] .client-row { border-bottom-color: rgba(255,255,255,0.12); }
         [data-bs-theme="dark"] .client-amount { background-color: rgba(197, 143, 184, 0.15); color: var(--nx-primary); }
         [data-bs-theme="dark"] #placeholderTicket, [data-bs-theme="dark"] .text-muted-custom { color: #9a9096 !important; }
         [data-bs-theme="dark"] .ticket-row.total-row { background-color: #1a181c !important; }
-        [data-bs-theme="dark"] .select2-container--default .select2-selection--single { background-color: #1a181c; border-color: rgba(255,255,255,0.12); }
-        [data-bs-theme="dark"] .select2-container--default .select2-selection--single .select2-selection__rendered { color: #f5f2f4; }
-        [data-bs-theme="dark"] .select2-dropdown { background-color: #1a181c; border-color: rgba(255,255,255,0.12); }
-        [data-bs-theme="dark"] .select2-container--default .select2-search--dropdown .select2-search__field { background-color: #1a181c; border-color: rgba(255,255,255,0.12); color: #f5f2f4; }
-        [data-bs-theme="dark"] .select2-container--default .select2-results__option[aria-selected=true] { background-color: #1a181c; color: #f5f2f4; }
-        [data-bs-theme="dark"] .select2-container--default .select2-results__option--highlighted[aria-selected] { background-color: #c58fb8; color: #ffffff; }
+        [data-bs-theme="dark"] .select2-container--default .select2-selection--single { background-color: var(--nx-surface-2); border-color: var(--nx-border); }
+        [data-bs-theme="dark"] .select2-container--default .select2-selection--single .select2-selection__rendered { color: var(--nx-text); }
+        [data-bs-theme="dark"] .select2-dropdown { background-color: var(--nx-surface-2); border-color: var(--nx-border); }
+        [data-bs-theme="dark"] .select2-container--default .select2-search--dropdown .select2-search__field { background-color: var(--nx-surface-2); border-color: var(--nx-border); color: var(--nx-text); }
+        [data-bs-theme="dark"] .select2-container--default .select2-results__option[aria-selected=true] { background-color: var(--nx-surface-2); color: var(--nx-text); }
+        [data-bs-theme="dark"] .select2-container--default .select2-results__option--highlighted[aria-selected] { background-color: var(--nx-primary); color: #0a0709; }
         @media (max-width: 768px) {
             .ticket-wrapper { padding: 15px 10px !important; }
             .ticket-card { padding: 20px 15px !important; }
@@ -214,7 +214,7 @@ sort($bancos_unicos);
                                     </div>
                                     <div class="ticket-row total-row" style="display: none;" id="contenedorTotal">
                                         <div>
-                                            <div class="text-muted-custom mb-1" style="color: #c58fb8;">TOTAL TRANSFERENCIAS</div>
+                                            <div class="text-muted-custom mb-1" style="color: var(--nx-primary);">TOTAL TRANSFERENCIAS</div>
                                         </div>
                                         <div class="fs-large text-success-custom fw-bolder" id="outTotal" style="font-size: 26px;">$0.00 MXN</div>
                                     </div>
@@ -231,7 +231,7 @@ sort($bancos_unicos);
         <div class="modal-dialog">
             <div class="modal-content">
                 <form id="formCliente">
-                    <div class="modal-header" style="background: linear-gradient(135deg, #c58fb8 0%, #a29bfe 100%); color: white;">
+                    <div class="modal-header" style="background: var(--nx-accent-gradient); color: white;">
                         <h5 class="modal-title" id="tituloModalCliente"><i class="ti ti-user-plus"></i> Nuevo Cliente</h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>

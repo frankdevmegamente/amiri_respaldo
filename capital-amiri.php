@@ -49,7 +49,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
     [data-bs-theme="dark"] .capital-section-title { color: var(--nx-text-muted); }
     .table-reportes th { position: sticky; top: 0; background: var(--nx-surface); z-index: 2; }
     [data-bs-theme="dark"] .table-reportes th,
-    .dark-mode .table-reportes th { background: #1e2a3a; }
+    .dark-mode .table-reportes th { background: var(--nx-surface-2); }
     [data-bs-theme="dark"] .bg-light { background-color: var(--nx-surface-2) !important; }
 </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>

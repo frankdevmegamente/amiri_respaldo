@@ -270,7 +270,7 @@ try {
 
                 margin-bottom: 20px;
 
-                border-bottom: 3px solid #6c5ce7;
+                border-bottom: 3px solid #c58fb8;
 
                 padding-bottom: 10px;
 
@@ -278,7 +278,7 @@ try {
 
             .header h1 {
 
-                color: #6c5ce7;
+                color: #c58fb8;
 
                 margin: 0;
 
@@ -328,7 +328,7 @@ try {
 
             th {
 
-                background-color: #6c5ce7;
+                background-color: #c58fb8;
 
                 color: white;
 
@@ -364,7 +364,7 @@ try {
 
                 background-color: #e8f4f8;
 
-                border-left: 4px solid #6c5ce7;
+                border-left: 4px solid #c58fb8;
 
             }
 
