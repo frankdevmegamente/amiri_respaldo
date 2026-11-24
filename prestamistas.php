@@ -58,7 +58,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .form-label { color: #f5f2f4; }
         [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select, [data-bs-theme="dark"] .input-group-text { background-color: #1a181c; border-color: rgba(255,255,255,0.12); color: #f5f2f4; }
         [data-bs-theme="dark"] .form-control::placeholder { color: #9a9096; }
-        [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
+        [data-bs-theme="dark"] .bg-light { background-color: var(--nx-surface-2) !important; }
         [data-bs-theme="dark"] .bg-primary.bg-opacity-10 { background-color: rgba(93, 135, 255, 0.12) !important; }
         [data-bs-theme="dark"] .bg-success.bg-opacity-10 { background-color: rgba(25, 135, 84, 0.12) !important; }
         [data-bs-theme="dark"] .bg-warning.bg-opacity-10 { background-color: rgba(255, 193, 7, 0.12) !important; }

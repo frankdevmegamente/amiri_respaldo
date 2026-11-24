@@ -11,26 +11,26 @@ $ff = $_GET['fin'] ?? date('Y-m-t');
 <title>Diagnostico - Utilidad AMIRI</title>
 <link rel="stylesheet" href="src/assets/css/styles.min.css">
 <style>
-body{background:#0f172a;color:#e2e8f0;padding:20px;font-family:'Segoe UI',sans-serif}
-h1{color:#a78bfa;border-bottom:2px solid #c58fb8;padding-bottom:10px}
+body{background:var(--nx-surface);color:#e2e8f0;padding:20px;font-family:'Segoe UI',sans-serif}
+h1{color:var(--nx-primary);border-bottom:2px solid #c58fb8;padding-bottom:10px}
 h2{color:#c58fb8;margin-top:30px;font-size:1.1rem}
 table{width:100%;border-collapse:collapse;margin:10px 0 20px 0;font-size:0.85rem}
-th{background:#1e293b;color:#a78bfa;padding:8px 12px;text-align:left;border:1px solid #334155}
-td{padding:6px 12px;border:1px solid #334155}
-tr:nth-child(even){background:#1e293b}
-tr:hover{background:#334155}
+th{background:var(--nx-surface-2);color:var(--nx-primary);padding:8px 12px;text-align:left;border:1px solid var(--nx-border)}
+td{padding:6px 12px;border:1px solid var(--nx-border)}
+tr:nth-child(even){background:var(--nx-surface-2)}
+tr:hover{background:var(--nx-border)}
 .neg{color:#f87171;font-weight:bold}.pos{color:#4ade80;font-weight:bold}
 .small{font-size:0.75rem;color:#64748b}
-.filters{background:#1e293b;padding:12px 16px;border-radius:8px;margin-bottom:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.filters label{color:#94a3b8;font-size:0.85rem}
-.filters input{background:#0f172a;border:1px solid #334155;color:#e2e8f0;padding:4px 8px;border-radius:4px}
+.filters{background:var(--nx-surface-2);padding:12px 16px;border-radius:8px;margin-bottom:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.filters label{color:var(--nx-text-muted);font-size:0.85rem}
+.filters input{background:var(--nx-surface);border:1px solid var(--nx-border);color:#e2e8f0;padding:4px 8px;border-radius:4px}
 .filters button{background:#c58fb8;color:#fff;border:none;padding:6px 16px;border-radius:4px;cursor:pointer}
 .alert{padding:12px 16px;border-radius:8px;margin:10px 0;font-size:0.85rem}
 .alert-danger{background:rgba(248,113,113,0.15);border:1px solid rgba(248,113,113,0.3);color:#fca5a5}
 .alert-info{background:rgba(96,165,250,0.15);border:1px solid rgba(96,165,250,0.3);color:#93c5fd}
 .alert-warning{background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.3);color:#fde68a}
 .sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:16px 0}
-.si{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:12px;text-align:center}
+.si{background:var(--nx-surface);border:1px solid var(--nx-border);border-radius:8px;padding:12px;text-align:center}
 .si .lb{font-size:0.7rem;color:#64748b;text-transform:uppercase;letter-spacing:0.5px}
 .si .vl{font-size:1.3rem;font-weight:800;margin-top:4px}
 </style>
@@ -41,7 +41,7 @@ tr:hover{background:#334155}
 <label>Desde:</label><input type="date" id="fI" value="<?= htmlspecialchars($fi) ?>">
 <label>Hasta:</label><input type="date" id="fF" value="<?= htmlspecialchars($ff) ?>">
 <button onclick="location.href='?inicio='+document.getElementById('fI').value+'&fin='+document.getElementById('fF').value">Filtrar</button>
-<button onclick="location.href='?inicio=2020-01-01&fin=2099-12-31'" style="background:#334155">Ver Todo Historico</button>
+<button onclick="location.href='?inicio=2020-01-01&fin=2099-12-31'" style="background:var(--nx-border)">Ver Todo Historico</button>
 </div>
 <?php
 

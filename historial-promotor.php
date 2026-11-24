@@ -76,9 +76,9 @@ try {
         [data-bs-theme="dark"] .modal-header,
         [data-bs-theme="dark"] .modal-footer,
         [data-bs-theme="dark"] .table-light {
-            background-color: #1f2535 !important;
-            border-color: #2b3350 !important;
-            color: #e6ecff !important;
+            background-color: var(--nx-surface) !important;
+            border-color: var(--nx-border) !important;
+            color: var(--nx-text) !important;
         }
 
         [data-bs-theme="dark"] .card {
@@ -89,13 +89,13 @@ try {
         [data-bs-theme="dark"] .table thead th,
         [data-bs-theme="dark"] .table tbody td,
         [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
-            background-color: #1f2535 !important;
-            color: #e6ecff !important;
-            border-color: #2b3350 !important;
+            background-color: var(--nx-surface) !important;
+            color: var(--nx-text) !important;
+            border-color: var(--nx-border) !important;
         }
 
         [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
-            background-color: #232b3c !important;
+            background-color: var(--nx-surface-2) !important;
         }
 
         [data-bs-theme="dark"] .form-control,
@@ -105,9 +105,9 @@ try {
         [data-bs-theme="dark"] .alert,
         [data-bs-theme="dark"] .badge,
         [data-bs-theme="dark"] .nav-tabs .nav-link {
-            background-color: #232b3c !important;
-            color: #e6ecff !important;
-            border-color: #2b3350 !important;
+            background-color: var(--nx-surface-2) !important;
+            color: var(--nx-text) !important;
+            border-color: var(--nx-border) !important;
         }
 
         [data-bs-theme="dark"] .nav-tabs .nav-link.active {

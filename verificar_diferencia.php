@@ -103,18 +103,18 @@ $nf = function($n) { return '$' . number_format((float)$n, 2); };
         @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 500px) { .grid { grid-template-columns: 1fr; } }
         [data-bs-theme="dark"] body { /* Helios */ }
-        [data-bs-theme="dark"] .header-card, [data-bs-theme="dark"] .card-stat, [data-bs-theme="dark"] .status-card, [data-bs-theme="dark"] .table-detail { background: #1f2535; }
-        [data-bs-theme="dark"] .header-card h1 { color: #e6ecff; }
-        [data-bs-theme="dark"] .card-stat .stat-header h3 { color: #9aa4c8; }
-        [data-bs-theme="dark"] .card-stat .total { color: #e6ecff; }
-        [data-bs-theme="dark"] .card-stat .breakdown { border-top-color: #2b3350; }
+        [data-bs-theme="dark"] .header-card, [data-bs-theme="dark"] .card-stat, [data-bs-theme="dark"] .status-card, [data-bs-theme="dark"] .table-detail { background: var(--nx-surface); }
+        [data-bs-theme="dark"] .header-card h1 { color: var(--nx-text); }
+        [data-bs-theme="dark"] .card-stat .stat-header h3 { color: var(--nx-text-muted); }
+        [data-bs-theme="dark"] .card-stat .total { color: var(--nx-text); }
+        [data-bs-theme="dark"] .card-stat .breakdown { border-top-color: var(--nx-border); }
         [data-bs-theme="dark"] .card-stat .breakdown li { color: #c8cee8; }
-        [data-bs-theme="dark"] .card-stat .breakdown li .label { color: #9aa4c8; }
-        [data-bs-theme="dark"] .table-detail th { background: #232b3c; color: #9aa4c8; }
-        [data-bs-theme="dark"] .table-detail td { color: #c8cee8; border-top-color: #2b3350; }
+        [data-bs-theme="dark"] .card-stat .breakdown li .label { color: var(--nx-text-muted); }
+        [data-bs-theme="dark"] .table-detail th { background: var(--nx-surface-2); color: var(--nx-text-muted); }
+        [data-bs-theme="dark"] .table-detail td { color: #c8cee8; border-top-color: var(--nx-border); }
         [data-bs-theme="dark"] .table-detail tr:last-child td { border-top-color: #3d4760; }
-        [data-bs-theme="dark"] .status-card .status-detail { color: #9aa4c8; }
-        [data-bs-theme="dark"] .progress-bar { background: #2b3350; }
+        [data-bs-theme="dark"] .status-card .status-detail { color: var(--nx-text-muted); }
+        [data-bs-theme="dark"] .progress-bar { background: var(--nx-border); }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>

@@ -169,9 +169,9 @@ try {
         [data-bs-theme="dark"] .modal-content,
         [data-bs-theme="dark"] .modal-header,
         [data-bs-theme="dark"] .modal-footer {
-            background-color: #1f2535 !important;
-            border-color: #2b3350 !important;
-            color: #e6ecff !important;
+            background-color: var(--nx-surface) !important;
+            border-color: var(--nx-border) !important;
+            color: var(--nx-text) !important;
         }
 
         [data-bs-theme="dark"] .card {
@@ -182,13 +182,13 @@ try {
         [data-bs-theme="dark"] .table thead th,
         [data-bs-theme="dark"] .table tbody td,
         [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) {
-            background-color: #1f2535 !important;
-            color: #e6ecff !important;
-            border-color: #2b3350 !important;
+            background-color: var(--nx-surface) !important;
+            color: var(--nx-text) !important;
+            border-color: var(--nx-border) !important;
         }
 
         [data-bs-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) {
-            background-color: #232b3c !important;
+            background-color: var(--nx-surface-2) !important;
         }
 
         [data-bs-theme="dark"] .form-control,
@@ -198,9 +198,9 @@ try {
         [data-bs-theme="dark"] .alert,
         [data-bs-theme="dark"] .badge,
         [data-bs-theme="dark"] .nav-tabs .nav-link {
-            background-color: #232b3c !important;
-            color: #e6ecff !important;
-            border-color: #2b3350 !important;
+            background-color: var(--nx-surface-2) !important;
+            color: var(--nx-text) !important;
+            border-color: var(--nx-border) !important;
         }
 
         [data-bs-theme="dark"] .nav-tabs .nav-link.active {
@@ -248,11 +248,28 @@ try {
             <div class="body-wrapper-inner">
                 <div class="container-fluid px-4" style="max-width: 100%;">
                     
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="page-breadcrumb d-flex align-items-center mb-3 mt-2">
-                                <h3 class="mb-0"><i class="ti ti-user"></i> <?= htmlspecialchars($promotor['nombre']) ?></h3>
-                                <a href="promotores.php" class="btn btn-secondary ms-auto"><i class="ti ti-arrow-left"></i> Volver a Promotores</a>
+                    <div class="card mov-header shadow-sm border-0 rounded-4 mb-4">
+                        <div class="bg-pattern"></div>
+                        <div class="bg-pattern-2"></div>
+                        <div class="card-body p-4">
+                            <div class="row align-items-center g-3">
+                                <div class="col-md">
+                                    <div class="d-flex align-items-center gap-3 mb-1">
+                                        <div class="d-flex align-items-center justify-content-center rounded-3"
+                                             style="width:48px;height:48px;background:rgba(197,143,184,0.14);">
+                                            <i class="ti ti-user text-primary" style="font-size:1.6rem;"></i>
+                                        </div>
+                                        <div>
+                                            <h2 class="mb-0"><?= htmlspecialchars($promotor['nombre']) ?></h2>
+                                            <span class="sub-badge"><i class="ti ti-circle"></i> Detalle del promotor</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-auto">
+                                    <a href="promotores.php" class="btn btn-outline-secondary">
+                                        <i class="ti ti-arrow-left"></i> Volver a Promotores
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>

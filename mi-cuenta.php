@@ -60,10 +60,10 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
         .body-wrapper-inner, .body-wrapper .container-fluid { padding-top: 15px !important; margin-top: 0 !important; }
         [data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
         [data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
-        [data-bs-theme="dark"] .card { background-color: #1f2535 !important; border-color: #2b3350 !important; color: #e6ecff !important; }
-        [data-bs-theme="dark"] .table, [data-bs-theme="dark"] .table thead th, [data-bs-theme="dark"] .table tbody td { background-color: #1f2535 !important; color: #e6ecff !important; border-color: #2b3350 !important; }
-        [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select { background-color: #232b3c !important; color: #e6ecff !important; border-color: #2b3350 !important; }
-        [data-bs-theme="dark"] .modal-content { background-color: #1f2535 !important; border-color: #2b3350 !important; color: #e6ecff !important; }
+        [data-bs-theme="dark"] .card { background-color: var(--nx-surface) !important; border-color: var(--nx-border) !important; color: var(--nx-text) !important; }
+        [data-bs-theme="dark"] .table, [data-bs-theme="dark"] .table thead th, [data-bs-theme="dark"] .table tbody td { background-color: var(--nx-surface) !important; color: var(--nx-text) !important; border-color: var(--nx-border) !important; }
+        [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select { background-color: var(--nx-surface-2) !important; color: var(--nx-text) !important; border-color: var(--nx-border) !important; }
+        [data-bs-theme="dark"] .modal-content { background-color: var(--nx-surface) !important; border-color: var(--nx-border) !important; color: var(--nx-text) !important; }
         .perfil-avatar { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; background: rgba(93,135,255,.12); color: var(--nx-primary); }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>

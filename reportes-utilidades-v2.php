@@ -26,7 +26,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .body-wrapper-inner, .body-wrapper .container-fluid { padding-top: 15px !important; margin-top: 0 !important; }
         .chart-container { position: relative; height: 300px; }
         .nav-pills .nav-link { border-radius: 8px; padding: 10px 20px; }
-        .nav-pills .nav-link.active { background: linear-gradient(135deg, #c58fb8, #a78bfa); }
+        .nav-pills .nav-link.active { background: var(--nx-accent-gradient); }
         .table-reportes th { background-color: #f8f9fa; font-weight: 600; }
         [data-bs-theme="dark"] .table-reportes th { background-color: var(--nx-surface-2); }
         .metric-card-util { transition: all 0.25s ease; position: relative; overflow: hidden; }
@@ -35,13 +35,13 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .metric-card-util .top-strip { position: absolute; top: 0; left: 0; right: 0; height: 3px; border-radius: 0.75rem 0.75rem 0 0; }
         .util-icon { width: 42px; height: 42px; }
         .util-label { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--nx-text-muted); }
-        [data-bs-theme="dark"] .util-label { color: #8b92a8; }
+        [data-bs-theme="dark"] .util-label { color: var(--nx-text-muted); }
         .util-value { font-size: 1.5rem; font-weight: 800; color: var(--nx-text); line-height: 1.2; letter-spacing: -0.3px; }
         [data-bs-theme="dark"] .util-value { color: #e8ecf0; }
         .util-breakdown { padding-top: 10px; margin-top: 6px; border-top: 1px solid #e2e8f0; }
         [data-bs-theme="dark"] .util-breakdown { border-top-color: #2d3140; }
         .util-breakdown .br-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 0.78rem; color: var(--nx-text-muted); }
-        [data-bs-theme="dark"] .util-breakdown .br-row { color: #8b92a8; }
+        [data-bs-theme="dark"] .util-breakdown .br-row { color: var(--nx-text-muted); }
         .util-breakdown .br-row .br-label { min-width: 0; }
         .util-breakdown .br-row .br-value { font-weight: 700; white-space: nowrap; margin-left: 12px; }
         .util-breakdown .br-divider { height: 1px; background: #e2e8f0; margin: 4px 0; }
@@ -74,8 +74,8 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .empty-state { text-align:center; padding:24px 16px; }
         .empty-state .empty-icon { font-size:2.5rem; opacity:0.25; margin-bottom:8px; display:block; }
         .empty-state .empty-title { font-size:0.95rem; font-weight:600; color: var(--nx-text-muted); margin-bottom:4px; }
-        .empty-state .empty-sub { font-size:0.78rem; color:#8b92a8; }
-        [data-bs-theme="dark"] .empty-state .empty-title { color:#8b92a8; }
+        .empty-state .empty-sub { font-size:0.78rem; color:var(--nx-text-muted); }
+        [data-bs-theme="dark"] .empty-state .empty-title { color:var(--nx-text-muted); }
         [data-bs-theme="dark"] .empty-state .empty-sub { color:#6b7280; }
         .top-cliente-row { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid #f0f2f5; }
         [data-bs-theme="dark"] .top-cliente-row { border-bottom-color:#2d3140; }
@@ -87,7 +87,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .top-cliente-bar-wrap { background:#2d3140; }
         .top-cliente-bar { height:100%; border-radius:4px; transition:width 0.6s ease; }
         .top-cliente-value { font-size:0.72rem; font-weight:700; color: var(--nx-text-muted); min-width:55px; text-align:right; }
-        [data-bs-theme="dark"] .top-cliente-value { color:#8b92a8; }
+        [data-bs-theme="dark"] .top-cliente-value { color:var(--nx-text-muted); }
         .sparkline-wrap { width:100%; height:36px; margin-top:6px; }
         .meta-bar-wrap { margin-top:8px; padding-top:6px; border-top:1px solid #e2e8f0; }
         [data-bs-theme="dark"] .meta-bar-wrap { border-top-color:#2d3140; }
@@ -97,7 +97,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .meta-bar-fill { height:100%; border-radius:4px; transition:width 0.8s ease; }
         .meta-btn { font-size:0.65rem; padding:0 4px; color: var(--nx-text-muted); cursor:pointer; }
         .meta-btn:hover { color:#c58fb8; }
-        .br-section-label { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:#8b92a8; margin-bottom:4px; }
+        .br-section-label { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--nx-text-muted); margin-bottom:4px; }
         [data-bs-theme="dark"] .br-section-label { color:#6b7280; }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
@@ -582,7 +582,7 @@ function renderTopClientes(datos) {
         return;
     }
     var maxVal = parseFloat(top[0].comision_amiri) || 1;
-    var colores = ['#c58fb8','var(--nx-primary)','#14b8a6','#f59e0b','#d96a4e','#e74c3c','#3498db','#2ecc71','#9b59b6','#1abc9c'];
+    var colores = ['#c58fb8','var(--nx-primary)','var(--nx-success)','var(--nx-warning)','#d96a4e','#e74c3c','#3498db','#2ecc71','#9b59b6','#1abc9c'];
     var html = '';
     top.forEach(function(r, i) {
         var v = parseFloat(r.comision_amiri) || 0;
@@ -599,7 +599,7 @@ function renderTopClientes(datos) {
 
 let chartServicio, chartCliente, chartPromotor, chartComparativa;
 let dtServicio, dtCliente, dtPromotor;
-const COLORES = ['#c58fb8','#f59e0b','#14b8a6','#a78bfa','#fbbf24','#2dd4bf','#8b5cf6','#d97706','#0d9488','#c084fc'];
+const COLORES = ['#c58fb8','var(--nx-warning)','var(--nx-success)','var(--nx-primary)','var(--nx-warning)','var(--nx-success)','var(--nx-primary)','var(--nx-warning)','#0d9488','#c084fc'];
 
 function formatoNumero(num) {
     num = parseFloat(num || 0);
@@ -682,14 +682,14 @@ function cargarResumen() {
             $('#lblRentBrutaDivisas').text('$' + formatoNumero(data.ganancia_divisas));
             $('#lblRentDivisasUsd').text('$' + formatoNumero(data.ganancia_usd));
             $('#lblRentDivisasUsdt').text('$' + formatoNumero(data.ganancia_usdt));
-            $('#lblRentResultado').text(margen.toFixed(1) + '%').css('color', margen >= 0 ? '#14b8a6' : '#d96a4e');
+            $('#lblRentResultado').text(margen.toFixed(1) + '%').css('color', margen >= 0 ? 'var(--nx-success)' : '#d96a4e');
             if (neta < 0) {
                 $('#statUtilidadNeta, #lblNetFinal').removeClass('text-primary').addClass('text-danger').css('color', '#d96a4e');
             } else {
-                $('#statUtilidadNeta, #lblNetFinal').removeClass('text-danger').addClass('text-primary').css('color', '#14b8a6');
+                $('#statUtilidadNeta, #lblNetFinal').removeClass('text-danger').addClass('text-primary').css('color', 'var(--nx-success)');
             }
 
-            var margenColor = margen >= 0 ? '#14b8a6' : '#d96a4e';
+            var margenColor = margen >= 0 ? 'var(--nx-success)' : '#d96a4e';
             $('#statRentabilidadNeta').css('color', margenColor);
             $('#statMargenPromedio').text(margen.toFixed(1) + '%').css('color', margenColor);
 
@@ -962,7 +962,7 @@ function cargarGraficaComparativa() {
                         labels: dias.map(function(d) { return 'Día ' + d; }),
                         datasets: [
                             { label: 'Utilidad AMIRI', data: comisiones, backgroundColor: '#c58fb8', borderRadius: 4, borderSkipped: false },
-                            { label: 'Utilidad Promotor', data: comisionesProm, backgroundColor: '#a78bfa', borderRadius: 4, borderSkipped: false }
+                            { label: 'Utilidad Promotor', data: comisionesProm, backgroundColor: 'var(--nx-primary)', borderRadius: 4, borderSkipped: false }
                         ]
                     },
                     options: {
@@ -1008,7 +1008,7 @@ function cargarGraficaComparativa() {
                         labels: data.map(function(d) { return d.mes; }),
                         datasets: [
                             { label: 'Utilidad AMIRI', data: data.map(function(d) { return parseFloat(d.comisiones) || 0; }), backgroundColor: '#c58fb8', borderRadius: 4, borderSkipped: false },
-                            { label: 'Utilidad Promotor', data: data.map(function(d) { return parseFloat(d.comisiones_promotor) || 0; }), backgroundColor: '#a78bfa', borderRadius: 4, borderSkipped: false }
+                            { label: 'Utilidad Promotor', data: data.map(function(d) { return parseFloat(d.comisiones_promotor) || 0; }), backgroundColor: 'var(--nx-primary)', borderRadius: 4, borderSkipped: false }
                         ]
                     },
                     options: {

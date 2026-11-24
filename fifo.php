@@ -74,7 +74,7 @@ $pdo = getPDO();
             color: #e8ecf0;
         }
         [data-bs-theme="dark"] .kpi-label {
-            color: #8b92a8;
+            color: var(--nx-text-muted);
         }
 
         .nav-moneda .nav-link {
@@ -111,8 +111,8 @@ $pdo = getPDO();
 
         /* FIFO dark table overrides removed - Helios */
         [data-bs-theme="dark"] .table-dark th {
-            background-color: #2b3350 !important;
-            color: #e6ecff !important;
+            background-color: var(--nx-border) !important;
+            color: var(--nx-text) !important;
         }
 
         .month-nav-btn {
@@ -130,11 +130,11 @@ $pdo = getPDO();
             border-color: #c58fb8;
         }
         [data-bs-theme="dark"] .month-nav-btn {
-            border-color: #2b3350;
-            color: #8b92a8;
+            border-color: var(--nx-border);
+            color: var(--nx-text-muted);
         }
         [data-bs-theme="dark"] .month-nav-btn:hover {
-            background: #2b3350;
+            background: var(--nx-border);
             color: #c58fb8;
             border-color: #c58fb8;
         }

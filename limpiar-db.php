@@ -39,7 +39,7 @@ if ($confirmar !== 'si') {
     ?>
     <!DOCTYPE html>
     <html><head><meta charset="UTF-8"><title>Limpiar DB</title>
-    <style>body{background:#0f172a;color:#e2e8f0;padding:30px;font-family:sans-serif}h1{color:#f87171}.btn{padding:12px 24px;border:none;border-radius:6px;font-size:1rem;cursor:pointer;margin:5px}.btn-danger{background:#dc2626;color:#fff}.btn-cancel{background:#334155;color:#fff}</style>
+    <style>body{background:var(--nx-surface);color:#e2e8f0;padding:30px;font-family:sans-serif}h1{color:#f87171}.btn{padding:12px 24px;border:none;border-radius:6px;font-size:1rem;cursor:pointer;margin:5px}.btn-danger{background:#dc2626;color:#fff}.btn-cancel{background:var(--nx-border);color:#fff}</style>
     </head><body>
     <h1>Limpiar Base de Datos</h1>
     <p>Esto eliminará: movimientos, deudas, gastos, cierres, inventario, historial, auditoría, retiros, préstamos.</p>
@@ -89,7 +89,7 @@ $pdo->exec("UPDATE cuentas SET saldo_actual = 0, valor_mxn = 0");
 ?>
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>Limpieza OK</title>
-<style>body{background:#0f172a;color:#e2e8f0;padding:30px;font-family:sans-serif}h1{color:#4ade80}.ok{color:#4ade80}.err{color:#f87171}.btn{padding:12px 24px;border:none;border-radius:6px;font-size:1rem;cursor:pointer;margin:5px;background:#c58fb8;color:#fff;text-decoration:none;display:inline-block}table{width:100%;border-collapse:collapse}td,th{padding:6px;border:1px solid #334155;text-align:left}th{background:#1e293b;color:#a78bfa}</style>
+<style>body{background:var(--nx-surface);color:#e2e8f0;padding:30px;font-family:sans-serif}h1{color:#4ade80}.ok{color:#4ade80}.err{color:#f87171}.btn{padding:12px 24px;border:none;border-radius:6px;font-size:1rem;cursor:pointer;margin:5px;background:#c58fb8;color:#fff;text-decoration:none;display:inline-block}table{width:100%;border-collapse:collapse}td,th{padding:6px;border:1px solid var(--nx-border);text-align:left}th{background:var(--nx-surface-2);color:var(--nx-primary)}</style>
 </head><body>
 <h1>Limpieza completada</h1>
 <h3>Tablas limpiadas (<?= count($ok) ?>):</h3>

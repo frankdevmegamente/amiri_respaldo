@@ -174,7 +174,7 @@ $pagina_actual = basename($_SERVER['PHP_SELF']);
 [data-bs-theme="dark"] .bg-success.bg-opacity-10 { background-color: rgba(19,222,185,0.12) !important; }
 [data-bs-theme="dark"] .bg-warning.bg-opacity-10 { background-color: rgba(255,174,31,0.12) !important; }
 [data-bs-theme="dark"] .bg-info.bg-opacity-10 { background-color: rgba(83,155,255,0.12) !important; }
-[data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
+[data-bs-theme="dark"] .bg-light { background-color: var(--nx-surface-2) !important; }
 </style>
 
 <body>

@@ -421,7 +421,7 @@ $metricas = obtenerMetricas($pdo);
         [data-bs-theme="dark"] .form-label { color: #f5f2f4; }
         [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select { background-color: #1a181c; border-color: rgba(255,255,255,0.12); color: #f5f2f4; }
         [data-bs-theme="dark"] .form-control::placeholder { color: #9a9096; }
-        [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
+        [data-bs-theme="dark"] .bg-light { background-color: var(--nx-surface-2) !important; }
         [data-bs-theme="dark"] .progress { background-color: rgba(255,255,255,0.12); }
         [data-bs-theme="dark"] code { color: #f5f2f4; }
     </style>

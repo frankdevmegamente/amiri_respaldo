@@ -119,7 +119,7 @@ $twoFAEnabled = $user2FA['two_fa_enabled'] ?? false;
 }
 
 [data-bs-theme="dark"] .bg-light {
-    background-color: #1e293b !important;
+    background-color: var(--nx-surface-2) !important;
 }
 
 /* ─── Page Header ─────────────────────────────── */

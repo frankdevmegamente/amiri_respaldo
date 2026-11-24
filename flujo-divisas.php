@@ -789,9 +789,9 @@ $serviciosDivisas = [
 
         [data-bs-theme="dark"] #totalesGroup .card {
 
-            background: #0f172a;
+            background: var(--nx-surface);
 
-            border-color: #1f2937;
+            border-color: var(--nx-border);
 
         }
 
@@ -873,7 +873,7 @@ $serviciosDivisas = [
 
             background: #111827;
 
-            border-color: #1f2937;
+            border-color: var(--nx-border);
 
             color: #e5e7eb;
 
