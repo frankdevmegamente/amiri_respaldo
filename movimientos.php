@@ -314,10 +314,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                     <option value="USDT">USDT</option>
                                 </select>
                             </div>
-                            <div class="col-xl-2 col-md-4 d-flex align-items-end gap-3">
+                            <div class="col-xl-3 col-md-6 d-flex align-items-end gap-2 flex-wrap">
                                 <div class="form-check mt-2">
                                     <input class="form-check-input" type="checkbox" id="filtroAnulados" checked>
-                                    <label class="form-check-label" for="filtroAnulados" style="font-size:0.85rem;" title="Sin marcar: solo vigentes. Marcado: incluye anulados/corregidos/inactivos.">Incluir anulados</label>
+                                    <label class="form-check-label" for="filtroAnulados" style="font-size:0.8rem; white-space:nowrap;" title="Sin marcar: solo vigentes. Marcado: incluye anulados/corregidos/inactivos.">Incluir anulados</label>
                                 </div>
                                 <button class="btn btn-primary btn-sm" onclick="aplicarFiltros()">
                                     <i class="ti ti-search"></i> Buscar

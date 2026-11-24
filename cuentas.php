@@ -175,7 +175,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             position: relative; overflow: hidden; 
             border: 1px solid #eef2f6;
         }
-        .tb-texto-principal { color: #1e293b; font-size: 1.1rem; font-weight: 700; line-height: 1.2; }
+        .tb-texto-principal { color: var(--nx-surface-2); font-size: 1.1rem; font-weight: 700; line-height: 1.2; }
         .tb-texto-secundario { color: #9a9096; font-size: 0.7rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; }
         .tb-cuenta { color: var(--nx-primary); font-size: 1.4rem; font-weight: 800; letter-spacing: 1px; word-break: break-all; }
         .tb-linea { border-top: 1px dashed #e2e8f0; }
@@ -217,8 +217,9 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .bg-success.bg-opacity-10 { background-color: rgba(19,222,185,0.12) !important; }
         [data-bs-theme="dark"] .bg-warning.bg-opacity-10 { background-color: rgba(255,174,31,0.12) !important; }
         [data-bs-theme="dark"] .bg-info.bg-opacity-10 { background-color: rgba(83,155,255,0.12) !important; }
-        [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
+        [data-bs-theme="dark"] .bg-light { background-color: var(--nx-surface-2) !important; }
     </style>
+    <link rel="stylesheet" href="src/assets/css/descargables-helios.css?v=helios5" />
 
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
@@ -1083,67 +1084,34 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             function descargarImagenCuenta() {
                 const btn = $('#btnDescargarImagen');
                 const textoOriginal = btn.html();
-                const tarjeta = document.querySelector("#tarjetaCuentaAmiri");
-                const esModoOscuro = document.body.getAttribute('data-bs-theme') === 'dark' ||
-                                     document.body.classList.contains('dark-mode');
+                const tarjeta = document.querySelector('#tarjetaCuentaAmiri');
 
                 btn.prop('disabled', true).html('<i class="ti ti-loader ti-spin"></i> Generando...');
 
-                const estilosOriginales = {
-                    background: tarjeta.style.background,
-                    border: tarjeta.style.border,
-                    boxShadow: tarjeta.style.boxShadow,
-                    borderRadius: tarjeta.style.borderRadius,
-                    overflow: tarjeta.style.overflow
-                };
-                const logoClaro = tarjeta.querySelector('.logo-modo-claro');
-                const logoOscuro = tarjeta.querySelector('.logo-modo-oscuro');
-                const logoClaroDisplay = logoClaro ? logoClaro.style.display : null;
-                const logoOscuroDisplay = logoOscuro ? logoOscuro.style.display : null;
-
-                if (esModoOscuro) {
-                    tarjeta.style.background = '#1a181c';
-                    tarjeta.style.border = '1px solid rgba(255,255,255,0.12)';
-                    tarjeta.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
-                    if (logoClaro) logoClaro.style.display = 'none';
-                    if (logoOscuro) logoOscuro.style.display = 'block';
-                }
-
-                tarjeta.style.borderRadius = '0';
-                tarjeta.style.overflow = 'visible';
-
                 html2canvas(tarjeta, {
                     scale: 3,
-                    backgroundColor: esModoOscuro ? '#1a181c' : '#ffffff',
-                    useCORS: true
-                }).then(canvas => {
-                    tarjeta.style.borderRadius = estilosOriginales.borderRadius;
-                    tarjeta.style.overflow = estilosOriginales.overflow;
-                    if (esModoOscuro) {
-                        tarjeta.style.background = estilosOriginales.background;
-                        tarjeta.style.border = estilosOriginales.border;
-                        tarjeta.style.boxShadow = estilosOriginales.boxShadow;
-                        if (logoClaro) logoClaro.style.display = logoClaroDisplay;
-                        if (logoOscuro) logoOscuro.style.display = logoOscuroDisplay;
+                    backgroundColor: null,
+                    useCORS: true,
+                    onclone: function(doc) {
+                        doc.body.classList.add('descargable-export');
+                        const el = doc.querySelector('#tarjetaCuentaAmiri');
+                        if (el) {
+                            el.style.background = '#302a2e';
+                            el.style.border = '1px solid #4a4045';
+                            el.style.boxShadow = 'none';
+                            el.style.borderRadius = '24px';
+                            el.style.overflow = 'hidden';
+                        }
                     }
-
-                    let link = document.createElement('a');
+                }).then(canvas => {
+                    const link = document.createElement('a');
                     link.download = 'Datos_Bancarios_Amiri.png';
                     link.href = canvas.toDataURL('image/png');
                     link.click();
-
                     btn.prop('disabled', false).html(textoOriginal);
                     showToast('Imagen descargada correctamente', 'success');
                 }).catch(err => {
-                    tarjeta.style.borderRadius = estilosOriginales.borderRadius;
-                    tarjeta.style.overflow = estilosOriginales.overflow;
-                    if (esModoOscuro) {
-                        tarjeta.style.background = estilosOriginales.background;
-                        tarjeta.style.border = estilosOriginales.border;
-                        tarjeta.style.boxShadow = estilosOriginales.boxShadow;
-                        if (logoClaro) logoClaro.style.display = logoClaroDisplay;
-                        if (logoOscuro) logoOscuro.style.display = logoOscuroDisplay;
-                    }
+                    console.error(err);
                     btn.prop('disabled', false).html(textoOriginal);
                     showToast('Hubo un error al generar la imagen', 'error');
                 });

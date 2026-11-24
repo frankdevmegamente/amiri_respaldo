@@ -1,0 +1,287 @@
+/* =========================================================
+   HELIOS DARK GLASS — ESTILO PARA ARCHIVOS DESCARGABLES
+   Aplica a tickets y tarjetas bancarias (vista previa + PNG)
+   ========================================================= */
+
+/* ---------- TICKETS (depósitos / transferencias) ---------- */
+#vistaPreviaTicket.ticket-card {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    border-radius: 24px;
+    padding: 22px 20px;
+    background: linear-gradient(160deg, #3d3539 0%, #2a2427 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    color: #fff;
+    font-family: 'Montserrat', 'Poppins', 'Inter', sans-serif;
+    overflow: hidden;
+}
+
+#vistaPreviaTicket .ticket-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(197, 143, 184, 0.35);
+    position: relative;
+    z-index: 1;
+}
+
+#vistaPreviaTicket .ticket-title {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    color: #d9a3cc;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-left: 15px;
+}
+
+#vistaPreviaTicket #placeholderTicket { color: #9a9096 !important; }
+
+#vistaPreviaTicket .ticket-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    background: #141214;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    position: relative;
+}
+
+#vistaPreviaTicket .ticket-item-nombre {
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+}
+
+#vistaPreviaTicket .ticket-item-cuenta {
+    font-size: 10px;
+    color: #9a9096;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#vistaPreviaTicket .ticket-item-monto {
+    background: rgba(61, 220, 132, 0.12);
+    color: #3ddc84;
+    border: 1px solid rgba(61, 220, 132, 0.3);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: right;
+    min-width: 110px;
+    white-space: nowrap;
+}
+
+#vistaPreviaTicket .ticket-quitar {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 999px;
+}
+
+#vistaPreviaTicket .ticket-total {
+    background: #141214;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    padding: 18px;
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#vistaPreviaTicket .ticket-total-label {
+    color: #d9a3cc;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+#vistaPreviaTicket .ticket-total-value {
+    color: #3ddc84;
+    font-weight: 800;
+    font-size: 28px;
+    text-shadow: 0 0 20px rgba(61, 220, 132, 0.25);
+}
+
+/* Glows difusos (círculos translúcidos, compatibles con html2canvas) */
+#vistaPreviaTicket .ticket-deco-1 {
+    top: -70px;
+    right: -70px;
+    width: 200px;
+    height: 200px;
+    background: rgba(197, 143, 184, 0.14);
+    border-radius: 50%;
+}
+
+#vistaPreviaTicket .ticket-deco-2 {
+    bottom: -60px;
+    left: -60px;
+    width: 160px;
+    height: 160px;
+    background: rgba(61, 220, 132, 0.08);
+    border-radius: 50%;
+}
+
+#vistaPreviaTicket > *:not(.ticket-deco) { position: relative; z-index: 1; }
+
+/* ---------- TARJETA DE DATOS BANCARIOS ---------- */
+#tarjetaCuentaAmiri.tarjeta-bancaria {
+    width: 100%;
+    max-width: 420px;
+    background: linear-gradient(160deg, #3d3539 0%, #2a2427 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 24px !important;
+    padding: 22px 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+    color: #fff !important;
+    font-family: 'Montserrat', 'Poppins', 'Inter', sans-serif;
+    overflow: hidden;
+}
+
+#tarjetaCuentaAmiri .tb-texto-principal { color: #fff !important; font-size: 1rem; font-weight: 700; line-height: 1.2; }
+#tarjetaCuentaAmiri .tb-texto-secundario { color: #9a9096 !important; font-size: 10px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+#tarjetaCuentaAmiri .tb-cuenta { color: #d9a3cc !important; font-size: 1.35rem; font-weight: 800; letter-spacing: 1px; word-break: break-all; }
+#tarjetaCuentaAmiri .tb-linea { border-top: 1px solid rgba(197, 143, 184, 0.35) !important; }
+
+/* Logo fijo en descargables: siempre blanco sobre fondo transparente */
+#vistaPreviaTicket .logo-modo-claro,
+#tarjetaCuentaAmiri .logo-modo-claro { display: none !important; }
+#vistaPreviaTicket .logo-modo-oscuro,
+#tarjetaCuentaAmiri .logo-modo-oscuro { display: block !important; }
+
+/* ---------- EXPORTACIÓN PNG ---------- */
+/* Estos estilos se aplican en onclone para evitar gradientes/sombras que html2canvas dibuja como cuadros */
+.descargable-export #vistaPreviaTicket,
+.descargable-export #tarjetaCuentaAmiri {
+    background: #302a2e !important;
+    border: 1px solid #4a4045 !important;
+    box-shadow: none !important;
+    border-radius: 24px !important;
+    overflow: hidden !important;
+}
+.descargable-export .ticket-item,
+.descargable-export .ticket-total,
+.descargable-export .client-row,
+.descargable-export .ticket-row.total-row {
+    background: #141214 !important;
+    box-shadow: none !important;
+}
+
+/* ---------- Variante CRUD (client-row / client-amount) ---------- */
+#vistaPreviaTicket .client-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    background: #141214;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+#vistaPreviaTicket .client-name { font-size: 15px; font-weight: 700; color: #fff; }
+#vistaPreviaTicket .client-account { font-size: 10px; color: #9a9096; text-transform: uppercase; letter-spacing: 0.5px; }
+#vistaPreviaTicket .client-amount {
+    background: rgba(61, 220, 132, 0.12);
+    color: #3ddc84;
+    border: 1px solid rgba(61, 220, 132, 0.3);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 700;
+    text-align: right;
+    min-width: 110px;
+    white-space: nowrap;
+}
+#vistaPreviaTicket .ticket-row.total-row {
+    background: #141214 !important;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 20px;
+    padding: 18px;
+    margin-top: 12px;
+}
+#vistaPreviaTicket .text-muted-custom { color: #d9a3cc !important; font-size: 11px; text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+#vistaPreviaTicket .text-success-custom { color: #3ddc84 !important; font-size: 28px !important; text-shadow: 0 0 20px rgba(61, 220, 132, 0.25); }
+
+/* Glows inline del ticket CRUD */
+#vistaPreviaTicket > div[style*="top: -60px"] {
+    background: rgba(197, 143, 184, 0.14) !important;
+    border-radius: 50% !important;
+    opacity: 1 !important;
+}
+#vistaPreviaTicket > div[style*="bottom: -40px"] {
+    background: rgba(61, 220, 132, 0.08) !important;
+    border-radius: 50% !important;
+    opacity: 1 !important;
+}
+#vistaPreviaTicket .client-list { position: relative; z-index: 1; }
+#vistaPreviaTicket .client-list .text-muted { color: #9a9096 !important; }
+/* Glows inline de la tarjeta bancaria */
+#tarjetaCuentaAmiri > div[style*="top: -60px"] {
+    background: rgba(197, 143, 184, 0.14) !important;
+    border-radius: 50% !important;
+    opacity: 1 !important;
+}
+#tarjetaCuentaAmiri > div[style*="bottom: -40px"] {
+    background: rgba(61, 220, 132, 0.08) !important;
+    border-radius: 50% !important;
+    opacity: 1 !important;
+}
+/* ---------- Modal "Compartir cuenta" (cuentas.php) ---------- */
+#main-wrapper #modalCompartirCuenta .modal-content {
+    background: linear-gradient(160deg, #2a2427 0%, #1c181b 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+    color: #fff !important;
+    font-family: 'Montserrat', 'Poppins', 'Inter', sans-serif;
+    overflow: hidden;
+}
+#main-wrapper #modalCompartirCuenta .modal-header,
+#main-wrapper #modalCompartirCuenta .modal-footer { border: 0 !important; }
+#main-wrapper #modalCompartirCuenta .modal-title {
+    color: #d9a3cc;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+#main-wrapper #modalCompartirCuenta .btn-close { filter: invert(1); opacity: 0.6; }
+#main-wrapper #modalCompartirCuenta .modal-footer .btn { border-radius: 999px; font-weight: 600; }
+#main-wrapper #modalCompartirCuenta .modal-footer .btn.btn-secondary {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    color: #fff !important;
+}
+#main-wrapper #modalCompartirCuenta .modal-footer .btn.btn-success {
+    background: #3ddc84 !important;
+    border: 1px solid rgba(61, 220, 132, 0.35) !important;
+    color: #0a0709 !important;
+}
+
+/* Botón "Compartir" en la tabla de cuentas */
+#main-wrapper button[onclick^="abrirGeneradorCuenta"] {
+    background: rgba(197, 143, 184, 0.12) !important;
+    color: #d9a3cc !important;
+    border: 1px solid rgba(197, 143, 184, 0.3) !important;
+    border-radius: 999px !important;
+    font-size: 0.75rem !important;
+    font-weight: 600;
+    padding: 4px 10px !important;
+}
+#main-wrapper button[onclick^="abrirGeneradorCuenta"]:hover {
+    background: rgba(197, 143, 184, 0.2) !important;
+    color: #fff !important;
+}

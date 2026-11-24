@@ -348,7 +348,7 @@ $serviciosDivisas = [
 
                     <div class="row mb-4">
                         <div class="col-12">
-                            <div class="card shadow border-3" id="cardDiferencia">
+                            <div class="card shadow border-3" id="cardDiferencia" style="overflow:hidden;border-radius:var(--nx-radius,20px);">
                                 <div class="card-body">
                                     <div class="row align-items-center">
                                         <div class="col-md-8">
@@ -1093,7 +1093,7 @@ $serviciosDivisas = [
 
     <style>
 
-        [data-bs-theme="dark"] #totalesGroup .card            { background: #0f172a; border-color: #1f2937; }
+        [data-bs-theme="dark"] #totalesGroup .card            { background: var(--nx-surface); border-color: var(--nx-border); }
 
         [data-bs-theme="dark"] #totalesGroup .card-header     { background: linear-gradient(135deg, #1d4ed8, #2563eb); border-color: transparent; color: #e5e7eb; }
 
@@ -1113,7 +1113,7 @@ $serviciosDivisas = [
 
         [data-bs-theme="dark"] .form-control,
 
-        [data-bs-theme="dark"] .form-select                   { background: #111827; border-color: #1f2937; color: #e5e7eb; }
+        [data-bs-theme="dark"] .form-select                   { background: #111827; border-color: var(--nx-border); color: #e5e7eb; }
 
         [data-bs-theme="dark"] .form-control:focus,
 
@@ -1132,23 +1132,23 @@ $serviciosDivisas = [
         /* ── Dark mode: Modales Proveedor / Deudor ────────────────────── */
         /* Cards dentro de los modales */
         [data-bs-theme="dark"] #modalProveedor .card,
-        [data-bs-theme="dark"] #modalDeudor .card                 { background-color: #111827 !important; border-color: #1f2937 !important; }
+        [data-bs-theme="dark"] #modalDeudor .card                 { background-color: #111827 !important; border-color: var(--nx-border) !important; }
 
         [data-bs-theme="dark"] #modalProveedor .card-body,
         [data-bs-theme="dark"] #modalDeudor .card-body            { background-color: transparent !important; color: #e5e7eb !important; }
 
         [data-bs-theme="dark"] #modalProveedor .card-header,
-        [data-bs-theme="dark"] #modalDeudor .card-header          { background-color: #1e293b !important; border-color: #1f2937 !important; color: #e5e7eb !important; }
+        [data-bs-theme="dark"] #modalDeudor .card-header          { background-color: var(--nx-surface-2) !important; border-color: var(--nx-border) !important; color: #e5e7eb !important; }
 
         /* Tablas */
         [data-bs-theme="dark"] #modalProveedor .table,
         [data-bs-theme="dark"] #modalDeudor .table                 { color: #e5e7eb !important; --bs-table-bg: transparent !important; }
 
         [data-bs-theme="dark"] #modalProveedor .table > :not(caption) > * > *,
-        [data-bs-theme="dark"] #modalDeudor .table > :not(caption) > * > *   { background-color: transparent !important; color: #e5e7eb !important; border-color: #1f2937 !important; }
+        [data-bs-theme="dark"] #modalDeudor .table > :not(caption) > * > *   { background-color: transparent !important; color: #e5e7eb !important; border-color: var(--nx-border) !important; }
 
         [data-bs-theme="dark"] #modalProveedor .table thead th,
-        [data-bs-theme="dark"] #modalDeudor .table thead th        { background-color: #1e293b !important; color: #94a3b8 !important; border-color: #1f2937 !important; }
+        [data-bs-theme="dark"] #modalDeudor .table thead th        { background-color: var(--nx-surface-2) !important; color: var(--nx-text-muted) !important; border-color: var(--nx-border) !important; }
 
         [data-bs-theme="dark"] #modalProveedor .table-striped > tbody > tr:nth-of-type(odd) > *,
         [data-bs-theme="dark"] #modalDeudor .table-striped > tbody > tr:nth-of-type(odd) > *  { background-color: rgba(255,255,255,0.02) !important; }
@@ -1157,7 +1157,7 @@ $serviciosDivisas = [
         [data-bs-theme="dark"] #modalDeudor .table-hover tbody tr:hover > *    { background-color: rgba(99,102,241,0.12) !important; color: #e5e7eb !important; }
 
         [data-bs-theme="dark"] #modalProveedor .table-responsive,
-        [data-bs-theme="dark"] #modalDeudor .table-responsive      { border-color: #1f2937 !important; }
+        [data-bs-theme="dark"] #modalDeudor .table-responsive      { border-color: var(--nx-border) !important; }
 
         /* Textos */
         [data-bs-theme="dark"] #modalProveedor .text-muted,
@@ -1185,7 +1185,7 @@ $serviciosDivisas = [
 
         /* Input groups */
         [data-bs-theme="dark"] #modalProveedor .input-group-text,
-        [data-bs-theme="dark"] #modalDeudor .input-group-text      { background-color: #1e293b !important; border-color: #1f2937 !important; color: #e5e7eb !important; }
+        [data-bs-theme="dark"] #modalDeudor .input-group-text      { background-color: var(--nx-surface-2) !important; border-color: var(--nx-border) !important; color: #e5e7eb !important; }
 
         /* Alertas */
         [data-bs-theme="dark"] #modalProveedor .alert-danger,
@@ -1209,7 +1209,7 @@ $serviciosDivisas = [
 
         /* hr */
         [data-bs-theme="dark"] #modalProveedor hr,
-        [data-bs-theme="dark"] #modalDeudor hr                      { border-color: #1f2937 !important; }
+        [data-bs-theme="dark"] #modalDeudor hr                      { border-color: var(--nx-border) !important; }
 
     </style>
 
@@ -1769,14 +1769,14 @@ $serviciosDivisas = [
 
                 if (Math.abs(diferencia) < 0.01) {
                     $card.removeClass('border-danger border-warning border-info').addClass('border-success');
-                    $cardBody.css('background-color', 'rgba(25,135,84,0.1)');
+                    $cardBody.css({'background-color':'rgba(25,135,84,0.08)','overflow':'hidden','border-radius':'inherit'});
                     $monto.removeClass('text-danger text-warning text-info').addClass('text-success');
                     $icon.css('background-color', 'rgba(25,135,84,0.2)');
                     $texto.html('<i class="ti ti-check-circle"></i> <strong>Todo cuadra correctamente</strong>');
                     $detalle.html('').hide();
                 } else if (diferencia < 0) {
                     $card.removeClass('border-success border-warning border-info').addClass('border-danger');
-                    $cardBody.css('background-color', 'rgba(220,53,69,0.1)');
+                    $cardBody.css({'background-color':'rgba(220,53,69,0.08)','overflow':'hidden','border-radius':'inherit'});
                     $monto.removeClass('text-success text-warning text-info').addClass('text-danger');
                     $icon.css('background-color', 'rgba(220,53,69,0.2)');
                     let msg = '<i class="ti ti-alert-triangle"></i> <strong>ALERTA:</strong> Falta dinero en el sistema';
@@ -1786,7 +1786,7 @@ $serviciosDivisas = [
                     cargarAlertasIntegridad($detalle);
                 } else {
                     $card.removeClass('border-success border-danger border-info').addClass('border-warning');
-                    $cardBody.css('background-color', 'rgba(255,193,7,0.1)');
+                    $cardBody.css({'background-color':'rgba(255,193,7,0.08)','overflow':'hidden','border-radius':'inherit'});
                     $monto.removeClass('text-success text-danger text-info').addClass('text-warning');
                     $icon.css('background-color', 'rgba(255,193,7,0.2)');
                     let msg = '<i class="ti ti-info-circle"></i> <strong>ATENCIÓN:</strong> Sobra dinero (revisar préstamos o capital)';

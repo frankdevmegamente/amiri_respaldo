@@ -62,7 +62,7 @@ $bancos = $pdo->query("SELECT COUNT(DISTINCT banco) FROM directorio_depositos WH
         [data-bs-theme="dark"] .form-label { color: #f5f2f4; }
         [data-bs-theme="dark"] .form-control, [data-bs-theme="dark"] .form-select { background-color: #1a181c; border-color: rgba(255,255,255,0.12); color: #f5f2f4; }
         [data-bs-theme="dark"] .form-control::placeholder { color: #9a9096; }
-        [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
+        [data-bs-theme="dark"] .bg-light { background-color: var(--nx-surface-2) !important; }
         .metric-card { position: relative; border-radius: 12px !important; transition: transform 0.2s ease, box-shadow 0.2s ease; cursor: pointer; }
         .metric-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important; }
         .metric-accent { position: absolute; top: 0; left: 0; right: 0; height: 4px; border-radius: 12px 12px 0 0; }
@@ -106,6 +106,7 @@ $bancos = $pdo->query("SELECT COUNT(DISTINCT banco) FROM directorio_depositos WH
         [data-bs-theme="dark"] .ticket-total { background-color: #1a181c !important; }
         [data-bs-theme="dark"] #placeholderTicket { color: #9a9096 !important; }
     </style>
+    <link rel="stylesheet" href="src/assets/css/descargables-helios.css?v=helios5" />
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <body>
@@ -550,8 +551,24 @@ $bancos = $pdo->query("SELECT COUNT(DISTINCT banco) FROM directorio_depositos WH
             const originalMaxWidth = ticket.style.maxWidth;
             const originalWidth = ticket.style.width;
             ticket.style.maxWidth = 'none';
-            ticket.style.width = '580px';
-            html2canvas(ticket, { backgroundColor: null, scale: 3, logging: false }).then(canvas => {
+            ticket.style.width = '480px';
+            html2canvas(ticket, {
+                backgroundColor: null,
+                scale: 3,
+                logging: false,
+                useCORS: true,
+                onclone: function(doc) {
+                    doc.body.classList.add('descargable-export');
+                    const el = doc.getElementById('vistaPreviaTicket');
+                    if (el) {
+                        el.style.background = '#302a2e';
+                        el.style.border = '1px solid #4a4045';
+                        el.style.boxShadow = 'none';
+                        el.style.borderRadius = '24px';
+                        el.style.overflow = 'hidden';
+                    }
+                }
+            }).then(canvas => {
                 const enlace = document.createElement('a');
                 enlace.download = 'Deposito_Masivo_Amiri_' + new Date().toISOString().slice(0,10) + '.png';
                 enlace.href = canvas.toDataURL('image/png');

@@ -1282,3 +1282,134 @@ html[data-bs-theme="dark"] .body-wrapper-inner { background: transparent !import
 .page-wrapper .metric-icon.bg-secondary, #main-wrapper .metric-icon.bg-secondary { background: rgba(154,144,150,0.15) !important; color: var(--nx-text-muted) !important; }
 .page-wrapper .metric-accent.bg-secondary, #main-wrapper .metric-accent.bg-secondary { background: linear-gradient(180deg, #9a9096, rgba(154,144,150,0.4)) !important; }
 html[data-bs-theme="dark"] .page-wrapper .text-secondary, html[data-bs-theme="dark"] #main-wrapper .text-secondary { color: var(--nx-text-muted) !important; }
+/* Fix cardDiferencia color spilling out of rounded corners */
+.page-wrapper #cardDiferencia, #main-wrapper #cardDiferencia {
+  overflow: hidden !important; border-radius: var(--nx-radius) !important;
+}
+.page-wrapper #cardDiferencia .card-body, #main-wrapper #cardDiferencia .card-body {
+  background: transparent !important; overflow: hidden !important;
+}
+.page-wrapper #cardDiferencia .card-body > * { background: transparent !important; }
+/* #cardDiferencia: prevent background color spilling out of rounded corners */
+.page-wrapper #cardDiferencia, #main-wrapper #cardDiferencia {
+  overflow: hidden !important; border-radius: var(--nx-radius) !important;
+}
+.page-wrapper #cardDiferencia .card-body, #main-wrapper #cardDiferencia .card-body {
+  overflow: hidden !important; border-radius: inherit !important;
+}
+/* ===== 2.2b: Tables in split screen / responsive fixes ===== */
+@media (max-width: 1399.98px) {
+  .page-wrapper .table-responsive, #main-wrapper .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .page-wrapper .table, #main-wrapper .table { min-width: 600px; }
+  .page-wrapper .table td, .page-wrapper .table th, #main-wrapper .table td, #main-wrapper .table th { white-space: nowrap; font-size: 0.85rem; }
+}
+@media (max-width: 991.98px) {
+  .page-wrapper .table, #main-wrapper .table { min-width: auto; }
+  .page-wrapper .table td, .page-wrapper .table th, #main-wrapper .table td, #main-wrapper .table th { white-space: normal; font-size: 0.8rem; }
+  .page-wrapper .card-body, #main-wrapper .card-body { padding: 12px !important; }
+  .page-wrapper .card-header, #main-wrapper .card-header { padding: 10px 12px !important; }
+}
+/* DataTables responsive */
+.page-wrapper .dataTables_wrapper, #main-wrapper .dataTables_wrapper { overflow-x: auto; }
+.page-wrapper .dataTables_wrapper .dataTables_scrollBody, #main-wrapper .dataTables_wrapper .dataTables_scrollBody { overflow-x: auto; }
+.page-wrapper .dataTables_wrapper .dataTables_length, #main-wrapper .dataTables_wrapper .dataTables_length,
+.page-wrapper .dataTables_wrapper .dataTables_filter, #main-wrapper .dataTables_wrapper .dataTables_filter { margin-bottom: 8px; }
+.page-wrapper .dataTables_wrapper .dataTables_info, #main-wrapper .dataTables_wrapper .dataTables_info { font-size: 0.8rem; color: var(--nx-text-muted); }
+.page-wrapper .dataTables_wrapper .dataTables_paginate, #main-wrapper .dataTables_wrapper .dataTables_paginate { font-size: 0.8rem; }
+
+/* ===== 2.2b: Badges and pills Helios ===== */
+.page-wrapper .badge, #main-wrapper .badge { border-radius: 999px; font-weight: 600; font-size: 0.72rem; padding: 4px 10px; }
+.page-wrapper .badge.bg-primary, #main-wrapper .badge.bg-primary { background: var(--nx-accent-gradient) !important; color: #fff; }
+.page-wrapper .badge.bg-success, #main-wrapper .badge.bg-success { background: rgba(61,220,132,0.15) !important; color: var(--nx-success) !important; border: 1px solid rgba(61,220,132,0.3); }
+.page-wrapper .badge.bg-danger, #main-wrapper .badge.bg-danger { background: rgba(255,122,122,0.15) !important; color: var(--nx-danger) !important; border: 1px solid rgba(255,122,122,0.3); }
+.page-wrapper .badge.bg-warning, #main-wrapper .badge.bg-warning { background: rgba(251,191,36,0.15) !important; color: var(--nx-warning) !important; border: 1px solid rgba(251,191,36,0.3); }
+.page-wrapper .badge.bg-info, #main-wrapper .badge.bg-info { background: rgba(197,143,184,0.15) !important; color: var(--nx-primary) !important; border: 1px solid rgba(197,143,184,0.3); }
+.page-wrapper .badge.bg-secondary, #main-wrapper .badge.bg-secondary { background: var(--nx-surface-3) !important; color: var(--nx-text-muted) !important; border: 1px solid var(--nx-border); }
+
+/* ===== 2.2b: Progress bars ===== */
+.page-wrapper .progress, #main-wrapper .progress { background: var(--nx-surface-3); border-radius: 999px; height: 6px; }
+.page-wrapper .progress-bar, #main-wrapper .progress-bar { background: var(--nx-accent-gradient); border-radius: 999px; }
+
+/* ===== 2.2b: Breadcrumbs ===== */
+.page-wrapper .breadcrumb, #main-wrapper .breadcrumb { background: transparent; padding: 0; margin: 0; font-size: 0.8rem; }
+.page-wrapper .breadcrumb-item, #main-wrapper .breadcrumb-item { color: var(--nx-text-muted); }
+.page-wrapper .breadcrumb-item.active, #main-wrapper .breadcrumb-item.active { color: var(--nx-text); }
+.page-wrapper .breadcrumb-item + .breadcrumb-item::before, #main-wrapper .breadcrumb-item + .breadcrumb-item::before { color: var(--nx-text-muted); }
+
+/* ===== 2.2b: Spinners ===== */
+.page-wrapper .spinner-border, #main-wrapper .spinner-border { color: var(--nx-primary); }
+.page-wrapper .spinner-grow, #main-wrapper .spinner-grow { color: var(--nx-primary); }
+
+/* ===== 2.2b: Tooltips ===== */
+.page-wrapper .tooltip-inner, #main-wrapper .tooltip-inner { background: var(--nx-surface); color: var(--nx-text); border: 1px solid var(--nx-border); border-radius: var(--nx-radius-sm); font-size: 0.78rem; }
+.page-wrapper .bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before, #main-wrapper .bs-tooltip-auto[data-popper-placement^=top] .tooltip-arrow::before { border-top-color: var(--nx-surface); }
+
+/* ===== 2.2b: Popovers ===== */
+.page-wrapper .popover, #main-wrapper .popover { background: var(--nx-surface); border: 1px solid var(--nx-border); border-radius: var(--nx-radius); box-shadow: var(--nx-shadow); }
+.page-wrapper .popover-header, #main-wrapper .popover-header { background: var(--nx-surface-2); border-bottom: 1px solid var(--nx-border); color: var(--nx-text); }
+.page-wrapper .popover-body, #main-wrapper .popover-body { color: var(--nx-text-muted); }
+
+/* ===== 2.2b: List groups ===== */
+.page-wrapper .list-group-item, #main-wrapper .list-group-item { background: var(--nx-surface); border-color: var(--nx-border); color: var(--nx-text); }
+.page-wrapper .list-group-item:hover, #main-wrapper .list-group-item:hover { background: var(--nx-surface-2); }
+.page-wrapper .list-group-item.active, #main-wrapper .list-group-item.active { background: var(--nx-accent-gradient); border-color: transparent; color: #fff; }
+
+/* ===== 2.2b: Nav tabs ===== */
+.page-wrapper .nav-tabs, #main-wrapper .nav-tabs { border-bottom: 1px solid var(--nx-border); }
+.page-wrapper .nav-tabs .nav-link, #main-wrapper .nav-tabs .nav-link { color: var(--nx-text-muted); border: none; border-bottom: 2px solid transparent; }
+.page-wrapper .nav-tabs .nav-link:hover, #main-wrapper .nav-tabs .nav-link:hover { color: var(--nx-primary); border-bottom-color: var(--nx-primary); }
+.page-wrapper .nav-tabs .nav-link.active, #main-wrapper .nav-tabs .nav-link.active { color: var(--nx-primary); border-bottom-color: var(--nx-primary); background: transparent; }
+
+/* ===== 2.2b: Cards with no padding headers ===== */
+.page-wrapper .card-header.bg-transparent, #main-wrapper .card-header.bg-transparent { background: transparent !important; }
+
+/* ===== 2.2b: Empty states ===== */
+.page-wrapper .empty-state, #main-wrapper .empty-state { text-align: center; padding: 40px 20px; color: var(--nx-text-muted); }
+.page-wrapper .empty-state i, #main-wrapper .empty-state i { font-size: 3rem; color: var(--nx-text-muted); opacity: 0.5; margin-bottom: 12px; }
+.page-wrapper .empty-state .empty-title, #main-wrapper .empty-state .empty-title { font-size: 1.1rem; font-weight: 600; color: var(--nx-text); margin-bottom: 4px; }
+.page-wrapper .empty-state .empty-sub, #main-wrapper .empty-state .empty-sub { font-size: 0.85rem; color: var(--nx-text-muted); }
+/* Fix dropdown menus being clipped by cards/containers */
+.page-wrapper .dropdown-menu, #main-wrapper .dropdown-menu { z-index: 1060 !important; }
+.page-wrapper .card .dropdown-menu, #main-wrapper .card .dropdown-menu { z-index: 1060 !important; }
+/* Ensure dropdown toggle's parent doesn't clip */
+.page-wrapper .card:has(.dropdown-toggle), #main-wrapper .card:has(.dropdown-toggle) { overflow: visible !important; }
+/* Fix dropdown clipping - force visible overflow on all cards with dropdowns */
+.page-wrapper .card, #main-wrapper .card { overflow: hidden !important; }\n.page-wrapper .card.filter-card, #main-wrapper .card.filter-card { overflow: visible !important; }
+.page-wrapper .dropdown-menu, #main-wrapper .dropdown-menu { position: absolute !important; z-index: 9999 !important; }
+/* Ensure card-body and chart containers respect card border-radius */
+.page-wrapper .card-body, #main-wrapper .card-body { border-radius: inherit; overflow: hidden; }
+.page-wrapper .chart-container, #main-wrapper .chart-container { border-radius: var(--nx-radius-sm); overflow: hidden; }
+/* Movimientos filter bar: prevent button overflow */
+.page-wrapper .filtros-bar .btn, #main-wrapper .filtros-bar .btn { white-space: nowrap; }
+.page-wrapper .filtros-bar .form-check, #main-wrapper .filtros-bar .form-check { min-width: 0; }
+
+/* =========================================================
+   LIGHT MODE: texto oscuro en botones con acento mauve
+   (mismo estilo que el botón de movimientos/Buscar)
+   ========================================================= */
+html[data-bs-theme="light"] .page-wrapper .btn-primary,
+html[data-bs-theme="light"] #main-wrapper .btn-primary,
+html[data-bs-theme="light"] .nx-btn-primary,
+html[data-bs-theme="light"] .nx-page-btn.active,
+html[data-bs-theme="light"] .tipo-pill.active {
+    color: #0a0709 !important;
+}
+html[data-bs-theme="light"] .tipo-pill.active .count {
+    background: rgba(10, 7, 9, 0.14) !important;
+    color: #0a0709 !important;
+}
+/* =========================================================
+   LIGHT MODE: texto oscuro en badges/pills con fondo suave
+   (Movimientos, Ver Detalle, USD, Proveedor, Com. AMIRI,
+    Este Año, banco en depósitos/transferencias, etc.)
+   ========================================================= */
+html[data-bs-theme="light"] .page-wrapper .badge.bg-opacity-10,
+html[data-bs-theme="light"] #main-wrapper .badge.bg-opacity-10,
+html[data-bs-theme="light"] .page-wrapper .badge[class*="bg-opacity-10"],
+html[data-bs-theme="light"] #main-wrapper .badge[class*="bg-opacity-10"],
+html[data-bs-theme="light"] .page-wrapper .btn.badge,
+html[data-bs-theme="light"] #main-wrapper .btn.badge,
+html[data-bs-theme="light"] .badge-usd,
+html[data-bs-theme="light"] .badge-usdt {
+    color: #0a0709 !important;
+}

@@ -38,7 +38,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             width: 400px;
             height: 400px;
             border-radius: 50%;
-            background: rgba(93, 135, 255, 0.08);
+            background: rgba(197,143,184,0.08);
             pointer-events: none;
         }
         .gastos-header .bg-pattern-2 {
@@ -48,7 +48,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
             width: 250px;
             height: 250px;
             border-radius: 50%;
-            background: rgba(19, 222, 185, 0.06);
+            background: rgba(61,220,132,0.06);
             pointer-events: none;
         }
         .gastos-header h2 { font-size: 1.75rem; font-weight: 700; margin-bottom: 0.25rem; }
@@ -113,7 +113,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .form-control,
         [data-bs-theme="dark"] .form-select { background-color: #1a181c; border-color: rgba(255,255,255,0.12); color: #f5f2f4; }
         [data-bs-theme="dark"] .form-control::placeholder { color: #9a9096; }
-        [data-bs-theme="dark"] .bg-light { background-color: #1e293b !important; }
+        [data-bs-theme="dark"] .bg-light { background-color: var(--nx-surface-2) !important; }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>

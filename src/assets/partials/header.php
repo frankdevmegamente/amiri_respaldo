@@ -9,7 +9,7 @@ $usuario_rol = $usuario_rol ?? ($_SESSION['usuario_rol'] ?? 'usuario');
 ?>
 <!-- Helios shell assets (injected for legacy pages that don't include them in <head>) -->
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="src/assets/css/nexo.css?v=helios9" />
+<link rel="stylesheet" href="src/assets/css/nexo.css?v=helios25" />
 <script>
 (function(){
   try {

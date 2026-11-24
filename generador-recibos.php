@@ -22,241 +22,176 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
     <style>
         /* =========================================
-           ESTILOS DEL TICKET (HÍBRIDO: ESCRITORIO CLÁSICO / MÓVIL MODERNO)
+           HELIOS DARK GLASS - CALCULO DE VENTA TICKET
            ========================================= */
         .body-wrapper { padding-top: 100px !important; }
         .body-wrapper-inner, .body-wrapper .container-fluid { padding-top: 15px !important; margin-top: 0 !important; }
-        
+
         .ticket-wrapper {
-            background-color: transparent; padding: 0; 
+            background-color: transparent; padding: 0;
             display: flex; justify-content: center; align-items: flex-start;
         }
 
-        /* DISEÑO BASE (ESCRITORIO - TU VERSIÓN ORIGINAL) */
+        /* Page background glow */
         .ticket-card {
-            background: var(--nx-surface);
-            width: 100%; max-width: 550px;
-            border-radius: 0px;
-            padding: 45px;
-            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.03);
-            color: var(--nx-text);
-            font-family: 'Manrope', sans-serif;
             position: relative;
+            width: 100%; max-width: 420px;
+            border-radius: 24px;
+            padding: 22px 20px;
+            background: linear-gradient(160deg, #3d3539 0%, #2a2427 100%);
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.06);
+            color: #fff;
+            font-family: 'Montserrat', 'Poppins', 'Inter', sans-serif;
+            overflow: hidden;
         }
 
+        /* Top-right mauve glow */
+        .ticket-card::before {
+            content: '';
+            position: absolute;
+            top: -80px; right: -80px;
+            width: 220px; height: 220px;
+            background: radial-gradient(circle, rgba(197,143,184,0.25) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Bottom-left green glow */
+        .ticket-card::after {
+            content: '';
+            position: absolute;
+            bottom: -60px; left: -60px;
+            width: 180px; height: 180px;
+            background: radial-gradient(circle, rgba(61,220,132,0.12) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .ticket-card > * { position: relative; z-index: 1; }
+
+        /* Clean export - hide glows that cause black boxes in PNG */
+        .ticket-card.exporting::before,
+        .ticket-card.exporting::after { display: none !important; }
+
+        /* Header */
         .ticket-header {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 30px; padding-bottom: 25px;
-            border-bottom: 3px solid #c58fb8;
+            margin-bottom: 16px; padding-bottom: 14px;
+            border-bottom: none;
+            position: relative;
         }
+        .ticket-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, #5a4552, #d9a3cc, transparent);
+        }
+
+        .ticket-header img { height: 40px; max-width: 100%; object-fit: contain; }
 
         .ticket-title {
-            font-size: 18px; font-weight: 600; letter-spacing: 1px;
-            color: #c58fb8; text-transform: uppercase;
+            font-size: 13px; font-weight: 500; letter-spacing: 1.5px;
+            color: #d9a3cc; text-transform: uppercase;
         }
 
-        /* Contenedor Híbrido: En escritorio actúa como lista vertical */
+        /* Cards (sections) */
+        .ticket-section {
+            background: linear-gradient(160deg, #121012 0%, #0b0b0c 100%);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 20px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            /* solid translucent fallback (no backdrop-filter for export compat) */
+            background: linear-gradient(160deg, #141214 0%, #0e0c0e 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 4px 16px rgba(0,0,0,0.3);
+        }
+
+        .text-muted-custom {
+            color: #9a9096; font-size: 10px; text-transform: uppercase;
+            font-weight: 600; margin-bottom: 4px; display: block; letter-spacing: 0.5px;
+        }
+
+        .fs-large { font-size: 28px; font-weight: 700; color: #fff; line-height: 1.1; }
+        .text-primary-custom { color: #c58fb8; font-weight: 700; }
+        .text-success-custom { color: #3ddc84; font-weight: 800; font-size: 32px; line-height: 1.1; }
+
+        /* Grid items (cantidad, tipo de cambio) */
         .responsive-grid { display: block; }
-        
-        /* En escritorio, cada item es una fila con línea punteada */
         .responsive-grid .grid-item {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 0; border-bottom: 1px dashed #ebf1f6;
+            padding: 0;
         }
+        .responsive-grid .grid-item > div:nth-child(1) { text-align: left; }
+        .responsive-grid .grid-item > div:nth-child(2) { margin-top: 0 !important; }
 
-        .ticket-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 0; border-bottom: 1px dashed #ebf1f6;
+        .badge-moneda {
+            padding: 6px 14px; border-radius: 999px; font-weight: 700; font-size: 11px;
+            border: 1px solid rgba(255,255,255,0.12);
         }
+        .badge-moneda.usdt { background-color: rgba(61,220,132,0.12); color: #3ddc84; border-color: rgba(61,220,132,0.3); }
+        .badge-moneda.mxn { background-color: #1a171a; color: #fff; border-color: rgba(255,255,255,0.12); }
 
-        .commission-section { padding: 20px 0; border-bottom: 1px dashed #ebf1f6; }
+        /* Commission section */
+        .commission-section { border: none; }
+        .commission-section span { color: #fff; font-size: 14px; }
+        .commission-section strong { color: #fff; }
 
-        .text-muted-custom { 
-            color: #7c8fac; font-size: 13px; text-transform: uppercase; 
-            font-weight: 600; margin-bottom: 8px; display: block;
-        }
-
-        .fs-large { font-size: 26px; font-weight: 700; color: #1a1a1a; }
-        .text-primary-custom { color: #c58fb8; font-weight: 700; }
-        .text-success-custom { color: #36c76c; font-weight: 800; font-size: 34px; }
-
+        /* Total row (highlighted) */
         .ticket-row.total-row {
-            background: #f8faff; border: none; border-radius: 12px;
-            padding: 30px 25px; margin-top: 30px;
+            background: linear-gradient(135deg, #0b0b0c 0%, #1a1216 100%);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 20px;
+            padding: 18px;
+            margin-top: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        .ticket-row.total-row::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 120px; height: 120px;
+            background: radial-gradient(circle, rgba(197,143,184,0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .ticket-row.total-row .text-muted-custom { color: #d9a3cc; margin-bottom: 0; }
+        .ticket-row.total-row .text-success-custom {
+            color: #3ddc84;
+            text-shadow: 0 0 20px rgba(61,220,132,0.25);
         }
 
-        .badge-moneda { padding: 8px 18px; border-radius: 8px; font-weight: 700; font-size: 12px; }
-        .badge-moneda.usdt { background-color: #e6fcf5; color: #20c997; }
-        .badge-moneda.mxn { background-color: #ebf1f6; color: #7c8fac; }
+        /* Observaciones */
+        .observaciones-section {
+            background: rgba(197,143,184,0.06);
+            padding: 16px; border-radius: 16px;
+            border: 1px solid rgba(197,143,184,0.2);
+            margin-top: 12px;
+        }
+        .observaciones-section .text-primary-custom { color: #d9a3cc; }
 
-        /* =========================================
-           🌙 REGLAS PARA MODO OSCURO (GLOBAL)
-           ========================================= */
-        [data-bs-theme="dark"] .ticket-card { background: #1a181c; border-color: rgba(255,255,255,0.12); box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3); }
-        [data-bs-theme="dark"] .fs-large { color: #ffffff !important; }
-        [data-bs-theme="dark"] .ticket-row,
-        [data-bs-theme="dark"] .responsive-grid .grid-item,
-        [data-bs-theme="dark"] .commission-section { border-bottom-color: rgba(255,255,255,0.12); }
-        [data-bs-theme="dark"] .ticket-row.total-row { background: #1a181c; }
-        [data-bs-theme="dark"] .commission-section span,
-        [data-bs-theme="dark"] .ticket-card strong { color: #f5f2f4 !important; }
-        [data-bs-theme="dark"] .text-muted-custom { color: #9a9096; }
-        [data-bs-theme="dark"] .badge-moneda.usdt { background-color: rgba(32, 201, 151, 0.15); }
-        [data-bs-theme="dark"] .badge-moneda.mxn { background-color: rgba(255, 255, 255, 0.1); color: #f5f2f4;}
-        [data-bs-theme="dark"] #ticketObservaciones { background: #1a181c !important; border-color: rgba(255,255,255,0.12) !important; }
-        [data-bs-theme="dark"] #outObservacionesTxt { color: #f5f2f4 !important; }
-        [data-bs-theme="dark"] .btn-check:checked + .btn-outline-primary { color: #ffffff !important; }
-        [data-bs-theme="dark"] .btn-outline-primary { color: #799dfb; border-color: #c58fb8; }
+        /* Footer note */
+        .ticket-footer-note {
+            font-size: 11px; color: #9a9096; font-style: italic;
+            text-align: center; margin-top: 16px;
+        }
 
-        [data-bs-theme="dark"] .logo-modo-claro, .dark-mode .logo-modo-claro { display: none !important; }
-        [data-bs-theme="dark"] .logo-modo-oscuro, .dark-mode .logo-modo-oscuro { display: block !important; }
+        /* Dark mode (already dark, but keep for consistency) */
 
-        /* =========================================
-           📱 MÓVIL (IDÉNTICO A ESCRITORIO, VERSIÓN MINIATURA)
-           ========================================= */
+        /* Mobile */
         @media (max-width: 768px) {
-            .ticket-card {
-                padding: 20px; /* Menos espacio en los bordes para que quepa más info */
-                max-width: 100%;
-            }
-
-            .ticket-header {
-                margin-bottom: 10px;
-                padding-bottom: 10px;
-            }
-
-            .ticket-header img {
-                height: 28px !important; /* Logo mini */
-            }
-
-            .ticket-title {
-                font-size: 11px;
-            }
-
-            .ticket-wrapper {
-                padding: 0 10px;
-            }
-
-            .ticket-row {
-                padding: 15px 0;
-            }
-
-            .commission-section {
-                padding: 15px 0;
-            }
-
-            /* 1. FORZAMOS QUE TODO SIGA EN HORIZONTAL COMO EN PC */
-            .responsive-grid .grid-item {
-                display: flex !important; 
-                flex-direction: row !important;
-                justify-content: space-between !important; 
-                align-items: center !important;
-                padding: 10px 0 !important;
-            }
-
-            .responsive-grid .grid-item > div:nth-child(1) { text-align: left; }
-            .responsive-grid .grid-item > div:nth-child(2) { margin-top: 0 !important; }
-
-            .commission-section {
-                padding: 10px 0;
-            }
-
-            /* 2. ACHICAMOS TEXTOS PARA EVITAR QUE BRINQUEN DE RENGLÓN */
-            .text-muted-custom {
-                font-size: 9px; 
-                margin-bottom: 2px;
-            }
-
-            .fs-large {
-                font-size: 16px; /* Números más compactos */
-            }
-
-            .badge-moneda {
-                padding: 4px 8px;
-                font-size: 9px;
-            }
-
-            .commission-section span, 
-            .commission-section strong {
-                font-size: 11px !important;
-            }
-
-            #outComisionTotal {
-                font-size: 12px !important;
-            }
-
-            /* 3. FILA DE TOTAL IDÉNTICA A ESCRITORIO (Sin gradientes) */
-            .ticket-row.total-row {
-                padding: 12px 15px !important;
-                margin-top: 15px !important;
-                flex-direction: row !important; /* Obligamos a que estén lado a lado */
-                justify-content: space-between !important;
-                align-items: center !important;
-                background: #f8faff !important; /* Fondo gris claro original */
-                border: none !important;
-            }
-
-            [data-bs-theme="dark"] .ticket-row.total-row {
-                background: #1a181c !important; /* Fondo oscuro original */
-            }
-
-            .ticket-row.total-row .text-muted-custom { 
-                color: #c58fb8 !important; 
-                font-size: 10px !important;
-            }
-            
-            .ticket-row.total-row .text-success-custom { 
-                color: #36c76c !important; 
-                font-size: 14px !important;
-                text-align: right;
-                word-break: break-word;
-            }
-
-            /* 4. COMPACTAMOS LAS OBSERVACIONES AL MÁXIMO */
-            .observaciones-section {
-                padding: 10px !important;
-                margin-top: 10px !important;
-            }
-
-            .observaciones-section .text-primary-custom {
-                font-size: 9px !important;
-                margin-bottom: 2px !important;
-            }
-
-            #outObservacionesTxt {
-                font-size: 10px !important; /* Letra pequeñita para que quepa mucho texto */
-                line-height: 1.1 !important; /* Juntamos los renglones */
-            }
+            .ticket-card { padding: 18px 16px; max-width: 100%; border-radius: 20px; }
+            .ticket-header img { height: 32px !important; }
+            .ticket-title { font-size: 11px; }
+            .fs-large { font-size: 22px; }
+            .text-success-custom { font-size: 26px; }
+            .badge-moneda { padding: 4px 10px; font-size: 9px; }
+            .ticket-row.total-row { padding: 14px 16px; }
+            .text-muted-custom { font-size: 9px; }
         }
-        
 
 
-        @media (max-width: 480px) {
-            .ticket-card {
-                padding: 20px 15px; /* Aún menos padding en móviles pequeños */
-            }
-
-            .ticket-header {
-                margin-bottom: 20px;
-                padding-bottom: 15px;
-            }
-
-            .ticket-header img {
-                height: 24px !important; /* Logo aún más pequeño */
-            }
-
-            .fs-large {
-                font-size: 20px;
-            }
-
-            .text-success-custom {
-                font-size: 24px;
-            }
-
-            .ticket-row.total-row {
-                padding: 15px 10px;
-            }
-        }
     </style>
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
@@ -278,7 +213,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         <div class="col-12 col-lg-5 mb-4 order-1 order-lg-1">
                             <div class="card shadow-sm border-0 rounded-4">
                                 <div class="card-body p-4">
-                                    <h5 class="card-title fw-semibold mb-4">Datos de Cotización</h5>
+                                    <h5 class="card-title fw-semibold mb-4">Datos de Cotizaci&oacute;n</h5>
                                     
                                     <div class="mb-4">
                                         <div class="btn-group w-100 shadow-sm" role="group">
@@ -312,7 +247,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                     </div>
                                     
                                     <div class="mb-3" id="grupoComisionInput">
-                                        <label class="form-label fw-semibold">Comisión (%)</label>
+                                        <label class="form-label fw-semibold">Comisi&oacute;n (%)</label>
                                         <div class="input-group">
                                             <input type="text" step="0.01" class="form-control" id="inputMargen" value="">
                                             <span class="input-group-text bg-light">%</span>
@@ -321,7 +256,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold">Observaciones (Opcional)</label>
-                                        <textarea class="form-control" id="inputObservaciones" rows="2" placeholder="Ej. COTIZACIÓN CON DÓLARES..."></textarea>
+                                        <textarea class="form-control" id="inputObservaciones" rows="2" placeholder="Ej. COTIZACI&Oacute;N CON D&Oacute;LARES..."></textarea>
                                     </div>
                                     
                                     <hr class="my-4">
@@ -335,7 +270,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                         <input type="text" class="form-control text-success fw-bold fs-5 bg-success bg-opacity-10 border-0" id="inputTotal" readonly>
                                     </div>
                                     <button class="btn btn-primary w-100 mt-4 py-2 d-flex align-items-center justify-content-center fw-semibold shadow-sm" id="btnDescargar">
-                                        <i class="ti ti-download me-2 fs-5"></i> Descargar Cotización
+                                        <i class="ti ti-download me-2 fs-5"></i> Descargar Cotizaci&oacute;n
                                     </button>
                                 </div>
                             </div>
@@ -343,64 +278,60 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                         <div class="col-12 col-lg-7 order-2 order-lg-2">
                             <div class="ticket-wrapper">
-                                <div class="ticket-card" id="vistaPreviaTicket" style="position: relative; overflow: hidden;">
-                                    
-                                    <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: var(--nx-primary); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-                                    <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: var(--nx-success); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+                                 <div class="ticket-card" id="vistaPreviaTicket">
+                                     <div class="ticket-header">
+                                         <img src="src/assets/images/logos/logo2-blanco-sin-fondo.png" alt="Logo Amiri" class="logo-modo-claro" style="height: 45px; max-width: 100%; object-fit: contain;" />
+                                         <div class="ticket-title" id="outTicketTitle">C&Aacute;LCULO DE VENTA</div>
+                                     </div>
 
-                                    <div class="ticket-header" style="position: relative; z-index: 1;">
-                                        <img src="src/assets/images/logos/logo2.png" alt="Logo Amiri" class="logo-modo-claro" style="height: 45px; max-width: 100%; object-fit: contain;" />
-                                        <img src="src/assets/images/logos/logo2-blanco-sin-fondo.png" alt="Logo Amiri" class="logo-modo-oscuro" style="height: 45px; max-width: 100%; object-fit: contain; display: none;" />
-                                        <div class="ticket-title" id="outTicketTitle">CÁLCULO DE VENTA</div>
-                                    </div>
+                                     <div class="ticket-section responsive-grid">
+                                         <div class="grid-item">
+                                             <div>
+                                                 <span class="text-muted-custom">CANTIDAD</span>
+                                                 <div class="fs-large" id="outCantidad">0.00</div>
+                                             </div>
+                                             <div>
+                                                 <span class="badge-moneda usdt" id="outMoneda">USDT</span>
+                                             </div>
+                                         </div>
+                                     </div>
 
-                                    <div class="responsive-grid" style="position: relative; z-index: 1;">
-                                        <div class="grid-item">
-                                            <div>
-                                                <span class="text-muted-custom">CANTIDAD</span>
-                                                <div class="fs-large" id="outCantidad">0.00</div>
-                                            </div>
-                                            <div>
-                                                <span class="badge-moneda usdt" id="outMoneda">USDT</span>
-                                            </div>
-                                        </div>
+                                     <div class="ticket-section responsive-grid">
+                                         <div class="grid-item">
+                                             <div>
+                                                 <span class="text-muted-custom">TIPO DE CAMBIO</span>
+                                                 <div class="fs-large text-primary-custom">
+                                                     <span id="outTcFinalTxt">$0.00</span>
+                                                 </div>
+                                             </div>
+                                             <div>
+                                                 <span class="badge-moneda mxn">MXN</span>
+                                             </div>
+                                         </div>
+                                     </div>
 
-                                        <div class="grid-item">
-                                            <div>
-                                                <span class="text-muted-custom">TIPO DE CAMBIO</span>
-                                                <div class="fs-large text-primary-custom">
-                                                    <span id="outTcFinalTxt">$0.00</span> 
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <span class="badge-moneda mxn">MXN</span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                     <div class="ticket-section commission-section" id="ticketComision">
+                                         <span class="text-muted-custom">COMISI&Oacute;N</span>
+                                         <div class="d-flex justify-content-between align-items-center mb-1">
+                                             <span style="font-size: 15px;">PORCENTAJE: <strong id="outMargenTxt">0.00%</strong></span>
+                                         </div>
+                                         <div style="font-size: 14px; color: #9a9096;">
+                                             TOTAL DE COMISI&Oacute;N: <span id="outComisionTotal" style="font-weight: 600; color: #fff;">$0.00 MXN</span>
+                                         </div>
+                                     </div>
 
-                                    <div class="commission-section" id="ticketComision" style="position: relative; z-index: 1;">
-                                        <span class="text-muted-custom">COMISIÓN</span>
-                                        <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <span style="font-size: 15px;">PORCENTAJE: <strong id="outMargenTxt">0.00%</strong></span>
-                                        </div>
-                                        <div style="font-size: 14px; color: #7c8fac;">
-                                            TOTAL DE COMISIÓN: <span id="outComisionTotal" style="font-weight: 600; color: var(--nx-text);">$0.00 MXN</span>
-                                        </div>
-                                    </div>
+                                     <div class="ticket-row total-row d-flex justify-content-between align-items-center">
+                                         <div class="text-muted-custom" id="outTotalLabel">TOTAL A RECIBIR</div>
+                                         <div class="text-success-custom" id="outTotalTxt">$0.00 MXN</div>
+                                     </div>
 
-                                    <div class="ticket-row total-row d-flex justify-content-between align-items-center" style="position: relative; z-index: 1;">
-                                        <div class="text-muted-custom" style="color: #c58fb8; margin-bottom: 0;" id="outTotalLabel">TOTAL A RECIBIR</div>
-                                        <div class="text-success-custom" id="outTotalTxt">$0.00 MXN</div>
-                                    </div>
+                                     <div class="observaciones-section" id="ticketObservaciones" style="display: none;">
+                                         <div class="text-primary-custom mb-2" style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">OBSERVACIONES</div>
+                                         <div id="outObservacionesTxt" style="font-size: 15px; color: #fff; white-space: pre-wrap; line-height: 1.5; font-weight: 500;"></div>
+                                     </div>
 
-                                    <div class="observaciones-section mt-4" id="ticketObservaciones" style="display: none; background: rgba(93, 135, 255, 0.05); padding: 20px; border-radius: 12px; border: 1px solid rgba(93, 135, 255, 0.2); position: relative; z-index: 1;">
-                                        <div class="text-primary-custom mb-2" style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">OBSERVACIONES</div>
-                                        <div id="outObservacionesTxt" style="font-size: 15px; color: var(--nx-text); white-space: pre-wrap; line-height: 1.5; font-weight: 500;"></div>
-                                    </div>
-
-                                    <div class="text-center mt-5" style="position: relative; z-index: 1;">
-                                        <div style="font-size: 11px; color: #a1b0cb; font-style: italic;">* Esta cotización tiene una vigencia de 30 minutos a partir de su emisión.</div>
-                                    </div>
+                                     <div class="ticket-footer-note">* Esta cotizaci&oacute;n tiene una vigencia de 30 minutos a partir de su emisi&oacute;n.</div>
+                                 </div>
                                 </div>
                             </div>
                         </div>
@@ -525,7 +456,27 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 btn.prop('disabled', true);
 
                 // AQUI ESTÁ LA MAGIA: backgroundColor: null
-                html2canvas(ticket, { backgroundColor: null, scale: 3 }).then(canvas => {
+                html2canvas(ticket, {
+                    backgroundColor: null,
+                    scale: 3,
+                    useCORS: true,
+                    onclone: function(doc) {
+                        var el = doc.getElementById('vistaPreviaTicket');
+                        if (el) {
+                            el.style.boxShadow = 'none';
+                            el.style.background = '#302a2e';
+                            el.style.borderRadius = '24px';
+                            el.style.overflow = 'hidden';
+                            el.classList.add('exporting');
+                            el.querySelectorAll('.ticket-section').forEach(function(s) {
+                                s.style.background = '#141214';
+                                s.style.boxShadow = 'none';
+                            });
+                            var total = el.querySelector('.ticket-row.total-row');
+                            if (total) { total.style.background = '#141214'; total.style.boxShadow = 'none'; }
+                        }
+                    }
+                }).then(canvas => {
                     const enlace = document.createElement('a');
                     enlace.download = `Cotizacion_${new Date().toISOString().slice(0,10)}.png`;
                     enlace.href = canvas.toDataURL("image/png");

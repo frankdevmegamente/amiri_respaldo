@@ -92,6 +92,7 @@ sort($bancos_unicos);
             .client-account { font-size: 11px !important; }
         }
     </style>
+    <link rel="stylesheet" href="src/assets/css/descargables-helios.css?v=helios5" />
     <script>document.documentElement.setAttribute('data-bs-theme',localStorage.getItem('darkMode')==='true'?'dark':'light')</script>
 </head>
 <body>
@@ -453,8 +454,24 @@ sort($bancos_unicos);
             const originalMaxWidth = ticket.style.maxWidth;
             const originalWidth = ticket.style.width;
             ticket.style.maxWidth = 'none';
-            ticket.style.width = '580px';
-            html2canvas(ticket, { backgroundColor: null, scale: 3, logging: false }).then(canvas => {
+            ticket.style.width = '480px';
+            html2canvas(ticket, {
+                backgroundColor: null,
+                scale: 3,
+                logging: false,
+                useCORS: true,
+                onclone: function(doc) {
+                    doc.body.classList.add('descargable-export');
+                    const el = doc.getElementById('vistaPreviaTicket');
+                    if (el) {
+                        el.style.background = '#302a2e';
+                        el.style.border = '1px solid #4a4045';
+                        el.style.boxShadow = 'none';
+                        el.style.borderRadius = '24px';
+                        el.style.overflow = 'hidden';
+                    }
+                }
+            }).then(canvas => {
                 const enlace = document.createElement('a');
                 const fechaTxt = new Date().toISOString().slice(0,10);
                 enlace.download = `Deposito_Masivo_Amiri_${fechaTxt}.png`;

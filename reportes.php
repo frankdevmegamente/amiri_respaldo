@@ -199,7 +199,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .card-stat .bg-light {
             background-color: var(--nx-surface-2) !important;
             color: #e2e8f0 !important;
-            border-color: #334155 !important;
+            border-color: var(--nx-border) !important;
         }
 
         [data-bs-theme="dark"] .card-stat .bg-light .text-muted {
@@ -235,7 +235,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         [data-bs-theme="dark"] .modal-footer {
             background-color: var(--nx-surface) !important;
             border-color: var(--nx-border) !important;
-            color: #e6ecff !important;
+            color: var(--nx-text) !important;
         }
 
         [data-bs-theme="dark"] .bg-primary.bg-opacity-10 { background-color: rgba(197,143,184,0.12) !important; }
@@ -301,7 +301,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                         <div class="col-12">
 
-                            <div class="card filter-card shadow-sm">
+                            <div class="card filter-card shadow-sm" style="overflow:visible !important; position:relative; z-index:10;">
 
                                 <div class="card-body py-3">
 
@@ -357,7 +357,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 
                                             <div class="btn-group me-2">
 
-                                                <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown">
+                                                <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" data-bs-container="body">
 
                                                     <i class="ti ti-download"></i> Exportar
 
@@ -1223,7 +1223,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         label: 'Promotores',
                         data: data.map(d => parseFloat(d.promotores || 0)),
                         borderColor: 'var(--nx-success)',
-                        backgroundColor: 'rgba(19, 222, 185, 0.1)',
+                        backgroundColor: 'rgba(61, 220, 132, 0.1)',
                         fill: true,
                         tension: 0.4
                     }]
@@ -1319,7 +1319,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     }, {
                         label: 'Ventas USD',
                         data: usdVentas,
-                        backgroundColor: 'rgba(19, 222, 185, 0.7)'
+                        backgroundColor: 'rgba(61, 220, 132, 0.7)'
                     }]
                 },
                 options: {
