@@ -195,8 +195,7 @@ sort($bancos_unicos);
                         <div class="col-lg-7 col-md-7">
                             <div class="ticket-wrapper">
                                 <div class="ticket-card" id="vistaPreviaTicket" style="position: relative; overflow: hidden;">
-                                    <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: var(--nx-primary); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-                                    <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: var(--nx-success); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+
                                     <div class="ticket-header" style="position: relative; z-index: 1;">
                                         <div class="d-flex align-items-center" style="max-width: 50%; overflow: hidden;">
                                             <img src="src/assets/images/logos/logo2.png" alt="Logo Amiri" class="logo-modo-claro" style="height: 45px; max-width: 100%; object-fit: contain;" />

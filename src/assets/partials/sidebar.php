@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // src/assets/partials/sidebar.php — Helios shell (shared)
 if (!isset($pagina_actual)) {
     $pagina_actual = basename($_SERVER['PHP_SELF'] ?? '') ?: '';

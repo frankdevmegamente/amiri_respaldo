@@ -399,8 +399,7 @@ $scriptUrl = 'importar-sql.php';
                 <div class="row mb-4">
                     <div class="col-12">
                         <div class="card" style="position:relative;overflow:hidden;">
-                            <div style="position:absolute;top:-60px;right:-60px;width:180px;height:180px;background:var(--nx-primary);opacity:0.08;border-radius:50%;pointer-events:none;"></div>
-                            <div style="position:absolute;bottom:-40px;left:-40px;width:120px;height:120px;background:var(--nx-success);opacity:0.08;border-radius:50%;pointer-events:none;"></div>
+
                             <div class="card-body p-4" style="position:relative;z-index:1;">
                                 <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
                                     <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width:40px;height:40px;">

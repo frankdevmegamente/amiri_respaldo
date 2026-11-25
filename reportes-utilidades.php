@@ -61,7 +61,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .dark-mode .logo-modo-claro { display: none !important; }
         [data-bs-theme="dark"] .logo-modo-oscuro,
         .dark-mode .logo-modo-oscuro { display: block !important; }
-        /* â”€â”€ Skeleton screens â”€â”€ */
+        /* ── Skeleton screens ── */
         @keyframes skeleton-pulse { 0%{opacity:0.6} 50%{opacity:1} 100%{opacity:0.6} }
         .skeleton { animation:skeleton-pulse 1.4s ease-in-out infinite; background:linear-gradient(90deg,var(--nx-surface-2) 25%,var(--nx-surface-3) 50%,var(--nx-surface-2) 75%); background-size:200% 100%; border-radius:6px; }
         [data-bs-theme="dark"] .skeleton { background:linear-gradient(90deg,#1a181c 25%,#2a2427 50%,#1a181c 75%); background-size:200% 100%; }
@@ -69,14 +69,14 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .skeleton-value { height:28px; width:45%; margin-bottom:8px; }
         .skeleton-badge { height:18px; width:80px; border-radius:20px; }
         .skeleton-chart { height:260px; width:100%; border-radius:8px; }
-        /* â”€â”€ Empty states â”€â”€ */
+        /* ── Empty states ── */
         .empty-state { text-align:center; padding:24px 16px; }
         .empty-state .empty-icon { font-size:2.5rem; opacity:0.25; margin-bottom:8px; display:block; }
         .empty-state .empty-title { font-size:0.95rem; font-weight:600; color: var(--nx-text-muted); margin-bottom:4px; }
         .empty-state .empty-sub { font-size:0.78rem; color:var(--nx-text-muted); }
         [data-bs-theme="dark"] .empty-state .empty-title { color:var(--nx-text-muted); }
         [data-bs-theme="dark"] .empty-state .empty-sub { color:#9a9096; }
-        /* â”€â”€ Top clientes â”€â”€ */
+        /* ── Top clientes ── */
         .top-cliente-row { display:flex; align-items:center; gap:8px; padding:5px 0; border-bottom:1px solid var(--nx-border); }
         [data-bs-theme="dark"] .top-cliente-row { border-bottom-color:#1a181c; }
         .top-cliente-row:last-child { border-bottom:none; }
@@ -88,9 +88,9 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .top-cliente-bar { height:100%; border-radius:4px; transition:width 0.6s ease; }
         .top-cliente-value { font-size:0.72rem; font-weight:700; color: var(--nx-text-muted); min-width:55px; text-align:right; }
         [data-bs-theme="dark"] .top-cliente-value { color:var(--nx-text-muted); }
-        /* â”€â”€ Sparkline â”€â”€ */
+        /* ── Sparkline ── */
         .sparkline-wrap { width:100%; height:36px; margin-top:6px; }
-        /* â”€â”€ Meta progress â”€â”€ */
+        /* ── Meta progress ── */
         .meta-bar-wrap { margin-top:8px; padding-top:6px; border-top:1px solid var(--nx-border); }
         [data-bs-theme="dark"] .meta-bar-wrap { border-top-color:#1a181c; }
         .meta-bar-label { display:flex; justify-content:space-between; font-size:0.68rem; color: var(--nx-text-muted); margin-bottom:3px; }
@@ -99,10 +99,10 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         .meta-bar-fill { height:100%; border-radius:4px; transition:width 0.8s ease; }
         .meta-btn { font-size:0.65rem; padding:0 4px; color: var(--nx-text-muted); cursor:pointer; }
         .meta-btn:hover { color:#c58fb8; }
-        /* â”€â”€ Section labels for consolidated card â”€â”€ */
+        /* ── Section labels for consolidated card ── */
         .br-section-label { font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--nx-text-muted); margin-bottom:4px; }
         [data-bs-theme="dark"] .br-section-label { color:#9a9096; }
-        /* â”€â”€ Dark mode: Estado de Resultados â”€â”€ */
+        /* ── Dark mode: Estado de Resultados ── */
         [data-bs-theme="dark"] .bg-light {
             background-color: var(--nx-surface-2) !important;
             border-color: rgba(255,255,255,0.12) !important;
@@ -151,7 +151,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                                 <select class="form-select form-select-sm" id="selectPeriodo">
                                                     <option value="mes" selected>Este Mes</option>
                                                     <option value="mes_pasado">Mes Pasado</option>
-                                                    <option value="anio">Este AÃ±o</option>
+                                                    <option value="anio">Este Año</option>
                                                     <option value="rango">Fecha Personalizada</option>
                                                 </select>
                                             </div>
@@ -179,7 +179,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                 <!-- Estado de Resultados (3 cards agrupadas) -->
                 <div class="row mb-4">
                     <div class="col-12">
-                        <div class="card border-0 shadow-sm">
+                        <div class="card border-0 shadow-sm nx-hover-lift nx-animate-in">
                             <div class="top-strip" style="background:linear-gradient(90deg,#c58fb8,#fbbf24,#d9a3cc);height:3px;border-radius:0.75rem 0.75rem 0 0;"></div>
                             <div class="card-body p-4">
                                 <div class="skeleton-wrap" id="skeletonResumen" style="display:none;">
@@ -198,13 +198,13 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                             <h5 class="fw-semibold mb-0" style="font-size:0.95rem;">Estado de Resultados</h5>
                                             <span class="text-muted" style="font-size:0.7rem;">Utilidades desglosadas por ingreso, gasto y resultado final</span>
                                         </div>
-                                        <span class="badge bg-purple bg-opacity-10 text-purple border-0 ms-auto" id="rangoResultados">PerÃ­odo actual</span>
-                                        <span class="badge bg-secondary bg-opacity-10 text-secondary border-0" style="font-size:0.6rem;cursor:help;" title="Los datos se actualizan automÃ¡ticamente al cambiar el perÃ­odo o promotor. Fuentes: deudas_clientes, movimientos, gastos.">fuentes</span>
+                                        <span class="badge bg-purple bg-opacity-10 text-purple border-0 ms-auto" id="rangoResultados">Período actual</span>
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary border-0" style="font-size:0.6rem;cursor:help;" title="Los datos se actualizan automáticamente al cambiar el período o promotor. Fuentes: deudas_clientes, movimientos, gastos.">fuentes</span>
                                     </div>
                                     <div class="row g-3">
                                         <!-- Utilidad Bruta -->
                                         <div class="col-xl-4 col-md-6 mb-3">
-                                            <div class="card card-stat border-0 shadow-sm h-100">
+                                            <div class="card card-stat border-0 shadow-sm h-100 nx-hover-lift nx-animate-in">
                                                 <div class="card-body">
                                                     <div class="d-flex align-items-center mb-3">
                                                         <div class="stat-icon bg-purple bg-opacity-10 text-purple me-3">
@@ -243,7 +243,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                         </div>
                                         <!-- Utilidad Neta -->
                                         <div class="col-xl-4 col-md-6 mb-3">
-                                            <div class="card card-stat border-0 shadow-sm h-100">
+                                            <div class="card card-stat border-0 shadow-sm h-100 nx-hover-lift nx-animate-in">
                                                 <div class="card-body">
                                                     <div class="d-flex align-items-center mb-3">
                                                         <div class="stat-icon bg-success bg-opacity-10 text-success me-3">
@@ -282,7 +282,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                         </div>
                                         <!-- Rentabilidad Neta -->
                                         <div class="col-xl-4 col-md-6 mb-3">
-                                            <div class="card card-stat border-0 shadow-sm h-100">
+                                            <div class="card card-stat border-0 shadow-sm h-100 nx-hover-lift nx-animate-in">
                                                 <div class="card-body">
                                                     <div class="d-flex align-items-center mb-3">
                                                         <div class="stat-icon bg-success bg-opacity-10 text-success me-3">
@@ -312,7 +312,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                                             </div>
                                                         </div>
                                                         <div class="d-flex justify-content-between text-muted mb-1" id="rentBrutaToggle" style="cursor:pointer;">
-                                                            <span><i class="ti ti-chevron-down" id="rentBrutaChevron"></i> (Ã·) Utilidad Bruta:</span>
+                                                            <span><i class="ti ti-chevron-down" id="rentBrutaChevron"></i> (÷) Utilidad Bruta:</span>
                                                             <span id="lblRentBruta" class="fw-bold text-dark">$0.00</span>
                                                         </div>
                                                         <div id="rentBrutaDetalle" style="display:none;">
@@ -351,7 +351,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         <div class="card shadow-sm">
                             <div class="card-header bg-transparent d-flex align-items-center flex-wrap gap-2">
                                 <h6 class="fw-semibold mb-0"><i class="ti ti-dashboard me-2" style="color:#c58fb8;"></i>Dashboard de Utilidades</h6>
-                                <span class="badge bg-purple bg-opacity-10 text-purple border-0 ms-1" id="rangoDashboard">PerÃ­odo actual</span>
+                                <span class="badge bg-purple bg-opacity-10 text-purple border-0 ms-1" id="rangoDashboard">Período actual</span>
                             </div>
                             <div class="card-body p-4">
                                 <div class="row">
@@ -428,7 +428,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                             <i class="ti ti-crown" style="color:#fbbf24;font-size:14px;"></i>
                                             <h6 class="fw-semibold mb-0" style="font-size:0.82rem;">Top 10 Clientes</h6>
                                         </div>
-                                        <div id="topClientesList"><div class="empty-state"><span class="empty-icon"><i class="ti ti-users"></i></span><div class="empty-title">Sin datos</div><div class="empty-sub">No hay clientes en el perÃ­odo</div></div></div>
+                                        <div id="topClientesList"><div class="empty-state"><span class="empty-icon"><i class="ti ti-users"></i></span><div class="empty-title">Sin datos</div><div class="empty-sub">No hay clientes en el período</div></div></div>
                                     </div>
                                     <div class="col-lg-9">
                                         <div class="d-flex align-items-center gap-2 mb-2">
@@ -451,7 +451,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                                             <th class="text-end">Utilidad AMIRI</th>
                                                             <th class="text-end">Ganancia Divisas</th>
                                                             <th class="text-end">Total</th>
-                                                            <th class="text-end">% ContribuciÃ³n</th>
+                                                            <th class="text-end">% Contribución</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="bodyServicio"></tbody>
@@ -479,7 +479,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                                             <th class="text-end">Operaciones</th>
                                                             <th class="text-end">Utilidad AMIRI</th>
                                                             <th class="text-end">Utilidad Promotor</th>
-                                                            <th class="text-end">% ContribuciÃ³n</th>
+                                                            <th class="text-end">% Contribución</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="bodyPromotor"></tbody>
@@ -507,7 +507,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                                                             <th class="text-end">Operaciones</th>
                                                             <th class="text-end">Monto Total</th>
                                                             <th class="text-end">Utilidad AMIRI</th>
-                                                            <th class="text-end">% ContribuciÃ³n</th>
+                                                            <th class="text-end">% Contribución</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="bodyCliente"></tbody>
@@ -528,16 +528,16 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         </div>
                     </div>
                 </div>
-                <!-- Utilidad por DÃ­a -->
+                <!-- Utilidad por Día -->
                 <div class="row mt-4">
                     <div class="col-12">
                         <div class="card shadow-sm">
                             <div class="card-header bg-transparent d-flex justify-content-between align-items-center flex-wrap gap-2">
-                                <h6 class="fw-semibold mb-0"><i class="ti ti-chart-bar me-2" style="color:#c58fb8;"></i>Utilidad por DÃ­a</h6>
+                                <h6 class="fw-semibold mb-0"><i class="ti ti-chart-bar me-2" style="color:#c58fb8;"></i>Utilidad por Día</h6>
                                 <div class="d-flex align-items-center gap-2">
                                     <small class="text-muted" id="totalPeriodoGrafica"></small>
                                     <select class="form-select form-select-sm w-auto" id="selectGrafica">
-                                        <option value="utilidad_diaria" selected>Diaria (por dÃ­a)</option>
+                                        <option value="utilidad_diaria" selected>Diaria (por día)</option>
                                         <option value="utilidad_bruta">Mensual (tendencia)</option>
                                         <option value="por_servicio">Por Servicio</option>
                                         <option value="por_promotor">Por Promotor</option>
@@ -556,12 +556,12 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
         </div>
     </div>
 </div>
-<!-- Modal Detalle DÃ­a -->
+<!-- Modal Detalle Día -->
 <div class="modal fade modal-premium" id="modalDetalleDia" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="ti ti-list-details me-2"></i>Operaciones del DÃ­a <span id="modalDiaTitulo"></span></h5>
+                <h5 class="modal-title"><i class="ti ti-list-details me-2"></i>Operaciones del Día <span id="modalDiaTitulo"></span></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -603,11 +603,11 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
 <script src="src/assets/js/utils.js"></script>
 <script src="src/assets/js/pantalla-completa.js"></script>
 <script>
-/* â”€â”€ Top 10 Clientes â”€â”€ */
+/* ── Top 10 Clientes ── */
 function renderTopClientes(datos) {
     var top = datos.slice(0, 10);
     if (!top.length) {
-        $('#topClientesList').html('<div class="empty-state"><span class="empty-icon"><i class="ti ti-users"></i></span><div class="empty-title">Sin datos</div><div class="empty-sub">No hay clientes en el perÃ­odo</div></div>');
+        $('#topClientesList').html('<div class="empty-state"><span class="empty-icon"><i class="ti ti-users"></i></span><div class="empty-title">Sin datos</div><div class="empty-sub">No hay clientes en el período</div></div>');
         return;
     }
     var maxVal = parseFloat(top[0].comision_amiri) || 1;
@@ -618,7 +618,7 @@ function renderTopClientes(datos) {
         var pct = (v / maxVal) * 100;
         html += '<div class="top-cliente-row">' +
             '<div class="top-cliente-rank" style="background:' + colores[i] + ';">' + (i + 1) + '</div>' +
-            '<span class="top-cliente-name">' + (r.cliente || 'â€”') + '</span>' +
+            '<span class="top-cliente-name">' + (r.cliente || '—') + '</span>' +
             '<div class="top-cliente-bar-wrap"><div class="top-cliente-bar" style="width:' + pct + '%;background:' + colores[i] + ';"></div></div>' +
             '<span class="top-cliente-value">$' + formatoNumero(v) + '</span>' +
         '</div>';
@@ -642,6 +642,23 @@ function formatoNumero(num) {
         count++;
     }
     return result + '.' + decPart;
+}
+
+function animarValor(selector, final, duracion) {
+    duracion = duracion || 600;
+    var $el = $(selector);
+    if (!$el.length) return;
+    var inicio = 0;
+    var t0 = null;
+    function step(ts) {
+        if (t0 === null) t0 = ts;
+        var p = Math.min((ts - t0) / duracion, 1);
+        var eased = 1 - Math.pow(1 - p, 3);
+        var v = inicio + (final - inicio) * eased;
+        $el.text('$' + formatoNumero(v));
+        if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
 }
 
 function formatoMoneda(num, moneda) {
@@ -690,8 +707,8 @@ function cargarResumen() {
             const neta = parseFloat(data.utilidad_neta) || 0;
             const gastos = parseFloat(data.gastos_total) || 0;
             var margen = bruta > 0 ? (neta / bruta) * 100 : 0;
-            $('#statUtilidadNeta').text('$' + formatoNumero(neta));
-            $('#statUtilidadBruta').text('$' + formatoNumero(bruta));
+            animarValor('#statUtilidadNeta', neta);
+            animarValor('#statUtilidadBruta', bruta);
             $('#statRentabilidadNeta').text(margen.toFixed(1) + '%');
             $('#lblComisionesAmiri').text('$' + formatoNumero(data.comisiones_amiri));
             $('#lblGananciaDivisas').text('$' + formatoNumero(data.ganancia_divisas));
@@ -723,26 +740,28 @@ function cargarResumen() {
             $('#statRentabilidadNeta').css('color', margenColor);
             $('#statMargenPromedio').text(margen.toFixed(1) + '%').css('color', margenColor);
 
-            // Cargar tendencia vs perÃ­odo anterior
+            // Cargar tendencia vs período anterior
             $.getJSON(`api/reportes-utilidades.php?tipo=comparativa&${getParams()}`, function(prev) {
                 var prevBruta = parseFloat(prev.utilidad_bruta) || 0;
                 var prevNeta = parseFloat(prev.utilidad_neta) || 0;
                 var prevGastos = parseFloat(prev.gastos_total) || 0;
 
                 function badgeTendencia(actual, anterior) {
-                    if (anterior === 0) return '<span class="trend-badge neutral" title="Periodo actual: $' + formatoNumero(actual) + ' | Periodo anterior: $0"><i class="ti ti-minus"></i> â€”</span>';
+                    if (anterior === 0) return '<span class="trend-badge neutral" title="Periodo actual: $' + formatoNumero(actual) + ' | Periodo anterior: $0"><i class="ti ti-minus"></i> —</span>';
                     var diff = ((actual - anterior) / anterior) * 100;
                     var cls = diff >= 0 ? 'up' : 'down';
                     var icon = diff >= 0 ? 'ti ti-trending-up' : 'ti ti-trending-down';
                     return '<span class="trend-badge ' + cls + '" title="Actual: $' + formatoNumero(actual) + ' | Anterior: $' + formatoNumero(anterior) + '"><i class="' + icon + '" style="font-size:10px;"></i> ' + (diff >= 0 ? '+' : '') + diff.toFixed(1) + '%</span>';
                 }
-                $('#trendNeta').html(badgeTendencia(neta, prevNeta));
+                $('#trendNeta').html(badgeTendencia(neta, prevNeta)).addClass('is-updated');
+                setTimeout(function(){ $('#trendNeta').removeClass('is-updated'); }, 420);
 
                 var prevMargen = prevBruta > 0 ? (prevNeta / prevBruta) * 100 : 0;
                 var ppDiff = margen - prevMargen;
                 var ppCls = ppDiff >= 0 ? 'up' : 'down';
                 var ppIcon = ppDiff >= 0 ? 'ti ti-trending-up' : 'ti ti-trending-down';
-                $('#trendRentabilidad').html('<span class="trend-badge ' + ppCls + '" title="Actual: ' + margen.toFixed(1) + '% | Anterior: ' + prevMargen.toFixed(1) + '%"><i class="' + ppIcon + '" style="font-size:10px;"></i> ' + (ppDiff >= 0 ? '+' : '') + ppDiff.toFixed(1) + ' p.p.</span>');
+                $('#trendRentabilidad').html('<span class="trend-badge ' + ppCls + '" title="Actual: ' + margen.toFixed(1) + '% | Anterior: ' + prevMargen.toFixed(1) + '%"><i class="' + ppIcon + '" style="font-size:10px;"></i> ' + (ppDiff >= 0 ? '+' : '') + ppDiff.toFixed(1) + ' p.p.</span>').addClass('is-updated');
+                setTimeout(function(){ $('#trendRentabilidad').removeClass('is-updated'); }, 420);
             });
 
             // Inicializar tooltips si hay metadata
@@ -779,7 +798,7 @@ function cargarPorServicio() {
                 totalDivisas += divisas;
                 total += t;
                 html += `<tr>
-                    <td><a href="#" class="drill-link text-decoration-none fw-medium" data-servicio="${r.servicio || 'â€”'}"><i class="ti ti-search"></i>${r.servicio || 'â€”'}</a></td>
+                    <td><a href="#" class="drill-link text-decoration-none fw-medium" data-servicio="${r.servicio || '—'}"><i class="ti ti-search"></i>${r.servicio || '—'}</a></td>
                     <td class="text-end">${r.operaciones || 0}</td>
                     <td class="text-end">$${formatoNumero(amiri)}</td>
                     <td class="text-end">$${formatoNumero(divisas)}</td>
@@ -814,7 +833,7 @@ function cargarPorServicio() {
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false }, tooltip: { backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: 'var(--nx-text)', cornerRadius: 8, padding: { x: 12, y: 8 }, callbacks: { label: function(c) { return '$' + formatoNumero(c.parsed.y); } } } },
-                    scales: { y: { beginAtZero: true, ticks: { callback: function(v) { return '$' + v.toFixed(0); } } } }
+                    scales: { y: { beginAtZero: true, grid: { color: nxChartGridColor('rgba(0,0,0,0.08)'), drawBorder: false }, ticks: { callback: function(v) { return '$' + v.toFixed(0); } } } }
                 }
             });
         })
@@ -975,7 +994,7 @@ function cargarGraficaComparativa() {
                 chartComparativa = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: dias.map(function(d) { return 'DÃ­a ' + d; }),
+                        labels: dias.map(function(d) { return 'Día ' + d; }),
                         datasets: [
                             { label: 'Utilidad AMIRI', data: comisiones, backgroundColor: '#c58fb8', borderRadius: 4, borderSkipped: false },
                             { label: 'Utilidad Promotor', data: comisionesProm, backgroundColor: 'var(--nx-primary)', borderRadius: 4, borderSkipped: false }
@@ -1009,8 +1028,8 @@ function cargarGraficaComparativa() {
                             }
                         },
                         scales: {
-                            x: { stacked: true },
-                            y: { stacked: true, beginAtZero: true, ticks: { callback: function(v) { return '$' + v.toFixed(0); } } }
+                            x: { stacked: true, grid: { color: nxChartGridColor('rgba(0,0,0,0.08)'), drawBorder: false } },
+                            y: { stacked: true, beginAtZero: true, grid: { color: nxChartGridColor('rgba(0,0,0,0.08)'), drawBorder: false }, ticks: { callback: function(v) { return '$' + v.toFixed(0); } } }
                         }
                     }
                 });
@@ -1039,8 +1058,8 @@ function cargarGraficaComparativa() {
                             }
                         },
                         scales: {
-                            x: { stacked: true },
-                            y: { stacked: true, beginAtZero: true, ticks: { callback: function(v) { return '$' + v.toFixed(0); } } }
+                            x: { stacked: true, grid: { color: nxChartGridColor('rgba(0,0,0,0.08)'), drawBorder: false } },
+                            y: { stacked: true, beginAtZero: true, grid: { color: nxChartGridColor('rgba(0,0,0,0.08)'), drawBorder: false }, ticks: { callback: function(v) { return '$' + v.toFixed(0); } } }
                         }
                     }
                 });
@@ -1049,7 +1068,7 @@ function cargarGraficaComparativa() {
                 const meses = [...new Set(data.map(d => d.mes))].sort();
                 const key = desglose === 'por_servicio' ? 'servicio' : 'promotor';
                 if (grupos.length === 0 || meses.length === 0) {
-                    $('#totalPeriodoGrafica').text('Sin datos para este perÃ­odo');
+                    $('#totalPeriodoGrafica').text('Sin datos para este período');
                     chartComparativa = null;
                 } else {
                     const datasets = grupos.map((g, i) => ({
@@ -1060,12 +1079,12 @@ function cargarGraficaComparativa() {
                     chartComparativa = new Chart(ctx, {
                         type: 'bar',
                         data: { labels: meses, datasets: datasets.map(ds => ({ ...ds, borderRadius: 4, borderSkipped: false })) },
-                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 14, padding: 14 } }, tooltip: { backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: 'var(--nx-text)', cornerRadius: 8, padding: { x: 12, y: 8 } } }, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true, ticks: { callback: function(v) { return '$' + v.toFixed(0); } } } } }
+                        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 14, padding: 14 } }, tooltip: { backgroundColor: 'var(--nx-surface-2)', titleColor: '#fff', bodyColor: 'var(--nx-text)', cornerRadius: 8, padding: { x: 12, y: 8 } } }, scales: { x: { stacked: true, grid: { color: nxChartGridColor('rgba(0,0,0,0.08)'), drawBorder: false } }, y: { stacked: true, beginAtZero: true, grid: { color: nxChartGridColor('rgba(0,0,0,0.08)'), drawBorder: false }, ticks: { callback: function(v) { return '$' + v.toFixed(0); } } } } }
                     });
                 }
             }
         })
-        .fail(function() { mostrarError('Error al cargar la grÃ¡fica'); })
+        .fail(function() { mostrarError('Error al cargar la gráfica'); })
         .always(function() { mostrarCarga(false); });
 }
 
@@ -1098,7 +1117,7 @@ function abrirDetalleDia(dia) {
             $('#totalDetallePromotor').text('$' + formatoNumero(totalProm));
             $('#modalDetalleDia').modal('show');
         })
-        .fail(function() { mostrarError('Error al cargar detalle del dÃ­a'); });
+        .fail(function() { mostrarError('Error al cargar detalle del día'); });
 }
 
 $(document).on('click', '.drill-link', function(e) {
@@ -1154,11 +1173,11 @@ function actualizarRangoDashboard() {
     var label = '';
     if (sel === 'rango') {
         var fi = $('#fechaInicio').val() || '?', ff = $('#fechaFin').val() || '?';
-        label = fi + ' â†’ ' + ff;
+        label = fi + ' → ' + ff;
     } else if (sel === 'mes_pasado') {
         label = 'Mes Pasado';
     } else if (sel === 'anio') {
-        label = 'Este AÃ±o';
+        label = 'Este Año';
     } else {
         label = 'Este Mes';
     }
@@ -1172,13 +1191,18 @@ function recargarTodo() {
     cargarResumen(); cargarPorServicio(); cargarPorCliente(); cargarPorPromotor(); cargarGraficaComparativa();
 }
 
-/* â”€â”€ Skeleton helpers â”€â”€ */
+/* ── Skeleton helpers ── */
 function mostrarSkeleton(show) {
-    $('#skeletonResumen').toggle(Boolean(show));
-    $('#contentResumen').toggle(!Boolean(show));
+    if (show) {
+        $('#contentResumen').stop(true).fadeOut(160);
+        $('#skeletonResumen').stop(true).fadeIn(160);
+    } else {
+        $('#skeletonResumen').stop(true).fadeOut(160);
+        $('#contentResumen').stop(true).fadeIn(160);
+    }
 }
 
-/* â”€â”€ Sparkline drawing â”€â”€ */
+/* ── Sparkline drawing ── */
 function dibujarSparkline(id, datos) {
     var canvas = document.getElementById(id);
     if (!canvas || !datos || datos.length < 2) return;
@@ -1283,6 +1307,16 @@ $(document).on('click', '#brutaDivisasToggle', function() {
 
 
 $(document).ready(function() {
+    if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function(entries) {
+            entries.forEach(function(e) {
+                if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+        document.querySelectorAll('.nx-reveal').forEach(function(el){ io.observe(el); });
+    } else {
+        document.querySelectorAll('.nx-reveal').forEach(function(el){ el.classList.add('is-visible'); });
+    }
     $('#fechaInicio').val(new Date().toISOString().slice(0, 8) + '01');
     $('#fechaFin').val(new Date().toISOString().slice(0, 10));
     $('body').append('<div id="loadingOverlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.3);z-index:9998;"><div class="position-absolute top-50 start-50 translate-middle"><div class="spinner-border text-light" role="status"><span class="visually-hidden">Cargando...</span></div></div></div>');

@@ -67,8 +67,8 @@ $usuario_rol = $usuario_rol ?? ($_SESSION['usuario_rol'] ?? 'usuario');
           <div class="d-flex align-items-center flex-wrap gap-2" style="row-gap:4px;">
             <span class="d-flex align-items-center gap-1"><i class="ti ti-info-circle"></i> Estados de meses</span>
             <span class="d-flex align-items-center gap-1 ms-auto" style="white-space:nowrap;">
-              <span style="color:var(--nx-success)">●</span> abierto
-              <span style="color:var(--nx-danger)">●</span> cerrado
+              <span class="nx-legend-dot" style="background:var(--nx-success);"></span> abierto
+              <span class="nx-legend-dot" style="background:var(--nx-danger);"></span> cerrado
             </span>
           </div>
         </li>

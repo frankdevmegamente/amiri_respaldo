@@ -279,8 +279,7 @@ try {
                         <div class="col-md-4">
                             <div class="card shadow-sm border-0 rounded-4 h-100" style="position: relative; overflow: hidden;">
                                 
-                                <div style="position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: var(--nx-primary); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
-                                <div style="position: absolute; bottom: -40px; left: -40px; width: 120px; height: 120px; background: var(--nx-success); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+
 
                                 <div class="card-body p-4" style="position: relative; z-index: 1;">
                                     <div class="d-flex align-items-center mb-4 pb-3 border-bottom">

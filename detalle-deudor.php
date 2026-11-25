@@ -81,7 +81,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                     <div class="row mb-4">
                         <div class="col-md-4">
                             <div class="card shadow-sm border-0 rounded-4 h-100" style="position: relative; overflow: hidden;">
-                                <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: var(--nx-warning); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+
                                 <div class="card-body p-4" style="position: relative; z-index: 1;">
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="bg-warning bg-opacity-10 text-warning rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
@@ -98,7 +98,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         </div>
                         <div class="col-md-4">
                             <div class="card shadow-sm border-0 rounded-4 h-100" style="position: relative; overflow: hidden;">
-                                <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: var(--nx-success); opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+
                                 <div class="card-body p-4" style="position: relative; z-index: 1;">
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="bg-success bg-opacity-10 text-success rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
@@ -115,7 +115,7 @@ $nombre_usuario = $_SESSION['usuario_nombre'] ?? 'Usuario';
                         </div>
                         <div class="col-md-4">
                             <div class="card shadow-sm border-0 rounded-4 h-100" style="position: relative; overflow: hidden;">
-                                <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: #ff4d4f; opacity: 0.08; border-radius: 50%; z-index: 0; pointer-events: none;"></div>
+
                                 <div class="card-body p-4" style="position: relative; z-index: 1;">
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="bg-danger bg-opacity-10 text-danger rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
