@@ -3,7 +3,7 @@
 // Punto único de carga de assets Helios. Se incluye desde header.php
 // (fallback para páginas legacy) y puede incluirse al final de <head>.
 $heliosAssetsLoaded = true;
-$heliosCssVersion = 'helios45';
+$heliosCssVersion = 'helios48';
 $heliosDownloadablesVersion = 'helios10';
 ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -44,7 +44,8 @@ $heliosDownloadablesVersion = 'helios10';
       borderColor: Chart.defaults.borderColor,
       gridColor: Chart.defaults.scale && Chart.defaults.scale.grid ? Chart.defaults.scale.grid.color : null,
       gridDrawBorder: Chart.defaults.scale && Chart.defaults.scale.grid ? Chart.defaults.scale.grid.drawBorder : null,
-      ticksColor: Chart.defaults.scale && Chart.defaults.scale.ticks ? Chart.defaults.scale.ticks.color : null
+      ticksColor: Chart.defaults.scale && Chart.defaults.scale.ticks ? Chart.defaults.scale.ticks.color : null,
+      scaleBorderColor: Chart.defaults.scale && Chart.defaults.scale.border ? Chart.defaults.scale.border.color : null
     };
   }
   function lightGrid() {
@@ -63,6 +64,9 @@ $heliosDownloadablesVersion = 'helios10';
       if (Chart.defaults.scale && Chart.defaults.scale.ticks) {
         Chart.defaults.scale.ticks.color = DARK.ticks;
       }
+      if (Chart.defaults.scale && Chart.defaults.scale.border) {
+        Chart.defaults.scale.border.color = DARK.border;
+      }
       return;
     }
     Chart.defaults.color = originalDefaults.color;
@@ -73,6 +77,9 @@ $heliosDownloadablesVersion = 'helios10';
     }
     if (Chart.defaults.scale && Chart.defaults.scale.ticks) {
       Chart.defaults.scale.ticks.color = originalDefaults.ticksColor;
+    }
+    if (Chart.defaults.scale && Chart.defaults.scale.border) {
+      Chart.defaults.scale.border.color = originalDefaults.scaleBorderColor || originalDefaults.borderColor;
     }
   }
   function applyToCharts() {
@@ -86,6 +93,7 @@ $heliosDownloadablesVersion = 'helios10';
         if (!scale) return;
         if (scale.grid) scale.grid.color = dark ? DARK.grid : lightGrid();
         if (scale.ticks) scale.ticks.color = dark ? DARK.ticks : ((originalDefaults && originalDefaults.ticksColor) || '#666');
+       if (scale.border) scale.border.color = dark ? DARK.border : ((originalDefaults && (originalDefaults.scaleBorderColor || originalDefaults.borderColor)) || 'rgba(0,0,0,0.1)');
       });
       var legend = chart.options && chart.options.plugins && chart.options.plugins.legend;
       if (legend && legend.labels) {
